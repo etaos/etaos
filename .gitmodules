@@ -1,0 +1,3 @@
+[submodule "scripts/build"]
+	path = scripts/build
+	url = git://git.michelmegens.net/bietje/build.git
