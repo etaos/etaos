@@ -1,0 +1,13 @@
+mainmenu "Eta/OS $ARCH Kernel Configuration"
+
+config SRCARCH
+	string
+	option env="SRCARCH"
+
+config MODULES
+	bool "Module building"
+	option modules
+	help
+	  Enable the building of modules.
+
+source "arch/$SRCARCH/Kconfig"
