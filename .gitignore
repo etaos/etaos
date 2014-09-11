@@ -1,2 +1,6 @@
+*.o
+.*.cmd
+*.order
+.config*
 include/config
 include/generated
