@@ -1,0 +1,16 @@
+menu "Memory Allocation"
+
+config MALLOC
+	bool "Memory allocator"
+	default y
+	help
+	  Enable or disable the memory allocator. If you're not
+	  sure, say 'Y' here.
+
+config MMDEBUG
+	bool "Memory debugger"
+	help
+	  Say 'Y' here if you want to enable the memory
+	  allocation debugging code.
+
+endmenu

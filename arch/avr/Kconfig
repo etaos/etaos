@@ -1,0 +1,23 @@
+menu "AVR system configuration"
+
+config MEM_SIZE
+	int "Memory size"
+	help
+	  Enter the amount of available memory.
+
+config STACK_SIZE
+	int "Stack size"
+	help
+	  Enter the amount of bytes which should be
+	  reserved for the stack by default. This value
+	  will be the size of the main thread (if scheduling
+	  is enabled) and it will be used as default for
+	  other threads if no stack size is given when a new
+	  thread is created.
+
+endmenu
+
+source "kernel/Kconfig"
+source "drivers/Kconfig"
+source "mm/Kconfig"
+

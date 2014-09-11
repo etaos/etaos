@@ -1,0 +1,14 @@
+menu "Device drivers"
+
+menuconfig DRIVER_CORE
+	bool "Device driver core"
+	default y
+	help
+	  Enable or disable the device driver core. If you're not
+	  sure, say 'Y' here.
+
+if DRIVER_CORE
+source "drivers/core/Kconfig"
+endif
+
+endmenu
