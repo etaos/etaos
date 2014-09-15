@@ -1,9 +1,10 @@
 menu "AVR system configuration"
 
-config MEM_SIZE
-	int "Memory size"
+config EXT_MEM
+	int "External memory"
 	help
-	  Enter the amount of available memory.
+	  If you connected external memory to your AVR core,
+	  enter the amount of bytes you connected here.
 
 config STACK_SIZE
 	int "Stack size"
@@ -14,6 +15,18 @@ config STACK_SIZE
 	  is enabled) and it will be used as default for
 	  other threads if no stack size is given when a new
 	  thread is created.
+
+choice
+	prompt "AVR core selection"
+	help
+	  Select the AVR architecture to build for.
+
+config ATMEGA328
+	bool "ATmega 328(p)"
+	help
+	  Select if you are building for the Atmel ATmega328 or ATmega328p
+	  AVR core.
+endchoice
 
 endmenu
 

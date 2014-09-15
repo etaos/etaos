@@ -47,6 +47,9 @@ HOSTCXX      = g++
 HOSTCFLAGS   = -Wall -Wno-char-subscripts -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOSTCXXFLAGS = -O2
 
+KBUILD_CFLAGS := -Wall -Iinclude
+KBUILD_AFLAGS := -Iinclude
+
 # Normally we just run the built-in.
 KBUILD_BUILTIN := 1
 
@@ -63,17 +66,12 @@ ifeq ($(MAKECMDGOALS),)
 	KBUILD_MODULES := 1
 endif
 
-head-y :=
-init-y :=
-core-y :=
-drivers-y :=
-net-y :=
-libs-y :=
-
+-include include/config/auto.conf
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
 export CONFIG_SHELL HOSTCC HOSTCXX HOSTCFLAGS HOSTCXXFLAGS
 export KBUILD_BUILTIN KBUILD_MODULES
+export KBUILD_CFLAGS KBUILD_AFLAGS
 
 # Beautify output
 # ---------------------------------------------------------------------------
@@ -110,7 +108,6 @@ export quiet Q KBUILD_VERBOSE
 export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_versions
 
 # We need some generic definitions (do not try to remake the file).
--include include/config/auto.conf
 include $(srctree)/scripts/Kbuild.include
 
 AS		= $(CROSS_COMPILE)as
@@ -172,6 +169,7 @@ export MODLIB
 
 # building
 core-y += kernel/ mm/
+drivers-y += drivers/
 
 etaos-dirs	:= $(patsubst %/,%,$(filter %/, $(core-y) $(core-m) \
 				$(drivers-y) $(drivers-m) $(libs-y) $(libs-m)))
@@ -192,7 +190,7 @@ $(sort $(etaos-deps)): $(etaos-dirs) ;
 
 quiet_cmd_link_etaos = LD      $@
 cmd_link_etaos = $(LD) $(LDFLAGS) -r -o $@ $(etaos-deps)
-etaos.o: $(etaos-deps)
+etaos.elf: $(etaos-deps)
 	$(call if_changed,link_etaos)
 
 PHONY += modules cremodverdir
@@ -200,10 +198,10 @@ modules: prepare $(etaos-dirs)
 
 # Core build
 PHONY += etaos
-etaos: etaos.o
+etaos: etaos.elf
 
 quiet_cmd_install_etaos = INSTALL      etaos core
-cmd_install_etaos = cp etaos.o $(INSTALL_ETAOS_PATH)/etaos.o
+cmd_install_etaos = cp etaos.elf $(INSTALL_ETAOS_PATH)/etaos.elf
 
 etaos_install: etaos
 	$(call if_changed,install_etaos)

@@ -1,6 +1,19 @@
+menuconfig DRIVER_CORE
+	tristate "Device driver core"
+	select MALLOC
+	default y
+	help
+	  Enable or disable the device driver core. If you're not
+	  sure, say 'Y' here.
+
+if DRIVER_CORE
+
 config DRIVER_DBG
 	bool "Driver core debugging"
+	depends on DRIVER_CORE
 	help
 	  Say 'Y' here if you want to enable the device driver
 	  debugging code.
+
+endif
 

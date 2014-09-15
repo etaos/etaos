@@ -2,5 +2,6 @@
 .*.cmd
 *.order
 .config*
+*.elf
 include/config
 include/generated
