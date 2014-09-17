@@ -191,6 +191,7 @@ $(sort $(etaos-deps)): $(etaos-dirs) ;
 quiet_cmd_link_etaos = LD      $@
 cmd_link_etaos = $(LD) $(LDFLAGS) -r -o $@ $(etaos-deps)
 etaos.elf: $(etaos-deps)
+	@echo $(LIB_GCC)
 	$(call if_changed,link_etaos)
 
 PHONY += modules cremodverdir

@@ -166,16 +166,17 @@ __vectors:
  */
 .text
 .global __bad_interrupt
-__bad_interrupt:
 .func __bad_interrupt
+__bad_interrupt:
 	.weak __vector_default
 	.set __vector_default, __vectors
 	XJMP __vector_default
 .endfunc
 
 /* __init is the first place the IP jumps to after power on */
-__init:
 .section .init0,"ax",@progbits
+.weak __init
+__init:
 	.weak __stack
 	.weak __head_end
 	.set __head_end, 0
@@ -196,7 +197,18 @@ __init:
 #endif
 
 .section .init4,"ax",@progbits
-	.global __do_copy_data
+	clr r0
+	ldi r30, lo8(__bss_start)
+	ldi r31, hi8(__bss_start)
+	ldi r17, hi8(__bss_end)
+bss_init_loop:
+	cpi r30, lo8(__bss_end)
+	cpc r31, r17
+	breq __do_copy_data
+	st Z+, r0
+	XJMP bss_init_loop
+
+.global __do_copy_data
 __do_copy_data:
 	ldi	r17, hi8(__data_end)
 	ldi	r26, lo8(__data_start)

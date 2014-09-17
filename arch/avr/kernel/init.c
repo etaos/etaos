@@ -18,7 +18,13 @@
 
 extern void avr_init(void);
 
+static unsigned int x = 5, y = 7;
+
 void avr_init(void)
 {
+	unsigned int z, d;
+
+	z = x*y;
+	d = (z-5)/10;
 	while(1);
 }
