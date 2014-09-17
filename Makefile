@@ -203,7 +203,7 @@ etaos: etaos.elf
 quiet_cmd_install_etaos = INSTALL      etaos core
 cmd_install_etaos = cp etaos.elf $(INSTALL_ETAOS_PATH)/etaos.elf
 
-etaos_install: etaos
+etaos_install: etaos.elf
 	$(call if_changed,install_etaos)
 
 cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \

@@ -19,12 +19,6 @@
 #include <asm/config.h>
 #include <asm/io.h>
 
-#ifndef CONFIG_MEM_SIZE
-#define RAM 0x800
-#else
-#define RAM CONFIG_MEM_SIZE
-#endif
-
 .macro vector name
 	.if (. - __vectors < _VECTORS_SIZE)
 		.weak \name
@@ -202,6 +196,24 @@ __init:
 #endif
 
 .section .init4,"ax",@progbits
+	.global __do_copy_data
+__do_copy_data:
+	ldi	r17, hi8(__data_end)
+	ldi	r26, lo8(__data_start)
+	ldi	r27, hi8(__data_start)
+	ldi	r30, lo8(__data_load_start)
+	ldi	r31, hi8(__data_load_start)
+copy_loop:
+	cpi r30, lo8(__data_load_end)
+	cpc r31, r17
+	breq copy_done
+	lpm
+	adiw r30, 1
+	st X+, r0
+	XJMP copy_loop
+
+copy_done:
+	.set __stack, RAMEND
 .section .init9,"ax",@progbits
 	XCALL avr_init
 
