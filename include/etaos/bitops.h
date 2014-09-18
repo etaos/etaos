@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - AVR5 arch boot
+ *  Eta/OS - Bit ops
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,21 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __BITOPS_H__
+#define __BITOPS_H__
+
 #include <etaos/types.h>
-#include <etaos/bitops.h>
+#include <asm/bitops.h>
 
-extern void avr_init(void);
-
-extern unsigned char __heap_start;
-
-static unsigned int x = 5, y = 7;
-static unsigned int d;
-
-void avr_init(void)
+static inline bool test_bit(unsigned bit, volatile unsigned long *flags)
 {
-	bool test;
-	d = x*y;
-	test = test_bit(2, (unsigned long*)&d);
-	
-	while(1);
+	return 1UL & (flags[bit / BITS_PER_LONG] >> (bit % BITS_PER_LONG));
 }
+
+#endif
