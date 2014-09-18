@@ -27,7 +27,7 @@
 	.endif
 .endm
 
-.section .vectors, "ax", @progbits
+.section .vectors,"ax",@progbits
 .global __vectors
 .func __vecotrs
 __vectors:
@@ -175,57 +175,46 @@ __bad_interrupt:
 
 /* __init is the first place the IP jumps to after power on */
 .section .init0,"ax",@progbits
-.weak __init
+.weak	__init
 __init:
-	.weak __stack
-	.weak __head_end
-	.set __head_end, 0
-.section .init1,"ax",@progbits
-.section .init2,"ax",@progbits
-	clr __zero_reg__
-	out AVR_STATUS_ADDR, __zero_reg__
-	ldi r28, lo8(__stack)
-	ldi r29, hi8(__stack)
-	out AVR_STACK_LOW_ADDR, r28
-	out AVR_STACK_HI_ADDR, r29
+.weak	__stack
+.weak	__heap_end
+.set	__heap_end, 0
 
-#ifdef CONFIG_HAVE_RAMPD
+.section .init2,"ax",@progbits
+	clr	__zero_reg__
+	out	AVR_STATUS_ADDR, __zero_reg__
+	ldi	r28,lo8(__stack)
+#ifdef __AVR_XMEGA__
+	out	AVR_STACK_LOW_ADDR, r28
+	ldi	r29,hi8(__stack)
+	out	AVR_STACK_HI_ADDR, r29
+#else
+	ldi	r29,hi8(__stack)
+	out	AVR_STACK_HI_ADDR, r29
+	out	AVR_STACK_LOW_ADDR, r28
+#endif  /* __AVR_XMEGA__ */
+
+#ifdef __AVR_HAVE_RAMPD__
 	out	AVR_RAMPD_ADDR, __zero_reg__
 	out	AVR_RAMPX_ADDR, __zero_reg__
 	out	AVR_RAMPY_ADDR, __zero_reg__
 	out	AVR_RAMPZ_ADDR, __zero_reg__
 #endif
 
-.section .init4,"ax",@progbits
-	clr r0
-	ldi r30, lo8(__bss_start)
-	ldi r31, hi8(__bss_start)
-	ldi r17, hi8(__bss_end)
-bss_init_loop:
-	cpi r30, lo8(__bss_end)
-	cpc r31, r17
-	breq __do_copy_data
-	st Z+, r0
-	XJMP bss_init_loop
-
-.global __do_copy_data
-__do_copy_data:
-	ldi	r17, hi8(__data_end)
-	ldi	r26, lo8(__data_start)
-	ldi	r27, hi8(__data_start)
-	ldi	r30, lo8(__data_load_start)
-	ldi	r31, hi8(__data_load_start)
-copy_loop:
-	cpi r30, lo8(__data_load_end)
-	cpc r31, r17
-	breq copy_done
-	lpm
-	adiw r30, 1
-	st X+, r0
-	XJMP copy_loop
-
-copy_done:
-	.set __stack, RAMEND
+.set __stack, RAMEND
 .section .init9,"ax",@progbits
 	XCALL avr_init
+	XJMP _exit
+
+.section .fini9,"ax",@progbits
+.global _exit
+_exit:
+	.weak exit
+exit:
+
+.section .fini0,"ax",@progbits
+	cli
+__end_prog:
+	XJMP __end_prog
 

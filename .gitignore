@@ -3,5 +3,6 @@
 *.order
 .config*
 *.elf
+*.img
 include/config
 include/generated

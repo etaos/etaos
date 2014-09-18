@@ -131,6 +131,7 @@ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
 export CPP AR NM STRIP OBJCOPY OBJDUMP
 export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
 export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+export LDFLAGS
 
 # Basic helpers built in scripts/
 PHONY += scripts_basic
@@ -170,6 +171,8 @@ export MODLIB
 # building
 core-y += kernel/ mm/
 drivers-y += drivers/
+etaos-img := etaos.elf
+etaos-target := etaos.img
 
 etaos-dirs	:= $(patsubst %/,%,$(filter %/, $(core-y) $(core-m) \
 				$(drivers-y) $(drivers-m) $(libs-y) $(libs-m)))
@@ -179,6 +182,7 @@ etaos-alldirs	:= $(sort $(etaos-dirs) $(patsubst %/,%,$(filter %/, \
 
 core-y		:= $(patsubst %/, %/built-in.o, $(core-y))
 etaos-deps := $(head-y) $(init-y) $(core-y)
+etaos-core := $(init-y) $(core-y)
 
 
 PHONY += $(etaos-dirs)
@@ -190,19 +194,25 @@ $(sort $(etaos-deps)): $(etaos-dirs) ;
 
 quiet_cmd_link_etaos = LD      $@
 cmd_link_etaos = $(LD) $(LDFLAGS) -r -o $@ $(etaos-deps)
-etaos.elf: $(etaos-deps)
-	@echo $(LIB_GCC)
+$(etaos-img): $(etaos-deps)
 	$(call if_changed,link_etaos)
+
+quiet_cmd_link_app = LD      $@
+cmd_link_app = $(LD) $(LDFLAGS_etaos) -o $(etaos-target) $(etaos-img) \
+	       $(app-img) $(ETAOS_LIBS)
+$(etaos-target): $(etaos-deps)
+	$(call if_changed,link_app)
 
 PHONY += modules cremodverdir
 modules: prepare $(etaos-dirs)
 
 # Core build
-PHONY += etaos
-etaos: etaos.elf
+PHONY += etaos app
+etaos: $(etaos-img)
+app: $(etaos-target)
 
 quiet_cmd_install_etaos = INSTALL      etaos core
-cmd_install_etaos = cp etaos.elf $(INSTALL_ETAOS_PATH)/etaos.elf
+cmd_install_etaos = cp $(etaos-img) $(INSTALL_ETAOS_PATH)/$(etaos-img)
 
 etaos_install: etaos.elf
 	$(call if_changed,install_etaos)
@@ -231,6 +241,7 @@ mrproper: $(mrproper-dirs)
 # clean - Delete most, but leave enough to build external modules
 #
 CLEAN_DIRS  += $(MODVERDIR)
+CLEAN_FILES += etaos.elf etaos.img
 clean		:= -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.clean obj
 clean: rm-dirs  := $(CLEAN_DIRS)
 clean: rm-files := $(CLEAN_FILES)

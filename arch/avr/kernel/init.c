@@ -18,13 +18,16 @@
 
 extern void avr_init(void);
 
+extern unsigned char __heap_start;
+
 static unsigned int x = 5, y = 7;
+static unsigned int d;
 
 void avr_init(void)
 {
-	unsigned int z, d;
-
-	z = x*y;
-	d = (z-5)/10;
+	unsigned char *hs;
+	d = x*y;
+	hs = &__heap_start;
+	
 	while(1);
 }
