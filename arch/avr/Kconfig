@@ -16,6 +16,15 @@ config STACK_SIZE
 	  other threads if no stack size is given when a new
 	  thread is created.
 
+config SIMUL_AVR
+	bool "Enable SIMULAVR support"
+	help
+	  By saying 'Y' here you will enable support for SIMUALAVR;
+	  an AVR emulator. This will also enable two extra I/O
+	  registers for input and output. All in- and output from the
+	  std C library will be directed from and to these to I/O ports.
+	  If unsure, say 'N' here.
+
 choice
 	prompt "AVR core selection"
 	help
