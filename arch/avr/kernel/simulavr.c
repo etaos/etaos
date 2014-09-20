@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - ETA/OS types
+ *  ETA/OS - SIMUL AVR support
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,19 +16,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ETAOS_TYPES_H_
-#define __ETAOS_TYPES_H_
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/stdio.h>
 
-#include <asm/types.h>
+#include <asm/io.h>
+#include <asm/simulavr.h>
 
-typedef unsigned char bool;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
+int simul_avr_write_byte(int c, FILE stream)
+{
+	if(c == '\n')
+		simul_avr_write_byte('\r', stream);
 
-typedef char int8_t;
-typedef short int16_t;
+	SIMO = c;
+	return c;
+}
 
-typedef arch_size_t size_t;
-typedef arch_ssize_t ssize_t;
+void simul_avr_write_string(char *s, FILE stream)
+{
+	while(*s) {
+		simul_avr_write_byte(*s, stream);
+		s++;
+	}
+}
 
-#endif

@@ -1,0 +1,17 @@
+menuconfig LIBC
+	tristate "C library configuration"
+	depends on m
+	default y
+	help
+	  Say 'y' here if you want to build a (and
+	  configure) a standard C library. If you
+	  are unsure say 'y' here.
+
+if LIBC 
+
+source "lib/stdio/Kconfig"
+
+source "lib/stdlib/Kconfig"
+
+endif
+

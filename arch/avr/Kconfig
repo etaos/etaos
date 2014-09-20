@@ -42,4 +42,5 @@ endmenu
 source "kernel/Kconfig"
 source "drivers/Kconfig"
 source "mm/Kconfig"
+source "lib/Kconfig"
 

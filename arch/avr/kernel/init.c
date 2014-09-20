@@ -20,6 +20,7 @@
 #include <etaos/bitops.h>
 
 #include <asm/io.h>
+#include <asm/simulavr.h>
 
 extern void avr_init(void);
 
@@ -33,12 +34,8 @@ void avr_init(void)
 	bool test;
 	d = x*y;
 	test = test_bit(2, (unsigned long*)&d);
-
-	STDOUT_PORT = 'b';
-	STDOUT_PORT = 'o';
-	STDOUT_PORT = 'o';
-	STDOUT_PORT = 't';
-	STDOUT_PORT = '\n';
+	
+	simul_avr_write_string("Booting!\n", NULL);
 
 	while(1);
 }

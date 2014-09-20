@@ -24,4 +24,8 @@ typedef unsigned long long uint64_t;
 
 typedef long int32_t;
 typedef long long int64_t;
+
+typedef unsigned int arch_size_t;
+typedef int arch_ssize_t;
+
 #endif

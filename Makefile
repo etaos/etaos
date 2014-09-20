@@ -176,6 +176,7 @@ export MODLIB
 # building
 core-y += kernel/ mm/
 drivers-y += drivers/
+libs-y += lib/
 etaos-img := etaos.elf
 etaos-target := etaos.img
 
@@ -186,9 +187,10 @@ etaos-alldirs	:= $(sort $(etaos-dirs) $(patsubst %/,%,$(filter %/, \
 		     $(net-n)  $(net-)  $(libs-n)    $(libs-))))
 
 core-y		:= $(patsubst %/, %/built-in.o, $(core-y))
-etaos-deps := $(head-y) $(init-y) $(core-y)
-etaos-core := $(init-y) $(core-y)
+drivers-y	:= $(patsubst %/, %/built-in.o, $(drivers-y))
+libs-y		:= $(patsubst %/, %/built-in.o, $(libs-y))
 
+etaos-deps := $(head-y) $(init-y) $(core-y) $(drivers-y) $(libs-y)
 
 PHONY += $(etaos-dirs)
 $(etaos-dirs): prepare scripts
@@ -205,7 +207,7 @@ $(etaos-img): $(etaos-deps)
 quiet_cmd_link_app = LD      $@
 cmd_link_app = $(LD) $(LDFLAGS_etaos) -o $(etaos-target) $(etaos-img) \
 	       $(app-img) $(ETAOS_LIBS)
-$(etaos-target): $(etaos-deps)
+$(etaos-target): $(etaos-img)
 	$(call if_changed,link_app)
 
 PHONY += modules cremodverdir

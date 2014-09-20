@@ -1,0 +1,9 @@
+config STDIO
+	tristate "STDIO library"
+	depends on m
+	default m
+	select STDLIB
+	help
+	  Say 'y' here if you want to build the
+	  STDIO library, which is part of libc. If
+	  unsure say 'y' here.

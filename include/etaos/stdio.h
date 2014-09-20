@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - ETA/OS types
+ *  Eta/OS - ETA/OS stdio header
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,19 +16,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ETAOS_TYPES_H_
-#define __ETAOS_TYPES_H_
+#ifndef __STDIO_H__
+#define __STDIO_H__
 
-#include <asm/types.h>
+#include <etaos/kernel.h>
+#include <etaos/types.h>
 
-typedef unsigned char bool;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
+typedef struct file {
+	struct file *next;
 
-typedef char int8_t;
-typedef short int16_t;
+	unsigned long flags;
+	int fd;
 
-typedef arch_size_t size_t;
-typedef arch_ssize_t ssize_t;
+	int (*close)(struct file*);
+	int (*read)(struct file*, void*, size_t);
+	int (*write)(struct file*, void*, size_t);
+	int (*flush)(struct file*);
+
+	void *data;
+	volatile unsigned char *buff;
+	size_t length;
+	size_t index;
+
+} *FILE;
+
+extern int putc(int c, FILE stream);
+extern int fputc(int c, FILE stream);
 
 #endif

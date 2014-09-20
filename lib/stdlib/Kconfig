@@ -1,0 +1,8 @@
+config STDLIB
+	tristate "Stardard C library"
+	depends on m
+	default m
+	help
+	  Say 'y' here if you want to build the
+	  standard C library. If you are unsure
+	  say 'y' here.

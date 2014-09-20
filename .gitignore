@@ -4,5 +4,6 @@
 .config*
 *.elf
 *.img
+*swp
 include/config
 include/generated

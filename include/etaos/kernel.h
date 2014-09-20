@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - ETA/OS types
+ *  Eta/OS - ETA/OS kernel header
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,19 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ETAOS_TYPES_H_
-#define __ETAOS_TYPES_H_
+#ifndef __ETAOS_KERNEL_H__
+#define __ETAOS_KERNEL_H__
 
-#include <asm/types.h>
+#include <generated/autoconf.h>
+#include <etaos/types.h>
 
-typedef unsigned char bool;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-
-typedef char int8_t;
-typedef short int16_t;
-
-typedef arch_size_t size_t;
-typedef arch_ssize_t ssize_t;
+#define NULL ((void*)0)
 
 #endif
