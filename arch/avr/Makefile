@@ -8,7 +8,7 @@ DEFCONF-$(CONFIG_ATMEGA328) += arch/avr/defconf/atmega328.dc
 include $(DEFCONF-y)
 
 KBUILD_CFLAGS += -nostdlib -nostdinc -ffreestanding
-KBUILD_CFLAGS += -Iarch/avr/include -g
+KBUILD_CFLAGS += -Iarch/avr/include $(KBUILD_DBG)
 KBUILD_AFLAGS += -Iarch/avr/include
 
 cflags-$(CONFIG_ATMEGA328) += -mmcu=atmega328

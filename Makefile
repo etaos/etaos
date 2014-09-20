@@ -50,6 +50,11 @@ HOSTCXXFLAGS = -O2
 KBUILD_CFLAGS := -Wall -Iinclude
 KBUILD_AFLAGS := -Iinclude
 
+ifneq ($(DBG),)
+	KBUILD_DBG := -g
+endif
+export KBUILD_DBG
+
 # Normally we just run the built-in.
 KBUILD_BUILTIN := 1
 
