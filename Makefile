@@ -174,7 +174,7 @@ MODLIB	= $(INSTALL_MOD_PATH)/etaos
 export MODLIB
 
 # building
-core-y += kernel/ mm/
+core-y += kernel/ mm/ fs/
 drivers-y += drivers/
 libs-y += lib/
 etaos-img := etaos.elf

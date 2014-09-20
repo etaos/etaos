@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - AVR5 arch boot
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - VFS driver.
+ *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,26 +17,39 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
-#include <asm/io.h>
-#include <asm/simulavr.h>
+FILE __iob[MAX_OPEN];
+struct file *vfshead;
 
-extern void avr_init(void);
-
-extern unsigned char __heap_start;
-
-static unsigned int x = 5, y = 7;
-static unsigned int d;
-
-void avr_init(void)
+void vfs_init(void)
 {
-	bool test;
-	d = x*y;
-	test = test_bit(2, (unsigned long*)&d);
-	
-	simul_avr_write_string("Booting!\n", NULL);
+	int i = 3;
 
-	while(1);
+	for(; i < MAX_OPEN; i++)
+		__iob[i] = NULL;
+
+	vfshead = NULL;
 }
+
+void vfs_add(FILE newfile)
+{
+	newfile->next = vfshead;
+	vfshead = newfile;
+}
+
+int vfs_delete(FILE file)
+{
+	struct file **fpp;
+
+	fpp = &file;
+	for(; *fpp; fpp = &(*fpp)->next) {
+		if(*fpp == file) {
+			*fpp = file->next;
+			return 0;
+		}
+	}
+
+	return -1;
+}
+

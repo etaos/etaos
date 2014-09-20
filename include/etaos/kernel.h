@@ -21,7 +21,13 @@
 
 #include <generated/autoconf.h>
 #include <etaos/types.h>
+#include <etaos/stddef.h>
 
 #define NULL ((void*)0)
+#define FALSE 0
+#define TRUE !FALSE
+
+#define true TRUE
+#define false FALSE
 
 #endif

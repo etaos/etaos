@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - AVR5 arch boot
+ *  ETA/OS - STDIO printf
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,26 +17,17 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
-#include <asm/io.h>
-#include <asm/simulavr.h>
-
-extern void avr_init(void);
-
-extern unsigned char __heap_start;
-
-static unsigned int x = 5, y = 7;
-static unsigned int d;
-
-void avr_init(void)
+int printf(const char *fmt, ...)
 {
-	bool test;
-	d = x*y;
-	test = test_bit(2, (unsigned long*)&d);
-	
-	simul_avr_write_string("Booting!\n", NULL);
+	int i;
+	va_list va;
 
-	while(1);
+	va_start(va, fmt);
+	i = vfprintf(stdout, fmt, va);
+	va_end(va);
+
+	return i;
 }
+

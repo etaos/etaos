@@ -22,6 +22,37 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 
+/**
+ *  * \def MAX_OPEN
+ *   * \brief Maximum amount of files opened at the same time.
+ *    */
+#define MAX_OPEN 16
+
+/* file flags */
+#define __SRD	0x0001		/* OK to read */
+#define __SWR	0x0002		/* OK to write */
+#define __SRWB  0x0004		/* Read/write from buffer */
+#define __SPGM	0x0008		/* fmt string is in progmem */
+#define __SERR	0x0010		/* found error */
+#define __SEOF	0x0020		/* found EOF */
+#define __SUNGET 0x040		/* ungetc() happened */
+#define __SMALLOC 0x80		/* handle is malloc()ed */
+
+#define STREAM_READ_FLAG 	0
+#define STREAM_WRITE_FLAG 	1
+#define STREAM_RW_BUFFER_FLAG 	2
+#define STREAM_FMT_PROGMEM_FLAG 3
+#define STREAM_ERROR_FLAG 	4
+#define STREAM_EOF_FLAG 	5
+#define STREAM_UNGETC_FLAG 	6
+#define STREAM_MALLOC_FLAG 	7
+
+#define _FDEV_SETUP_READ  __SRD	/**< fdev_setup_stream() with read intent */
+#define _FDEV_SETUP_WRITE __SWR	/**< fdev_setup_stream() with write intent */
+#define _FDEV_SETUP_RW    (__SRD|__SWR)	/**< fdev_setup_stream() with read/write intent */
+#define _FDEV_SETUP_RWB   __SRWB /**< Read/write from buffers */
+
+
 typedef struct file {
 	struct file *next;
 
@@ -40,7 +71,16 @@ typedef struct file {
 
 } *FILE;
 
+extern FILE __iob[];
+
+#define stdin 	__iob[0]
+#define stdout 	__iob[1]
+#define stderr 	__iob[2]
+
 extern int putc(int c, FILE stream);
 extern int fputc(int c, FILE stream);
+extern int fputs(char *c, FILE stream);
+extern int printf(const char *, ...);
+extern int vfprintf(FILE stream, const char *fmt, va_list va);
 
 #endif

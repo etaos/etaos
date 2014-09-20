@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - AVR5 arch boot
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - fputs
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,26 +17,13 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
-#include <asm/io.h>
-#include <asm/simulavr.h>
-
-extern void avr_init(void);
-
-extern unsigned char __heap_start;
-
-static unsigned int x = 5, y = 7;
-static unsigned int d;
-
-void avr_init(void)
+int fputs(char *s, FILE stream)
 {
-	bool test;
-	d = x*y;
-	test = test_bit(2, (unsigned long*)&d);
+	for (; *s; s++) {
+		fputc(*s, stream);
+	}
 	
-	simul_avr_write_string("Booting!\n", NULL);
-
-	while(1);
+	return 0;
 }
