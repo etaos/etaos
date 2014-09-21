@@ -26,6 +26,29 @@ config SIMUL_AVR
 	  std C library will be directed from and to these to I/O ports.
 	  If unsure, say 'N' here.
 
+choice
+	prompt "STDIO output device"
+	depends on STDIO
+	help
+	  Select which device driver should be used to drive
+	  the STDIO library. By default the USART is selected.
+
+config STDIO_SIMUL_AVR
+	bool "STDIO simulavr driver"
+	depends on SIMUL_AVR
+	help
+	  Select if you want to use the special output registers
+	  of simulavr to drive the STDIO library.
+
+config STDIO_USART
+	bool "STDIO USART driver"
+	depends on USART
+	help
+	  Select if you want to use the USART registers
+	  to drive the STDIO library. If unsure say 'y' here.
+
+endchoice
+
 config LIBFLT
 	tristate "Floating point library"
 	depends on m

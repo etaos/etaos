@@ -29,8 +29,10 @@ extern int main(void);
 
 void avr_init(void)
 {
-#ifdef CONFIG_SIMUL_AVR
+#ifdef CONFIG_STDIO_SIMUL_AVR
 	simul_avr_setup_streams();
+#elif CONFIG_STDIO_USART
+	avr_setup_usart_streams();
 #endif
 	//simul_avr_write_string("Booting!\n", NULL);
 	printf("Booting!\n");
