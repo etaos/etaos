@@ -33,6 +33,13 @@ ifndef KBUILD_CHECKSRC
 	KBUILD_CHECKSRC = 0
 endif
 
+ifeq ("$(origin A)", "command line")
+  KBUILD_EXTMOD := $(A)
+endif
+
+ifneq ($(KBUILD_EXTMOD),)
+  appdir	:= $(KBUILD_EXTMOD)
+endif
 srctree		:= $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
 objtree		:= $(CURDIR)
 
@@ -137,6 +144,7 @@ export CPP AR NM STRIP OBJCOPY OBJDUMP
 export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
 export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
 export LDFLAGS
+export LDFLAGS_etaos
 
 # Basic helpers built in scripts/
 PHONY += scripts_basic
@@ -179,6 +187,7 @@ drivers-y += drivers/
 libs-y += lib/
 etaos-img := etaos.elf
 etaos-target := etaos.img
+export etaos-img
 
 etaos-dirs	:= $(patsubst %/,%,$(filter %/, $(core-y) $(core-m) \
 				$(drivers-y) $(drivers-m) $(libs-y) $(libs-m)))
@@ -206,9 +215,10 @@ $(etaos-img): $(etaos-deps)
 
 quiet_cmd_link_app = LD      $@
 cmd_link_app = $(LD) $(LDFLAGS_etaos) -o $(etaos-target) $(etaos-img) \
-	       $(app-img) $(ETAOS_LIBS)
+	       $(app-img) $(ETAOS_LIBS) $(ETAOS_EXTRA_LIBS)
 $(etaos-target): $(etaos-img)
-	$(call if_changed,link_app)
+	$(Q)$(MAKE) $(build)=$(appdir)
+	$(Q)$(MAKE) $(link)=$(appdir)
 
 PHONY += modules cremodverdir
 modules: prepare $(etaos-dirs)

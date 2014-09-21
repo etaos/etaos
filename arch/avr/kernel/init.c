@@ -24,8 +24,8 @@
 #include <asm/simulavr.h>
 
 extern void avr_init(void);
-
 extern unsigned char __heap_start;
+extern int main(void);
 
 void avr_init(void)
 {
@@ -34,6 +34,7 @@ void avr_init(void)
 #endif
 	//simul_avr_write_string("Booting!\n", NULL);
 	printf("Booting!\n");
+	main();
 
 	while(1);
 }

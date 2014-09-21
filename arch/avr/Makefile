@@ -23,8 +23,11 @@ KBUILD_AFLAGS += $(aflags-y)
 LDFLAGS += $(lflags-y) -T$(lscript-r-y)
 LDFLAGS_etaos += $(lflags-y) -T$(lscript-y) -Tdata $(DATA_LOAD_OFFSET)
 
+softfloat-$(CONFIG_LIBFLT) = -lflt
+
 LIB_GCC = $(dir $(shell $(CC) $(KBUILD_CFLAGS) --print-libgcc-file-name))
-ETAOS_LIBS += -L$(LIB_GCC) --start-group -lgcc --end-group
+ETAOS_EXTRA_LIBS += -L$(LIB_GCC) --start-group -lgcc $(softfloat-m) --end-group
+export ETAOS_EXTRA_LIBS
 
 head-y += arch/avr/kernel/start.o
 init-y += arch/avr/kernel/init.o
