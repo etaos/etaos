@@ -23,6 +23,24 @@
 #include <asm/io.h>
 #include <asm/simulavr.h>
 
+static FDEV_SETUP_STREAM(simavr_stream,
+			 NULL,
+			 NULL,
+			 &simul_avr_write_byte,
+			 NULL,
+			 NULL,
+			 "SIMAVR_STREAM",
+			 _FDEV_SETUP_RW,
+			 NULL);
+
+void simul_avr_setup_streams(void)
+{
+	stdout = &simavr_stream;
+	stdin = &simavr_stream;
+	stderr = &simavr_stream;
+	iob_add(&simavr_stream);
+}
+
 int simul_avr_write_byte(int c, FILE stream)
 {
 	if(c == '\n')

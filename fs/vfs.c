@@ -18,9 +18,24 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
+#include <etaos/vfs.h>
 
 FILE __iob[MAX_OPEN];
-struct file *vfshead;
+static struct file *vfshead;
+
+int iob_add(FILE stream)
+{
+	int rc;
+		
+	for(rc = 3; rc < MAX_OPEN; rc++) {
+		if(__iob[rc] == NULL) {
+			__iob[rc] = stream;
+			stream->fd = rc;
+			return rc;
+		}
+	}
+	return -1;
+}
 
 void vfs_init(void)
 {

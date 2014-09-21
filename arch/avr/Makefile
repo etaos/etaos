@@ -30,3 +30,5 @@ head-y += arch/avr/kernel/start.o
 init-y += arch/avr/kernel/init.o
 
 core-y += arch/avr/kernel/
+libs-y += arch/avr/libflt/
+

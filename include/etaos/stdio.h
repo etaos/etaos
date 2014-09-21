@@ -52,8 +52,43 @@
 #define _FDEV_SETUP_RW    (__SRD|__SWR)	/**< fdev_setup_stream() with read/write intent */
 #define _FDEV_SETUP_RWB   __SRWB /**< Read/write from buffers */
 
+#define EOF 1
+
+struct file;
+/**
+ * \brief Define a file stream.
+ * \param defname Variable name of the stream.
+ * \param r Read function pointer.
+ * \param w Write function pointer.
+ * \param p Put function pointer.
+ * \param g Get function pointer.
+ * \param f Flush function pointer.
+ * \param n File name function pointer.
+ * \param fl Flags byte.
+ * \param d Data pointer.
+ * \warning The file name (<b>n</b>) MUST be unique.
+ * 
+ * This defines an initialized file stream structure.
+ */
+#define FDEV_SETUP_STREAM(defname, r, w, p, g, f, n, fl, d) \
+	struct file defname = {	\
+	.write = r,		\
+	.read = w,		\
+	.put = p,		\
+	.get = g,		\
+	.flush = f,		\
+	.name = n,		\
+	.flags = fl,		\
+	.data = d,		\
+	 /* default initializations */ \
+	.length = 0,		\
+	.index = 0,		\
+	.buff = NULL,		\
+}
+
 
 typedef struct file {
+	const char *name;
 	struct file *next;
 
 	unsigned long flags;
@@ -63,6 +98,8 @@ typedef struct file {
 	int (*read)(struct file*, void*, size_t);
 	int (*write)(struct file*, void*, size_t);
 	int (*flush)(struct file*);
+	int (*put)(int c, struct file*);
+	int (*get)(int c, struct file*);
 
 	void *data;
 	volatile unsigned char *buff;
@@ -82,5 +119,6 @@ extern int fputc(int c, FILE stream);
 extern int fputs(char *c, FILE stream);
 extern int printf(const char *, ...);
 extern int vfprintf(FILE stream, const char *fmt, va_list va);
+extern int iob_add(FILE iob);
 
 #endif

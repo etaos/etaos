@@ -27,16 +27,13 @@ extern void avr_init(void);
 
 extern unsigned char __heap_start;
 
-static unsigned int x = 5, y = 7;
-static unsigned int d;
-
 void avr_init(void)
 {
-	bool test;
-	d = x*y;
-	test = test_bit(2, (unsigned long*)&d);
-	
-	simul_avr_write_string("Booting!\n", NULL);
+#ifdef CONFIG_SIMUL_AVR
+	simul_avr_setup_streams();
+#endif
+	//simul_avr_write_string("Booting!\n", NULL);
+	printf("Booting!\n");
 
 	while(1);
 }

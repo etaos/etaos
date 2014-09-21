@@ -2,7 +2,6 @@ menu "File systems"
 
 config VFS
 	tristate "Virtual Filesystem"
-	depends on STDIO
 	help
 	  If set to 'y', the virtual filesystem driver
 	  will be compiled. The virtual file system is

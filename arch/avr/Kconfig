@@ -18,12 +18,23 @@ config STACK_SIZE
 
 config SIMUL_AVR
 	bool "Enable SIMULAVR support"
+	select VFS
 	help
 	  By saying 'Y' here you will enable support for SIMUALAVR;
 	  an AVR emulator. This will also enable two extra I/O
 	  registers for input and output. All in- and output from the
 	  std C library will be directed from and to these to I/O ports.
 	  If unsure, say 'N' here.
+
+config LIBFLT
+	tristate "Floating point library"
+	depends on m
+	default m
+	help
+	  By saying 'm' here you enable the floating point
+	  built-in library. You should only say 'm' here if
+	  gcc is not build with soft-fp (which isn't the case
+	  by default). If you unsure say 'm' here.
 
 choice
 	prompt "AVR core selection"
