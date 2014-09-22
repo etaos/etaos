@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Memory module
+ *  ETA/OS - Spinlock header
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <etaos/kernel.h>
-#include <etaos/types.h>
-#include <etaos/mem.h>
+#ifndef __AVR_SPINLOCK_H__
+#define __AVR_SPINLOCK_H__
 
-MEM void *mm_alloc(size_t size)
+#include <etaos/mutex.h>
+
+extern void avr_spin_lock(unsigned char *);
+extern void avr_spin_unlock(unsigned char*);
+
+#define arch_mutex_lock(__l) arch_spin_lock(__l)
+#define arch_mutex_unlock(__l) arch_spin_unlock(__l)
+
+static inline void arch_spin_lock(mutex_t *mutex)
 {
-	return NULL;
+	avr_spin_lock((unsigned char*)&mutex->lock);
 }
+
+static inline void arch_spin_unlock(mutex_t *mutex)
+{
+	avr_spin_unlock((unsigned char*)&mutex->lock);
+}
+#endif

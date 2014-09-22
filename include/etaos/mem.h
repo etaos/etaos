@@ -16,11 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __MEM_H__
+#define __MEM_H__
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/mem.h>
 
-MEM void *mm_alloc(size_t size)
-{
-	return NULL;
-}
+#define MM_MAGIC_BYTE 0x99
+
+struct heap_node {
+	struct heap_node *next;
+	uint8_t magic;
+	size_t size;
+};
+
+#define MEM __attribute__((malloc))
+
+extern MEM void* mm_alloc(size_t);
+
+#endif

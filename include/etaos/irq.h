@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Memory module
+ *  ETA/OS - IRQ header
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <etaos/kernel.h>
-#include <etaos/types.h>
-#include <etaos/mem.h>
+#ifndef __IRQ_H__
+#define __IRQ_H__
 
-MEM void *mm_alloc(size_t size)
-{
-	return NULL;
-}
+extern void irq_save_and_disable(unsigned long *flags);
+extern void irq_restore(unsigned long *flags);
+
+#endif
+
