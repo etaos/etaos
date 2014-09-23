@@ -66,6 +66,8 @@ choice
 
 config ATMEGA328
 	bool "ATmega 328(p)"
+	select ARCH_CLEAR_BIT
+	select ARCH_TNC
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega328p
 	  AVR core.

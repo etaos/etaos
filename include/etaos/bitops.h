@@ -22,9 +22,18 @@
 #include <etaos/types.h>
 #include <asm/bitops.h>
 
+#ifndef CONFIG_ARCH_TEST_BIT
 static inline bool test_bit(unsigned bit, volatile unsigned long *flags)
 {
 	return 1UL & (flags[bit / BITS_PER_LONG] >> (bit % BITS_PER_LONG));
 }
+#endif
+
+#ifndef CONFIG_ARCH_TNC
+static inline int test_and_clear_bit(unsigned nr, volatile unsigned long *addr)
+{
+	return 0;
+}
+#endif
 
 #endif

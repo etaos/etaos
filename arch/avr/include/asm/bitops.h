@@ -19,6 +19,47 @@
 #ifndef __AVR_BITOPS_H_
 #define __AVR_BITOPS_H_
 
-#define BITS_PER_LONG 32
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/stdio.h>
+
+#define BITS_PER_LONG 32UL
+#define BITS_PER_BYTE  8UL
+
+static inline void clear_bit(unsigned nr, volatile unsigned long *flags)
+{
+	unsigned char *p = ((unsigned char*)flags) + (nr/BITS_PER_BYTE);
+	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
+	unsigned char tmp;
+
+	__asm__ __volatile__(
+			"ld %0, %a2"	"\n\t"
+			"com %3"	"\n\t"
+			"and %0, %3"	"\n\t"
+			"st %a1, %0"	"\n\t"
+			: "=&d" (tmp), "=e" (p)
+			: "e" (p), "d" (msk)
+			);
+}
+
+static inline int test_and_clear_bit(unsigned nr, volatile unsigned long *addr)
+{
+	unsigned char *p = ((unsigned char*)addr) + (nr/BITS_PER_BYTE);
+	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
+	unsigned char tmp, old;
+
+	__asm__ __volatile__(
+			"ld %0, %a3"	"\n\t"
+			"mov %2, %0"	"\n\t"
+			"and %2, %4"	"\n\t"
+			"com %4"	"\n\t"
+			"and %0, %4"	"\n\t"
+			"st %a1, %0"	"\n\t"
+			: "=&r" (tmp), "=e" (p), "=&r" (old)
+			: "e" (p), "d" (msk)
+			: "memory"
+			);
+	return old != 0;
+}
 
 #endif
