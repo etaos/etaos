@@ -10,4 +10,10 @@ config MODULES
 	help
 	  Enable the building of modules.
 
+config CROSS_COMPILE
+	string "Cross compile prefix"
+	help
+	  Enter the toolchain cross compile prefix. For example,
+	  to cross compile for avr enter avr- here.
+
 source "arch/$SRCARCH/Kconfig"

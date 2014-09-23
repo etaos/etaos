@@ -62,11 +62,9 @@ ifneq ($(DBG),)
 endif
 export KBUILD_DBG
 
-# Normally we just run the built-in.
-KBUILD_BUILTIN := 1
-
 ifeq ($(MAKECMDGOALS),modules)
-  KBUILD_BUILTIN := $(if $(CONFIG_MODVERSIONS),1)
+else
+  KBUILD_BUILTIN := 1
 endif
 # if we have a make <whatever> modules also build modules besides whatever
 # else we're doing.
@@ -78,7 +76,22 @@ ifeq ($(MAKECMDGOALS),)
 	KBUILD_MODULES := 1
 endif
 
+# Basic helpers built in scripts/
+PHONY += scripts_basic 
+scripts_basic: 
+	$(Q)$(MAKE) $(build)=scripts/basic
+	$(Q)rm -f .tmp_quiet_recordmcount
+
+config: scripts_basic FORCE
+	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+
+%config: scripts_basic FORCE
+	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+
 -include include/config/auto.conf
+ifneq ($(CONFIG_CROSS_COMPILE),)
+  CROSS_COMPILE=$(CONFIG_CROSS_COMPILE)
+endif
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
 export CONFIG_SHELL HOSTCC HOSTCXX HOSTCFLAGS HOSTCXXFLAGS
@@ -117,7 +130,7 @@ else
 endif
 export quiet Q KBUILD_VERBOSE
 
-export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_versions
+export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(appdir))/).tmp_versions
 
 # We need some generic definitions (do not try to remake the file).
 include $(srctree)/scripts/Kbuild.include
@@ -146,20 +159,6 @@ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
 export LDFLAGS
 export LDFLAGS_etaos
 
-# Basic helpers built in scripts/
-PHONY += scripts_basic
-scripts_basic:
-	$(Q)$(MAKE) $(build)=scripts/basic
-	$(Q)rm -f .tmp_quiet_recordmcount
-
-config: scripts_basic FORCE
-	$(Q)$(MAKE) $(build)=scripts/kconfig $@
-
-%config: scripts_basic FORCE
-	$(Q)$(MAKE) $(build)=scripts/kconfig $@
-
-prepare: cremodverdir
-	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
 
 PHONY += headers_install
 # header install
@@ -201,8 +200,20 @@ libs-y		:= $(patsubst %/, %/built-in.o, $(libs-y))
 
 etaos-deps := $(head-y) $(init-y) $(core-y) $(drivers-y) $(libs-y)
 
-PHONY += $(etaos-dirs)
-$(etaos-dirs): prepare scripts
+modules: prepare $(etaos-dirs)
+etaos: prepare $(etaos-img)
+app: $(etaos-target)
+prepare: cremodverdir
+	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
+
+cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
+                  $(if $(KBUILD_MODULES),; rm -f $(MODVERDIR)/*)
+cremodverdir:
+	$(cmd_crmodverdir)
+PHONY += modules etaos cremodverdir app
+
+PHONY += $(etaos-dirs) $(etaos-img)
+$(etaos-dirs): scripts
 	$(Q)$(MAKE) $(build)=$@
 
 # build objects with decending
@@ -216,17 +227,10 @@ $(etaos-img): $(etaos-deps)
 quiet_cmd_link_app = LD      $@
 cmd_link_app = $(LD) $(LDFLAGS_etaos) -o $(etaos-target) $(etaos-img) \
 	       $(app-img) $(ETAOS_LIBS) $(ETAOS_EXTRA_LIBS)
-$(etaos-target): $(etaos-img)
+$(etaos-target):
 	$(Q)$(MAKE) $(build)=$(appdir)
 	$(Q)$(MAKE) $(link)=$(appdir)
 
-PHONY += modules cremodverdir
-modules: prepare $(etaos-dirs)
-
-# Core build
-PHONY += etaos app
-etaos: $(etaos-img)
-app: $(etaos-target)
 
 quiet_cmd_install_etaos = INSTALL      etaos core
 cmd_install_etaos = cp $(etaos-img) $(INSTALL_ETAOS_PATH)/$(etaos-img)
@@ -234,13 +238,9 @@ cmd_install_etaos = cp $(etaos-img) $(INSTALL_ETAOS_PATH)/$(etaos-img)
 etaos_install: etaos.elf
 	$(call if_changed,install_etaos)
 
-cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
-                  $(if $(KBUILD_MODULES),; rm -f $(MODVERDIR)/*)
-cremodverdir:
-	$(cmd_crmodverdir)
 
 PHONY += all
-all: prepare $(etaos-deps) etaos modules
+all: etaos modules
 
 # mrproper - Delete all generated files, including .config
 #
@@ -252,6 +252,13 @@ $(mrproper-dirs):
 
 mrproper: $(mrproper-dirs)
 
+quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
+      cmd_rmdirs = rm -rf $(rm-dirs)
+
+quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
+      cmd_rmfiles = rm -f $(rm-files)
+
+ifeq ($(KBUILD_EXTMOD),)
 # Shorthand for $(Q)$(MAKE) -f scripts/Makefile.clean obj=dir
 # Usage:
 # $(Q)$(MAKE) $(clean)=dir
@@ -262,15 +269,9 @@ CLEAN_FILES += etaos.elf etaos.img
 clean		:= -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.clean obj
 clean: rm-dirs  := $(CLEAN_DIRS)
 clean: rm-files := $(CLEAN_FILES)
-clean-dirs      := $(addprefix _clean_, . $(etaos-alldirs) scripts)
+clean-dirs      := $(addprefix _clean_, . $(etaos-alldirs))
 
 PHONY += $(clean-dirs) clean
-
-quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
-      cmd_rmdirs = rm -rf $(rm-dirs)
-
-quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
-      cmd_rmfiles = rm -f $(rm-files)
 
 $(clean-dirs):
 	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
@@ -285,6 +286,25 @@ clean: $(clean-dirs)
 		-o -name '*.symtypes' -o -name 'modules.order' \
 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
 		-o -name '*.gcno' \) -type f -print | xargs rm -f
+else
+CLEAN_DIRS += $(MODVERDIR)
+clean		:= -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.clean obj
+clean: rm-dirs  := $(CLEAN_DIRS)
+clean-dirs      := $(addprefix _clean_, $(appdir))
+
+$(clean-dirs):
+	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
+
+clean: $(clean-dirs)
+	$(call cmd,rmdirs)
+	@find $(appdir) $(RCS_FIND_IGNORE) \
+		\( -name '*.[oas]' -o -name '*.a' -o -name '.*.cmd' \
+		-o -name '*.a.*' \
+		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+		-o -name '*.symtypes' -o -name 'modules.order' \
+		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+		-o -name '*.gcno' \) -type f -print | xargs rm -f
+endif
 
 PHONY += FORCE
 FORCE:
