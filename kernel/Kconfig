@@ -4,5 +4,11 @@ config ARCH_TEST_BIT
 config ARCH_TNC
 	bool
 
+config ARCH_TNS
+	bool
+
+config ARCH_SET_BIT
+	bool
+
 config ARCH_CLEAR_BIT
 	bool

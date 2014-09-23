@@ -36,4 +36,25 @@ static inline int test_and_clear_bit(unsigned nr, volatile unsigned long *addr)
 }
 #endif
 
+#ifndef CONFIG_ARCH_TNS
+static inline int test_and_set_bit(unsigned nr, volatile unsigned long *addr)
+{
+	return 0;
+}
+#endif
+
+#ifndef CONFIG_ARCH_SET_BIT
+static inline void set_bit(unsigned nr, volatile unsigned long *addr)
+{
+	return 0;
+}
+#endif
+
+#ifndef CONFIG_ARCH_CLEAR_BIT
+static inline void clear_bit(unsigned nr, volatile unsigned long *addr)
+{
+	return 0;
+}
+#endif
+
 #endif
