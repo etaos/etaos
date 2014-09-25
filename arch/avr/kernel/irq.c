@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - IRQ header
+ *  ETA/OS - AVR IRQ support
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,20 +16,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __IRQ_H__
-#define __IRQ_H__
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/irq.h>
+#include <etaos/bitops.h>
 
-extern void irq_save_and_disable(unsigned long *flags);
-extern void irq_restore(unsigned long *flags);
+#include <asm/io.h>
 
-/* arch functions */
-void arch_irq_restore_flags(unsigned long *flags);
-unsigned long arch_irq_get_flags();
-void arch_irq_disable();
-void arch_irq_enable();
+void arch_irq_disable(void)
+{
+	cli();
+}
 
-#define irq_disable() arch_irq_disable()
-#define irq_enable() arch_irq_enable()
+void arch_irq_enable(void)
+{
+	sei();
+}
 
-#endif
+unsigned long arch_irq_get_flags(void)
+{
+	return ((unsigned long) (SREG & AVR_IRQ_BITS));
+}
+
+void arch_irq_restore_flags(unsigned long *flags)
+{
+	if(test_bit(AVR_IRQ_FLAG, flags))
+		sei();
+	return;
+}
 

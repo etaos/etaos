@@ -4,6 +4,8 @@
 .config*
 *.elf
 *.img
+*.a
 *swp
+.tmp_versions/
 include/config
 include/generated

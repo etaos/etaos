@@ -24,6 +24,9 @@
 
 #define _VECTORS_SIZE (26*4)
 
+#define AVR_IRQ_FLAG 7
+#define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
+
 #define AVR_STACK_LOW_ADDR 0x3D
 #define AVR_STACK_HI_ADDR 0x3E
 #define AVR_STATUS_ADDR 0x3F
@@ -39,10 +42,17 @@
     #endif
 #endif
 
+#define cli() __asm__ __volatile__("cli")
+#define sei() __asm__ __volatile__("sei")
+
+
+#define SREG (*((volatile unsigned char*)0x5F))
+
 #ifdef CONFIG_SIMUL_AVR
 
 #define SIMO (*((volatile unsigned char*)0x20))
 #define SIMI (*((volatile unsigned char*)0x20))
+
 
 #define STDOUT_PORT SIMO
 #define STDIN_PORT SIMI

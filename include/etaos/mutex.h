@@ -35,7 +35,7 @@ typedef struct mutex {
 } mutex_t;
 
 #define mutex_lock_irqsave(__l, __f) _mutex_lock_irqsave(__l, &__f)
-#define mutex_unlock_irqrestore(__l, __f) _mutex_unlock_irqrestore(__l, __f)
+#define mutex_unlock_irqrestore(__l, __f) _mutex_unlock_irqrestore(__l, &__f)
 
 #ifdef CONFIG_EVENT_MUTEX
 #else
@@ -50,9 +50,9 @@ static inline void _mutex_lock_irqsave(mutex_t *lock, unsigned long *flags)
 	arch_mutex_lock(lock);
 }
 
-static inline void _mutex_unlock_irqrestore(mutex_t *lock, unsigned long flags)
+static inline void _mutex_unlock_irqrestore(mutex_t *lock, unsigned long *flags)
 {
-	irq_restore(&flags);
+	irq_restore(flags);
 	arch_mutex_unlock(lock);
 }
 
