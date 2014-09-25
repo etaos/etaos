@@ -19,6 +19,8 @@
 #include <etaos/kernel.h>
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
+#include <etaos/vfs.h>
+#include <etaos/mem.h>
 
 #include <asm/io.h>
 #include <asm/simulavr.h>
@@ -29,13 +31,20 @@ extern int main(void);
 
 void avr_init(void)
 {
+#ifdef CONFIG_MALLOC
+	size_t hsize = RAMEND - CONFIG_STACK_SIZE - (size_t)&__heap_start;
+	mm_init((void*)&__heap_start, hsize);
+#endif
+
+#ifdef CONFIG_VFS
+	vfs_init();
+#endif
+
 #ifdef CONFIG_STDIO_SIMUL_AVR
 	simul_avr_setup_streams();
 #elif CONFIG_STDIO_USART
 	avr_setup_usart_streams();
 #endif
-	//simul_avr_write_string("Booting!\n", NULL);
-	printf("Booting!\n");
 	main();
 
 	while(1);

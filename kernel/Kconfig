@@ -12,3 +12,15 @@ config ARCH_SET_BIT
 
 config ARCH_CLEAR_BIT
 	bool
+
+menu "Generic system options"
+
+config IRQ_SUPPORT
+	bool "IRQ core"
+	select MALLOC
+	help
+	  Say 'y' here if you want to enable support
+	  IRQ chips. If you are unsure say 'y'.
+
+endmenu
+

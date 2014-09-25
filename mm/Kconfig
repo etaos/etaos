@@ -7,6 +7,31 @@ config MALLOC
 	  Enable or disable the memory allocator. If you're not
 	  sure, say 'Y' here.
 
+choice
+	prompt "Memory allocation algo"
+
+config MM_FIRST_FIT
+	bool "First fit allocator"
+	depends on MALLOC
+	help
+	  Say 'y' here if you want to build the first fit allocator.
+	  Code size wise this is the smallest allocator, but on
+	  allocation heavy systems it might cause trouble due to
+          resonably heavy memory fragmentation over time. If your system
+	  uses kmalloc/kfree allot you might be better of with the
+	  best fit allocator. If you are unsure say 'y' here.
+
+config MM_BEST_FIT
+	bool "Best fit allocator"
+	depends on MALLOC
+	help
+	  Say 'y'here if you want to build the best fit allocator instead.
+	  It it is a little bit bigger than the first fit allocator, but
+	  it treats the memory quite a bit better. Fragmentation is kept
+	  to a minimum and a single allocation takes up less space.
+
+endchoice
+
 config MMDEBUG
 	bool "Memory debugger"
 	help

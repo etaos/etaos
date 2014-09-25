@@ -21,17 +21,48 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/mutex.h>
+
+#ifdef CONFIG_MM_TRACE_OWNER
+#include <etaos/thread.h>
+#endif
 
 #define MM_MAGIC_BYTE 0x99
 
 struct heap_node {
 	struct heap_node *next;
 	uint8_t magic;
+	
 	size_t size;
+	unsigned long flags;
+#ifdef CONFIG_MM_TRACE_OWNER
+	struct thread *owner;
+#endif
 };
+
+#define MM_ALLOC_FLAG 0
 
 #define MEM __attribute__((malloc))
 
+extern struct heap_node *mm_head;
+extern mutex_t mlock;
+
 extern MEM void* mm_alloc(size_t);
 
+extern void mm_init_node(struct heap_node *node, size_t size);
+extern int mm_use_node(struct heap_node *node);
+extern void mm_split_node(struct heap_node *node, size_t ns);
+extern struct heap_node *mm_merge_node(struct heap_node *a, 
+		struct heap_node *b);
+extern int mm_return_node(struct heap_node *node);
+extern void mm_use_block(struct heap_node *node, struct heap_node *prev);
+extern int mm_kfree(void *ptr);
+extern void mm_heap_add_block(void *start, size_t size);
+extern size_t mm_heap_available(void);
+extern void mm_init(void *start, size_t size);
+
+#define kmalloc(__s) mm_alloc(__s)
+#define kfree(__ptr) mm_kfree(__ptr)
+
 #endif
+
