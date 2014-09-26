@@ -31,5 +31,28 @@ void arch_irq_enable();
 #define irq_disable() arch_irq_disable()
 #define irq_enable() arch_irq_enable()
 
+struct irq_data;
+typedef enum {
+	IRQ_NONE = 0 << 0,
+	IRQ_HANDLED = 1 << 0,
+	IRQ_WAKE_OWNER = 1 << 1,
+} irqreturn_t;
+typedef irqreturn_t (*irq_vector_t)(struct irq_data *irq, void *data);
+
+struct irq_data {
+	unsigned int irq;
+	unsigned int vector;
+
+	unsigned long flags;
+	struct irq_chip *chip;
+
+	irq_vector_t handler;
+	void *private_data;
+};
+struct irq_chip {
+};
+
+
+
 #endif
 

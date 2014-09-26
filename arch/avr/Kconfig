@@ -75,6 +75,13 @@ config ATMEGA328
 	  AVR core.
 endchoice
 
+config ATMEGA328_VECTORS
+	int "ATmega328 vectors"
+	depends on ATMEGA328
+	default 26
+	help
+	  Set the amount of available vectors.
+
 endmenu
 
 source "kernel/Kconfig"

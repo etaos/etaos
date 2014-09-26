@@ -31,4 +31,9 @@ typedef short int16_t;
 typedef arch_size_t size_t;
 typedef arch_ssize_t ssize_t;
 
+struct list_head {
+	struct list_head *next;
+	struct list_head *prev;
+};
+
 #endif
