@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - ETA/OS kernel header
+ *  Eta/OS - Compiler definitions
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,31 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ETAOS_KERNEL_H__
-#define __ETAOS_KERNEL_H__
+#ifndef __COMPILER_H__
+#define __COMPILER_H__
 
-#include <generated/autoconf.h>
-#include <etaos/types.h>
-#include <etaos/stddef.h>
-#include <etaos/compiler.h>
-
-#define NULL ((void*)0)
-#define ERR_PTR ((void*)-1)
-#define FALSE 0
-#define TRUE !FALSE
-
-#define true TRUE
-#define false FALSE
-
-#ifdef __compiler_offsetof
-#define offsetof(TYPE, MEMBER) __compiler_offsetof(TYPE,MEMBER)
-#else
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+#ifdef __GNUC__
+#include <etaos/compiler-gcc.h>
 #endif
 
-#define container_of(ptr, type, member) ({		\
-		const typeof( ((type *)0)->member) *__mptr = (ptr); \
-		(type *)( ( char *)__mptr - offsetof(type,member) );})
-
 #endif
-
