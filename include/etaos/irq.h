@@ -19,6 +19,9 @@
 #ifndef __IRQ_H__
 #define __IRQ_H__
 
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+
 extern void irq_save_and_disable(unsigned long *flags);
 extern void irq_restore(unsigned long *flags);
 
@@ -42,6 +45,7 @@ typedef irqreturn_t (*irq_vector_t)(struct irq_data *irq, void *data);
 struct irq_data {
 	unsigned int irq;
 	unsigned int vector;
+	struct list_head irq_list;
 
 	unsigned long flags;
 	struct irq_chip *chip;
@@ -49,10 +53,41 @@ struct irq_data {
 	irq_vector_t handler;
 	void *private_data;
 };
+
+#define IRQ_ENABLE_FLAG 0
+#define IRQ_RISING_FLAG 1
+#define IRQ_FALLING_FLAG 2
+
+#define IRQ_RISING_MASK (1 << IRQ_RISING_FLAG)
+#define IRQ_FALLING_MASK (1 << IRQ_FALLING_FLAG)
+
 struct irq_chip {
+	const char *name;
+	struct list_head irqs;
+
+	void (*sleep)(struct irq_chip *chip);
+	void (*resume)(struct irq_chip *chip);
 };
 
+extern int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq);
+extern int irq_chip_init(struct irq_chip *chip, const char *name);
+extern int irq_request(int irq, unsigned long flags);
+extern int irq_set_handle(int irq, irq_vector_t vector);
 
+/* IRQ CHIP FUNCTIONS */
 
+extern struct irq_chip *arch_get_irq_chip(void);
+
+static inline void irq_chip_set_sleep(struct irq_chip *chip,
+				      void (*sleep)(struct irq_chip *))
+{
+	chip->sleep = sleep;
+}
+
+static inline void irq_chip_set_resume(struct irq_chip *chip,
+				      void (*resume)(struct irq_chip *))
+{
+	chip->resume = resume;
+}
 #endif
 
