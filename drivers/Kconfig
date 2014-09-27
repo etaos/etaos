@@ -2,4 +2,6 @@ menu "Device drivers"
 
 source "drivers/core/Kconfig"
 
+source "drivers/usart/Kconfig"
+
 endmenu

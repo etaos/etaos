@@ -1,0 +1,5 @@
+menuconfig USART
+	tristate "USART support"
+	help
+	  Say 'y' here if you want to build support
+	  for USARTs.

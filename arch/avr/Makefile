@@ -11,7 +11,15 @@ KBUILD_CFLAGS += -nostdlib -nostdinc -ffreestanding -std=gnu89
 KBUILD_CFLAGS += -Iarch/avr/include $(KBUILD_DBG)
 KBUILD_AFLAGS += -Iarch/avr/include
 
-cflags-$(CONFIG_ATMEGA328) += -mmcu=atmega328
+mcu-$(CONFIG_ATMEGA328) = atmega328
+
+ifneq ($(CONFIG_PICO_POWER),)
+	MCU=$(addsuffix p, $(mcu-y))
+else
+	MCU=$(mcu-y)
+endif
+
+cflags-y += -mmcu=$(MCU)
 aflags-$(CONFIG_ATMEGA328) += -mmcu=avr5
 lflags-$(CONFIG_ATMEGA328) += -mavr5 -nostdlib -nostdinc
 

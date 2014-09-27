@@ -16,6 +16,12 @@ config STACK_SIZE
 	  other threads if no stack size is given when a new
 	  thread is created.
 
+config FCPU
+	int "CPU frequency"
+	default 8000000
+	help
+	  Enter the frequency your CPU will be running on here.
+
 config SIMUL_AVR
 	bool "Enable SIMULAVR support"
 	select VFS
@@ -74,6 +80,14 @@ config ATMEGA328
 	  Select if you are building for the Atmel ATmega328 or ATmega328p
 	  AVR core.
 endchoice
+
+config PICO_POWER
+	bool "Pico power"
+	depends on ATMEGA328
+	help
+	  Select if you are building for the pico power variant
+	  of your CPU. Do not select this option of you are not
+	  planning to run on a pico power CPU.
 
 config ATMEGA328_VECTORS
 	int "ATmega328 vectors"
