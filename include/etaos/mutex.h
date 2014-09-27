@@ -44,6 +44,11 @@ typedef struct mutex {
 
 #include <asm/spinlock.h>
 
+static inline void mutex_init(mutex_t *mutex)
+{
+	mutex->lock = 0;
+}
+
 static inline void _mutex_lock_irqsave(mutex_t *lock, unsigned long *flags)
 {
 	irq_save_and_disable(flags);
@@ -61,3 +66,4 @@ static inline void _mutex_unlock_irqrestore(mutex_t *lock, unsigned long *flags)
 #endif
 
 #endif
+
