@@ -9,3 +9,5 @@
 .tmp_versions/
 include/config
 include/generated
+.vimws/*
+.vimws/
