@@ -11,3 +11,4 @@ include/config
 include/generated
 .vimws/*
 .vimws/
+_theme_packages/
