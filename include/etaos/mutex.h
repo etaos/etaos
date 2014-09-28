@@ -40,9 +40,9 @@ typedef struct mutex {
 #ifdef CONFIG_EVENT_MUTEX
 #else
 
-#define DEFINE_MUTEX(__n) mutex_t __n = { .lock = 0, }
-
 #include <asm/spinlock.h>
+
+#define DEFINE_MUTEX(__n) mutex_t __n = { .lock = 0, }
 
 static inline void mutex_init(mutex_t *mutex)
 {
