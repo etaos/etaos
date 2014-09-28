@@ -22,6 +22,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
+
 #include <asm/spinlock.h>
 
 #define spin_lock(__l) arch_spin_lock(__l)

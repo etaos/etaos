@@ -40,7 +40,7 @@ typedef struct mutex {
 #ifdef CONFIG_EVENT_MUTEX
 #else
 
-#include <asm/spinlock.h>
+#include <asm/mutex.h>
 
 #define DEFINE_MUTEX(__n) mutex_t __n = { .lock = 0, }
 

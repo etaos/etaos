@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Spinlock header
+ *  ETA/OS - Mutex header
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,29 +17,24 @@
  */
 
 #if !defined(__MUTEX_H__) && !defined(__SPINLOCK_H__)
-#error Do not include <asm/spinlock.h> directly. \
+#error Do not include <asm/mutex.h> directly. \
 	Use <etaos/mutex.h> or <etaos/spinlock.h>!
 #endif
 
-#ifndef __AVR_SPINLOCK_H__
-#define __AVR_SPINLOCK_H__
-
-typedef struct spinlock {
-	uint8_t lock;
-} spinlock_t;
+#ifndef __AVR_MUTEX_H__
+#define __AVR_MUTEX_H__
 
 extern void avr_spin_lock(unsigned char *);
 extern void avr_spin_unlock(unsigned char*);
 
-static inline void arch_spin_lock(spinlock_t *spin)
+static inline void arch_mutex_lock(mutex_t *mutex)
 {
-	avr_spin_lock((unsigned char*)&spin->lock);
+	avr_spin_lock((unsigned char*)&mutex->lock);
 }
 
-static inline void arch_spin_unlock(spinlock_t *spin)
+static inline void arch_mutex_unlock(mutex_t *mutex)
 {
-	avr_spin_unlock((unsigned char*)&spin->lock);
+	avr_spin_unlock((unsigned char*)&mutex->lock);
 }
 
-#endif
-
+#endif /* __AVR_MUTEX_H__ */
