@@ -13,7 +13,7 @@ config ARCH_SET_BIT
 config ARCH_CLEAR_BIT
 	bool
 
-menu "Generic system options"
+menu "Generic system configuration"
 
 config IRQ_SUPPORT
 	bool "IRQ core"
