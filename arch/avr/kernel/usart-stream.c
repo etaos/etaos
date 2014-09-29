@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - AVR5 arch boot
+ *  ETA/OS - STDIO streams of the USART
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,36 +17,43 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/bitops.h>
+#include <etaos/types.h>
 #include <etaos/stdio.h>
-#include <etaos/vfs.h>
-#include <etaos/mem.h>
 
 #include <asm/io.h>
-#include <asm/simulavr.h>
 #include <asm/usart.h>
 
-extern void avr_init(void);
-extern unsigned char __heap_start;
-extern int main(void);
-
-void avr_init(void)
+static int avr_usart_putc(int c, FILE stream)
 {
-#ifdef CONFIG_MALLOC
-	size_t hsize = RAMEND - CONFIG_STACK_SIZE - (size_t)&__heap_start;
-	mm_init((void*)&__heap_start, hsize);
-#endif
+	if(c == '\n')
+		avr_usart_putc('\r', stream);
 
-#ifdef CONFIG_VFS
-	vfs_init();
-#endif
+	while(( UCSR0A & BIT(UDRE0) ) == 0);
+	UCSR0A |= BIT(TXCn);
+	UDR0 = c;
 
-#ifdef CONFIG_STDIO_SIMUL_AVR
-	simul_avr_setup_streams();
-#elif CONFIG_STDIO_USART
-	avr_setup_usart_streams();
-#endif
-	main();
+	return c;
+}
 
-	while(1);
+static FDEV_SETUP_STREAM(usart_stream,
+			 NULL,
+			 NULL,
+			 &avr_usart_putc,
+			 NULL,
+			 NULL,
+			 "SIMAVR_STREAM",
+			 _FDEV_SETUP_RW,
+			 NULL);
+
+void avr_setup_usart_streams(void)
+{
+	UBRR0H = UBRR0H_VALUE;
+	UBRR0L = UBRR0L_VALUE;
+	UCSR0A &= ~(BIT(U2X0));
+	UCSR0C = BIT(UCSZ01) | BIT(UCSZ00);
+	UCSR0B = BIT(TXEN0);
+
+	stdout = &usart_stream;
+	stdin = &usart_stream;
+	stderr = &usart_stream;
 }

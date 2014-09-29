@@ -19,6 +19,16 @@
 #ifndef __ARCH_IO_H_
 #define __ARCH_IO_H_
 
+#include <asm/config.h>
+
+#define BIT(__x) (1 << (__x))
+#define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
+#define F_CPU CONFIG_FCPU
+
+#ifdef CONFIG_ATMEGA328P
+#define CONFIG_ATMEGA328
+#endif
+
 #ifdef CONFIG_ATMEGA328
 #include <asm/iom328.h>
 #endif
