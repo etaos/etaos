@@ -19,6 +19,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/stdio.h>
+#include <etaos/string.h>
 #include <etaos/mutex.h>
 #include <etaos/device.h>
 #include <etaos/list.h>
@@ -113,7 +114,16 @@ static struct device *dev_allocate(struct dev_file_ops *fops)
 
 struct device *dev_get_by_name(const char *name)
 {
-	return NULL;
+	struct device *dev;
+	struct list_head *carriage;
+
+	list_for_each(carriage, &dev_root) {
+		dev = list_entry(carriage, struct device, devs);
+		if(!strcmp(name, dev->name))
+			return dev;
+	}
+
+	return NULL; /* no device has been found */
 }
 
 int pdev_add(struct platform_device *pdev, struct dev_file_ops *fops)
