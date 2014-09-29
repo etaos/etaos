@@ -57,15 +57,18 @@ struct irq_data {
 #define IRQ_ENABLE_FLAG 0
 #define IRQ_RISING_FLAG 1
 #define IRQ_FALLING_FLAG 2
+#define IRQ_SLOW_SOFT_FLAG 3
 
 #define IRQ_ENABLE_MASK (1 << IRQ_ENABLE_FLAG)
 #define IRQ_RISING_MASK (1 << IRQ_RISING_FLAG)
 #define IRQ_FALLING_MASK (1 << IRQ_FALLING_FLAG)
+#define IRQ_SLOW_SOFT_MASK (1 << IRQ_SLOW_SOFT_FLAG)
 
 struct irq_chip {
 	const char *name;
 	struct list_head irqs;
 
+	void (*chip_handle)(int irq);
 	void (*sleep)(struct irq_chip *chip);
 	void (*resume)(struct irq_chip *chip);
 };
@@ -75,6 +78,10 @@ extern int irq_chip_init(struct irq_chip *chip, const char *name);
 extern int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 			void *irq_data);
 extern int irq_set_handle(int irq, irq_vector_t vector);
+extern struct irq_data *irq_to_data(int irq);
+
+/* IRQ HANDLE FUNCTIONS */
+extern void irq_handle(int irq);
 
 /* IRQ CHIP FUNCTIONS */
 

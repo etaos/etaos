@@ -19,11 +19,12 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
+#include <etaos/list.h>
 
 static struct irq_chip avr_irq_chip = {
 	.name = "avr_irq_chip",
-	.irqs.next = &avr_irq_chip.irqs,
-	.irqs.prev = &avr_irq_chip.irqs,
+	.irqs = STATIC_INIT_LIST_HEAD(avr_irq_chip.irqs),
+	.chip_handle = &irq_handle,
 	.sleep = NULL,
 	.resume = NULL,
 };

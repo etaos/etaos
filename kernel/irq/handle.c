@@ -21,3 +21,26 @@
 #include <etaos/list.h>
 #include <etaos/irq.h>
 #include <etaos/error.h>
+#include <etaos/bitops.h>
+
+static void irq_handle_hard_irq(struct irq_data *data)
+{
+}
+
+static void irq_handle_slow_irq(struct irq_data *data)
+{
+}
+
+void irq_handle(int irq)
+{
+	struct irq_data *data;
+
+	data = irq_to_data(irq);
+	if(!data || !test_bit(IRQ_ENABLE_FLAG, &data->flags))
+		return;
+
+	if(test_bit(IRQ_SLOW_SOFT_FLAG, &data->flags))
+		irq_handle_slow_irq(data);
+	else
+		irq_handle_hard_irq(data);
+}

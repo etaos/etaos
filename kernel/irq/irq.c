@@ -27,7 +27,7 @@
 
 static void *arch_irqs[CONFIG_ARCH_VECTORS];
 
-static inline struct irq_data *irq_to_data(int irq)
+struct irq_data *irq_to_data(int irq)
 {
 	if(irq >= CONFIG_ARCH_VECTORS)
 		return NULL;
