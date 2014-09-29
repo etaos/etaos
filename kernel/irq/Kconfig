@@ -1,0 +1,16 @@
+menuconfig IRQ_SUPPORT
+	bool "IRQ core"
+	select MALLOC
+	help
+	  Say 'y' here if you want to enable support
+	  IRQ chips. If you are unsure say 'y'.
+
+if IRQ_SUPPORT
+
+config IRQ_DEBUG
+	bool "IRQ debug support"
+	help
+	  Say 'y' here if you want to build IRQ debugging. This
+	  option is useful for ETA/OS developers. If you are
+	  unsure say 'N' here.
+endif

@@ -59,19 +59,24 @@ void irq_restore(unsigned long *flags)
 	arch_irq_restore_flags(flags);
 }
 
-int irq_request(int irq, unsigned long flags)
+int irq_request(int irq, irq_vector_t vector, unsigned long flags,
+		void *irq_data)
 {
-	struct irq_data *idata;
+	struct irq_data *data;
 
-	idata = irq_to_data(irq);
-	if(!idata) {
-		idata = kmalloc(sizeof(*idata));
-		irq_store_data(irq, idata);
-	}
+	data = kmalloc(sizeof(*data));
+	if(!data)
+		return -ENOMEM;
 
-	idata->irq = irq;
-	idata->flags = flags & (IRQ_RISING_MASK | IRQ_FALLING_MASK);
-	set_bit(IRQ_ENABLE_FLAG, &idata->flags);
+	data->irq = irq;
+	data->handler = vector;
+	data->flags = flags;
+	data->private_data = data;
+	data->chip = arch_get_irq_chip();
+	irq_chip_add_irq(data->chip, data);
+	irq_store_data(irq, data);
+
+	set_bit(IRQ_ENABLE_FLAG, &data->flags);
 	return -EOK;
 }
 

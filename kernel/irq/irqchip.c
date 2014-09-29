@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - AVR IRQ support
+ *  ETA/OS - IRQ chip
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,40 +16,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define AVR_IRQ_CORE 1
-
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/irq.h>
-#include <etaos/bitops.h>
 #include <etaos/list.h>
+#include <etaos/irq.h>
+#include <etaos/error.h>
 
-#include <asm/io.h>
-#include <asm/irq.h>
-
-void arch_irq_disable(void)
+int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq)
 {
-	cli();
+	if(chip == NULL || irq == NULL)
+		return -ENOTINITIALISED;
+
+	irq->chip = chip;
+	list_add(&irq->irq_list, &chip->irqs);
+	return 0;
 }
 
-void arch_irq_enable(void)
+int irq_chip_init(struct irq_chip *chip, const char *name)
 {
-	sei();
-}
+	if(!chip)
+		return -ENOTINITIALISED;
 
-unsigned long arch_irq_get_flags(void)
-{
-	return ((unsigned long) (SREG & AVR_IRQ_BITS));
-}
-
-void arch_irq_restore_flags(unsigned long *flags)
-{
-	if(test_bit(AVR_IRQ_FLAG, flags))
-		sei();
-	return;
-}
-
-SIGNAL(TIMER0_OVERFLOW_VECTOR)
-{
+	chip->name = name;
+	chip->sleep = NULL;
+	chip->resume = NULL;
+	return -EOK;
 }
 

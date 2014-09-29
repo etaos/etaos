@@ -27,6 +27,7 @@
 #include <asm/usart.h>
 
 extern void avr_init(void);
+extern void avr_install_irqs(void);
 extern unsigned char __heap_start;
 extern int main(void);
 
