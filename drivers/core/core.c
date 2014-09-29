@@ -126,7 +126,7 @@ struct device *dev_get_by_name(const char *name)
 	return NULL; /* no device has been found */
 }
 
-int pdev_add(struct platform_device *pdev, struct dev_file_ops *fops)
+int dev_register_pdev(struct platform_device *pdev, struct dev_file_ops *fops)
 {
 	struct device *dev;
 
