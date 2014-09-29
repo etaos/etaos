@@ -13,5 +13,7 @@ source "lib/stdio/Kconfig"
 
 source "lib/stdlib/Kconfig"
 
+source "lib/string/Kconfig"
+
 endif
 

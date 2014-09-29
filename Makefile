@@ -2,9 +2,9 @@
 # ETA/OS root Makefile
 #
 
-VERSION = 2
-PATCHLEVEL = 6
-SUBLEVEL = 38
+VERSION = 0
+PATCHLEVEL = 0
+SUBLEVEL = 1
 EXTRAVERSION =
 NAME = Sheep on Meth
 
@@ -244,13 +244,18 @@ all: etaos modules
 
 # mrproper - Delete all generated files, including .config
 #
+
+quiet_cmd_mrproper_dirs = CLEAN $(mrproper-rmdirs)
+      cmd_mrproper_dirs = rm -rf $(mrproper-rmdirs)
 mrproper-dirs      := $(addprefix _mrproper_,scripts)
+mrproper-rmdirs += include/config include/generated
 
 PHONY += $(mrproper-dirs) mrproper
 $(mrproper-dirs):
+	$(call cmd,mrproper_dirs)
 	$(Q)$(MAKE) $(clean)=$(patsubst _mrproper_%,%,$@)
 
-mrproper: $(mrproper-dirs)
+mrproper: clean $(mrproper-dirs)
 
 quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
       cmd_rmdirs = rm -rf $(rm-dirs)

@@ -57,6 +57,20 @@ static inline int list_empty(const struct list_head *head)
 	return (head->next == head);
 }
 
+#define list_for_each(pos, head) \
+		for(pos = (head)->next; pos != (head); pos = pos->next)
+
+#define list_for_each_prev(pos, head) \
+		for(pos = (head)->prev; pos != (head); pos = pos->prev)
+
+#define list_for_each_safe(pos, n, head) \
+		for(pos = (head)->next, n = pos->next; pos != (head); \
+				pos = n, n = pos->next)
+
+#define list_for_each_prev_safe(pos, n, head) \
+		for(pos = (head)->prev, n = pos->prev; pos != (head); \
+				pos = n, n = pos->prev)
+
 #define list_add(___n, ___h) __list_add(___n, ___h, (___h)->next)
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
 
