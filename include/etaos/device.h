@@ -54,6 +54,7 @@ extern int device_create(struct device *dev, struct dev_file_ops *fops);
 extern int pdev_add(struct platform_device *pdev, struct dev_file_ops *fops);
 extern void dev_core_init();
 extern int dev_set_fops(struct device *dev, struct dev_file_ops *fops);
+extern struct device *dev_get_by_name(const char *name);
 
 static inline void *pdev_get_iobase(struct platform_device *pdev)
 {

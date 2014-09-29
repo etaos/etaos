@@ -111,6 +111,11 @@ static struct device *dev_allocate(struct dev_file_ops *fops)
 	return dev;
 }
 
+struct device *dev_get_by_name(const char *name)
+{
+	return NULL;
+}
+
 int pdev_add(struct platform_device *pdev, struct dev_file_ops *fops)
 {
 	struct device *dev;
