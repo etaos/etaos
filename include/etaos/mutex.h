@@ -40,9 +40,14 @@ typedef struct mutex {
 #ifdef CONFIG_EVENT_MUTEX
 #else
 
+#include <asm/mutex.h>
+
 #define DEFINE_MUTEX(__n) mutex_t __n = { .lock = 0, }
 
-#include <asm/spinlock.h>
+static inline void mutex_init(mutex_t *mutex)
+{
+	mutex->lock = 0;
+}
 
 static inline void _mutex_lock_irqsave(mutex_t *lock, unsigned long *flags)
 {
@@ -61,3 +66,4 @@ static inline void _mutex_unlock_irqrestore(mutex_t *lock, unsigned long *flags)
 #endif
 
 #endif
+

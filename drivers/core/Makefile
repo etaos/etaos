@@ -1,2 +1,2 @@
-obj-$(CONFIG_DRIVER_CORE) += driver_core.o
-driver_core-y += core.o
+obj-$(CONFIG_DRIVER_CORE) += driver-core.o
+driver-core-y += core.o
