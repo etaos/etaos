@@ -28,21 +28,39 @@
 
 #include <asm/io.h>
 
-static inline void atomic_inc(atomic_t *atom)
+static inline void atomic_add(int nr, atomic_t *atom)
 {
 	unsigned long flags;
 
 	irq_save_and_disable(&flags);
-	atom->value += 1;
+	atom->value += nr;
 	irq_restore(&flags);
 }
 
-static inline void atomic64_inc(atomic64_t *atom)
+static inline void atomic64_add(int64_t nr, atomic64_t *atom)
 {
 	unsigned long flags;
 
 	irq_save_and_disable(&flags);
-	atom->value += 1;
+	atom->value += nr;
+	irq_restore(&flags);
+}
+
+static inline void atomic_sub(int nr, atomic_t *atom)
+{
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	atom->value -= nr;
+	irq_restore(&flags);
+}
+
+static inline void atomic64_sub(int64_t nr, atomic64_t *atom)
+{
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	atom->value -= nr;
 	irq_restore(&flags);
 }
 
@@ -69,6 +87,12 @@ static inline int64_t atomic64_get(atomic64_t *atom)
 
 	return value;
 }
+
+#define atomic_inc(atom) atomic_add(1, atom)
+#define atomic64_inc(atom) atomic64_add(1LL, atom)
+
+#define atomic_dec(atom) atomic_sub(1, atom)
+#define atomic64_dec(atom) atomic64_sub(1, atom)
 
 #endif /* __AVR_ASM_ATOMIC_H__ */
 
