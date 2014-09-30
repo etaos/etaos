@@ -24,11 +24,16 @@
 #include <etaos/atomic.h>
 
 struct clocksource {
+	const char *name;
 
+	int (*enable)(struct clocksource*);
+	void (*disable)(struct clocksource*);
+
+	struct list_head timers;
 };
 
 struct timer {
-	struct list_head timers;
+	struct list_head list;
 
 	struct clocksource *source;
 	void (*handle)(struct timer *timer, void *arg);
