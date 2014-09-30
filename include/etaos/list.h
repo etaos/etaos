@@ -72,6 +72,7 @@ static inline int list_empty(const struct list_head *head)
 				pos = n, n = pos->prev)
 
 #define list_add(___n, ___h) __list_add(___n, ___h, (___h)->next)
+#define list_add_tail(__n, __h) __list_add(__n, (__h)->prev, __h)
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
 
 #endif
