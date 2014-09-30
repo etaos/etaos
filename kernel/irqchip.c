@@ -27,7 +27,7 @@ int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq)
 	if(chip == NULL || irq == NULL)
 		return -ENOTINITIALISED;
 
-	list_add(&chip->irqs, &irq->irq_list);
+	list_add(&irq->irq_list, &chip->irqs);
 	return 0;
 }
 
