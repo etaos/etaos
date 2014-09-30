@@ -44,25 +44,34 @@ typedef irqreturn_t (*irq_vector_t)(struct irq_data *irq, void *data);
 
 struct irq_data {
 	unsigned int irq;
-	unsigned int vector;
 	struct list_head irq_list;
 
 	unsigned long flags;
+	uint64_t num;
 	struct irq_chip *chip;
 
 	irq_vector_t handler;
 	void *private_data;
 };
 
+#ifdef CONFIG_SCHED
+struct irq_thread_data {
+	struct thread *thread;
+	struct irq_data idata;
+};
+#endif
+
 #define IRQ_ENABLE_FLAG 0
 #define IRQ_RISING_FLAG 1
 #define IRQ_FALLING_FLAG 2
 #define IRQ_SLOW_SOFT_FLAG 3
+#define IRQ_SLOW_TRIGGERED_FLAG 4
 
 #define IRQ_ENABLE_MASK (1 << IRQ_ENABLE_FLAG)
 #define IRQ_RISING_MASK (1 << IRQ_RISING_FLAG)
 #define IRQ_FALLING_MASK (1 << IRQ_FALLING_FLAG)
 #define IRQ_SLOW_SOFT_MASK (1 << IRQ_SLOW_SOFT_FLAG)
+#define IRQ_SLOW_TRIGGERED_MASK (1 << IRQ_SLOW_TRIGGERED_FLAG)
 
 struct irq_chip {
 	const char *name;

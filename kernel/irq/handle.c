@@ -25,6 +25,33 @@
 
 static void irq_handle_hard_irq(struct irq_data *data)
 {
+	irqreturn_t retv;
+#ifdef CONFIG_SCHED
+	struct irq_thread_data *tdata;
+#endif
+
+	retv = data->handler ?
+		data->handler(data, data->private_data) : IRQ_NONE;
+	switch(retv) {
+	case IRQ_NONE:
+		break;
+
+	case IRQ_HANDLED:
+		data->num += 1;
+		break;
+
+#ifdef CONFIG_SCHED
+	case IRQ_WAKE_OWNER:
+		data->num += 1;
+		tdata = container_of(data, struct irq_thread_data, idata);
+		thread_wake_up_from_irq(tdata->thread);
+		break;
+#endif
+
+	default:
+		break;
+	}
+	
 }
 
 static void irq_handle_slow_irq(struct irq_data *data)
