@@ -59,10 +59,18 @@ void irq_restore(unsigned long *flags)
 	arch_irq_restore_flags(flags);
 }
 
+#ifdef CONFIG_SCHED
+static int irq_request_threaded_irq(struct irq_data *irq)
+{
+	return -EINVAL;
+}
+#endif
+
 int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 		void *irq_data)
 {
 	struct irq_data *data;
+	int err;
 
 	data = kmalloc(sizeof(*data));
 	if(!data)
@@ -73,11 +81,20 @@ int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 	data->flags = flags;
 	data->private_data = data;
 	data->chip = arch_get_irq_chip();
-	irq_chip_add_irq(data->chip, data);
+#ifdef CONFIG_SCHED
+	if(test_bit(IRQ_THREADED_FLAG, &flags)) {
+		err = irq_request_threaded_irq(data);
+		if(err) {
+			kfree(data);
+			return err;
+		}
+	}
+#endif
+	err = irq_chip_add_irq(data->chip, data);
 	irq_store_data(irq, data);
 
 	set_bit(IRQ_ENABLE_FLAG, &data->flags);
-	return -EOK;
+	return err;
 }
 
 int irq_set_handle(int irq, irq_vector_t vector)
