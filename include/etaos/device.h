@@ -50,7 +50,8 @@ struct dev_file_ops {
 	int (*get)(int c, struct file*);
 };
 
-extern int device_create(struct device *dev, struct dev_file_ops *fops);
+extern int device_create(struct device *dev, const char *name,
+		struct dev_file_ops *fops);
 extern int dev_register_pdev(struct platform_device *pdev, 
 		struct dev_file_ops *fops);
 extern void dev_core_init();

@@ -49,7 +49,8 @@ static void device_release(struct device *dev)
 	kfree(dev);
 }
 
-int device_create(struct device *dev, struct dev_file_ops *fops)
+int device_create(struct device *dev, const char *name, 
+		struct dev_file_ops *fops)
 {
 	if(!dev)
 		return -EINVAL;
@@ -60,6 +61,8 @@ int device_create(struct device *dev, struct dev_file_ops *fops)
 			return -ENOMEM;
 	}
 
+	dev->name = name;
+	dev->file->name = name;
 	_dev_set_fops(dev, fops);
 	list_add(&dev->devs, &dev_root);
 	return 0;
