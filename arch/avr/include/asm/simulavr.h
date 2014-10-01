@@ -24,5 +24,6 @@
 extern int simul_avr_write_byte(int c, FILE stream);
 extern void simul_avr_write_string(char *s, FILE stream);
 extern void simul_avr_setup_streams(void);
+extern void simul_avr_exit(void);
 
 #endif
