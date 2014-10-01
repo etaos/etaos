@@ -62,6 +62,15 @@ ifneq ($(DBG),)
 endif
 export KBUILD_DBG
 
+ifeq ($(MAKECMDGOALS),prepare)
+	NOLIBGCC := 1
+endif
+
+ifneq ($(filter config menuconfig xconfig gconfig nconfig oldconfig \
+	silentoldconfig, $(MAKECMDGOALS)),)
+	NOLIBGCC := 1
+endif
+
 ifeq ($(MAKECMDGOALS),modules)
 else
   KBUILD_BUILTIN := 1

@@ -53,8 +53,8 @@
 #ifdef CONFIG_SIMUL_AVR
 
 #define SIMO (*((volatile unsigned char*)0x20))
-#define SIMI (*((volatile unsigned char*)0x20))
-
+#define SIMI (*((volatile unsigned char*)0x21))
+#define SIME (*((volatile unsigned char*)0x22))
 
 #define STDOUT_PORT SIMO
 #define STDIN_PORT SIMI
