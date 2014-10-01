@@ -27,7 +27,7 @@
 #include <etaos/error.h>
 #include <etaos/mem.h>
 
-static struct list_head dev_root;
+static struct list_head dev_root = STATIC_INIT_LIST_HEAD(dev_root);
 
 static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops);
 static struct device *dev_allocate(const char *name, struct dev_file_ops *fops);
@@ -54,6 +54,9 @@ static inline int dev_name_is_unique(struct device *dev)
 {
 	struct list_head *carriage;
 	struct device *c_dev;
+
+	if(list_empty(&dev_root))
+		return -EOK;
 
 	list_for_each(carriage, &dev_root) {
 		c_dev = list_entry(carriage, struct device, devs);

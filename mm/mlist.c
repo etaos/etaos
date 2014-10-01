@@ -132,6 +132,8 @@ int mm_return_node(struct heap_node *node)
 {
 	struct heap_node *carriage;
 
+	clear_bit(MM_ALLOC_FLAG, &node->flags);
+
 	if(node < mm_head) {
 		node->next = mm_head;
 		mm_head = node;

@@ -22,6 +22,8 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 
+#define STATIC_INIT_LIST_HEAD(name) { &(name), &(name) }
+
 static inline void list_head_init(struct list_head *list)
 {
 	list->next = list;
