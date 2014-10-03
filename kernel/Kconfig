@@ -22,5 +22,7 @@ config IRQ_SUPPORT
 	  Say 'y' here if you want to enable support
 	  IRQ chips. If you are unsure say 'y'.
 
+source "kernel/time/Kconfig"
+
 endmenu
 

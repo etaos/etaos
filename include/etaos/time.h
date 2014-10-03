@@ -22,12 +22,16 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/atomic.h>
+#include <etaos/spinlock.h>
 
 struct clocksource {
 	const char *name;
 
 	int (*enable)(struct clocksource*);
 	void (*disable)(struct clocksource*);
+	unsigned long freq;
+	unsigned long tc, tc_resume;
+	spinlock_t lock;
 
 	struct list_head timers;
 };
@@ -42,5 +46,16 @@ struct timer {
 	unsigned long tleft;
 	unsigned long ticks;
 };
+
+#define TIMER_ONESHOT_FLAG 0
+#define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
+
+extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
+		void (*handle)(struct timer*,void*), void *arg,
+		unsigned long flags);
+extern int tm_clock_source_initialise(const char *name, struct clocksource *cs,
+		unsigned long freq, int (*enable)(struct clocksource *cs),
+		void (*disable)(struct clocksource *cs));
+extern int tm_stop_timer(struct timer *timer);
 
 #endif /* __TIMER_H__ */

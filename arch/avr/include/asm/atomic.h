@@ -25,6 +25,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/irq.h>
 
 #include <asm/io.h>
 
