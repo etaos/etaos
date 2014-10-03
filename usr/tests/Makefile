@@ -6,13 +6,27 @@ all: mm
 
 MAKEFLAGS += -rR --no-print-directory
 
+PHONY := mm
 mm: FORCE
 	@echo [SIMUL AVR] Running MM test
 	@$(MAKE) -C mm/ all test
 	@echo [SIMUL AVR] MM test ended
 	@echo
 
-FORCE:
+PHONY += timetest
+timetest: FORCE
+	@echo [SIMUL AVR] Running TMTEST test
+	@$(MAKE) -C tmtest/ test
+	@echo [SIMUL AVR] TMTEST test ended
+	@echo
 
+
+PHONY += clean
 clean: FORCE
 	@$(MAKE) -C mm/ clean
+	@$(MAKE) -C tmtest/ clean
+
+PHONY += FORCE
+FORCE:
+
+.PHONY: $(PHONY)
