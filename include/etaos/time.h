@@ -57,5 +57,6 @@ extern int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 		unsigned long freq, int (*enable)(struct clocksource *cs),
 		void (*disable)(struct clocksource *cs));
 extern int tm_stop_timer(struct timer *timer);
+extern void tm_process_clock(struct clocksource *cs);
 
 #endif /* __TIMER_H__ */

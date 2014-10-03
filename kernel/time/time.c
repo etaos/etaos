@@ -24,6 +24,7 @@
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
 #include <etaos/spinlock.h>
+#include <etaos/string.h>
 
 int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 		unsigned long freq, int (*enable)(struct clocksource *cs),
@@ -124,5 +125,52 @@ int tm_stop_timer(struct timer *timer)
 	}
 
 	return 1;
+}
+
+void tm_process_clock(struct clocksource *cs)
+{
+	struct list_head *carriage, *tmp;
+	struct timer *timer;
+	unsigned long diff;
+
+	diff = cs->tc - cs->tc_resume;
+	cs->tc_resume = cs->tc;
+	
+	if(list_empty(&cs->timers))
+		return;
+
+	spin_lock(&cs->lock);
+	list_for_each_safe(carriage, tmp, &cs->timers) {
+		timer = list_entry(carriage, struct timer, list);
+
+		if(timer->tleft < diff) {
+			diff -= timer->tleft;
+			timer->tleft = 0;
+		} else {
+			timer->tleft -= diff;
+			diff = 0;
+		}
+
+		if(!timer->tleft) {
+			if(timer->handle) {
+				spin_unlock(&cs->lock);
+				timer->handle(timer, timer->priv_data);
+				spin_lock(&cs->lock);
+			}
+
+			list_del(&timer->list);
+			if(timer->ticks) {
+				timer->tleft = timer->ticks;
+				tm_start_timer(timer);
+			} else {
+				kfree(timer);
+			}
+		}
+
+		if(!diff)
+			break;
+	}
+
+	spin_unlock(&cs->lock);
 }
 
