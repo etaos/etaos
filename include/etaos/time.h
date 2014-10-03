@@ -33,6 +33,7 @@ struct clocksource {
 	unsigned long tc, tc_resume;
 	spinlock_t lock;
 
+	struct list_head list;
 	struct list_head timers;
 };
 
@@ -58,5 +59,6 @@ extern int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 		void (*disable)(struct clocksource *cs));
 extern int tm_stop_timer(struct timer *timer);
 extern void tm_process_clock(struct clocksource *cs);
+extern struct clocksource *tm_get_source_by_name(const char *name);
 
 #endif /* __TIMER_H__ */

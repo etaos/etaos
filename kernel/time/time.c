@@ -26,6 +26,8 @@
 #include <etaos/spinlock.h>
 #include <etaos/string.h>
 
+static struct list_head sources = STATIC_INIT_LIST_HEAD(sources);
+
 int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 		unsigned long freq, int (*enable)(struct clocksource *cs),
 		void (*disable)(struct clocksource *cs))
@@ -41,6 +43,7 @@ int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 	cs->tc = 0;
 	cs->tc_resume = 0;
 	spin_lock_init(&cs->lock);
+	list_add(&cs->list, &sources);
 	return -EOK;
 }
 
@@ -172,5 +175,19 @@ void tm_process_clock(struct clocksource *cs)
 	}
 
 	spin_unlock(&cs->lock);
+}
+
+struct clocksource *tm_get_source_by_name(const char *name)
+{
+	struct clocksource *cs;
+	struct list_head *carriage;
+
+	list_for_each(carriage, &sources) {
+		cs = list_entry(carriage, struct clocksource, list);
+		if(!strcmp(name, cs->name))
+				return cs;
+	}
+
+	return NULL;
 }
 
