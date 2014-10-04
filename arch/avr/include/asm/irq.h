@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - IRQ chip
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - AVR IRQ definitions
+ *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,29 +16,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <etaos/kernel.h>
-#include <etaos/types.h>
-#include <etaos/list.h>
-#include <etaos/irq.h>
-#include <etaos/error.h>
+#ifndef __AVR_IRQ_H__
+#define __AVR_IRQ_H__
 
-int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq)
-{
-	if(chip == NULL || irq == NULL)
-		return -ENOTINITIALISED;
+#define IRQ_ENTRY_ATTRIBS signal, used, externally_visible
 
-	list_add(&irq->irq_list, &chip->irqs);
-	return 0;
-}
+#define irq_vector(num) __vector_ ## num
 
-int irq_chip_init(struct irq_chip *chip, const char *name)
-{
-	if(!chip)
-		return -ENOTINITIALISED;
+#define TIMER0_OVERFLOW_VECTOR_NUM 16
+#define SPI_STC_VECTOR_NUM	   17
+#define TWI_STC_VECTOR_NUM	   24
 
-	chip->name = name;
-	chip->sleep = NULL;
-	chip->resume = NULL;
-	return -EOK;
-}
+#define TIMER0_OVERFLOW_VECTOR irq_vector(16)
+#define SPI_STC_VECTOR irq_vector(17)
+#define TWI_STC_VECTOR irq_vector(24)
+
+#define SIGNAL(_vector) \
+	void _vector(void) __attribute__((IRQ_ENTRY_ATTRIBS)); \
+	void _vector(void)
+
+#endif /* __AVR_IRQ_H__ */
 

@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - AVR5 arch boot
+ *  ETA/OS - AVR CPU
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,40 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <etaos/kernel.h>
-#include <etaos/bitops.h>
-#include <etaos/stdio.h>
-#include <etaos/vfs.h>
-#include <etaos/mem.h>
+#ifndef __AVR_CPU_H__
+#define __AVR_CPU_H__
 
-#include <asm/io.h>
-#include <asm/cpu.h>
-#include <asm/simulavr.h>
-#include <asm/usart.h>
+extern void avr_start_sysclk(void);
 
-extern void avr_init(void);
-extern void avr_install_irqs(void);
-extern unsigned char __heap_start;
-extern int main(void);
-
-void avr_init(void)
-{
-#ifdef CONFIG_MALLOC
-	size_t hsize = RAMEND - CONFIG_STACK_SIZE - (size_t)&__heap_start;
-	mm_init((void*)&__heap_start, hsize);
 #endif
 
-#ifdef CONFIG_VFS
-	vfs_init();
-#endif
-
-#ifdef CONFIG_STDIO_SIMUL_AVR
-	simul_avr_setup_streams();
-#elif CONFIG_STDIO_USART
-	avr_setup_usart_streams();
-#endif
-	avr_start_sysclk();
-	main();
-
-	while(1);
-}

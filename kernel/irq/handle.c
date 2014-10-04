@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - AVR IRQ support
+ *  ETA/OS - IRQ handling
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,53 +16,54 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define AVR_IRQ_CORE 1
-
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/irq.h>
-#include <etaos/bitops.h>
 #include <etaos/list.h>
+#include <etaos/irq.h>
+#include <etaos/error.h>
+#include <etaos/bitops.h>
 
-#include <asm/io.h>
-#include <asm/irq.h>
-
-void arch_irq_disable(void)
+static void irq_handle_hard_irq(struct irq_data *data)
 {
-	cli();
-}
-
-void arch_irq_enable(void)
-{
-	sei();
-}
-
-unsigned long arch_irq_get_flags(void)
-{
-	return ((unsigned long) (SREG & AVR_IRQ_BITS));
-}
-
-void arch_irq_restore_flags(unsigned long *flags)
-{
-	if(test_bit(AVR_IRQ_FLAG, flags))
-		sei();
-	return;
-}
-
-#ifdef CONFIG_IRQ_DEBUG
-extern unsigned long test_sys_tick;
-unsigned long test_sys_tick = 0;
+	irqreturn_t retv;
+#ifdef CONFIG_SCHED
+	struct irq_thread_data *tdata;
 #endif
 
-SIGNAL(TIMER0_OVERFLOW_VECTOR)
-{
-#ifdef CONFIG_IRQ_DEBUG
-	test_sys_tick++;
-#endif
-#if 1
-	struct irq_chip *chip = arch_get_irq_chip();
+	retv = data->handler ?
+		data->handler(data, data->private_data) : IRQ_NONE;
+	switch(retv) {
+	case IRQ_NONE:
+		break;
 
-	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
+	case IRQ_HANDLED:
+		data->num += 1;
+		break;
+
+#ifdef CONFIG_SCHED
+	case IRQ_WAKE_OWNER:
+		data->num += 1;
+		tdata = container_of(data, struct irq_thread_data, idata);
+		thread_wake_up_from_irq(tdata->thread);
+		break;
 #endif
+
+	default:
+		break;
+	}
+	
 }
 
+void irq_handle(int irq)
+{
+	struct irq_data *data;
+
+	data = irq_to_data(irq);
+	if(!data)
+		return;
+	
+	if(!test_bit(IRQ_ENABLE_FLAG, &data->flags))
+		return;
+
+	irq_handle_hard_irq(data);
+}

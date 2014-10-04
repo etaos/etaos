@@ -29,7 +29,6 @@
 
 .section .vectors,"ax",@progbits
 .global __vectors
-.func __vecotrs
 __vectors:
 	XJMP	__init
 	vector	__vector_1
@@ -159,7 +158,6 @@ __vectors:
 	vector	__vector_125
 	vector	__vector_126
 	vector	__vector_127
-.endfunc
 
 /*
  * Text section which boots up the AVR core.

@@ -60,5 +60,37 @@
 #define STDIN_PORT SIMI
 #endif /* CONFIG_SIMUL_AVR */
 
+/* TIMER 0 */ 
+#define TCCR0A MEM_IO8(0x44)
+#define WGM00  0x1
+#define WGM01  0x2
+#define COM0B0 0x10
+#define COM0B1 0x20
+#define COM0A0 0x40
+#define COM0A1 0x80
+
+#define TCCR0B MEM_IO8(0x45)
+#define CS00  0x1
+#define CS01  0x2
+#define CS02  0x4
+#define WGM02 0x8
+#define FOC0B 0x40
+#define FOC0A 0x80
+
+#define TCNT0  MEM_IO8(0x46)
+#define OCR0A  MEM_IO8(0x47)
+#define OCR0B  MEM_IO8(0x48)
+
+#define TIMSK0 MEM_IO8(0x6E)
+#define TOIE0  0x1
+#define OCIE0A 0x2
+#define OCIE0B 0x4
+
+#define TIFR0  MEM_IO8(0x35)
+#define TOV   0x1
+#define OCF0A 0x2
+#define OCF0B 0x4
+
+
 #endif
 

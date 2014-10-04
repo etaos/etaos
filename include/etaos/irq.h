@@ -44,35 +44,53 @@ typedef irqreturn_t (*irq_vector_t)(struct irq_data *irq, void *data);
 
 struct irq_data {
 	unsigned int irq;
-	unsigned int vector;
 	struct list_head irq_list;
 
 	unsigned long flags;
+	uint64_t num;
 	struct irq_chip *chip;
 
 	irq_vector_t handler;
 	void *private_data;
 };
 
+#ifdef CONFIG_SCHED
+struct irq_thread_data {
+	struct thread *thread;
+	struct irq_data idata;
+};
+#endif
+
 #define IRQ_ENABLE_FLAG 0
 #define IRQ_RISING_FLAG 1
 #define IRQ_FALLING_FLAG 2
+#define IRQ_THREADED_FLAG 3
+#define IRQ_THREADED_TRIGGERED_FLAG 4
 
+#define IRQ_ENABLE_MASK (1 << IRQ_ENABLE_FLAG)
 #define IRQ_RISING_MASK (1 << IRQ_RISING_FLAG)
 #define IRQ_FALLING_MASK (1 << IRQ_FALLING_FLAG)
+#define IRQ_THREADED_MASK (1 << IRQ_THREADED_FLAG)
+#define IRQ_THREADED_TRIGGERED_MASK (1 << IRQ_THREADED_TRIGGERED_FLAG)
 
 struct irq_chip {
 	const char *name;
 	struct list_head irqs;
 
+	void (*chip_handle)(int irq);
 	void (*sleep)(struct irq_chip *chip);
 	void (*resume)(struct irq_chip *chip);
 };
 
 extern int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq);
 extern int irq_chip_init(struct irq_chip *chip, const char *name);
-extern int irq_request(int irq, unsigned long flags);
+extern int irq_request(int irq, irq_vector_t vector, unsigned long flags,
+			void *irq_data);
 extern int irq_set_handle(int irq, irq_vector_t vector);
+extern struct irq_data *irq_to_data(int irq);
+
+/* IRQ HANDLE FUNCTIONS */
+extern void irq_handle(int irq);
 
 /* IRQ CHIP FUNCTIONS */
 

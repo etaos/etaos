@@ -27,7 +27,7 @@
 
 static void *arch_irqs[CONFIG_ARCH_VECTORS];
 
-static inline struct irq_data *irq_to_data(int irq)
+struct irq_data *irq_to_data(int irq)
 {
 	if(irq >= CONFIG_ARCH_VECTORS)
 		return NULL;
@@ -59,20 +59,42 @@ void irq_restore(unsigned long *flags)
 	arch_irq_restore_flags(flags);
 }
 
-int irq_request(int irq, unsigned long flags)
+#ifdef CONFIG_SCHED
+static int irq_request_threaded_irq(struct irq_data *irq)
 {
-	struct irq_data *idata;
+	return -EINVAL;
+}
+#endif
 
-	idata = irq_to_data(irq);
-	if(!idata) {
-		idata = kmalloc(sizeof(*idata));
-		irq_store_data(irq, idata);
+int irq_request(int irq, irq_vector_t vector, unsigned long flags,
+		void *irq_data)
+{
+	struct irq_data *data;
+	int err;
+
+	data = kmalloc(sizeof(*data));
+	if(!data)
+		return -ENOMEM;
+
+	data->irq = irq;
+	data->handler = vector;
+	data->flags = flags;
+	data->private_data = data;
+	data->chip = arch_get_irq_chip();
+#ifdef CONFIG_SCHED
+	if(test_bit(IRQ_THREADED_FLAG, &flags)) {
+		err = irq_request_threaded_irq(data);
+		if(err) {
+			kfree(data);
+			return err;
+		}
 	}
+#endif
+	err = irq_chip_add_irq(data->chip, data);
+	irq_store_data(irq, data);
 
-	idata->irq = irq;
-	idata->flags = flags & (IRQ_RISING_MASK | IRQ_FALLING_MASK);
-	set_bit(IRQ_ENABLE_FLAG, &idata->flags);
-	return -EOK;
+	set_bit(IRQ_ENABLE_FLAG, &data->flags);
+	return err;
 }
 
 int irq_set_handle(int irq, irq_vector_t vector)
