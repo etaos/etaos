@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Spinlock header
+ *  ETA/OS - Atomic header
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,35 +16,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined(__MUTEX_H__) && !defined(__SPINLOCK_H__)
-#error Do not include <asm/spinlock.h> directly. \
-	Use <etaos/mutex.h> or <etaos/spinlock.h>!
-#endif
+#ifndef __AVR_ATOMIC_H__
+#define __AVR_ATOMIC_H__
 
-#ifndef __AVR_SPINLOCK_H__
-#define __AVR_SPINLOCK_H__
+#define ATOMIC_INIT(val) { (val) }
 
-typedef struct spinlock {
-	uint8_t lock;
-} spinlock_t;
+typedef struct {
+	int value;
+} atomic_t;
 
-extern void avr_spin_lock(unsigned char *);
-extern void avr_spin_unlock(unsigned char*);
+typedef struct {
+	int64_t value;
+} atomic64_t;
 
-static inline void spin_lock_init(spinlock_t *lock)
-{
-	lock->lock = 0;
-}
-
-static inline void arch_spin_lock(spinlock_t *spin)
-{
-	avr_spin_lock((unsigned char*)&spin->lock);
-}
-
-static inline void arch_spin_unlock(spinlock_t *spin)
-{
-	avr_spin_unlock((unsigned char*)&spin->lock);
-}
+#include <asm/atomic.h>
 
 #endif
-

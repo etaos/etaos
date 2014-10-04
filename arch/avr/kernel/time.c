@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Spinlock header
+ *  ETA/OS - AVR time
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,35 +16,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined(__MUTEX_H__) && !defined(__SPINLOCK_H__)
-#error Do not include <asm/spinlock.h> directly. \
-	Use <etaos/mutex.h> or <etaos/spinlock.h>!
-#endif
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/time.h>
 
-#ifndef __AVR_SPINLOCK_H__
-#define __AVR_SPINLOCK_H__
+#include <asm/time.h>
 
-typedef struct spinlock {
-	uint8_t lock;
-} spinlock_t;
+#define AVR_SYSCLK_FRQ 1000UL
 
-extern void avr_spin_lock(unsigned char *);
-extern void avr_spin_unlock(unsigned char*);
+static struct clocksource sysclk = {
+	.name = "sys-clk",
+};
 
-static inline void spin_lock_init(spinlock_t *lock)
+static int avr_sysclk_enable(struct clocksource *cs)
 {
-	lock->lock = 0;
+	return -1;
 }
 
-static inline void arch_spin_lock(spinlock_t *spin)
+void avr_timer_init(void)
 {
-	avr_spin_lock((unsigned char*)&spin->lock);
+	tm_clock_source_initialise(sysclk.name, &sysclk, AVR_SYSCLK_FRQ,
+					&avr_sysclk_enable, NULL);
 }
-
-static inline void arch_spin_unlock(spinlock_t *spin)
-{
-	avr_spin_unlock((unsigned char*)&spin->lock);
-}
-
-#endif
 

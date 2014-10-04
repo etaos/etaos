@@ -17,5 +17,7 @@ menu "Generic system configuration"
 
 source "kernel/irq/Kconfig"
 
+source "kernel/time/Kconfig"
+
 endmenu
 

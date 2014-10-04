@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Spinlock header
+ *  ETA/OS - Time core
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,35 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined(__MUTEX_H__) && !defined(__SPINLOCK_H__)
-#error Do not include <asm/spinlock.h> directly. \
-	Use <etaos/mutex.h> or <etaos/spinlock.h>!
-#endif
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/time.h>
 
-#ifndef __AVR_SPINLOCK_H__
-#define __AVR_SPINLOCK_H__
-
-typedef struct spinlock {
-	uint8_t lock;
-} spinlock_t;
-
-extern void avr_spin_lock(unsigned char *);
-extern void avr_spin_unlock(unsigned char*);
-
-static inline void spin_lock_init(spinlock_t *lock)
+static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 {
-	lock->lock = 0;
+	struct clocksource *cs = (struct clocksource*)data;
+
+	cs->tc += 1;
+	return IRQ_HANDLED;
 }
-
-static inline void arch_spin_lock(spinlock_t *spin)
-{
-	avr_spin_lock((unsigned char*)&spin->lock);
-}
-
-static inline void arch_spin_unlock(spinlock_t *spin)
-{
-	avr_spin_unlock((unsigned char*)&spin->lock);
-}
-
-#endif
-
