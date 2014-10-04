@@ -39,9 +39,7 @@ static inline int irq_store_data(int irq, struct irq_data *data)
 {
 	if(irq >= CONFIG_ARCH_VECTORS)
 		return -EINVAL;
-	if(arch_irqs[irq]) /* already initialised */
-		return -EINVAL;
-
+	
 	arch_irqs[irq] = data;
 	return -EOK;
 }
@@ -67,7 +65,7 @@ static int irq_request_threaded_irq(struct irq_data *irq)
 #endif
 
 int irq_request(int irq, irq_vector_t vector, unsigned long flags,
-		void *irq_data)
+		void *priv)
 {
 	struct irq_data *data;
 	int err;
@@ -79,7 +77,7 @@ int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 	data->irq = irq;
 	data->handler = vector;
 	data->flags = flags;
-	data->private_data = data;
+	data->private_data = priv;
 	data->chip = arch_get_irq_chip();
 #ifdef CONFIG_SCHED
 	if(test_bit(IRQ_THREADED_FLAG, &flags)) {

@@ -20,6 +20,9 @@
 #include <etaos/types.h>
 #include <etaos/atomic.h>
 #include <etaos/time.h>
+#include <etaos/irq.h>
+#include <etaos/tick.h>
+#include <etaos/stdio.h>
 
 static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 {
@@ -28,3 +31,9 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 	atomic64_inc(&cs->tc);
 	return IRQ_HANDLED;
 }
+
+void systick_setup(int irq, struct clocksource *src)
+{
+	irq_request(irq, &systick_irq_handle, IRQ_RISING_MASK, src);
+}
+

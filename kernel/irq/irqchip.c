@@ -40,6 +40,7 @@ int irq_chip_init(struct irq_chip *chip, const char *name)
 	chip->name = name;
 	chip->sleep = NULL;
 	chip->resume = NULL;
+	chip->chip_handle = &irq_handle;
 	return -EOK;
 }
 

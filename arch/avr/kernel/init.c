@@ -22,6 +22,7 @@
 #include <etaos/vfs.h>
 #include <etaos/mem.h>
 
+#include <asm/time.h>
 #include <asm/io.h>
 #include <asm/cpu.h>
 #include <asm/simulavr.h>
@@ -48,7 +49,7 @@ void avr_init(void)
 #elif CONFIG_STDIO_USART
 	avr_setup_usart_streams();
 #endif
-	avr_start_sysclk();
+	avr_timer_init();
 	main();
 
 	while(1);

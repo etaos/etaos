@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Atomic header
+ *  ETA/OS - Tick header
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,29 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AVR_ATOMIC_H__
-#define __AVR_ATOMIC_H__
+#ifndef __TICK_H__
+#define __TICK_H__
 
-#define ATOMIC_INIT(val) { (val) }
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/time.h>
 
-typedef struct {
-	volatile int value;
-} atomic_t;
+extern void systick_setup(int irq, struct clocksource *src);
 
-typedef struct {
-	volatile int64_t value;
-} atomic64_t;
+#endif /* __TICK_H__ */
 
-#include <asm/atomic.h>
-
-static inline void atomic_init(atomic_t *atom)
-{
-	atom->value = 0;
-}
-
-static inline void atomic64_init(atomic64_t *atom)
-{
-	atom->value = 0LL;
-}
-
-#endif

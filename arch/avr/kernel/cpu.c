@@ -20,6 +20,7 @@
 #include <etaos/types.h>
 #include <etaos/irq.h>
 #include <etaos/list.h>
+#include <etaos/tick.h>
 
 #include <asm/io.h>
 #include <asm/cpu.h>
@@ -37,8 +38,9 @@ struct irq_chip *arch_get_irq_chip(void)
 	return &avr_irq_chip;
 }
 
-void avr_start_sysclk(void)
+void avr_start_sysclk(int irq, struct clocksource *src)
 {
+	systick_setup(irq, src);
 #if F_CPU == 16000000
 	OCR0A = 250;
 #elif F_CPU == 8000000

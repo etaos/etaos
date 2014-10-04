@@ -19,7 +19,10 @@
 #ifndef __AVR_CPU_H__
 #define __AVR_CPU_H__
 
-extern void avr_start_sysclk(void);
+#include <etaos/kernel.h>
+#include <etaos/time.h>
+
+extern void avr_start_sysclk(int irq, struct clocksource *src);
 
 #endif
 

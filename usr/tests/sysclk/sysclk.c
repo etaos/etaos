@@ -10,6 +10,7 @@
 #include <etaos/mem.h>
 #include <etaos/list.h>
 #include <etaos/irq.h>
+#include <etaos/time.h>
 
 #include <asm/io.h>
 #include <asm/simulavr.h>
@@ -33,10 +34,18 @@ static void sysclk_ping(void)
 
 int main(void)
 {
+	struct clocksource *src;
+	int64_t sys_tick;
+
 	irq_enable();
 	printf("Application started!\n");
 	sysclk_ping();
-	printf("OK: Clock finished: %u, exiting\n", test_sys_tick);
+
+	src = tm_get_source_by_name("sys-clk");
+	sys_tick = atomic64_get(&src->tc);
+	printf("OK: Clock finished: %u", 
+			sys_tick);
+	printf("::%u, program ended\n", test_sys_tick);
 #ifdef CONFIG_SIMUL_AVR
 	simul_avr_exit();
 #endif
