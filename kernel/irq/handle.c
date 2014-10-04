@@ -59,7 +59,10 @@ void irq_handle(int irq)
 	struct irq_data *data;
 
 	data = irq_to_data(irq);
-	if(!data || !test_bit(IRQ_ENABLE_FLAG, &data->flags))
+	if(!data)
+		return;
+	
+	if(!test_bit(IRQ_ENABLE_FLAG, &data->flags))
 		return;
 
 	irq_handle_hard_irq(data);

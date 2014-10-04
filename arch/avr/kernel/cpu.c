@@ -39,13 +39,15 @@ struct irq_chip *arch_get_irq_chip(void)
 
 void avr_start_sysclk(void)
 {
-	TCCR0A |= WGM00 | WGM01;
-	TCCR0B |= WGM02 | CS00 | CS01;
 #if F_CPU == 16000000
 	OCR0A = 250;
 #elif F_CPU == 8000000
-	OCR0A = 125;
+	OCRA0 = 125;
+#else
+#error Unsupported CPU frequency for timer IRQ
 #endif
-	TIMSK0 |= TOIE0;
+	TIMSK0 = TOIE0;
+	TCCR0A = WGM00 | WGM01;
+	TCCR0B = WGM02 | CS00 | CS01;
 }
 

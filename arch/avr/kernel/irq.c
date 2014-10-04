@@ -51,8 +51,10 @@ void arch_irq_restore_flags(unsigned long *flags)
 
 SIGNAL(TIMER0_OVERFLOW_VECTOR)
 {
+#if 1
 	struct irq_chip *chip = arch_get_irq_chip();
 
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
+#endif
 }
 
