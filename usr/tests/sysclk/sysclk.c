@@ -43,9 +43,8 @@ int main(void)
 
 	src = tm_get_source_by_name("sys-clk");
 	sys_tick = atomic64_get(&src->tc);
-	printf("OK: Clock finished: %u", 
-			sys_tick);
-	printf("::%u, program ended\n", test_sys_tick);
+	printf("OK: Clock finished: %lli::%lu - prog end\n", 
+			sys_tick, test_sys_tick);
 #ifdef CONFIG_SIMUL_AVR
 	simul_avr_exit();
 #endif
