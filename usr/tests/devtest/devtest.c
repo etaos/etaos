@@ -12,7 +12,7 @@
 
 static struct platform_device exit_dev = {
 	.name = "exit-dev",
-	.io_base = (void*) &SIME,
+	.io_base = NULL,
 };
 
 static int exit_dev_write(struct file* file, void *data, size_t len);
@@ -23,7 +23,6 @@ static struct dev_file_ops exit_dev_fops = {
 
 static int exit_dev_write(struct file* file, void *data, size_t len)
 {
-	SIME = -5;
 	return 0;
 }
 
@@ -51,11 +50,10 @@ static int run_dev_test(void)
 int main(void)
 {
 	struct device *found, *found2;
-	int err;
 
 	irq_enable();
 	printf("Application started!\n");
-	err = run_dev_test();
+	run_dev_test();
 
 	found = dev_get_by_name("exit-dev");
 	found->release(found);
@@ -70,7 +68,7 @@ int main(void)
 		printf("[ERR] devices not deltedted succesfully!\n");
 
 #ifdef CONFIG_SIMUL_AVR
-	simul_avr_exit(err);
+	simul_avr_exit(1);
 #endif
 	return 0;
 }
