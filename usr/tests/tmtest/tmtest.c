@@ -64,7 +64,7 @@ int main(void)
 	tm_stop_timer(tm2);
 	tmtest_list_timers(&cs);
 #ifdef CONFIG_SIMUL_AVR
-	simul_avr_exit();
+	simul_avr_exit(0);
 #endif
 	return 0;
 }

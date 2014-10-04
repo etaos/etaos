@@ -30,7 +30,8 @@ struct clocksource {
 	int (*enable)(struct clocksource*);
 	void (*disable)(struct clocksource*);
 	unsigned long freq;
-	unsigned long tc, tc_resume;
+	atomic64_t tc;
+	int64_t tc_resume;
 	spinlock_t lock;
 
 	struct list_head list;
@@ -51,6 +52,15 @@ struct timer {
 #define TIMER_ONESHOT_FLAG 0
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
+static inline int64_t tm_update_source(struct clocksource *source)
+{
+	int64_t diff;
+
+	diff = atomic64_get(&source->tc);
+	diff -= source->tc_resume;
+	return diff;
+}
+
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
 		unsigned long flags);
@@ -58,7 +68,7 @@ extern int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 		unsigned long freq, int (*enable)(struct clocksource *cs),
 		void (*disable)(struct clocksource *cs));
 extern int tm_stop_timer(struct timer *timer);
-extern void tm_process_clock(struct clocksource *cs);
+extern void tm_process_clock(struct clocksource *cs, int64_t diff);
 extern struct clocksource *tm_get_source_by_name(const char *name);
 
 #endif /* __TIMER_H__ */

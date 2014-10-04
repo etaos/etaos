@@ -40,7 +40,7 @@ int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 	cs->freq = freq;
 	cs->enable = enable;
 	cs->disable = disable;
-	cs->tc = 0;
+	atomic64_init(&cs->tc);
 	cs->tc_resume = 0;
 	spin_lock_init(&cs->lock);
 	list_add(&cs->list, &sources);
@@ -98,7 +98,7 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		timer->ticks = timer->tleft;
 
 	timer->source = cs;
-	timer->tleft += cs->tc - cs->tc_resume;
+	timer->tleft += (unsigned long) (atomic64_get(&cs->tc) - cs->tc_resume);
 	timer->handle = handle;
 	timer->priv_data = arg;
 
@@ -130,16 +130,12 @@ int tm_stop_timer(struct timer *timer)
 	return 1;
 }
 
-void tm_process_clock(struct clocksource *cs)
+void tm_process_clock(struct clocksource *cs, int64_t diff)
 {
 	struct list_head *carriage, *tmp;
 	struct timer *timer;
-	unsigned long diff;
-
-	diff = cs->tc - cs->tc_resume;
-	cs->tc_resume = cs->tc;
 	
-	if(list_empty(&cs->timers))
+	if(list_empty(&cs->timers) || diff < 0 || diff == 0)
 		return;
 
 	spin_lock(&cs->lock);
