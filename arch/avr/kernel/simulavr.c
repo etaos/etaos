@@ -41,6 +41,11 @@ void simul_avr_setup_streams(void)
 	iob_add(&simavr_stream);
 }
 
+void simul_avr_exit(char err)
+{
+	SIME = err;
+}
+
 int simul_avr_write_byte(int c, FILE stream)
 {
 	if(c == '\n')

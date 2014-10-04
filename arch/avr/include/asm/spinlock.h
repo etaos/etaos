@@ -31,6 +31,11 @@ typedef struct spinlock {
 extern void avr_spin_lock(unsigned char *);
 extern void avr_spin_unlock(unsigned char*);
 
+static inline void spin_lock_init(spinlock_t *lock)
+{
+	lock->lock = 0;
+}
+
 static inline void arch_spin_lock(spinlock_t *spin)
 {
 	avr_spin_lock((unsigned char*)&spin->lock);

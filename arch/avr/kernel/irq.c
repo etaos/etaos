@@ -16,12 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define AVR_IRQ_CORE 1
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
 #include <etaos/bitops.h>
+#include <etaos/list.h>
 
 #include <asm/io.h>
+#include <asm/irq.h>
 
 void arch_irq_disable(void)
 {
@@ -43,5 +47,22 @@ void arch_irq_restore_flags(unsigned long *flags)
 	if(test_bit(AVR_IRQ_FLAG, flags))
 		sei();
 	return;
+}
+
+#ifdef CONFIG_IRQ_DEBUG
+extern unsigned long test_sys_tick;
+unsigned long test_sys_tick = 0;
+#endif
+
+SIGNAL(TIMER0_OVERFLOW_VECTOR)
+{
+#ifdef CONFIG_IRQ_DEBUG
+	test_sys_tick++;
+#endif
+#if 1
+	struct irq_chip *chip = arch_get_irq_chip();
+
+	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
+#endif
 }
 

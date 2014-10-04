@@ -6,9 +6,12 @@
 *.img
 *.a
 *swp
+*.hex
+*.dmp
 .tmp_versions/
 include/config
 include/generated
 .vimws/*
 .vimws/
 _theme_packages/
+*.*.swp

@@ -22,6 +22,8 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 
+#define STATIC_INIT_LIST_HEAD(name) { &(name), &(name) }
+
 static inline void list_head_init(struct list_head *list)
 {
 	list->next = list;
@@ -57,6 +59,12 @@ static inline int list_empty(const struct list_head *head)
 	return (head->next == head);
 }
 
+static inline int list_is_last(const struct list_head *list,
+				const struct list_head *head)
+{
+	return list->next == head;
+}
+
 #define list_for_each(pos, head) \
 		for(pos = (head)->next; pos != (head); pos = pos->next)
 
@@ -72,7 +80,11 @@ static inline int list_empty(const struct list_head *head)
 				pos = n, n = pos->prev)
 
 #define list_add(___n, ___h) __list_add(___n, ___h, (___h)->next)
+#define list_add_tail(__n, __h) __list_add(__n, (__h)->prev, __h)
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
+
+#define list_next_entry(pos, member) \
+	list_entry((pos)->member.next, typeof(*(pos)), member)
 
 #endif
 

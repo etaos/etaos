@@ -15,12 +15,9 @@ config ARCH_CLEAR_BIT
 
 menu "Generic system configuration"
 
-config IRQ_SUPPORT
-	bool "IRQ core"
-	select MALLOC
-	help
-	  Say 'y' here if you want to enable support
-	  IRQ chips. If you are unsure say 'y'.
+source "kernel/irq/Kconfig"
+
+source "kernel/time/Kconfig"
 
 endmenu
 

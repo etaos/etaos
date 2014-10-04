@@ -29,6 +29,7 @@
 #define spin_unlock(__l) arch_spin_unlock(__l)
 
 #define DEFINE_SPINLOCK(__n) spinlock_t __n = { .lock = 0, }
+#define SPIN_LOCK_INIT(__n) { .lock = 0, }
 
 static inline void _spin_lock_irqsave(spinlock_t *lock, unsigned long *flags)
 {
