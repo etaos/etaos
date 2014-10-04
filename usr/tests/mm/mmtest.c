@@ -46,6 +46,7 @@ static void mem_test(void)
 	tmp = kmalloc(100);
 	mm_heap_available();
 	kfree(tmp);
+	kfree(tmp);
 	mm_heap_available();
 }
 
@@ -67,7 +68,7 @@ int main(void)
 
 //	printf("Exit %i - %u:%u\n", atomic_get(&atom_var), irq1, irq2);
 #ifdef CONFIG_SIMUL_AVR
-	simul_avr_exit();
+	simul_avr_exit(0);
 #endif
 	return 0;
 }

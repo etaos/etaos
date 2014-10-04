@@ -2,7 +2,7 @@
 # Tests root Makefile
 #
 
-all: mm
+all: mm devtest timetest
 
 MAKEFLAGS += -rR --no-print-directory
 
@@ -20,13 +20,20 @@ timetest: FORCE
 	@echo [SIMUL AVR] TMTEST test ended
 	@echo
 
+PHONY += devtest
+devtest: FORCE
+	@echo [SIMUL AVR] Running Devtest test
+	@$(MAKE) -C devtest/ all test
+	@echo [SIMUL AVR] Devtest test ended
+	@echo
+
+PHONY += FORCE
+FORCE:
 
 PHONY += clean
 clean: FORCE
 	@$(MAKE) -C mm/ clean
 	@$(MAKE) -C tmtest/ clean
-
-PHONY += FORCE
-FORCE:
+	@$(MAKE) -C devtest/ clean
 
 .PHONY: $(PHONY)

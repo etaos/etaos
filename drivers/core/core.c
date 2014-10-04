@@ -27,16 +27,17 @@
 #include <etaos/error.h>
 #include <etaos/mem.h>
 
-static struct list_head dev_root;
+static struct list_head dev_root = STATIC_INIT_LIST_HEAD(dev_root);
 
 static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops);
+static struct device *dev_allocate(const char *name, struct dev_file_ops *fops);
 
 void dev_core_init(void)
 {
 	list_head_init(&dev_root);
 }
 
-static void device_release(struct device *dev)
+static void dev_release(struct device *dev)
 {
 	FILE file;
 
@@ -49,28 +50,68 @@ static void device_release(struct device *dev)
 	kfree(dev);
 }
 
-int device_create(struct device *dev, struct dev_file_ops *fops)
+static inline int dev_name_is_unique(struct device *dev)
 {
-	if(!dev)
-		return -EINVAL;
+	struct list_head *carriage;
+	struct device *c_dev;
 
-	if(!dev->file) {
-		dev->file = kmalloc(sizeof(struct file));
-		if(!dev->file)
-			return -ENOMEM;
+	if(list_empty(&dev_root))
+		return -EOK;
+
+	list_for_each(carriage, &dev_root) {
+		c_dev = list_entry(carriage, struct device, devs);
+		if(!strcmp(dev->name, c_dev->name))
+			return -EINVAL;
 	}
 
-	_dev_set_fops(dev, fops);
+	return -EOK;
+}
+
+struct device *device_create(const char *name, void *data,
+		struct dev_file_ops *fops)
+{
+	struct device *dev;
+
+	dev = dev_allocate(name, fops);
+	if(!dev)
+		return NULL;
+
+	dev->dev_data = data;
+	return dev;
+}
+
+int device_initialize(struct device *dev, struct dev_file_ops *fops)
+{
+	int err;
+
+	if(!dev || !dev->name)
+		return -EINVAL;
+
+	err = dev_name_is_unique(dev);
+	if(err)
+		return err;
+
+	dev->release = &dev_release;
+	mutex_init(&dev->dev_lock);
+
+	dev->file = kmalloc(sizeof(*(dev->file)));
+	if(!dev->file)
+		return -ENOMEM;
+
+	dev_set_fops(dev, fops);
+
 	list_add(&dev->devs, &dev_root);
-	return 0;
+	return -EOK;
 }
 
 static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 {
 	struct file *file;
 
-	file = dev->file;
+	if(!fops)
+		return -EINVAL;
 
+	file = dev->file;
 	file->write = fops->write;
 	file->read = fops->read;
 	file->put = fops->put;
@@ -92,7 +133,7 @@ int dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 	return -EOK;
 }
 
-static struct device *dev_allocate(struct dev_file_ops *fops)
+static struct device *dev_allocate(const char *name, struct dev_file_ops *fops)
 {
 	struct device *dev;
 	FILE file;
@@ -103,12 +144,8 @@ static struct device *dev_allocate(struct dev_file_ops *fops)
 	if(!dev || !file)
 		return NULL;
 
-	dev->release = &device_release;
-	mutex_init(&dev->dev_lock);
-
-	dev->file = file;
-	dev_set_fops(dev, fops);
-
+	dev->name = name;
+	device_initialize(dev, fops);
 	return dev;
 }
 
@@ -133,11 +170,12 @@ int dev_register_pdev(struct platform_device *pdev, struct dev_file_ops *fops)
 	if(!pdev)
 		return -EINVAL;
 
-	dev = dev_allocate(fops);
-	dev->pdev = pdev;
-	dev->name = pdev->name;
-	list_add(&dev->devs, &dev_root);
+	if(!pdev->name)
+		return -EINVAL;
 
+	dev = dev_allocate(pdev->name, fops);
+	dev->pdev = pdev;
+	
 	return -EOK;
 }
 

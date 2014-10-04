@@ -91,7 +91,7 @@ modorder-target := $(obj)/modules.order
 # We keep a list of all modules in $(MODVERDIR)
 
 __build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y)) \
-	 $(if $(KBUILD_MODULES),$(obj-m) $(modorder-target)) \
+	 $(if $(KBUILD_MODULES),$(obj-m)) \
 	 $(subdir-ym) $(always)
 	@:
 
@@ -226,7 +226,7 @@ define rule_cc_o_c
 endef
 
 quiet_cmd_link_single-m = AR [M]  $@
-cmd_link_single-m = $(CC) $(c_flags) -c -o $@ $< && $(AR) rcs $(@:.o=.a) $@
+cmd_link_single-m = $(CC) $(c_flags) -c -o $@ $<
 
 # Built-in and composite module parts
 $(obj)/%.o: $(src)/%.c FORCE
@@ -235,10 +235,17 @@ $(obj)/%.o: $(src)/%.c FORCE
 
 # Single-part modules are special since we need to mark them in $(MODVERDIR)
 
+quiet_cmd_ar_single-m = AR [M]  $(single-used-modname)
+cmd_ar_single-m = $(AR) rcs $(single-used-modname) $@ $(cmd_secanalysis)
+
+single-used-modname := $(addprefix $(dir $(single-used-m))lib,$(notdir $(single-used-m:.o=.a)))
+single-used-tmpmodname := $(addprefix lib,$(notdir $(single-used-m:.o=.mod)))
+
 $(single-used-m): $(obj)/%.o: $(src)/%.c FORCE
 	$(call cmd,force_checksrc)
 	$(call if_changed,link_single-m)
-	@{ echo $(@:.o=.a); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
+	$(call if_changed,ar_single-m)
+	@{ echo $(single-used-modname); echo $@; } > $(MODVERDIR)/$(single-used-tmpmodname)
 
 quiet_cmd_cc_lst_c = MKLST   $@
       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
@@ -344,19 +351,27 @@ $($(subst $(obj)/,,$(@:.o=-y)))), $^)
 quiet_cmd_link_multi-y = LD      $@
 cmd_link_multi-y = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
 
-quiet_cmd_link_multi-m = AR [M]  $@
-cmd_link_multi-m = $(AR) rcs $(@:.o=.a) $(link_multi_deps) $(cmd_secanalysis)
+quiet_cmd_link_multi-m = LD [M]  $@
+cmd_link_multi-m = rm -f $@; $(AR) rcs$(KBUILD_ARFLAGS) $@
+
+quiet_cmd_ar_multi-m = AR [M]  $(multi-used-modname)
+cmd_ar_multi-m = $(AR) rcs $(multi-used-modname) $(link_multi_deps) $(cmd_secanalysis)
 
 # We would rather have a list of rules like
 # 	foo.o: $(foo-objs)
 # but that's not so easy, so we rather make all composite objects depend
 # on the set of all their parts
+
+multi-used-modname := $(addprefix $(dir $(multi-used-m))lib,$(notdir $(multi-used-m:.o=.a)))
+multi-used-tmpmodname := $(addprefix lib,$(notdir $(multi-used-m:.o=.mod)))
+
 $(multi-used-y) : %.o: $(multi-objs-y) FORCE
 	$(call if_changed,link_multi-y)
 
-$(multi-used-m) : %.o: $(multi-objs-m) FORCE
+$(multi-used-m) : %o: $(multi-objs-m) FORCE
 	$(call if_changed,link_multi-m)
-	@{ echo $(@:.o=.a); echo $(link_multi_deps); } > $(MODVERDIR)/$(@F:.o=.mod)
+	$(call if_changed,ar_multi-m)
+	@{ echo $(multi-used-modname); echo $(link_multi_deps); } > $(MODVERDIR)/$(multi-used-tmpmodname)
 
 targets += $(multi-used-y) $(multi-used-m)
 

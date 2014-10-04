@@ -1,5 +1,5 @@
-obj-$(CONFIG_LIBFLT) += libflt.o
-libflt-y = \
+obj-$(CONFIG_LIBFLT) += flt.o
+flt-y = \
 	acos.o \
 	addsf3.o \
 	addsf3x.o \
