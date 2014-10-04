@@ -49,8 +49,16 @@ void arch_irq_restore_flags(unsigned long *flags)
 	return;
 }
 
+#ifdef CONFIG_IRQ_DEBUG
+extern unsigned long test_sys_tick;
+unsigned long test_sys_tick = 0;
+#endif
+
 SIGNAL(TIMER0_OVERFLOW_VECTOR)
 {
+#ifdef CONFIG_IRQ_DEBUG
+	test_sys_tick++;
+#endif
 #if 1
 	struct irq_chip *chip = arch_get_irq_chip();
 
