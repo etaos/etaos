@@ -18,12 +18,13 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/atomic.h>
 #include <etaos/time.h>
 
 static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 {
 	struct clocksource *cs = (struct clocksource*)data;
 
-	cs->tc += 1;
+	atomic64_inc(&cs->tc);
 	return IRQ_HANDLED;
 }
