@@ -30,9 +30,11 @@ static int atmega_usart_putc(struct usart *usart, int c)
 	if(c == '\n')
 		atmega_usart_putc(usart, '\r');
 
+	mutex_lock(&usart->bus_lock);
 	while(( UCSR0A & BIT(UDRE0) ) == 0);
 	UCSR0A |= BIT(TXCn);
 	UDR0 = c;
+	mutex_unlock(&usart->bus_lock);
 
 	return c;
 }
@@ -40,9 +42,28 @@ static int atmega_usart_putc(struct usart *usart, int c)
 static int atmega_usart_getc(struct usart *usart)
 {
 	int c;
+
+	mutex_lock(&usart->bus_lock);
 	while(!(UCSR0A & BIT(RXC0)));
 	c = UDR0;
+	mutex_unlock(&usart->bus_lock);
 	return c;
+}
+
+static int atmega_usart_read(struct usart *uart, void *rx, size_t rxlen)
+{
+	unsigned char *rxbuff;
+	size_t i;
+
+	if(!rx)
+		return -EINVAL;
+
+	rxbuff = rx;
+	for(i = 0; i < rxlen; i++) {
+		rxbuff[i] = atmega_usart_getc(uart);
+	}
+
+	return -EOK;
 }
 
 static int atmega_usart_write(struct usart *uart, const void *tx,
@@ -70,6 +91,7 @@ static struct usart atmega_usart = {
 	.putc = atmega_usart_putc,
 	.getc = atmega_usart_getc,
 	.write = atmega_usart_write,
+	.read = atmega_usart_read,
 	.timeout = 0,
 	.dev = { .name = "atm-usart", },
 };

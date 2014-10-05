@@ -40,6 +40,14 @@ static int usart_write(FILE file, void *buff, size_t len)
 	return usart->write(usart, buff, len);
 }
 
+static int usart_read(FILE file, void *buff, size_t len)
+{
+	struct usart *usart;
+
+	usart = to_usart_dev(file);
+	return usart->read(usart, buff, len);
+}
+
 static int usart_putc(int c, FILE stream)
 {
 	struct usart *usart;
@@ -58,6 +66,7 @@ static int usart_getc(FILE stream)
 
 static struct dev_file_ops usart_fops = {
 	.write = &usart_write,
+	.read = &usart_read,
 	.put = &usart_putc,
 	.get = &usart_getc,
 };
