@@ -3,3 +3,12 @@ menuconfig USART
 	help
 	  Say 'y' here if you want to build support
 	  for USARTs.
+
+if USART
+config ATMEGA_USART
+	tristate "ATmega USART module"
+	depends on USART
+	help
+	  Say 'y' here if you are planning on using the USART
+	  controller on an ATmega AVR.
+endif

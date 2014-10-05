@@ -30,9 +30,11 @@ struct usart {
 
 	struct device dev;
 	int (*write)(struct usart *uart, const void *tx,
-			size_t txlen, unsigned int baud);
-	int (*read)(struct usart *uart, void *rx, size_t rxlen,
-			unsigned int baud);
+			size_t txlen);
+	int (*putc)(struct usart*, int);
+	int (*read)(struct usart *uart, void *rx, size_t len);
 };
+
+extern int usart_initialise(struct usart *usart);
 
 #endif

@@ -23,9 +23,9 @@
 #include <etaos/types.h>
 
 /**
- *  * \def MAX_OPEN
- *   * \brief Maximum amount of files opened at the same time.
- *    */
+ * \def MAX_OPEN
+ * \brief Maximum amount of files opened at the same time.
+ */
 #define MAX_OPEN 16
 
 /* file flags */

@@ -43,13 +43,12 @@ void avr_init(void)
 #ifdef CONFIG_VFS
 	vfs_init();
 #endif
-
-#ifdef CONFIG_STDIO_SIMUL_AVR
-	simul_avr_setup_streams();
-#elif CONFIG_STDIO_USART
-	avr_setup_usart_streams();
+#if defined(CONFIG_ATMEGA_USART) || defined(CONFIG_ATMEGA_USART_MODULE)
+	atmega_usart_init();
 #endif
+#ifdef CONFIG_TIMER
 	avr_timer_init();
+#endif
 	main();
 
 	while(1);

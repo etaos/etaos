@@ -19,14 +19,16 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/stdio.h>
+#include <etaos/usart.h>
+#include <etaos/error.h>
 
 #include <asm/io.h>
 #include <asm/usart.h>
 
-static int avr_usart_putc(int c, FILE stream)
+int atmega_usart_putc(struct usart *usart, int c)
 {
 	if(c == '\n')
-		avr_usart_putc('\r', stream);
+		atmega_usart_putc(usart, '\r');
 
 	while(( UCSR0A & BIT(UDRE0) ) == 0);
 	UCSR0A |= BIT(TXCn);
@@ -35,17 +37,35 @@ static int avr_usart_putc(int c, FILE stream)
 	return c;
 }
 
-static FDEV_SETUP_STREAM(usart_stream,
-			 NULL,
-			 NULL,
-			 &avr_usart_putc,
-			 NULL,
-			 NULL,
-			 "SIMAVR_STREAM",
-			 _FDEV_SETUP_RW,
-			 NULL);
+static int atmega_usart_write(struct usart *uart, const void *tx,
+			size_t txlen)
+{
+	int err;
+	size_t i;
+	const char *txbuf = tx;
 
-void avr_setup_usart_streams(void)
+	for(i = 0; i < txlen; i++) {
+		err = atmega_usart_putc(uart, txbuf[i]);
+		if(err != txbuf[i]) {
+			err = -EINVAL;
+			break;
+		}
+	}
+	
+	if(err < 0)
+		return 0;
+	else
+		return err;
+}
+
+static struct usart atmega_usart = {
+	.putc = atmega_usart_putc,
+	.write = atmega_usart_write,
+	.timeout = 0,
+	.dev = { .name = "atm-usart", },
+};
+
+void atmega_usart_init(void)
 {
 	UBRR0H = UBRR0H_VALUE;
 	UBRR0L = UBRR0L_VALUE;
@@ -53,7 +73,7 @@ void avr_setup_usart_streams(void)
 	UCSR0C = BIT(UCSZ01) | BIT(UCSZ00);
 	UCSR0B = BIT(TXEN0);
 
-	stdout = &usart_stream;
-	stdin = &usart_stream;
-	stderr = &usart_stream;
+	mutex_init(&(atmega_usart.bus_lock));
+	usart_initialise(&atmega_usart);
 }
+

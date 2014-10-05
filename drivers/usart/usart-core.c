@@ -21,4 +21,56 @@
 #include <etaos/device.h>
 #include <etaos/mutex.h>
 #include <etaos/usart.h>
+#include <etaos/error.h>
+
+static inline struct usart *to_usart_dev(FILE file)
+{
+	struct device *dev;
+
+	dev = container_of(file, struct device, file);
+
+	return dev->dev_data;
+}
+
+static int usart_write(FILE file, void *buff, size_t len)
+{
+	struct usart *usart;
+
+	usart = to_usart_dev(file);
+	return usart->write(usart, buff, len);
+}
+
+static int usart_putc(int c, FILE stream)
+{
+	struct usart *usart;
+
+	usart = to_usart_dev(stream);
+	return usart->putc(usart, c);
+}
+
+static struct dev_file_ops usart_fops = {
+	.write = &usart_write,
+	.put = &usart_putc,
+};
+
+int usart_initialise(struct usart *usart)
+{
+	FILE usart_stream;
+	int err;
+
+	err = device_initialize(&usart->dev, &usart_fops);
+	if(err)
+		return err;
+
+	usart->dev.dev_data = usart;
+	usart_stream = dev_to_file(&usart->dev);
+
+#ifdef CONFIG_STDIO_USART
+	stdout = usart_stream;
+	stdin = usart_stream;
+	stderr = usart_stream;
+#endif
+
+	return -EOK;
+}
 

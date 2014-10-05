@@ -19,6 +19,9 @@
 #ifndef __ATMEGA_USART_H
 #define __ATMEGA_USART_H
 
+#include <etaos/kernel.h>
+#include <etaos/usart.h>
+
 #include <asm/io.h>
 
 #ifndef BAUD
@@ -99,5 +102,8 @@
 #define UDRIE0 5
 
 extern void avr_setup_usart_streams(void);
+extern void atmega_usart_init(void);
+extern int atmega_usart_putc(struct usart *usart, int c);
 
 #endif /* __ATMEGA_USART_H */
+
