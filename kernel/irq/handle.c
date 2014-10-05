@@ -22,6 +22,7 @@
 #include <etaos/irq.h>
 #include <etaos/error.h>
 #include <etaos/bitops.h>
+#include <etaos/thread.h>
 
 static void irq_handle_hard_irq(struct irq_data *data)
 {

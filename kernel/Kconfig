@@ -19,5 +19,7 @@ source "kernel/irq/Kconfig"
 
 source "kernel/time/Kconfig"
 
+source "kernel/sched/Kconfig"
+
 endmenu
 

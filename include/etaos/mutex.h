@@ -22,6 +22,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
+#include <etaos/thread.h>
 
 typedef struct mutex {
 #ifdef CONFIG_EVENT_MUTEX

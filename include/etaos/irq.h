@@ -20,6 +20,7 @@
 #define __IRQ_H__
 
 #include <etaos/kernel.h>
+#include <etaos/thread.h>
 #include <etaos/types.h>
 
 extern void irq_save_and_disable(unsigned long *flags);
