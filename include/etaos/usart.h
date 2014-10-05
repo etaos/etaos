@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - STDIO streams of the USART
+ *  ETA/OS - USART driver header
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,44 +16,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __USART_H__
+#define __USART_H__
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/stdio.h>
+#include <etaos/device.h>
+#include <etaos/mutex.h>
 
-#include <asm/io.h>
-#include <asm/usart.h>
+struct usart {
+	mutex_t bus_lock;
+	int timeout;
 
-static int avr_usart_putc(int c, FILE stream)
-{
-	if(c == '\n')
-		avr_usart_putc('\r', stream);
+	struct device dev;
+	int (*write)(struct usart *uart, const void *tx,
+			size_t txlen);
+	int (*putc)(struct usart*, int);
+	int (*getc)(struct usart*);
+	int (*read)(struct usart *uart, void *rx, size_t len);
+};
 
-	while(( UCSR0A & BIT(UDRE0) ) == 0);
-	UCSR0A |= BIT(TXCn);
-	UDR0 = c;
+extern int usart_initialise(struct usart *usart);
 
-	return c;
-}
-
-static FDEV_SETUP_STREAM(usart_stream,
-			 NULL,
-			 NULL,
-			 &avr_usart_putc,
-			 NULL,
-			 NULL,
-			 "SIMAVR_STREAM",
-			 _FDEV_SETUP_RW,
-			 NULL);
-
-void avr_setup_usart_streams(void)
-{
-	UBRR0H = UBRR0H_VALUE;
-	UBRR0L = UBRR0L_VALUE;
-	UCSR0A &= ~(BIT(U2X0));
-	UCSR0C = BIT(UCSZ01) | BIT(UCSZ00);
-	UCSR0B = BIT(TXEN0);
-
-	stdout = &usart_stream;
-	stdin = &usart_stream;
-	stderr = &usart_stream;
-}
+#endif

@@ -32,7 +32,7 @@ struct platform_device {
 struct device {
 	const char *name;
 	struct list_head devs;
-	FILE file;
+	struct file file;
 
 	mutex_t dev_lock;
 	struct platform_device *pdev;
@@ -47,7 +47,7 @@ struct dev_file_ops {
 	int (*write)(struct file*, void*, size_t);
 	int (*flush)(struct file*);
 	int (*put)(int c, struct file*);
-	int (*get)(int c, struct file*);
+	int (*get)(struct file*);
 };
 
 extern struct device *device_create(const char *name, void *data,
@@ -75,4 +75,7 @@ static inline void *dev_get_iobase(struct device *dev)
 	return NULL;
 }
 
+#define dev_to_file(__d) (&(__d)->file)
+
 #endif
+

@@ -39,14 +39,10 @@ void dev_core_init(void)
 
 static void dev_release(struct device *dev)
 {
-	FILE file;
-
 	if(!dev)
 		return;
 
-	file = dev->file;
 	list_del(&dev->devs);
-	kfree(file);
 	kfree(dev);
 }
 
@@ -94,10 +90,6 @@ int device_initialize(struct device *dev, struct dev_file_ops *fops)
 	dev->release = &dev_release;
 	mutex_init(&dev->dev_lock);
 
-	dev->file = kmalloc(sizeof(*(dev->file)));
-	if(!dev->file)
-		return -ENOMEM;
-
 	dev_set_fops(dev, fops);
 
 	list_add(&dev->devs, &dev_root);
@@ -108,10 +100,12 @@ static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 {
 	struct file *file;
 
+	file = &dev->file;
+	file->flags = _FDEV_SETUP_RW;
+
 	if(!fops)
 		return -EINVAL;
 
-	file = dev->file;
 	file->write = fops->write;
 	file->read = fops->read;
 	file->put = fops->put;
@@ -136,12 +130,10 @@ int dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 static struct device *dev_allocate(const char *name, struct dev_file_ops *fops)
 {
 	struct device *dev;
-	FILE file;
 
 	dev = kmalloc(sizeof(*dev));
-	file = kmalloc(sizeof(*file));
 
-	if(!dev || !file)
+	if(!dev)
 		return NULL;
 
 	dev->name = name;
