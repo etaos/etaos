@@ -99,7 +99,7 @@ typedef struct file {
 	int (*write)(struct file*, void*, size_t);
 	int (*flush)(struct file*);
 	int (*put)(int c, struct file*);
-	int (*get)(int c, struct file*);
+	int (*get)( struct file*);
 
 	void *data;
 	volatile unsigned char *buff;

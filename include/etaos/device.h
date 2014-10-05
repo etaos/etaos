@@ -47,7 +47,7 @@ struct dev_file_ops {
 	int (*write)(struct file*, void*, size_t);
 	int (*flush)(struct file*);
 	int (*put)(int c, struct file*);
-	int (*get)(int c, struct file*);
+	int (*get)(struct file*);
 };
 
 extern struct device *device_create(const char *name, void *data,

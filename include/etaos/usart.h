@@ -32,6 +32,7 @@ struct usart {
 	int (*write)(struct usart *uart, const void *tx,
 			size_t txlen);
 	int (*putc)(struct usart*, int);
+	int (*getc)(struct usart*);
 	int (*read)(struct usart *uart, void *rx, size_t len);
 };
 

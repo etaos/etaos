@@ -48,9 +48,18 @@ static int usart_putc(int c, FILE stream)
 	return usart->putc(usart, c);
 }
 
+static int usart_getc(FILE stream)
+{
+	struct usart *usart;
+
+	usart = to_usart_dev(stream);
+	return usart->getc(usart);
+}
+
 static struct dev_file_ops usart_fops = {
 	.write = &usart_write,
 	.put = &usart_putc,
+	.get = &usart_getc,
 };
 
 int usart_initialise(struct usart *usart)

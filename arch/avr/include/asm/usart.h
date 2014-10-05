@@ -103,7 +103,6 @@
 
 extern void avr_setup_usart_streams(void);
 extern void atmega_usart_init(void);
-extern int atmega_usart_putc(struct usart *usart, int c);
 
 #endif /* __ATMEGA_USART_H */
 

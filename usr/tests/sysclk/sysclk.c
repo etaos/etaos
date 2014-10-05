@@ -39,6 +39,7 @@ int main(void)
 
 	irq_enable();
 	printf("Application started!\n");
+	stdin->get(stdin);
 	sysclk_ping();
 
 	src = tm_get_source_by_name("sys-clk");

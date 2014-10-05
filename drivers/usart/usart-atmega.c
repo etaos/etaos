@@ -25,7 +25,7 @@
 #include <asm/io.h>
 #include <asm/usart.h>
 
-int atmega_usart_putc(struct usart *usart, int c)
+static int atmega_usart_putc(struct usart *usart, int c)
 {
 	if(c == '\n')
 		atmega_usart_putc(usart, '\r');
@@ -34,6 +34,14 @@ int atmega_usart_putc(struct usart *usart, int c)
 	UCSR0A |= BIT(TXCn);
 	UDR0 = c;
 
+	return c;
+}
+
+static int atmega_usart_getc(struct usart *usart)
+{
+	int c;
+	while(!(UCSR0A & BIT(RXC0)));
+	c = UDR0;
 	return c;
 }
 
@@ -60,6 +68,7 @@ static int atmega_usart_write(struct usart *uart, const void *tx,
 
 static struct usart atmega_usart = {
 	.putc = atmega_usart_putc,
+	.getc = atmega_usart_getc,
 	.write = atmega_usart_write,
 	.timeout = 0,
 	.dev = { .name = "atm-usart", },
@@ -71,7 +80,7 @@ void atmega_usart_init(void)
 	UBRR0L = UBRR0L_VALUE;
 	UCSR0A &= ~(BIT(U2X0));
 	UCSR0C = BIT(UCSZ01) | BIT(UCSZ00);
-	UCSR0B = BIT(TXEN0);
+	UCSR0B = BIT(TXEN0) | BIT(RXEN0);
 
 	mutex_init(&(atmega_usart.bus_lock));
 	usart_initialise(&atmega_usart);
