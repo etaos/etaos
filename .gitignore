@@ -12,6 +12,7 @@
 .tmp_versions/
 include/config
 include/generated
+.vimproject
 .vimws/*
 .vimws/
 _theme_packages/
