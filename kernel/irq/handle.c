@@ -45,7 +45,7 @@ static void irq_handle_hard_irq(struct irq_data *data)
 	case IRQ_WAKE_OWNER:
 		data->num += 1;
 		tdata = container_of(data, struct irq_thread_data, idata);
-		thread_wake_up_from_irq(tdata->thread);
+		thread_wake_up_from_irq(tdata->owner);
 		break;
 #endif
 

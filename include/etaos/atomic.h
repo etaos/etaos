@@ -16,8 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AVR_ATOMIC_H__
-#define __AVR_ATOMIC_H__
+#ifndef __ATOMIC_H__
+#define __ATOMIC_H__
+
+#include <etaos/kernel.h>
+#include <etaos/types.h>
 
 #define ATOMIC_INIT(val) { (val) }
 

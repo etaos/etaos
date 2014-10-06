@@ -18,11 +18,10 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/atomic.h>
-#include <etaos/time.h>
+#include <etaos/thread.h>
+#include <etaos/sched.h>
 #include <etaos/irq.h>
-#include <etaos/tick.h>
 
-void thread_wake_up_from_irq(struct thread *t)
+void thread_wake_up_from_irq(struct thread *thread)
 {
 }

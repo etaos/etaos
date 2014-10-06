@@ -19,8 +19,34 @@
 #ifndef __THREAD_H__
 #define __THREAD_H__
 
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/time.h>
+
 struct thread {
+	const char *name;
+	struct thread *next;
+	unsigned long flags;
+
+	struct thread *q_next;
+	struct thread *volatile*queue;
+
+	void *stack;
+	void *sp;
+	size_t stack_size;
+	unsigned char prio;
+	
+	struct timer *timer;
+	unsigned char *ec;
+
+	void *param;
 };
+
+#define THREAD_RUNNING_FLAG	 0
+#define THREAD_SLEEPING_FLAG	 1
+#define THREAD_WAITING_FLAG	 2
+#define THREAD_EXIT_FLAG 	 3
+#define THREAD_NEED_RESCHED_FLAG 4
 
 extern void thread_wake_up_from_irq(struct thread *t);
 

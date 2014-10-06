@@ -52,15 +52,8 @@ struct timer {
 #define TIMER_ONESHOT_FLAG 0
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
-static inline int64_t tm_update_source(struct clocksource *source)
-{
-	int64_t diff;
 
-	diff = atomic64_get(&source->tc);
-	diff -= source->tc_resume;
-	return diff;
-}
-
+extern int64_t tm_update_source(struct clocksource *source);
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
 		unsigned long flags);
@@ -72,3 +65,4 @@ extern void tm_process_clock(struct clocksource *cs, int64_t diff);
 extern struct clocksource *tm_get_source_by_name(const char *name);
 
 #endif /* __TIMER_H__ */
+

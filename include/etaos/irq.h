@@ -20,7 +20,6 @@
 #define __IRQ_H__
 
 #include <etaos/kernel.h>
-#include <etaos/thread.h>
 #include <etaos/types.h>
 
 extern void irq_save_and_disable(unsigned long *flags);
@@ -36,6 +35,7 @@ void arch_irq_enable();
 #define irq_enable() arch_irq_enable()
 
 struct irq_data;
+struct irq_chip;
 typedef enum {
 	IRQ_NONE = 0 << 0,
 	IRQ_HANDLED = 1 << 0,
@@ -56,8 +56,9 @@ struct irq_data {
 };
 
 #ifdef CONFIG_SCHED
+#include <etaos/thread.h>
 struct irq_thread_data {
-	struct thread *thread;
+	struct thread *owner;
 	struct irq_data idata;
 };
 #endif

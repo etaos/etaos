@@ -25,6 +25,7 @@
 #include <etaos/bitops.h>
 #include <etaos/spinlock.h>
 #include <etaos/string.h>
+#include <etaos/atomic.h>
 
 static struct list_head sources = STATIC_INIT_LIST_HEAD(sources);
 
@@ -128,6 +129,15 @@ int tm_stop_timer(struct timer *timer)
 	}
 
 	return 1;
+}
+
+int64_t tm_update_source(struct clocksource *source)
+{
+	int64_t diff;
+
+	diff = atomic64_get(&source->tc);
+	diff -= source->tc_resume;
+	return diff;
 }
 
 void tm_process_clock(struct clocksource *cs, int64_t diff)
