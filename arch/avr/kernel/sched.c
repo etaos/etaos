@@ -1,5 +1,5 @@
 /*
- *  ETA/OS arch IO
+ *  ETA/OS - Scheduling core
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,30 +16,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ARCH_IO_H_
-#define __ARCH_IO_H_
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/thread.h>
+#include <etaos/sched.h>
 
-#include <asm/config.h>
+static struct rq avr_rq = {
+	.rq_threads = NULL,
+	.current = NULL,
+	.switch_count = 0,
+	.lock = SPIN_LOCK_INIT(avr_rq.lock),
+};
 
-#define BIT(__x) (1 << (__x))
-#define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
-#define F_CPU CONFIG_FCPU
+struct rq *sched_get_cpu_rq(void)
+{
+	return &avr_rq;
+}
 
-#ifdef CONFIG_ATMEGA328P
-#define CONFIG_ATMEGA328
-#endif
+struct rq *sched_select_rq(void)
+{
+	return &avr_rq;
+}
 
-#ifdef CONFIG_ATMEGA328
-#include <asm/iom328.h>
-#endif
-
-#define irq_enter_critical() __asm__ __volatile__( \
-		"in __tmp_reg__, __SREG__" "\n\t" \
-		"cli"			   "\n\t" \
-		"push __tmp_reg__"	   "\n\t")
-#define irq_exit_critical() __asm__ __volatile__( \
-		"pop __tmp_reg__"	   "\n\t" \
-		"out __SREG__, __tmp_reg__""\n\t")
-
-#endif
-
+void cpu_reschedule(struct rq *rq, struct thread *prev, struct thread *next)
+{
+}

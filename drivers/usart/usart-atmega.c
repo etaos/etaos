@@ -73,6 +73,7 @@ static int atmega_usart_write(struct usart *uart, const void *tx,
 	size_t i;
 	const char *txbuf = tx;
 
+	err = 0;
 	for(i = 0; i < txlen; i++) {
 		err = atmega_usart_putc(uart, txbuf[i]);
 		if(err != txbuf[i]) {

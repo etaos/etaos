@@ -22,11 +22,24 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/time.h>
+#include <etaos/spinlock.h>
+
+typedef void (*thread_handle_t)(void *arg);
+
+#define THREAD(__name, __argname) static void __name(void * __argname)
+
+struct sched_class;
+struct thread_queue {
+	struct sched_class *sclass;
+	spinlock_t lock;
+	volatile struct thread *queue;
+};
 
 struct thread {
 	const char *name;
 	struct thread *next;
 	unsigned long flags;
+	int preemt_cnt;
 
 	struct thread *q_next;
 	struct thread *volatile*queue;
@@ -37,7 +50,7 @@ struct thread {
 	unsigned char prio;
 	
 	struct timer *timer;
-	unsigned char *ec;
+	unsigned char ec;
 
 	void *param;
 };
@@ -49,5 +62,11 @@ struct thread {
 #define THREAD_NEED_RESCHED_FLAG 4
 
 extern void thread_wake_up_from_irq(struct thread *t);
+extern int thread_initialise(struct thread *tp, char *name, 
+		thread_handle_t handle, void *arg, size_t stack_size, 
+		void *stack, unsigned char prio);
+
+extern struct thread *thread_create(char *name, thread_handle_t handle, 
+		void *arg, size_t stack_size, void *stack, unsigned char prio);
 
 #endif /* __THREAD_H__ */
