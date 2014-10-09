@@ -27,21 +27,30 @@
 
 struct rq;
 struct sched_class {
-	struct thread *threads;
-	struct thread *kill_queue;
-
-	bool (*sort)(struct thread *head, struct thread *entry);
 	struct thread *(*next_runnable)(struct rq*);
+	void (*add_thread)(struct rq *rq, struct thread *tp);
+	int (*rm_thread)(struct rq *rq, struct thread *tp);
+};
+
+struct rr_rq {
+	struct thread *run_queue;
 };
 
 struct rq {
-	struct sched_class *sclass;
-	struct thread *rq_threads;
+	struct sched_class *sched_class;
+#ifdef CONFIG_RR
+	struct rr_rq rq;
+#endif
+	struct thread *wake_queue;
+	struct thread *kill_queue;
 	struct thread *current;
+
+	unsigned int switch_count;
+	
 	struct clocksource *source;
 	spinlock_t lock;
-	unsigned int switch_count;
 };
+
 
 #define SIGNALED ((void*)-1)
 
@@ -56,18 +65,26 @@ extern void cpu_reschedule(struct rq *rq,
 		struct thread *prev, 
 		struct thread *next);
 
-extern void class_remove_thread(struct rq *rq, struct thread *tp);
-extern void class_add_thread(struct rq *rq, struct thread *tp);
+extern void raw_thread_add_to_wake_q(struct thread *tp);
+extern void raw_thread_add_to_kill_q(struct thread *tp);
+extern void thread_add_to_wake_q(struct thread *tp);
+extern void thread_add_to_kill_q(struct thread *tp);
 
-extern void sched_remove_from_queue(struct thread *thread, 
-		struct thread_queue *qp);
-extern void sched_add_to_queue(struct thread *thread, struct thread_queue *qp);
+extern void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp);
+extern void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp);
+extern void rq_remove_wake_thread(struct rq *rq, struct thread *tp);
+extern void rq_remove_kill_thread(struct rq *rq, struct thread *tp);
 
-extern void raw_rq_add_thread(struct rq *rq, struct thread *tp);
-extern void raw_rq_remove_thread(struct rq *rq, struct thread *tp);
+extern int rq_remove_thread(struct thread *tp);
+extern int rq_add_thread(struct rq *rq, struct thread *tp);
 
-extern void rq_add_thread(struct rq *rq, struct thread *tp);
-extern void rq_remove_thread(struct rq *rq, struct thread *tp);
+static inline struct thread *current_thread(void)
+{
+	struct rq *rq;
+
+	rq = sched_get_cpu_rq();
+	return rq->current;
+}
 
 static inline int *preemt_counter_ptr(struct thread *tp)
 {

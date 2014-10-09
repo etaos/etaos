@@ -54,14 +54,12 @@ int thread_initialise(struct thread *tp, char *name, thread_handle_t handle,
 	tp->prio = prio;
 	tp->flags = 0;
 
-	tp->q_next = NULL;
-	tp->next = NULL;
+	tp->rq_next = NULL;
+	tp->queue = NULL;
 
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	rq = sched_select_rq();
 	
-	class_add_thread(rq, tp);
-	rq_add_thread(rq, tp);
 	return -EOK;
 }
 

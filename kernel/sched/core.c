@@ -18,6 +18,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/error.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
 #include <etaos/irq.h>
@@ -33,10 +34,188 @@ void thread_wake_up_from_irq(struct thread *thread)
 
 static inline struct thread *sched_next_runnable(struct rq *rq)
 {
-	if(rq->sclass)
-		return rq->sclass->next_runnable(rq);
+	struct sched_class *class;
+
+	class = rq->sched_class; /* class is valid, a thread 
+			       CANNOT be running wihout */
+	if(class->next_runnable)
+		return class->next_runnable(rq);
 
 	return NULL;
+}
+
+static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
+{
+	struct thread *carriage;
+
+	carriage = *tpp;
+	if(carriage == SIGNALED)
+		return -EINVAL;
+
+	while(carriage) {
+		if(carriage == tp) {
+			*tpp = tp->rq_next;
+			tp->rq_next = NULL;
+			tp->queue = NULL;
+			break;
+		}
+
+		tpp = &carriage->rq_next;
+		continue;
+	}
+
+	return -EOK;
+}
+
+void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp)
+{
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	rq_list_remove(tp, &rq->wake_queue);
+	irq_restore(&flags);
+}
+
+void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
+{
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	rq_list_remove(tp, &rq->kill_queue);
+	irq_restore(&flags);
+}
+
+void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
+{
+	spin_lock(&rq->lock);
+	raw_rq_remove_wake_thread(rq, tp);
+	spin_unlock(&rq->lock);
+}
+
+void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
+{
+	spin_lock(&rq->lock);
+	raw_rq_remove_kill_thread(rq, tp);
+	spin_unlock(&rq->lock);
+}
+
+static inline void rq_list_add(struct thread *new, struct thread *head)
+{
+	new->rq_next = head;
+}
+
+static void rq_add_wake_thread(struct rq *rq, struct thread *new)
+{
+	struct sched_class *class;
+
+	class = rq->sched_class;
+
+	if(new->on_rq)
+		class->rm_thread(new->rq, new);
+
+	rq_list_add(new, rq->wake_queue);
+	rq->wake_queue = new;
+}
+
+static void rq_add_kill_thread(struct rq *rq, struct thread *new)
+{
+	struct sched_class *class;
+
+	class = rq->sched_class;
+
+	if(new->on_rq)
+		class->rm_thread(new->rq, new);
+
+	rq_list_add(new, rq->kill_queue);
+	rq->kill_queue = new;
+}
+
+void raw_thread_add_to_wake_q(struct thread *tp)
+{
+	struct rq *rq;
+
+	if(!tp->on_rq)
+		return;
+
+	rq = tp->rq;
+	rq_add_wake_thread(rq, tp);
+}
+
+void raw_thread_add_to_kill_q(struct thread *tp)
+{
+	struct rq *rq;
+
+	if(!tp->on_rq)
+		return;
+
+	rq = tp->rq;
+	rq_add_kill_thread(rq, tp);
+}
+
+void thread_add_to_wake_q(struct thread *tp)
+{
+	struct rq *rq;
+
+	if(!tp->on_rq)
+		return;
+
+	rq = tp->rq;
+	spin_lock(&rq->lock);
+	raw_thread_add_to_wake_q(tp);
+	spin_unlock(&rq->lock);
+}
+
+void thread_add_to_kill_q(struct thread *tp)
+{
+	struct rq *rq;
+
+	if(!tp->on_rq)
+		return;
+
+	rq = tp->rq;
+	spin_lock(&rq->lock);
+	raw_thread_add_to_kill_q(tp);
+	spin_unlock(&rq->lock);
+}
+
+int rq_add_thread(struct rq *rq, struct thread *tp)
+{
+	int err;
+	struct prev_rq;
+	struct sched_class *class = rq->sched_class;
+
+	err = 0;
+	if(tp->on_rq)
+		err = rq_remove_thread(tp);
+
+	spin_lock(&rq->lock);
+	class->add_thread(rq, tp);
+	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	spin_unlock(&rq->lock);
+	tp->on_rq = true;
+
+	return err;
+}
+
+int rq_remove_thread(struct thread *tp)
+{
+	int err;
+	struct sched_class *class;
+	struct rq *rq;
+
+	rq = tp->rq;
+	if(!tp->on_rq) {
+		err = -EINVAL;
+	} else {
+		class = rq->sched_class;
+		spin_lock(&rq->lock);
+		clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+		err = class->rm_thread(rq, tp);
+		spin_unlock(&rq->lock);
+		tp->on_rq = false;
+	}
+
+	return err;
 }
 
 static void rq_post_schedule(struct rq *rq)
@@ -45,7 +224,7 @@ static void rq_post_schedule(struct rq *rq)
 
 static inline struct thread *sched_get_next_runnable(struct rq *rq)
 {
-	struct sched_class *class = rq->sclass;
+	struct sched_class *class = rq->sched_class;
 
 	if(class)
 		return class->next_runnable(rq);
@@ -71,7 +250,7 @@ resched:
 	preemt_disable(current(rq));
 	spin_lock_irqsave(&rq->lock, flags);
 #ifdef CONFIG_EVENT_MUTEX
-	carriage = rq->sclass->threads;
+	carriage = rq->wake_queue;
 	while(carriage) {
 		events = carriage->ec;
 
@@ -82,7 +261,7 @@ resched:
 			if(tp != SIGNALED)
 				thread_wake_up_from_irq(tp);
 		}
-		carriage = carriage->next;
+		carriage = carriage->rq_next;
 	}
 #endif
 
@@ -110,155 +289,6 @@ resched:
 		goto resched;
 
 	return;
-}
-
-void class_add_thread(struct rq *rq, struct thread *tp)
-{
-	struct sched_class *class;
-
-	if(!rq || !tp)
-		return;
-
-	class = rq->sclass;
-
-	tp->next = class->threads;
-	class->threads = tp;
-}
-
-void class_remove_thread(struct rq *rq, struct thread *tp)
-{
-	struct thread *carriage, *prev;
-	struct sched_class *class = rq->sclass;
-
-	for(carriage = class->threads, prev = NULL; carriage; 
-			prev = carriage, carriage = carriage->next) {
-		if(carriage == tp) {
-			prev->next = carriage->next;
-			tp->next = NULL;
-			break;
-		}	
-	}
-
-	tp->queue = SIGNALED;
-	return;
-}
-
-static void __sched_remove_from_queue(struct thread *thread, 
-		struct thread *volatile*qpp)
-{
-	struct thread *tp;
-
-	irq_enter_critical();
-	tp = *qpp;
-	irq_exit_critical();
-
-	if(tp != SIGNALED) {
-		while(tp) {
-			if(tp == thread) {
-				irq_enter_critical();
-				*qpp = thread->q_next;
-#ifdef CONFIG_EVENT_MUTEX
-				if(thread->ec) {
-					if(thread->q_next)
-						thread->q_next->ec = thread->ec;
-					thread->ec = 0;
-				}
-#endif
-				irq_exit_critical();
-				thread->q_next = NULL;
-				thread->queue = NULL;
-				break;
-			}
-
-			qpp = &tp->q_next;
-			tp = tp->q_next;
-		}
-	}
-
-	return;
-}
-
-#define QUEUE_POINTER(_q) ((struct thread *volatile*)&(_q)->queue)
-static void __sched_add_to_queue(struct thread *thread,
-		struct thread *volatile*qpp, struct sched_class *class)
-{
-	struct thread *tp;
-
-	thread->ec = 0;
-	thread->queue = qpp;
-
-	irq_enter_critical();
-	tp = *qpp;
-
-	if(tp == SIGNALED) {
-		tp = NULL;
-		thread->ec++;
-	} else if(tp) {
-		irq_exit_critical();
-		while(tp && !class->sort(tp, thread)) {
-			qpp = &tp->q_next;
-			tp = tp->next;
-		}
-		irq_enter_critical();
-	}
-
-	thread->next = tp;
-	*qpp = thread;
-
-	if(thread->next) {
-		if(thread->next->ec) {
-			thread->ec += thread->next->ec;
-			thread->next->ec = 0;
-		}
-	}
-
-	irq_exit_critical();
-	return;
-}
-
-#define RQ_POINTER(_rq) ((struct thread *volatile*)&rq->rq_threads)
-void raw_rq_add_thread(struct rq *rq, struct thread *tp)
-{
-	struct sched_class *class;
-
-	class = rq->sclass;
-	__sched_add_to_queue(tp, RQ_POINTER(rq), class);
-}
-
-void raw_rq_remove_thread(struct rq *rq, struct thread *tp)
-{
-	struct thread *volatile*tqpp;
-
-	tqpp = RQ_POINTER(rq);
-	__sched_remove_from_queue(tp, tqpp);
-}
-
-void rq_add_thread(struct rq *rq, struct thread *tp)
-{
-	spin_lock(&rq->lock);
-	raw_rq_add_thread(rq, tp);
-	spin_unlock(&rq->lock);
-}
-
-void rq_remove_thread(struct rq *rq, struct thread *tp)
-{
-	spin_lock(&rq->lock);
-	raw_rq_remove_thread(rq, tp);
-	spin_unlock(&rq->lock);
-}
-
-void sched_remove_from_queue(struct thread *thread, struct thread_queue *qp)
-{
-	spin_lock(&qp->lock);
-	__sched_remove_from_queue(thread, QUEUE_POINTER(qp));
-	spin_unlock(&qp->lock);
-}
-
-void sched_add_to_queue(struct thread *thread, struct thread_queue *qp)
-{
-	spin_lock(&qp->lock);
-	__sched_add_to_queue(thread, QUEUE_POINTER(qp), qp->sclass);
-	spin_unlock(&qp->lock);
 }
 
 void schedule(void)

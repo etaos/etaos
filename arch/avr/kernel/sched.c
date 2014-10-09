@@ -22,7 +22,6 @@
 #include <etaos/sched.h>
 
 static struct rq avr_rq = {
-	.rq_threads = NULL,
 	.current = NULL,
 	.switch_count = 0,
 	.lock = SPIN_LOCK_INIT(avr_rq.lock),
