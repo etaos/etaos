@@ -28,6 +28,8 @@
 
 #include <asm/io.h>
 
+static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
+
 void thread_wake_up_from_irq(struct thread *thread)
 {
 }
@@ -116,30 +118,28 @@ static inline void rq_list_add(struct thread *new, struct thread *head)
 
 static void rq_add_wake_thread(struct rq *rq, struct thread *new)
 {
-	struct sched_class *class;
+	struct rq *_rq;
 
-	class = rq->sched_class;
-
-	if(new->on_rq)
-		class->rm_thread(new->rq, new);
-
+	_rq = new->rq;
 	new->rq = rq;
 	rq_list_add(new, rq->wake_queue);
 	rq->wake_queue = new;
+
+	if(new->on_rq)
+		raw_rq_remove_thread(_rq, new);
 }
 
 static void rq_add_kill_thread(struct rq *rq, struct thread *new)
 {
-	struct sched_class *class;
+	struct rq *_rq;
 
-	class = rq->sched_class;
-
-	if(new->on_rq)
-		class->rm_thread(new->rq, new);
-
+	_rq = new->rq;
 	new->rq = rq;
 	rq_list_add(new, rq->kill_queue);
 	rq->kill_queue = new;
+
+	if(new->on_rq)
+		raw_rq_remove_thread(_rq, new);
 }
 
 void raw_thread_add_to_wake_q(struct thread *tp)
@@ -197,39 +197,70 @@ int rq_add_thread(struct rq *rq, struct thread *tp)
 	return err;
 }
 
-int rq_remove_thread(struct thread *tp)
+static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 {
-	int err;
 	struct sched_class *class;
-	struct rq *rq;
+	int err;
 
-	rq = tp->rq;
 	if(!tp->on_rq) {
 		err = -EINVAL;
+	} else if(rq->current == tp) {
+		/*
+		 * The current thread is to be
+		 * removed from the RQ. This requires
+		 * it to be stopped first.
+		 */
+		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+		clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+		schedule();
+		err = -EOK;
 	} else {
 		class = rq->sched_class;
-		spin_lock(&rq->lock);
 		clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 		err = class->rm_thread(rq, tp);
-		spin_unlock(&rq->lock);
 		tp->on_rq = false;
 	}
 
 	return err;
 }
 
-static void rq_post_schedule(struct rq *rq)
+int rq_remove_thread(struct thread *tp)
+{
+	int err;
+	struct rq *rq;
+
+	rq = tp->rq;
+	if(rq->current != tp) {
+		spin_lock(&rq->lock);
+		err = raw_rq_remove_thread(rq, tp);
+		spin_unlock(&rq->lock);
+	} else {
+		err = raw_rq_remove_thread(rq, tp);
+	}
+
+	return err;
+}
+
+static void rq_update(struct rq *rq)
 {
 }
 
-static inline struct thread *sched_get_next_runnable(struct rq *rq)
+static struct thread *sched_get_next_runnable(struct rq *rq,
+						     struct thread *current)
 {
+	struct thread *next;
 	struct sched_class *class = rq->sched_class;
 
-	if(class)
-		return class->next_runnable(rq);
-	else
+	if(class) {
+		next = class->next_runnable(rq);
+		if(test_bit(THREAD_RUNNING_FLAG, &current->flags))
+			class->add_thread(rq, current);
+		else
+			current->on_rq = false;
+		return next;
+	} else {
 		return NULL;
+	}
 }
 
 #define current(_rq) ((_rq)->current)
@@ -271,14 +302,14 @@ resched:
 		tm_process_clock(rq->source, diff);
 #endif
 
-	tp = sched_get_next_runnable(rq);
+	tp = sched_get_next_runnable(rq, rq->current);
 	if(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
 				&current(rq)->flags) && tp != current(rq)) {
+		rq_update(rq);
 		rq->current = tp;
 		rq->switch_count++;
 		cpu_reschedule(rq, current(rq), tp);
 		spin_unlock_irqrestore(&rq->lock, flags);
-		rq_post_schedule(rq);
 		rq = sched_get_cpu_rq();
 	} else {
 		spin_unlock_irqrestore(&rq->lock, flags);
