@@ -67,35 +67,45 @@ static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
 	return -EOK;
 }
 
-void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp)
+void raw_rq_remove_wake_thread(struct thread *tp)
 {
 	unsigned long flags;
+	struct rq *rq;
 
+	rq = tp->rq;
 	irq_save_and_disable(&flags);
 	rq_list_remove(tp, &rq->wake_queue);
 	irq_restore(&flags);
 }
 
-void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
+void raw_rq_remove_kill_thread(struct thread *tp)
 {
 	unsigned long flags;
+	struct rq *rq;
 
+	rq = tp->rq;
 	irq_save_and_disable(&flags);
 	rq_list_remove(tp, &rq->kill_queue);
 	irq_restore(&flags);
 }
 
-void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
+void rq_remove_wake_thread(struct thread *tp)
 {
+	struct rq *rq;
+
+	rq = tp->rq;
 	spin_lock(&rq->lock);
-	raw_rq_remove_wake_thread(rq, tp);
+	raw_rq_remove_wake_thread(tp);
 	spin_unlock(&rq->lock);
 }
 
-void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
+void rq_remove_kill_thread(struct thread *tp)
 {
+	struct rq *rq;
+
+	rq = tp->rq;
 	spin_lock(&rq->lock);
-	raw_rq_remove_kill_thread(rq, tp);
+	raw_rq_remove_kill_thread(tp);
 	spin_unlock(&rq->lock);
 }
 
@@ -113,6 +123,7 @@ static void rq_add_wake_thread(struct rq *rq, struct thread *new)
 	if(new->on_rq)
 		class->rm_thread(new->rq, new);
 
+	new->rq = rq;
 	rq_list_add(new, rq->wake_queue);
 	rq->wake_queue = new;
 }
@@ -126,6 +137,7 @@ static void rq_add_kill_thread(struct rq *rq, struct thread *new)
 	if(new->on_rq)
 		class->rm_thread(new->rq, new);
 
+	new->rq = rq;
 	rq_list_add(new, rq->kill_queue);
 	rq->kill_queue = new;
 }
@@ -134,10 +146,7 @@ void raw_thread_add_to_wake_q(struct thread *tp)
 {
 	struct rq *rq;
 
-	if(!tp->on_rq)
-		return;
-
-	rq = tp->rq;
+	rq = sched_get_cpu_rq();
 	rq_add_wake_thread(rq, tp);
 }
 
@@ -145,10 +154,7 @@ void raw_thread_add_to_kill_q(struct thread *tp)
 {
 	struct rq *rq;
 
-	if(!tp->on_rq)
-		return;
-
-	rq = tp->rq;
+	rq = sched_get_cpu_rq();
 	rq_add_kill_thread(rq, tp);
 }
 
@@ -156,10 +162,7 @@ void thread_add_to_wake_q(struct thread *tp)
 {
 	struct rq *rq;
 
-	if(!tp->on_rq)
-		return;
-
-	rq = tp->rq;
+	rq = sched_get_cpu_rq();
 	spin_lock(&rq->lock);
 	raw_thread_add_to_wake_q(tp);
 	spin_unlock(&rq->lock);
@@ -169,10 +172,7 @@ void thread_add_to_kill_q(struct thread *tp)
 {
 	struct rq *rq;
 
-	if(!tp->on_rq)
-		return;
-
-	rq = tp->rq;
+	rq = sched_get_cpu_rq();
 	spin_lock(&rq->lock);
 	raw_thread_add_to_kill_q(tp);
 	spin_unlock(&rq->lock);

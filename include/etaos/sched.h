@@ -70,10 +70,10 @@ extern void raw_thread_add_to_kill_q(struct thread *tp);
 extern void thread_add_to_wake_q(struct thread *tp);
 extern void thread_add_to_kill_q(struct thread *tp);
 
-extern void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp);
-extern void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp);
-extern void rq_remove_wake_thread(struct rq *rq, struct thread *tp);
-extern void rq_remove_kill_thread(struct rq *rq, struct thread *tp);
+extern void raw_rq_remove_wake_thread(struct thread *tp);
+extern void raw_rq_remove_kill_thread(struct thread *tp);
+extern void rq_remove_wake_thread(struct thread *tp);
+extern void rq_remove_kill_thread(struct thread *tp);
 
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
