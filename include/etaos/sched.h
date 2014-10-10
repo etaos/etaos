@@ -30,6 +30,9 @@ struct sched_class {
 	struct thread *(*next_runnable)(struct rq*);
 	void (*add_thread)(struct rq *rq, struct thread *tp);
 	int (*rm_thread)(struct rq *rq, struct thread *tp);
+	void (*thread_init)(struct thread *tp);
+	void (*queue_add)(struct thread_queue *q, struct thread *tp);
+	void (*queue_rm)(struct thread_queue *q, struct thread *tp);
 };
 
 struct rr_rq {
@@ -70,13 +73,20 @@ extern void raw_thread_add_to_kill_q(struct thread *tp);
 extern void thread_add_to_wake_q(struct thread *tp);
 extern void thread_add_to_kill_q(struct thread *tp);
 
-extern void raw_rq_remove_wake_thread(struct thread *tp);
-extern void raw_rq_remove_kill_thread(struct thread *tp);
-extern void rq_remove_wake_thread(struct thread *tp);
-extern void rq_remove_kill_thread(struct thread *tp);
+extern void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp);
+extern void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp);
+extern void rq_remove_wake_thread(struct rq *rq, struct thread *tp);
+extern void rq_remove_kill_thread(struct rq *rq, struct thread *tp);
 
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
+
+extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
+extern void queue_add_thread(struct thread_queue *qp, struct thread *tp);
+extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
+
+extern struct sched_class sys_sched_class;
+
 
 static inline struct thread *current_thread(void)
 {
@@ -103,11 +113,23 @@ static inline void preemt_enable(struct thread *tp)
 
 static inline void preemt_enable_no_resched(struct thread *tp)
 {
-	*preemt_counter_ptr(tp) += 1;
+	*preemt_counter_ptr(tp) -= 1;
 }
 
 static inline void preemt_disable(struct thread *tp)
 {
 	++*preemt_counter_ptr(tp);
+}
+
+static inline void thread_remove_from_wake_q(struct thread *tp)
+{
+	if(tp->rq)
+		rq_remove_wake_thread(tp->rq, tp);
+}
+
+static inline void thread_remove_from_kill_q(struct thread *tp)
+{
+	if(tp->rq)
+		rq_remove_kill_thread(tp->rq, tp);
 }
 #endif

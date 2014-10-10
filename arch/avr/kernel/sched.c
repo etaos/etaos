@@ -21,11 +21,26 @@
 #include <etaos/thread.h>
 #include <etaos/sched.h>
 
+#include <asm/time.h>
+#include <asm/sched.h>
+
 static struct rq avr_rq = {
+	.sched_class = &sys_sched_class,
+#ifdef CONFIG_RR
+	.rq = { .run_queue = NULL, },
+#endif
+	.wake_queue = NULL,
+	.kill_queue = NULL,
 	.current = NULL,
 	.switch_count = 0,
 	.lock = SPIN_LOCK_INIT(avr_rq.lock),
+
 };
+
+void avr_init_sched(void)
+{
+	avr_rq.source = avr_get_sys_clk();
+}
 
 struct rq *sched_get_cpu_rq(void)
 {
@@ -40,3 +55,4 @@ struct rq *sched_select_rq(void)
 void cpu_reschedule(struct rq *rq, struct thread *prev, struct thread *next)
 {
 }
+

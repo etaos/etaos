@@ -24,12 +24,15 @@
 #include <etaos/irq.h>
 
 #include <asm/spinlock.h>
+#include <asm/irq.h>
 
 #define spin_lock(__l) arch_spin_lock(__l)
 #define spin_unlock(__l) arch_spin_unlock(__l)
 
 #define DEFINE_SPINLOCK(__n) spinlock_t __n = { .lock = 0, }
 #define SPIN_LOCK_INIT(__n) { .lock = 0, }
+
+#define STATIC_SPIN_LOCK_INIT { .lock = 0, }
 
 static inline void _spin_lock_irqsave(spinlock_t *lock, unsigned long *flags)
 {
@@ -42,6 +45,18 @@ static inline void _spin_unlock_irqrestore(spinlock_t *lock,
 {
 	arch_spin_unlock(lock);
 	irq_restore(flags);
+}
+
+static inline void raw_spin_lock_irq(spinlock_t *lock)
+{
+	local_irq_disable();
+	arch_spin_lock(lock);
+}
+
+static inline void raw_spin_unlock_irq(spinlock_t *lock)
+{
+	local_irq_enable();
+	arch_spin_unlock(lock);
 }
 
 #define spin_lock_irqsave(__l, __f) _spin_lock_irqsave(__l, &__f)

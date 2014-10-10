@@ -25,12 +25,34 @@
 #include <etaos/spinlock.h>
 #include <etaos/list.h>
 
+
+#define DEFINE_THREAD_QUEUE(__name)			 \
+	static struct thread_queue __name = {		 \
+		.sched_class = &sys_sched_class,	 \
+		.lock = STATIC_SPIN_LOCK_INIT,		 \
+		.qhead = SIGNALED,			 \
+	}
+
+#define INIT_THREAD_QUEUE {			 \
+		.sched_class = &sys_sched_class, \
+		.lock = STATIC_SPIN_LOCK_INIT,	 \
+		.qhead = SIGNALED,		 \
+	}
+
 typedef void (*thread_handle_t)(void *arg);
 
-#define THREAD(__name, __argname) static void __name(void * __argname)
+#define THREAD(fn, param) \
+static void fn(void * param); \
+static void fn(void *param)
 
 struct rr_entity {
 	struct thread *next;
+};
+
+struct thread_queue {
+	struct sched_class *sched_class;
+	spinlock_t lock;
+	struct thread *qhead;
 };
 
 struct rq;
@@ -66,6 +88,7 @@ struct thread {
 #define THREAD_EXIT_FLAG 	 3
 #define THREAD_NEED_RESCHED_FLAG 4
 
+struct sched_class;
 extern void thread_wake_up_from_irq(struct thread *t);
 extern int thread_initialise(struct thread *tp, char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
@@ -73,5 +96,6 @@ extern int thread_initialise(struct thread *tp, char *name,
 
 extern struct thread *thread_create(char *name, thread_handle_t handle, 
 		void *arg, size_t stack_size, void *stack, unsigned char prio);
+extern struct sched_class sys_sched_class;
 
 #endif /* __THREAD_H__ */

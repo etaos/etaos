@@ -22,6 +22,7 @@
 #include <etaos/vfs.h>
 #include <etaos/mem.h>
 
+#include <asm/sched.h>
 #include <asm/time.h>
 #include <asm/io.h>
 #include <asm/cpu.h>
@@ -49,6 +50,10 @@ void avr_init(void)
 #ifdef CONFIG_TIMER
 	avr_timer_init();
 #endif
+#ifdef CONFIG_SCHED
+	avr_init_sched();
+#endif
+	irq_enable();
 	main();
 
 	while(1);

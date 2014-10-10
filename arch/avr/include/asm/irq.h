@@ -35,5 +35,10 @@
 	void _vector(void) __attribute__((IRQ_ENTRY_ATTRIBS)); \
 	void _vector(void)
 
+extern void arch_irq_disable(void);
+extern void arch_irq_enable(void);
+#define local_irq_disable() arch_irq_disable()
+#define local_irq_enable() arch_irq_enable()
+
 #endif /* __AVR_IRQ_H__ */
 
