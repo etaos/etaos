@@ -71,9 +71,12 @@ struct thread {
 	void *sp;
 	size_t stack_size;
 	unsigned char prio;
-	
+#ifdef CONFIG_TIMER	
 	struct timer *timer;
+#endif
+#ifdef CONFIG_EVENT_MUTEX
 	unsigned char ec;
+#endif
 
 	void *param;
 #ifdef CONFIG_RR

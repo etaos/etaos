@@ -28,6 +28,15 @@ config RR
 
 endchoice
 
+config EVENT_MUTEX
+	bool "Event mutexes"
+	help
+	  Enable to build more efficient mutexes, using
+	  the scheduler to queue threads in a mutex. After
+	  a signal has been given (from either IRQ or non-IRQ
+	  context) the thread will be released into the run queue
+	  again. If unsure say 'y' here.
+
 config DYN_PRIO
 	bool "Dynamic priorities"
 	help

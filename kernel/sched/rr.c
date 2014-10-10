@@ -25,15 +25,18 @@
 static void rr_queue_insert(struct thread *volatile*tpp, struct thread *tp)
 {
 	struct thread *thread;
-
+#ifdef CONFIG_EVENT_MUTEX
 	tp->ec = 0;
+#endif
 	tp->queue = tpp;
 	
 	thread = *tpp;
 
 	if(thread == SIGNALED) {
 		thread = NULL;
+#ifdef CONFIG_EVENT_MUTEX
 		tp->ec++;
+#endif
 	} else if(thread) {
 		while(thread && thread->prio < tp->prio) {
 			tpp = &thread->se.next;
@@ -42,11 +45,12 @@ static void rr_queue_insert(struct thread *volatile*tpp, struct thread *tp)
 	}
 	tp->se.next = thread;
 	*tpp = tp;
-
+#ifdef CONFIG_EVENT_MUTEX
 	if(tp->se.next && tp->se.next->ec) {
 		tp->ec += tp->se.next->ec;
 		tp->se.next->ec = 0;
 	}
+#endif
 }
 
 static int rr_queue_remove(struct thread *volatile*tpp, struct thread *tp)
@@ -63,11 +67,13 @@ static int rr_queue_remove(struct thread *volatile*tpp, struct thread *tp)
 		if(thread == tp) {
 			err = 0;
 			*tpp = tp->se.next;
+#ifdef CONFIG_EVENT_MUTEX
 			if(tp->ec) {
 				if(tp->se.next)
 					tp->se.next->ec = tp->ec;
 				tp->ec = 0;
 			}
+#endif
 
 			tp->se.next = NULL;
 			tp->queue = NULL;

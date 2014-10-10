@@ -25,7 +25,7 @@
 #include <etaos/thread.h>
 
 typedef struct mutex {
-#ifdef CONFIG_EVENT_MUTEX
+#ifdef NEVER_SET
 	struct thread *queue;
 #else
 	uint8_t lock;
@@ -38,7 +38,7 @@ typedef struct mutex {
 #define mutex_lock_irqsave(__l, __f) _mutex_lock_irqsave(__l, &__f)
 #define mutex_unlock_irqrestore(__l, __f) _mutex_unlock_irqrestore(__l, &__f)
 
-#ifdef CONFIG_EVENT_MUTEX
+#ifdef NEVER_SET
 #else
 
 #include <asm/mutex.h>
