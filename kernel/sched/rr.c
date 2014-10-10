@@ -87,6 +87,7 @@ static int rr_queue_remove(struct thread *volatile*tpp, struct thread *tp)
 	return err;
 }
 
+#ifdef CONFIG_THREAD_QUEUE
 static void rr_thread_queue_add(struct thread_queue *qp, struct thread *tp)
 {
 	rr_queue_insert(&qp->qhead, tp);
@@ -96,6 +97,7 @@ static void rr_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
 {
 	rr_queue_remove(&qp->qhead, tp);
 }
+#endif
 
 static void rr_add_thread(struct rq *rq, struct thread *tp)
 {
@@ -126,7 +128,9 @@ struct sched_class sys_sched_class = {
 	.rm_thread = &rr_rm_thread,
 	.add_thread = &rr_add_thread,
 	.next_runnable = &rr_next_runnable,
+#ifdef CONFIG_THREAD_QUEUE
 	.queue_add = &rr_thread_queue_add,
 	.queue_rm = &rr_thread_queue_remove,
+#endif
 };
 

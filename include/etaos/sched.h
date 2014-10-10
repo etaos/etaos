@@ -31,8 +31,10 @@ struct sched_class {
 	void (*add_thread)(struct rq *rq, struct thread *tp);
 	int (*rm_thread)(struct rq *rq, struct thread *tp);
 	void (*thread_init)(struct thread *tp);
+#ifdef CONFIG_THREAD_QUEUE
 	void (*queue_add)(struct thread_queue *q, struct thread *tp);
 	void (*queue_rm)(struct thread_queue *q, struct thread *tp);
+#endif
 };
 
 struct rr_rq {
@@ -77,13 +79,15 @@ extern void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp);
 extern void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp);
 extern void rq_remove_wake_thread(struct rq *rq, struct thread *tp);
 extern void rq_remove_kill_thread(struct rq *rq, struct thread *tp);
+extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
 
+#ifdef CONFIG_THREAD_QUEUE
 extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
 extern void queue_add_thread(struct thread_queue *qp, struct thread *tp);
-extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
+#endif
 
 extern struct sched_class sys_sched_class;
 
@@ -133,3 +137,4 @@ static inline void thread_remove_from_kill_q(struct thread *tp)
 		rq_remove_kill_thread(tp->rq, tp);
 }
 #endif
+

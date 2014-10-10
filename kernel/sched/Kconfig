@@ -28,8 +28,18 @@ config RR
 
 endchoice
 
+config THREAD_QUEUE
+	bool "Thread queues"
+	help
+	  Enable support for thread queue's by saying 'y' here.
+	  Thread queue's are a storage mechanism for threads using
+	  the default scheduling policy as its storage mechanism.
+	  You can select a storage mechanism (aka scheduling
+	  algorithm) above.
+
 config EVENT_MUTEX
 	bool "Event mutexes"
+	select THREAD_QUEUE
 	help
 	  Enable to build more efficient mutexes, using
 	  the scheduler to queue threads in a mutex. After

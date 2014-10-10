@@ -28,13 +28,16 @@
 
 #include <asm/io.h>
 
-static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
+#ifdef CONFIG_THREAD_QUEUE
 static int raw_rq_add_thread(struct rq *rq, struct thread *tp);
+#endif
+static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
 
 void thread_wake_up_from_irq(struct thread *thread)
 {
 }
 
+#ifdef CONFIG_THREAD_QUEUE
 static void raw_queue_add_thread(struct thread_queue *qp,
 					struct thread *tp)
 {
@@ -85,6 +88,7 @@ void queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 	spin_unlock_irqrestore(&qp->lock, flags);
 	schedule();
 }
+#endif
 
 static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
 {
@@ -198,6 +202,7 @@ void thread_add_to_kill_q(struct thread *tp)
 	spin_unlock_irqrestore(&rq->lock, flags);
 }
 
+#ifdef CONFIG_THREAD_QUEUE
 static int raw_rq_add_thread(struct rq *rq, struct thread *tp)
 {
 	int err;
@@ -215,21 +220,23 @@ static int raw_rq_add_thread(struct rq *rq, struct thread *tp)
 
 	return err;
 }
+#endif
 
 int rq_add_thread(struct rq *rq, struct thread *tp)
 {
 	int err;
 	struct prev_rq;
+	unsigned long flags;
 	struct sched_class *class = rq->sched_class;
 
 	err = 0;
 	if(tp->on_rq && test_bit(THREAD_RUNNING_FLAG, &tp->flags))
 		err = rq_remove_thread(tp);
 
-	spin_lock(&rq->lock);
+	spin_lock_irqsave(&rq->lock, flags);
 	class->add_thread(rq, tp);
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-	spin_unlock(&rq->lock);
+	spin_unlock_irqrestore(&rq->lock, flags);
 	tp->on_rq = true;
 	tp->rq = rq;
 
@@ -280,12 +287,13 @@ int rq_remove_thread(struct thread *tp)
 {
 	int err;
 	struct rq *rq;
+	unsigned long flags;
 
 	rq = tp->rq;
 	if(rq->current != tp) {
-		spin_lock(&rq->lock);
+		spin_lock_irqsave(&rq->lock, flags);
 		err = raw_rq_remove_thread(rq, tp);
-		spin_unlock(&rq->lock);
+		spin_unlock_irqrestore(&rq->lock, flags);
 	} else {
 		err = raw_rq_remove_thread(rq, tp);
 	}
@@ -367,6 +375,9 @@ resched:
 #endif
 
 	tp = sched_get_next_runnable(rq, rq->current);
+	/* Only have to reschedule if the THREAD_NEED_RESCHED_FLAG
+	   is set on the current thread, and if the next runnable
+	   isn't the same thread as the one currently running. */
 	if(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
 				&current(rq)->flags) && tp != current(rq)) {
 		rq_update(rq);

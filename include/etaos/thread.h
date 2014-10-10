@@ -25,7 +25,7 @@
 #include <etaos/spinlock.h>
 #include <etaos/list.h>
 
-
+#ifdef CONFIG_THREAD_QUEUE
 #define DEFINE_THREAD_QUEUE(__name)			 \
 	static struct thread_queue __name = {		 \
 		.sched_class = &sys_sched_class,	 \
@@ -38,6 +38,7 @@
 		.lock = STATIC_SPIN_LOCK_INIT,	 \
 		.qhead = SIGNALED,		 \
 	}
+#endif
 
 typedef void (*thread_handle_t)(void *arg);
 
@@ -49,11 +50,13 @@ struct rr_entity {
 	struct thread *next;
 };
 
+#ifdef CONFIG_THREAD_QUEUE
 struct thread_queue {
 	struct sched_class *sched_class;
 	spinlock_t lock;
 	struct thread *qhead;
 };
+#endif
 
 struct rq;
 struct thread {

@@ -78,7 +78,6 @@ static void test_thread_queue(struct rq *rq)
 	tp = rq->wake_queue;
 	rq_remove_wake_thread(rq, tp);
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-	set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
 	queue_remove_thread(&tst_q, tp);
 	printf("Flags: %s: %lu\n", rq->current->name, rq->current->flags);
 
