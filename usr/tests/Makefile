@@ -27,13 +27,21 @@ devtest: FORCE
 	@echo [SIMUL AVR] Devtest test ended
 	@echo
 
-PHONY += FORCE
-FORCE:
+PHONY += schedtest
+schedtest: FORCE
+	@echo [SIMUL AVR] Running schedtest test
+	@$(MAKE) -C schedtest/ all test
+	@echo [SIMUL AVR] schedtest test ended
+	@echo
 
 PHONY += clean
 clean: FORCE
 	@$(MAKE) -C mm/ clean
 	@$(MAKE) -C tmtest/ clean
 	@$(MAKE) -C devtest/ clean
+	@$(MAKE) -C schedtest/ clean
+
+PHONY += FORCE
+FORCE:
 
 .PHONY: $(PHONY)
