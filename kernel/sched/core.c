@@ -305,9 +305,11 @@ static struct thread *sched_get_next_runnable(struct rq *rq,
 
 	if(class) {
 		next = class->next_runnable(rq);
+		if(!next)
+			next = rq->current;
 		return next;
 	} else {
-		return NULL;
+		return rq->current;
 	}
 }
 
@@ -395,7 +397,7 @@ resched:
 	   is set on the current thread, and if the next runnable
 	   isn't the same thread as the one currently running. */
 	if(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
-				&current(rq)->flags) && tp != current(rq)) {
+			&current(rq)->flags) && tp != current(rq)) {
 		rq_update(rq);
 		rq->current = tp;
 		rq->switch_count++;
