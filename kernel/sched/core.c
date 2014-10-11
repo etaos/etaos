@@ -29,7 +29,7 @@
 #include <asm/io.h>
 
 #ifdef CONFIG_THREAD_QUEUE
-static int raw_rq_add_thread(struct rq *rq, struct thread *tp);
+static void raw_rq_add_thread(struct rq *rq, struct thread *tp);
 #endif
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
 
@@ -64,9 +64,6 @@ static void raw_queue_remove_thread(struct thread_queue *qp,
 	cp = qp->sched_class;
 	if(cp)
 		cp->queue_rm(qp, tp);
-
-	if(test_bit(THREAD_RUNNING_FLAG, &tp->flags))
-		raw_rq_add_thread(sched_get_cpu_rq(), tp);
 }
 
 void queue_add_thread(struct thread_queue *qp, struct thread *tp)
@@ -203,22 +200,17 @@ void thread_add_to_kill_q(struct thread *tp)
 }
 
 #ifdef CONFIG_THREAD_QUEUE
-static int raw_rq_add_thread(struct rq *rq, struct thread *tp)
+static void raw_rq_add_thread(struct rq *rq, struct thread *tp)
 {
-	int err;
 	struct prev_rq;
 	struct sched_class *class = rq->sched_class;
-
-	err = 0;
-	if(tp->on_rq && test_bit(THREAD_RUNNING_FLAG, &tp->flags))
-		err = raw_rq_remove_thread_noresched(tp->rq, tp);
 
 	class->add_thread(rq, tp);
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	tp->on_rq = true;
 	tp->rq = rq;
 
-	return err;
+	return;
 }
 #endif
 
@@ -335,6 +327,30 @@ static void rq_switch_context(struct rq *rq, struct thread *prev,
 	}
 }
 
+static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
+{
+	struct thread_queue *qp;
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	qp = thread_to_queue(tp);
+	tp = *tp->queue;
+
+	raw_rq_remove_wake_thread(rq, tp);
+	raw_queue_remove_thread(qp, tp);
+
+	if(rq->current != tp) {
+		raw_rq_add_thread(rq, tp);
+		if(tp->prio <= rq->current->prio)
+			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
+	} else {
+		set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+		tp->on_rq = true;
+		tp->rq = rq;
+	}
+	irq_restore(&flags);
+}
+
 #define current(_rq) ((_rq)->current)
 static void rq_schedule(void)
 {
@@ -362,7 +378,7 @@ resched:
 			carriage->ec--;
 			tp = *tpp;
 			if(tp != SIGNALED)
-				thread_wake_up_from_irq(tp);
+				rq_signal_event_queue(rq, tp);
 		}
 		carriage = carriage->rq_next;
 	}

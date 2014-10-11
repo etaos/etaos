@@ -30,13 +30,15 @@ static void sched_test_queues(void)
 	thread_initialise(&td4, "T4", &handle, NULL, 128, s4, 170);
 }
 
-static void print_queue(struct thread *qhead)
+static void print_queue(struct thread *curr, struct thread *qhead)
 {
 	struct thread *carriage;
 
+	if(curr)
+		printf("Current: %s::%lu\n", curr->name, curr->flags);
 	for(carriage = qhead; carriage; 
 			carriage = carriage->se.next) {
-		printf("%s::%lu\n", carriage->name, carriage->flags);
+		printf("  %s::%lu\n", carriage->name, carriage->flags);
 	}
 	
 }
@@ -51,16 +53,18 @@ static void test_schedule(struct rq *rq)
 	set_bit(THREAD_NEED_RESCHED_FLAG, &td3.flags);
 
 	schedule();
-	printf("RunQ: Current %s\n", rq->current->name);
-	print_queue(rq->rq.run_queue);
+	printf("RunQ:\n");
+	print_queue(rq->current, rq->rq.run_queue);
 }
 
 static void print_test_queue(struct rq *rq)
 {
+	struct thread *tp;
 	printf("Test Q:\n");
-	print_queue(tst_q.qhead);
+	print_queue(NULL, tst_q.qhead);
 	printf("Wake Q:\n");
-	printf("%s::%lu\n", rq->wake_queue->name, rq->wake_queue->flags);
+	for(tp = rq->wake_queue; tp; tp = tp->rq_next)
+		printf("  %s::%lu\n", tp->name, tp->flags);
 }
 
 static void test_thread_queue(struct rq *rq)
@@ -69,24 +73,27 @@ static void test_thread_queue(struct rq *rq)
 
 	thread_add_to_wake_q(rq->current);
 	queue_add_thread(&tst_q, rq->current);
-	printf("Flags: %s: %lu\n", rq->current->name, rq->current->flags);
-	
+
 	printf("RunQ\n");
-	print_queue(rq->rq.run_queue);
+	print_queue(rq->current, rq->rq.run_queue);
 	print_test_queue(rq);
 
-	tp = rq->wake_queue;
-	rq_remove_wake_thread(rq, tp);
-	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-	queue_remove_thread(&tst_q, tp);
-	printf("Flags: %s: %lu\n", rq->current->name, rq->current->flags);
-
-	thread_add_to_wake_q(rq->current);
-	queue_add_thread(&tst_q, rq->current);
-	printf("Flags: %s: %lu\n", rq->current->name, rq->current->flags);
+	printf("-- Wait next:\n");
+	tp = rq->current;
+	tst_q.qhead = NULL;
+	thread_add_to_wake_q(tp);
+	queue_add_thread(&tst_q, tp);
+	schedule();
 
 	printf("RunQ\n");
-	print_queue(rq->rq.run_queue);
+	print_queue(rq->current, rq->rq.run_queue);
+	print_test_queue(rq);
+
+	tp->ec += 1;
+	schedule();
+
+	printf("RunQ\n");
+	print_queue(rq->current, rq->rq.run_queue);
 	print_test_queue(rq);
 }
 

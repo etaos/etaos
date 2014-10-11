@@ -87,10 +87,19 @@ extern int rq_add_thread(struct rq *rq, struct thread *tp);
 #ifdef CONFIG_THREAD_QUEUE
 extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
 extern void queue_add_thread(struct thread_queue *qp, struct thread *tp);
+
+static inline struct thread_queue *thread_to_queue(struct thread *tp)
+{
+	struct thread **tpp = (struct thread**)tp->queue;
+
+	if(tpp)
+		return container_of(tpp, struct thread_queue, qhead);
+	else
+		return NULL;
+}
 #endif
 
 extern struct sched_class sys_sched_class;
-
 
 static inline struct thread *current_thread(void)
 {
