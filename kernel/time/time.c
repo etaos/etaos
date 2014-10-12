@@ -93,15 +93,15 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 
 	timer->tleft = (cs->freq / 1000UL) * ms;
 	
-	if(test_bit(TIMER_ONESHOT_FLAG, &flags))
-		timer->ticks = 0;
-	else
-		timer->ticks = timer->tleft;
-
 	timer->source = cs;
 	timer->tleft += (unsigned long) (atomic64_get(&cs->tc) - cs->tc_resume);
 	timer->handle = handle;
 	timer->priv_data = arg;
+	
+	if(test_bit(TIMER_ONESHOT_FLAG, &flags))
+		timer->ticks = 0;
+	else
+		timer->ticks = timer->tleft;
 
 	tm_start_timer(timer);
 	return timer;
@@ -137,6 +137,7 @@ int64_t tm_update_source(struct clocksource *source)
 
 	diff = atomic64_get(&source->tc);
 	diff -= source->tc_resume;
+	source->tc_resume = atomic64_get(&source->tc);
 	return diff;
 }
 
@@ -170,7 +171,9 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 			list_del(&timer->list);
 			if(timer->ticks) {
 				timer->tleft = timer->ticks;
+				spin_unlock(&cs->lock);
 				tm_start_timer(timer);
+				spin_lock(&cs->lock);
 			} else {
 				kfree(timer);
 			}

@@ -70,8 +70,8 @@ struct thread {
 	struct thread *volatile*queue;
 	struct thread *rq_next; /* wake/kill list */
 
-	void *stack;
-	void *sp;
+	void    *stack;
+	stack_t *sp;
 	size_t stack_size;
 	unsigned char prio;
 #ifdef CONFIG_TIMER	
@@ -103,5 +103,11 @@ extern int thread_initialise(struct thread *tp, char *name,
 extern struct thread *thread_create(char *name, thread_handle_t handle, 
 		void *arg, size_t stack_size, void *stack, unsigned char prio);
 extern struct sched_class sys_sched_class;
+
+extern void sched_init_idle(struct thread *tp, char *name, 
+		thread_handle_t handle, void *arg, size_t stack_size, 
+		void *stack);
+
+extern void yield(void);
 
 #endif /* __THREAD_H__ */

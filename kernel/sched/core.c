@@ -18,6 +18,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/init.h>
 #include <etaos/error.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
@@ -307,6 +308,7 @@ static struct thread *sched_get_next_runnable(struct rq *rq,
 		next = class->next_runnable(rq);
 		if(!next)
 			next = rq->current;
+
 		return next;
 	} else {
 		return rq->current;
@@ -318,15 +320,26 @@ static void rq_switch_context(struct rq *rq, struct thread *prev,
 {
 	struct sched_class *class = rq->sched_class;
 
-	class->rm_thread(rq, new); /* remove the new thread from the rq */
-	if(test_bit(THREAD_RUNNING_FLAG, &prev->flags)) {
-		prev->rq = rq;
-		prev->on_rq = true;
-		class->add_thread(rq, prev);
-	} else {
-		prev->rq = NULL;
-		prev->on_rq = false;
+	if(prev) {
+		if(test_bit(THREAD_RUNNING_FLAG, &prev->flags)) {
+			prev->rq = rq;
+			prev->on_rq = true;
+			class->add_thread(rq, prev);
+		} else {
+			prev->rq = NULL;
+			prev->on_rq = false;
+		}
 	}
+
+	if(prev != new) {
+		class->rm_thread(rq, new); /* remove the new 
+					      thread from the rq */
+		raw_spin_unlock_irq(&rq->lock);
+		cpu_reschedule(rq, prev, new);
+	} else {
+		raw_spin_unlock_irq(&rq->lock);
+	}
+
 }
 
 static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
@@ -370,6 +383,7 @@ static void rq_schedule(void)
 resched:
 	preemt_disable(prev);
 	raw_spin_lock_irq(&rq->lock);
+
 #ifdef CONFIG_EVENT_MUTEX
 	carriage = rq->wake_queue;
 	while(carriage) {
@@ -394,7 +408,7 @@ resched:
 
 	tp = sched_get_next_runnable(rq, rq->current);
 	/* Only have to reschedule if the THREAD_NEED_RESCHED_FLAG
-	   is set on the current thread, and if the next runnable
+	   is set on the current thread, and iff the next runnable
 	   isn't the same thread as the one currently running. */
 	if(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
 			&current(rq)->flags) && tp != current(rq)) {
@@ -402,7 +416,6 @@ resched:
 		rq->current = tp;
 		rq->switch_count++;
 		rq_switch_context(rq, prev, tp);
-		raw_spin_unlock_irq(&rq->lock);
 		rq = sched_get_cpu_rq();
 		prev = current(rq);
 	} else {
@@ -419,5 +432,35 @@ resched:
 void schedule(void)
 {
 	rq_schedule();
+}
+
+static struct thread idle_thread, main_thread;
+#define CONFIG_IDLE_STACK_SIZE CONFIG_STACK_SIZE
+static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE], 
+	       main_stack[CONFIG_STACK_SIZE];
+
+#ifdef CONFIG_SCHED
+THREAD(idle_thread_func, arg)
+{
+	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
+			CONFIG_STACK_SIZE, main_stack, 120);
+	while(true) {
+		yield();
+	}
+}
+#endif
+
+
+void sched_init(void)
+{
+	struct rq *rq;
+
+	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
+			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack);
+	rq = sched_get_cpu_rq();
+	idle_thread.rq = rq;
+	rq->current = &idle_thread;
+
+	cpu_reschedule(rq, NULL, &idle_thread);
 }
 

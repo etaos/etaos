@@ -26,6 +26,36 @@
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
 
+static void raw_thread_init(struct thread *tp, char *name, 
+		thread_handle_t handle, void *arg, size_t stack_size, 
+		void *stack, unsigned char prio)
+{
+	tp->name = name;
+	tp->param = arg;
+	tp->preemt_cnt = 0;
+	tp->prio = prio;
+	tp->flags = 0;
+#ifdef CONFIG_EVENT_MUTEX
+	tp->ec = 0;
+#endif
+
+	tp->rq_next = NULL;
+	tp->queue = NULL;
+	tp->timer = NULL;
+	tp->se.next = NULL;
+
+	sched_create_stack_frame(tp, stack, stack_size, handle);
+
+	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+}
+
+void sched_init_idle(struct thread *tp, char *name, 
+		thread_handle_t handle, void *arg, size_t stack_size, 
+		void *stack)
+{
+	raw_thread_init(tp, name, handle, arg, stack_size, stack, 255);
+}
+
 struct thread *thread_create(char *name, thread_handle_t handle, void *arg,
 			size_t stack_size, void *stack, unsigned char prio)
 {
@@ -48,22 +78,31 @@ int thread_initialise(struct thread *tp, char *name, thread_handle_t handle,
 	if(!tp)
 		return -EINVAL;
 
-	tp->name = name;
-	tp->param = arg;
-	tp->preemt_cnt = 0;
-	tp->prio = prio;
-	tp->flags = 0;
-
-	tp->rq_next = NULL;
-	tp->queue = NULL;
-	tp->timer = NULL;
-	tp->se.next = NULL;
-
-	preemt_disable(tp);
-	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	raw_thread_init(tp, name, handle, arg, stack_size, stack, prio);
 	rq = sched_select_rq();
 	
 	rq_add_thread(rq, tp);
 	return -EOK;
+}
+
+void yield(void)
+{
+	struct rq *rq;
+	struct thread *tp;
+
+	rq = sched_get_cpu_rq();
+	tp = rq->sched_class->next_runnable(rq);
+	if(!rq->current->preemt_cnt && tp) {
+#ifdef CONFIG_DYN_PRIO
+		if(sched_dyn_prio(tp) <= sched_dyn_prio(rq->current)) {
+#else
+		if(tp->prio <= rq->current->prio) {
+#endif
+			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
+		}
+		
+		if(test_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags))
+			schedule();
+	}
 }
 

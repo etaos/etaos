@@ -50,11 +50,13 @@ void avr_init(void)
 #ifdef CONFIG_TIMER
 	avr_timer_init();
 #endif
+	irq_enable();
 #ifdef CONFIG_SCHED
 	avr_init_sched();
-#endif
-	irq_enable();
+	sched_init();
+#else
 	main();
+#endif
 
 	while(1);
 }

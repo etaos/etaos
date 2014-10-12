@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - AVR scheduler
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - Init
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,16 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AVR_SCHED_H_
-#define __AVR_SCHED_H_
+#ifndef __INIT_H__
+#define __INIT_H__
 
-#include <etaos/types.h>
-
-extern void avr_init_sched(void);
-extern void avr_save_stack(stack_t *stack, struct thread *current);
-extern void avr_switch_context(stack_t *s, struct thread *tp);
-
-extern void sched_init(void);
-
+#ifdef CONFIG_SCHED
+extern void main_thread_func(void *arg);
 #endif
 
+#endif /* __INIT_H__ */

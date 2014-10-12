@@ -23,6 +23,7 @@
 
 #include <asm/time.h>
 #include <asm/sched.h>
+#include <asm/io.h>
 
 static struct rq avr_rq = {
 	.sched_class = &sys_sched_class,
@@ -52,7 +53,46 @@ struct rq *sched_select_rq(void)
 	return &avr_rq;
 }
 
+void sched_create_stack_frame(struct thread *tp, stack_t *stack,
+				size_t stack_size, thread_handle_t handle)
+{
+	char i;
+
+	if(!stack || !stack_size)
+		return;
+
+	tp->stack = stack;
+	tp->stack_size = stack_size;
+	tp->sp = &stack[stack_size-1];
+	*(tp->sp--) = (unsigned short)handle & 0xff;
+	*(tp->sp--) = ((unsigned short)handle >> 8) & 0xff;
+
+	/* add the SREG register */
+	*(tp->sp--) = 0x0; // location of r0 normally
+	*(tp->sp--) = SREG;
+
+	i = 0;
+	for(; i < 31; i++)
+		*(tp->sp--) = 0;
+
+	tp->sp[8] = ((unsigned short)tp->param) & 0xFF; /* r24 */
+	tp->sp[7] = (((unsigned short)tp->param) >> 8) & 0xFF; /* r25 */
+}
+
+void avr_save_stack(stack_t *sp, struct thread *current)
+{
+	if(current) {
+		sp += 2;
+		current->sp = sp;
+	}
+
+	return;
+}
+
 void cpu_reschedule(struct rq *rq, struct thread *prev, struct thread *next)
 {
+	irq_enter_critical();
+	avr_switch_context(next->sp, prev);
+	irq_exit_critical();
 }
 

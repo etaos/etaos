@@ -69,6 +69,8 @@ extern struct rq *sched_select_rq(void);
 extern void cpu_reschedule(struct rq *rq, 
 		struct thread *prev, 
 		struct thread *next);
+extern void sched_create_stack_frame(struct thread *tp, stack_t *stack,
+				size_t stack_size, thread_handle_t handle);
 
 extern void raw_thread_add_to_wake_q(struct thread *tp);
 extern void raw_thread_add_to_kill_q(struct thread *tp);
@@ -83,6 +85,8 @@ extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
+
+extern void sched_init(void);
 
 #ifdef CONFIG_THREAD_QUEUE
 extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
