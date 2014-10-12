@@ -57,10 +57,10 @@ static void tm_start_timer(struct timer *timer)
 	cs = timer->source;
 	prev_timer = NULL;
 
-	spin_lock(&cs->lock);
+	raw_spin_lock(&cs->lock);
 	if(list_empty(&cs->timers)) {
 		list_add(&timer->list, &cs->timers);
-		spin_unlock(&cs->lock);
+		raw_spin_unlock(&cs->lock);
 		return;
 	}
 
@@ -79,7 +79,7 @@ static void tm_start_timer(struct timer *timer)
 		list_add(&timer->list, &prev_timer->list);
 	else
 		list_add(&timer->list, &cs->timers);
-	spin_unlock(&cs->lock);
+	raw_spin_unlock(&cs->lock);
 }
 
 struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
@@ -92,16 +92,16 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		return NULL;
 
 	timer->tleft = (cs->freq / 1000UL) * ms;
+
+	if(test_bit(TIMER_ONESHOT_FLAG, &flags))
+		timer->ticks = 0;
+	else
+		timer->ticks = timer->tleft;
 	
 	timer->source = cs;
 	timer->tleft += (unsigned long) (atomic64_get(&cs->tc) - cs->tc_resume);
 	timer->handle = handle;
 	timer->priv_data = arg;
-	
-	if(test_bit(TIMER_ONESHOT_FLAG, &flags))
-		timer->ticks = 0;
-	else
-		timer->ticks = timer->tleft;
 
 	tm_start_timer(timer);
 	return timer;
@@ -116,14 +116,14 @@ int tm_stop_timer(struct timer *timer)
 	cs = timer->source;
 
 	if(timer->tleft) {
-		spin_lock(&cs->lock);
+		raw_spin_lock(&cs->lock);
 		if(!list_is_last(&timer->list, &cs->timers)) {
 			next = list_next_entry(timer, list);
 			next->tleft += timer->tleft;
 		}
 
 		list_del(&timer->list);
-		spin_unlock(&cs->lock);
+		raw_spin_unlock(&cs->lock);
 		kfree(timer);
 		return 0;
 	}
@@ -149,7 +149,7 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 	if(list_empty(&cs->timers) || diff < 0 || diff == 0)
 		return;
 
-	spin_lock(&cs->lock);
+	raw_spin_lock(&cs->lock);
 	list_for_each_safe(carriage, tmp, &cs->timers) {
 		timer = list_entry(carriage, struct timer, list);
 
@@ -163,17 +163,17 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 
 		if(!timer->tleft) {
 			if(timer->handle) {
-				spin_unlock(&cs->lock);
+				raw_spin_unlock(&cs->lock);
 				timer->handle(timer, timer->priv_data);
-				spin_lock(&cs->lock);
+				raw_spin_lock(&cs->lock);
 			}
 
 			list_del(&timer->list);
 			if(timer->ticks) {
 				timer->tleft = timer->ticks;
-				spin_unlock(&cs->lock);
+				raw_spin_unlock(&cs->lock);
 				tm_start_timer(timer);
-				spin_lock(&cs->lock);
+				raw_spin_lock(&cs->lock);
 			} else {
 				kfree(timer);
 			}
@@ -183,7 +183,7 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 			break;
 	}
 
-	spin_unlock(&cs->lock);
+	raw_spin_unlock(&cs->lock);
 }
 
 struct clocksource *tm_get_source_by_name(const char *name)

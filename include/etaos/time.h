@@ -21,8 +21,9 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/atomic.h>
 #include <etaos/spinlock.h>
+#include <etaos/atomic.h>
+
 
 struct clocksource {
 	const char *name;

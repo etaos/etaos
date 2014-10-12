@@ -21,11 +21,17 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/spinlock.h>
 #include <etaos/time.h>
 #include <etaos/thread.h>
 #include <etaos/bitops.h>
 
+#ifndef CONFIG_TIME_SLICE
+#define CONFIG_TIME_SLICE 5
+#endif
+
 struct rq;
+struct thread_queue;
 struct sched_class {
 	struct thread *(*next_runnable)(struct rq*);
 	void (*add_thread)(struct rq *rq, struct thread *tp);
@@ -56,11 +62,10 @@ struct rq {
 	spinlock_t lock;
 };
 
-
 #define SIGNALED ((void*)-1)
 
 #define sched_need_resched(__t) test_bit(THREAD_NEED_RESCHED_FLAG, \
-				&(__t)->flags)
+				&__t->flags)
 
 
 extern void schedule(void);
@@ -85,6 +90,9 @@ extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
+
+
+extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 
 extern void sched_init(void);
 
@@ -111,31 +119,6 @@ static inline struct thread *current_thread(void)
 
 	rq = sched_get_cpu_rq();
 	return rq->current;
-}
-
-static inline int *preemt_counter_ptr(struct thread *tp)
-{
-	return &tp->preemt_cnt;
-}
-static inline int preemt_dec_and_test(struct thread *tp)
-{
-	return !--*preemt_counter_ptr(tp) && sched_need_resched(tp);
-}
-
-static inline void preemt_enable(struct thread *tp)
-{
-	if(preemt_dec_and_test(tp))
-		schedule();
-}
-
-static inline void preemt_enable_no_resched(struct thread *tp)
-{
-	*preemt_counter_ptr(tp) -= 1;
-}
-
-static inline void preemt_disable(struct thread *tp)
-{
-	++*preemt_counter_ptr(tp);
 }
 
 static inline void thread_remove_from_wake_q(struct thread *tp)

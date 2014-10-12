@@ -24,10 +24,10 @@ int main(void)
 	printf("Application started (M:%u)!\n", mm_heap_available());
 	tm_create_timer(rq->source, 500, &thandle, NULL, 0);
 
-	printf("PROG EXIT");
+	printf("PROG EXIT\n");
 	while(true) {
-		set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
-		yield();
+		printf("maint\n");
+		sleep(500);
 	}
 	return 0;
 }

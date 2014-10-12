@@ -21,7 +21,6 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/time.h>
 #include <etaos/spinlock.h>
 #include <etaos/list.h>
 
@@ -62,6 +61,9 @@ struct rq;
 struct thread {
 	const char *name;
 	unsigned long flags;
+#ifdef CONFIG_PREEMPT
+	unsigned int slice;
+#endif
 	int preemt_cnt;
 
 	bool on_rq;
@@ -109,5 +111,6 @@ extern void sched_init_idle(struct thread *tp, char *name,
 		void *stack);
 
 extern void yield(void);
+extern void sleep(unsigned ms);
 
 #endif /* __THREAD_H__ */

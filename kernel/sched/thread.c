@@ -43,6 +43,9 @@ static void raw_thread_init(struct thread *tp, char *name,
 	tp->queue = NULL;
 	tp->timer = NULL;
 	tp->se.next = NULL;
+#ifdef CONFIG_PREEMPT
+	tp->slice = CONFIG_TIME_SLICE;
+#endif
 
 	sched_create_stack_frame(tp, stack, stack_size, handle);
 
@@ -104,5 +107,14 @@ void yield(void)
 		if(test_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags))
 			schedule();
 	}
+}
+
+void sleep(unsigned ms)
+{
+	struct thread *tp = current_thread();
+
+	sched_setup_sleep_thread(tp, ms);
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	schedule();
 }
 

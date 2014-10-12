@@ -56,7 +56,6 @@ struct irq_data {
 };
 
 #ifdef CONFIG_SCHED
-#include <etaos/thread.h>
 struct irq_thread_data {
 	struct thread *owner;
 	struct irq_data idata;

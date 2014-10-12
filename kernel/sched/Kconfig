@@ -57,4 +57,11 @@ config DYN_PRIO
 	  dead swap the entire scheduling system. If you are
 	  unsure say 'y' here.
 
+config PREEMPT
+	bool "CPU preemption"
+	help
+	  Say 'y' here to enable preemption. Preemption allows
+	  the scheduler to preempt the currently running task at
+	  any given moment.
+
 endif

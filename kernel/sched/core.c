@@ -22,6 +22,7 @@
 #include <etaos/error.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/preempt.h>
 #include <etaos/irq.h>
 #include <etaos/bitops.h>
 #include <etaos/time.h>
@@ -46,7 +47,7 @@ static void raw_queue_add_thread(struct thread_queue *qp,
 	unsigned long flags;
 
 	if(tp->on_rq && test_bit(THREAD_RUNNING_FLAG, &tp->flags)) {
-		spin_lock_irqsave(&tp->rq->lock, flags);
+		raw_spin_lock_irqsave(&tp->rq->lock, flags);
 		raw_rq_remove_thread_noresched(tp->rq, tp);
 		spin_unlock_irqrestore(&tp->rq->lock, flags);
 	}
@@ -71,7 +72,7 @@ void queue_add_thread(struct thread_queue *qp, struct thread *tp)
 {
 	unsigned long flags;
 
-	spin_lock_irqsave(&qp->lock, flags);
+	raw_spin_lock_irqsave(&qp->lock, flags);
 	raw_queue_add_thread(qp, tp);
 	spin_unlock_irqrestore(&qp->lock, flags);
 	schedule();
@@ -81,7 +82,7 @@ void queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 {
 	unsigned long flags;
 
-	spin_lock_irqsave(&qp->lock, flags);
+	raw_spin_lock_irqsave(&qp->lock, flags);
 	raw_queue_remove_thread(qp, tp);
 	spin_unlock_irqrestore(&qp->lock, flags);
 	schedule();
@@ -131,16 +132,16 @@ void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 
 void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 {
-	spin_lock(&rq->lock);
+	raw_spin_lock(&rq->lock);
 	raw_rq_remove_wake_thread(rq, tp);
-	spin_unlock(&rq->lock);
+	raw_spin_unlock(&rq->lock);
 }
 
 void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 {
-	spin_lock(&rq->lock);
+	raw_spin_lock(&rq->lock);
 	raw_rq_remove_kill_thread(rq, tp);
-	spin_unlock(&rq->lock);
+	raw_spin_unlock(&rq->lock);
 }
 
 static inline void rq_list_add(struct thread *new, struct thread *head)
@@ -184,9 +185,9 @@ void thread_add_to_wake_q(struct thread *tp)
 	unsigned long flags;
 
 	rq = sched_get_cpu_rq();
-	spin_lock_irqsave(&rq->lock, flags);
+	raw_spin_lock_irqsave(&rq->lock, flags);
 	raw_thread_add_to_wake_q(tp);
-	spin_unlock_irqrestore(&rq->lock, flags);
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
 void thread_add_to_kill_q(struct thread *tp)
@@ -195,9 +196,9 @@ void thread_add_to_kill_q(struct thread *tp)
 	unsigned long flags;
 
 	rq = sched_get_cpu_rq();
-	spin_lock_irqsave(&rq->lock, flags);
+	raw_spin_lock_irqsave(&rq->lock, flags);
 	raw_thread_add_to_kill_q(tp);
-	spin_unlock_irqrestore(&rq->lock, flags);
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
 #ifdef CONFIG_THREAD_QUEUE
@@ -226,10 +227,10 @@ int rq_add_thread(struct rq *rq, struct thread *tp)
 	if(tp->on_rq && test_bit(THREAD_RUNNING_FLAG, &tp->flags))
 		err = rq_remove_thread(tp);
 
-	spin_lock_irqsave(&rq->lock, flags);
+	raw_spin_lock_irqsave(&rq->lock, flags);
 	class->add_thread(rq, tp);
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-	spin_unlock_irqrestore(&rq->lock, flags);
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
 	tp->on_rq = true;
 	tp->rq = rq;
 
@@ -284,9 +285,9 @@ int rq_remove_thread(struct thread *tp)
 
 	rq = tp->rq;
 	if(rq->current != tp) {
-		spin_lock_irqsave(&rq->lock, flags);
+		raw_spin_lock_irqsave(&rq->lock, flags);
 		err = raw_rq_remove_thread(rq, tp);
-		spin_unlock_irqrestore(&rq->lock, flags);
+		raw_spin_unlock_irqrestore(&rq->lock, flags);
 	} else {
 		err = raw_rq_remove_thread(rq, tp);
 	}
@@ -296,6 +297,31 @@ int rq_remove_thread(struct thread *tp)
 
 static void rq_update(struct rq *rq)
 {
+}
+
+static void sched_sleep_timeout(struct timer *timer, void *arg)
+{
+	struct thread *tp;
+	struct rq *rq;
+
+	tp = arg;
+	rq = sched_get_cpu_rq();
+
+	clear_bit(THREAD_SLEEPING_FLAG, &tp->flags);
+	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	raw_rq_add_thread(rq, tp);
+}
+
+void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
+{
+	struct rq *rq;
+
+	rq = tp->rq;
+	set_bit(THREAD_SLEEPING_FLAG, &tp->flags);
+	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+
+	tp->timer = tm_create_timer(rq->source, ms, &sched_sleep_timeout,
+			tp, TIMER_ONESHOT_MASK);
 }
 
 static struct thread *sched_get_next_runnable(struct rq *rq,
@@ -381,7 +407,7 @@ static void rq_schedule(void)
 	prev = current(rq);
 
 resched:
-	preemt_disable(prev);
+	preempt_disable();
 	raw_spin_lock_irq(&rq->lock);
 
 #ifdef CONFIG_EVENT_MUTEX
@@ -404,9 +430,18 @@ resched:
 	diff = tm_update_source(rq->source);
 	if(diff)
 		tm_process_clock(rq->source, diff);
+#ifdef CONFIG_PREEMPT
+	if(diff < prev->slice) {
+		prev->slice -= diff;
+	} else {
+		prev->slice = CONFIG_TIME_SLICE;
+		set_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags);
+	}
+#endif
 #endif
 
 	tp = sched_get_next_runnable(rq, rq->current);
+
 	/* Only have to reschedule if the THREAD_NEED_RESCHED_FLAG
 	   is set on the current thread, and iff the next runnable
 	   isn't the same thread as the one currently running. */
@@ -422,7 +457,7 @@ resched:
 		raw_spin_unlock_irq(&rq->lock);
 	}
 
-	preemt_enable_no_resched(prev);
+	preempt_enable_no_resched();
 	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
 		goto resched;
 
@@ -442,10 +477,13 @@ static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE],
 #ifdef CONFIG_SCHED
 THREAD(idle_thread_func, arg)
 {
+	struct thread *tp = arg;
+
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack, 120);
 	while(true) {
-		yield();
+		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+		schedule();
 	}
 }
 #endif
@@ -462,5 +500,35 @@ void sched_init(void)
 	rq->current = &idle_thread;
 
 	cpu_reschedule(rq, NULL, &idle_thread);
+}
+
+int *preempt_counter_ptr(void)
+{
+	struct thread *tp = current_thread();
+	return &tp->preemt_cnt;
+}
+
+void __preempt_add(int num)
+{
+	volatile int *preemt_ptr = preempt_counter_ptr();
+
+	*preemt_ptr += num;
+}
+
+void __preempt_sub(int num)
+{
+	volatile int *preemt_ptr = preempt_counter_ptr();
+
+	*preemt_ptr -= num;
+}
+
+bool should_resched(void)
+{
+	struct thread *tp = current_thread();
+
+	if(test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags))
+		return true;
+	else
+		return false;
 }
 
