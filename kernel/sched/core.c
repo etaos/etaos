@@ -30,9 +30,7 @@
 
 #include <asm/io.h>
 
-#ifdef CONFIG_THREAD_QUEUE
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp);
-#endif
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
 
 void thread_wake_up_from_irq(struct thread *thread)
@@ -201,7 +199,6 @@ void thread_add_to_kill_q(struct thread *tp)
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
-#ifdef CONFIG_THREAD_QUEUE
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp)
 {
 	struct prev_rq;
@@ -214,7 +211,6 @@ static void raw_rq_add_thread(struct rq *rq, struct thread *tp)
 
 	return;
 }
-#endif
 
 int rq_add_thread(struct rq *rq, struct thread *tp)
 {
@@ -297,6 +293,11 @@ int rq_remove_thread(struct thread *tp)
 
 static void rq_update(struct rq *rq)
 {
+	struct sched_class *class;
+
+	class = rq->sched_class;
+	if(class->post_schedule)
+		class->post_schedule(rq);
 }
 
 static void sched_sleep_timeout(struct timer *timer, void *arg)
@@ -341,6 +342,11 @@ static struct thread *sched_get_next_runnable(struct rq *rq,
 	}
 }
 
+#ifdef CONFIG_DYN_PRIO
+#define dyn_prio_reset(__t) (__t)->dprio = 0;
+#else
+#define dyn_prio_reset(__t)
+#endif
 static void rq_switch_context(struct rq *rq, struct thread *prev,
 						struct thread *new)
 {
@@ -362,12 +368,14 @@ static void rq_switch_context(struct rq *rq, struct thread *prev,
 					      thread from the rq */
 		raw_spin_unlock_irq(&rq->lock);
 		cpu_reschedule(rq, prev, new);
+		dyn_prio_reset(new);
 	} else {
 		raw_spin_unlock_irq(&rq->lock);
 	}
 
 }
 
+#ifdef CONFIG_EVENT_MUTEX
 static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 {
 	struct thread_queue *qp;
@@ -382,7 +390,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 
 	if(rq->current != tp) {
 		raw_rq_add_thread(rq, tp);
-		if(tp->prio <= rq->current->prio)
+		if(prio(tp) <= prio(rq->current))
 			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
 	} else {
 		set_bit(THREAD_RUNNING_FLAG, &tp->flags);
@@ -391,12 +399,14 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 	}
 	irq_restore(&flags);
 }
+#endif
 
 #define current(_rq) ((_rq)->current)
-static void rq_schedule(void)
+static bool rq_schedule(void)
 {
 	struct rq *rq;
 	int64_t diff;
+	bool did_switch;
 	struct thread *tp, *prev;
 #ifdef CONFIG_EVENT_MUTEX
 	struct thread *carriage, *volatile*tpp;
@@ -405,6 +415,7 @@ static void rq_schedule(void)
 
 	rq = sched_get_cpu_rq();
 	prev = current(rq);
+	did_switch = false;
 
 resched:
 	preempt_disable();
@@ -447,12 +458,13 @@ resched:
 	   isn't the same thread as the one currently running. */
 	if(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
 			&current(rq)->flags) && tp != current(rq)) {
-		rq_update(rq);
 		rq->current = tp;
 		rq->switch_count++;
 		rq_switch_context(rq, prev, tp);
+		did_switch = true;
 		rq = sched_get_cpu_rq();
 		prev = current(rq);
+		rq_update(rq);
 	} else {
 		raw_spin_unlock_irq(&rq->lock);
 	}
@@ -461,12 +473,25 @@ resched:
 	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
 		goto resched;
 
-	return;
+	return did_switch;
 }
 
 void schedule(void)
 {
+#ifdef CONFIG_DYN_PRIO
+	bool need_prio_update;
+	struct rq *rq;
+	
+	need_prio_update = rq_schedule();
+	rq = sched_get_cpu_rq();
+	if(need_prio_update && rq->sched_class->dyn_prio_update) {
+		raw_spin_lock_irq(&rq->lock);
+		rq->sched_class->dyn_prio_update(rq);
+		raw_spin_unlock_irq(&rq->lock);
+	}
+#else
 	rq_schedule();
+#endif
 }
 
 static struct thread idle_thread, main_thread;
@@ -502,6 +527,7 @@ void sched_init(void)
 	cpu_reschedule(rq, NULL, &idle_thread);
 }
 
+#ifdef CONFIG_PREEMPT
 int *preempt_counter_ptr(void)
 {
 	struct thread *tp = current_thread();
@@ -521,6 +547,7 @@ void __preempt_sub(int num)
 
 	*preemt_ptr -= num;
 }
+#endif
 
 bool should_resched(void)
 {
@@ -531,4 +558,27 @@ bool should_resched(void)
 	else
 		return false;
 }
+
+#ifdef CONFIG_DYN_PRIO
+unsigned char prio(struct thread *tp)
+{
+	unsigned char retval;
+
+	retval = tp->prio;
+	if(tp->dprio <= retval)
+		retval -= tp->dprio;
+	else
+		retval = 0;
+
+	return retval;
+}
+#else
+unsigned char prio(struct thread *tp)
+{
+	if(tp)
+		return tp->prio;
+	else
+		return 0;
+}
+#endif
 

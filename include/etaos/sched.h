@@ -34,6 +34,10 @@ struct rq;
 struct thread_queue;
 struct sched_class {
 	struct thread *(*next_runnable)(struct rq*);
+	void (*post_schedule)(struct rq*);
+#ifdef CONFIG_DYN_PRIO
+	void (*dyn_prio_update)(struct rq*);
+#endif
 	void (*add_thread)(struct rq *rq, struct thread *tp);
 	int (*rm_thread)(struct rq *rq, struct thread *tp);
 	void (*thread_init)(struct thread *tp);
@@ -67,8 +71,9 @@ struct rq {
 #define sched_need_resched(__t) test_bit(THREAD_NEED_RESCHED_FLAG, \
 				&__t->flags)
 
-
+extern unsigned char prio(struct thread *tp);
 extern void schedule(void);
+extern bool should_resched(void);
 extern struct rq *sched_get_cpu_rq(void);
 extern struct rq *sched_select_rq(void);
 extern void cpu_reschedule(struct rq *rq, 

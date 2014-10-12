@@ -32,7 +32,6 @@ static void raw_thread_init(struct thread *tp, char *name,
 {
 	tp->name = name;
 	tp->param = arg;
-	tp->preemt_cnt = 0;
 	tp->prio = prio;
 	tp->flags = 0;
 #ifdef CONFIG_EVENT_MUTEX
@@ -45,6 +44,10 @@ static void raw_thread_init(struct thread *tp, char *name,
 	tp->se.next = NULL;
 #ifdef CONFIG_PREEMPT
 	tp->slice = CONFIG_TIME_SLICE;
+	tp->preemt_cnt = 0;
+#endif
+#ifdef CONFIG_DYN_PRIO
+	tp->dprio = 0;
 #endif
 
 	sched_create_stack_frame(tp, stack, stack_size, handle);
@@ -95,12 +98,8 @@ void yield(void)
 
 	rq = sched_get_cpu_rq();
 	tp = rq->sched_class->next_runnable(rq);
-	if(!rq->current->preemt_cnt && tp) {
-#ifdef CONFIG_DYN_PRIO
-		if(sched_dyn_prio(tp) <= sched_dyn_prio(rq->current)) {
-#else
-		if(tp->prio <= rq->current->prio) {
-#endif
+	if(preempt_test() && tp) {
+		if(prio(tp) <= prio(rq->current)) {
 			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
 		}
 		

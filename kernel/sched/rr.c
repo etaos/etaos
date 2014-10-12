@@ -38,7 +38,7 @@ static void rr_queue_insert(struct thread *volatile*tpp, struct thread *tp)
 		tp->ec++;
 #endif
 	} else if(thread) {
-		while(thread && thread->prio < tp->prio) {
+		while(thread && prio(thread) <= prio(tp)) {
 			tpp = &thread->se.next;
 			thread = thread->se.next;
 		}
@@ -124,10 +124,28 @@ static struct thread *rr_next_runnable(struct rq *rq)
 	return runnable;
 }
 
+#ifdef CONFIG_DYN_PRIO
+static void rr_update_dyn_prio(struct rq *rq)
+{
+	struct thread *walker;
+
+	walker = rq->rq.run_queue;
+
+	while(walker) {
+		walker->dprio += 1;
+		walker = walker->se.next;
+	}
+}
+#endif
+
 struct sched_class sys_sched_class = {
 	.rm_thread = &rr_rm_thread,
 	.add_thread = &rr_add_thread,
 	.next_runnable = &rr_next_runnable,
+#ifdef CONFIG_DYN_PRIO
+	.dyn_prio_update = &rr_update_dyn_prio,
+#endif
+	.post_schedule = NULL,
 #ifdef CONFIG_THREAD_QUEUE
 	.queue_add = &rr_thread_queue_add,
 	.queue_rm = &rr_thread_queue_remove,

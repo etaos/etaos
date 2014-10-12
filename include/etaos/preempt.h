@@ -16,12 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PREEMPT_CNT__
-#define __PREEMPT_CNT__
+#ifndef __PREEMPT_H__
+#define __PREEMPT_H__
 
 struct thread;
 extern void schedule(void);
 
+#ifdef CONFIG_PREEMPT
 extern void __preempt_add(int num);
 extern void __preempt_sub(int num);
 extern int *preempt_counter_ptr(void);
@@ -33,6 +34,11 @@ extern bool should_resched(void);
 static inline int preempt_dec_and_test(void)
 {
 	return !--*preempt_counter_ptr() && should_resched();
+}
+
+static inline int preempt_test(void)
+{
+	return !*preempt_counter_ptr();
 }
 
 static inline void preempt_enable(void)
@@ -50,6 +56,18 @@ static inline void preempt_disable(void)
 {
 	preempt_count_inc;
 }
+#else /* !CONFIG_PREEMPT */
 
-#endif
+#define __preempt_add(_i)
+#define __preempt_sub(_i)
+#define preempt_counter_ptr()
+#define preempt_count_inc
+#define preempt_count_dec
+#define preempt_dec_and_test()
+#define preempt_enable()
+#define preempt_enable_no_resched()
+#define preempt_disable()
+#define preempt_test() 1
+#endif /* CONFIG_PREEMPT */
+#endif /* __PREEMPT_H__ */
 

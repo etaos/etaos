@@ -63,8 +63,8 @@ struct thread {
 	unsigned long flags;
 #ifdef CONFIG_PREEMPT
 	unsigned int slice;
-#endif
 	int preemt_cnt;
+#endif
 
 	bool on_rq;
 	struct rq *rq;
@@ -76,6 +76,9 @@ struct thread {
 	stack_t *sp;
 	size_t stack_size;
 	unsigned char prio;
+#ifdef CONFIG_DYN_PRIO
+	unsigned char dprio;
+#endif
 #ifdef CONFIG_TIMER	
 	struct timer *timer;
 #endif
