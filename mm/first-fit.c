@@ -73,8 +73,8 @@ int mm_kfree(void *ptr)
 
 	mutex_lock(&mlock);
 	node = ptr - sizeof(*node);
-	if(!test_bit(MM_ALLOC_FLAG, &node->flags))
-		goto err_l;
+	/*if(!test_bit(MM_ALLOC_FLAG, &node->flags))
+		goto err_l;*/
 
 	if(node->magic != MM_MAGIC_BYTE)
 		goto err_l;

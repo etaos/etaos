@@ -48,7 +48,7 @@ static void raw_queue_add_thread(struct thread_queue *qp,
 	if(tp->on_rq && test_bit(THREAD_RUNNING_FLAG, &tp->flags)) {
 		raw_spin_lock_irqsave(&tp->rq->lock, flags);
 		raw_rq_remove_thread_noresched(tp->rq, tp);
-		spin_unlock_irqrestore(&tp->rq->lock, flags);
+		raw_spin_unlock_irqrestore(&tp->rq->lock, flags);
 	}
 
 
@@ -73,8 +73,7 @@ void queue_add_thread(struct thread_queue *qp, struct thread *tp)
 
 	raw_spin_lock_irqsave(&qp->lock, flags);
 	raw_queue_add_thread(qp, tp);
-	spin_unlock_irqrestore(&qp->lock, flags);
-	schedule();
+	raw_spin_unlock_irqrestore(&qp->lock, flags);
 }
 
 void queue_remove_thread(struct thread_queue *qp, struct thread *tp)
@@ -83,8 +82,7 @@ void queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 
 	raw_spin_lock_irqsave(&qp->lock, flags);
 	raw_queue_remove_thread(qp, tp);
-	spin_unlock_irqrestore(&qp->lock, flags);
-	schedule();
+	raw_spin_unlock_irqrestore(&qp->lock, flags);
 }
 #endif
 
@@ -202,9 +200,23 @@ void thread_add_to_kill_q(struct thread *tp)
 
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp)
 {
-	struct prev_rq;
 	struct sched_class *class = rq->sched_class;
 
+	class->add_thread(rq, tp);
+	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	tp->on_rq = true;
+	tp->rq = rq;
+
+	return;
+}
+
+void rq_add_thread_no_lock(struct thread *tp)
+{
+	struct rq *rq;
+	struct sched_class *class;
+
+	rq = sched_get_cpu_rq();
+	class = rq->sched_class;
 	class->add_thread(rq, tp);
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	tp->on_rq = true;
@@ -326,8 +338,7 @@ void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 			tp, TIMER_ONESHOT_MASK);
 }
 
-static struct thread *sched_get_next_runnable(struct rq *rq,
-						     struct thread *current)
+static struct thread *sched_get_next_runnable(struct rq *rq)
 {
 	struct thread *next;
 	struct sched_class *class = rq->sched_class;
@@ -369,7 +380,6 @@ static void rq_switch_context(struct rq *rq, struct thread *prev,
 					      thread from the rq */
 		raw_spin_unlock_irq(&rq->lock);
 		cpu_reschedule(rq, prev, new);
-		dyn_prio_reset(new);
 	} else {
 		raw_spin_unlock_irq(&rq->lock);
 	}
@@ -388,6 +398,13 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 
 	raw_rq_remove_wake_thread(rq, tp);
 	raw_queue_remove_thread(qp, tp);
+
+	if(!qp->qhead)
+		qp->qhead = SIGNALED;
+
+	if(tp->timer && tp->timer != SIGNALED) {
+		tm_stop_timer(tp->timer);
+	}
 
 	if(rq->current != tp) {
 		raw_rq_add_thread(rq, tp);
@@ -451,7 +468,7 @@ resched:
 #endif
 #endif
 
-	tp = sched_get_next_runnable(rq, rq->current);
+	tp = sched_get_next_runnable(rq);
 
 	/* Only have to reschedule if the THREAD_NEED_RESCHED_FLAG
 	   is set on the current thread, and iff the next runnable
@@ -460,6 +477,7 @@ resched:
 			&current(rq)->flags) && tp != current(rq)) {
 		rq->current = tp;
 		rq->switch_count++;
+		dyn_prio_reset(tp);
 		rq_switch_context(rq, prev, tp);
 		did_switch = true;
 		rq = sched_get_cpu_rq();

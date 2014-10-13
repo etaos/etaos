@@ -112,7 +112,11 @@ int tm_stop_timer(struct timer *timer)
 	struct clocksource *cs;
 	struct timer *next;
 
+	if(!timer || timer == SIGNALED)
+		return -1;
+
 	timer->ticks = 0;
+	timer->handle = NULL;
 	cs = timer->source;
 
 	if(timer->tleft) {
@@ -125,10 +129,9 @@ int tm_stop_timer(struct timer *timer)
 		list_del(&timer->list);
 		raw_spin_unlock(&cs->lock);
 		kfree(timer);
-		return 0;
 	}
 
-	return 1;
+	return 0;
 }
 
 int64_t tm_update_source(struct clocksource *source)

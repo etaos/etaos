@@ -128,32 +128,33 @@ void mm_split_node(struct heap_node *node, size_t ns)
 	node->size = ns;
 }
 
-int mm_return_node(struct heap_node *node)
+int mm_return_node(struct heap_node *block)
 {
-	struct heap_node *carriage;
+	struct heap_node *node;
 
-	clear_bit(MM_ALLOC_FLAG, &node->flags);
+	clear_bit(MM_ALLOC_FLAG, &block->flags);
 
-	if(node < mm_head) {
-		node->next = mm_head;
-		mm_head = node;
+	if(block < mm_head) {
+		block->next = mm_head;
+		mm_head = block;
 		return 0;
 	}
 
-	carriage = mm_head;
-	while(carriage) {
-		if(node > carriage && node < carriage->next) {
-			node->next = carriage->next;
-			carriage->next = node;
-		}
-
-		if(carriage->next == NULL) {
-			carriage->next = node;
-			node->next = NULL;
+	node = mm_head;
+	while(node) {
+		if(block > node && block < node->next) {
+			block->next = node->next;
+			node->next = block;
 			return 0;
 		}
 
-		carriage = carriage->next;
+		if(node->next == NULL) {
+			node->next = block;
+			block->next = NULL;
+			return 0;
+		}
+
+		node = node->next;
 	}
 
 	return -1;

@@ -1,0 +1,167 @@
+/*
+ *  ETA/OS - Event driven mutexes
+ *  Copyright (C) 2014   Michel Megens
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/error.h>
+#include <etaos/thread.h>
+#include <etaos/sched.h>
+#include <etaos/preempt.h>
+#include <etaos/evm.h>
+#include <etaos/irq.h>
+#include <etaos/bitops.h>
+#include <etaos/time.h>
+#include <etaos/spinlock.h>
+
+static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
+{
+	struct thread *tp;
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	tp = qp->qhead;
+
+	rq_remove_wake_thread(rq, tp);
+	queue_remove_thread(qp, tp);
+	if(!qp->qhead)
+		qp->qhead = SIGNALED;
+
+	if(tp->timer && tp->timer != SIGNALED) {
+		tm_stop_timer(tp->timer);
+		tp->timer = NULL;
+	}
+
+	if(rq->current != tp) {
+		rq_add_thread(rq, tp);
+		if(prio(tp) <= prio(rq->current))
+			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
+	} else {
+		set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+		tp->on_rq = true;
+		tp->rq = rq;
+	}
+	irq_restore(&flags);
+}
+
+static void evm_timeout(struct timer *timer, void *arg)
+{
+	struct thread *walker, *curr;
+	struct thread_queue *qp;
+	struct thread *volatile*tpp = arg;
+
+	qp = container_of((struct thread**)tpp, struct thread_queue, qhead);
+	walker = *tpp;
+
+	if(walker != SIGNALED) {
+		while(walker) {
+			if(walker->timer == timer) {
+				raw_rq_remove_wake_thread(sched_get_cpu_rq(), walker);
+				queue_remove_thread(qp, walker);
+				if(!qp->qhead)
+					qp->qhead = SIGNALED;
+
+				walker->timer = SIGNALED;
+				rq_add_thread_no_lock(walker);
+				break;
+			}
+			walker = qp->sched_class->thread_after(walker);
+		}
+
+		curr = current_thread();
+		if(prio(walker) <= prio(curr))
+			set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+	}
+}
+
+void evm_signal_event_queue(struct thread_queue *qp)
+{
+	struct rq *rq;
+	struct thread *tp;
+
+	tp = qp->qhead;
+
+	if(!tp) {
+		raw_spin_lock_irq(&qp->lock);
+		qp->qhead = SIGNALED;
+		raw_spin_unlock_irq(&qp->lock);
+	} else if(tp != SIGNALED) {
+		rq = sched_get_cpu_rq();
+		raw_evm_signal_event_queue(rq, qp);
+	}
+
+	yield();
+}
+
+int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms)
+{
+	raw_spin_unlock_irq(&qp->lock);
+	if(qp->qhead == SIGNALED)
+		qp->qhead = NULL;
+	raw_spin_unlock_irq(&qp->lock);
+
+	return evm_wait_event_queue(qp, ms);
+}
+
+int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
+{
+	struct thread *tp;
+	unsigned long flags;
+	struct clocksource *cs;
+
+	raw_spin_lock_irqsave(&qp->lock, flags);
+	if(qp->qhead == SIGNALED) {
+		qp->qhead = NULL;
+		raw_spin_unlock_irqrestore(&qp->lock, flags);
+		yield();
+		return -EOK;
+	} else {
+		raw_spin_unlock_irqrestore(&qp->lock, flags);
+	}
+
+	tp = current_thread();
+	cs = tp->rq->source;
+
+	if(ms)
+		tp->timer = tm_create_timer(cs, ms, &evm_timeout,
+				(void*)&qp->qhead, TIMER_ONESHOT_MASK);
+	else
+		tp->timer = NULL;
+
+	thread_add_to_wake_q(tp);
+	queue_add_thread(qp, tp);
+	schedule();
+
+	tp = current_thread();
+	if(tp->timer == SIGNALED) {
+		tp->timer = NULL;
+		return -1;
+	}
+
+	return 0;
+}
+
+void evm_signal_from_irq(struct thread_queue *qp)
+{
+	struct thread *tp;
+
+	tp = qp->qhead;
+	if(!tp)
+		qp->qhead = SIGNALED;
+	else if(tp != SIGNALED)
+		tp->ec++;
+}

@@ -124,6 +124,16 @@ static struct thread *rr_next_runnable(struct rq *rq)
 	return runnable;
 }
 
+#ifdef CONFIG_EVENT_MUTEX
+static struct thread *rr_thread_after(struct thread *tp)
+{
+	if(tp)
+		return tp->se.next;
+	else
+		return NULL;
+}
+#endif
+
 #ifdef CONFIG_DYN_PRIO
 static void rr_update_dyn_prio(struct rq *rq)
 {
@@ -144,6 +154,9 @@ struct sched_class sys_sched_class = {
 	.next_runnable = &rr_next_runnable,
 #ifdef CONFIG_DYN_PRIO
 	.dyn_prio_update = &rr_update_dyn_prio,
+#endif
+#ifdef CONFIG_EVENT_MUTEX
+	.thread_after = &rr_thread_after,
 #endif
 	.post_schedule = NULL,
 #ifdef CONFIG_THREAD_QUEUE

@@ -41,6 +41,9 @@ struct sched_class {
 	void (*add_thread)(struct rq *rq, struct thread *tp);
 	int (*rm_thread)(struct rq *rq, struct thread *tp);
 	void (*thread_init)(struct thread *tp);
+#ifdef CONFIG_EVENT_MUTEX
+	struct thread *(*thread_after)(struct thread *tp);
+#endif
 #ifdef CONFIG_THREAD_QUEUE
 	void (*queue_add)(struct thread_queue *q, struct thread *tp);
 	void (*queue_rm)(struct thread_queue *q, struct thread *tp);
@@ -65,8 +68,6 @@ struct rq {
 	struct clocksource *source;
 	spinlock_t lock;
 };
-
-#define SIGNALED ((void*)-1)
 
 #define sched_need_resched(__t) test_bit(THREAD_NEED_RESCHED_FLAG, \
 				&__t->flags)
@@ -95,6 +96,7 @@ extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
+extern void rq_add_thread_no_lock(struct thread *tp);
 
 
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);

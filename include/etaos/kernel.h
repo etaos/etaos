@@ -25,6 +25,7 @@
 #include <etaos/compiler.h>
 
 #define NULL ((void*)0)
+#define SIGNALED ((void*)-1)
 #define ERR_PTR ((void*)-1)
 #define FALSE 0
 #define TRUE !FALSE
