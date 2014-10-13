@@ -12,17 +12,22 @@
 #include <etaos/spinlock.h>
 #include <etaos/time.h>
 
-static void thandle(struct timer *tp, void *arg)
+static unsigned char test_thread_stack[CONFIG_STACK_SIZE];
+static struct thread *test_t;
+
+THREAD(test_th_handle, arg)
 {
-	printf("hai\n");
+	while(true) {
+		printf("test_thread\n");
+		sleep(1000);
+	}
 }
 
 int main(void)
 {
-	struct rq *rq = sched_get_cpu_rq();
-
 	printf("Application started (M:%u)!\n", mm_heap_available());
-	tm_create_timer(rq->source, 500, &thandle, NULL, 0);
+	test_t = thread_create("tst", &test_th_handle, NULL,
+			CONFIG_STACK_SIZE, test_thread_stack, 80);
 
 	printf("PROG EXIT\n");
 	while(true) {

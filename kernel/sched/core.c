@@ -29,6 +29,7 @@
 #include <etaos/spinlock.h>
 
 #include <asm/io.h>
+#include <asm/sched.h>
 
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp);
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
@@ -496,23 +497,19 @@ void schedule(void)
 
 static struct thread idle_thread, main_thread;
 #define CONFIG_IDLE_STACK_SIZE CONFIG_STACK_SIZE
-static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE], 
-	       main_stack[CONFIG_STACK_SIZE];
+static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE];
 
-#ifdef CONFIG_SCHED
 THREAD(idle_thread_func, arg)
 {
 	struct thread *tp = arg;
 
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
-			CONFIG_STACK_SIZE, main_stack, 120);
+			CONFIG_STACK_SIZE, main_stack_ptr, 120);
 	while(true) {
 		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 		schedule();
 	}
 }
-#endif
-
 
 void sched_init(void)
 {

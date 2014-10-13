@@ -71,8 +71,7 @@ struct thread *thread_create(char *name, thread_handle_t handle, void *arg,
 	if(!tp)
 		return NULL;
 
-	if(thread_initialise(tp, name, handle, arg, stack_size, stack, prio))
-		return NULL;
+	thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
 	return tp;
 }
 

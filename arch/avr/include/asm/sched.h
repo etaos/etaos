@@ -19,13 +19,18 @@
 #ifndef __AVR_SCHED_H_
 #define __AVR_SCHED_H_
 
+#include <etaos/kernel.h>
 #include <etaos/types.h>
+
+#include <asm/io.h>
 
 extern void avr_init_sched(void);
 extern void avr_save_stack(stack_t *stack, struct thread *current);
 extern void avr_switch_context(stack_t *s, struct thread *tp);
 
 extern void sched_init(void);
+
+#define main_stack_ptr ((void*)(INTERNAL_RAMEND-CONFIG_STACK_SIZE))
 
 #endif
 
