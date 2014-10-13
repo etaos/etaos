@@ -31,14 +31,15 @@
 
 extern void avr_init(void);
 extern void avr_install_irqs(void);
-extern unsigned char __heap_start;
+extern char __heap_start;
+static const char *mm_heap_start = &__heap_start;
 extern int main(void);
 
 void avr_init(void)
 {
 #ifdef CONFIG_MALLOC
-	size_t hsize = RAMEND - CONFIG_STACK_SIZE - (size_t)&__heap_start;
-	mm_init((void*)&__heap_start, hsize);
+	size_t hsize = RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
+	mm_init((void*)mm_heap_start, hsize);
 #endif
 
 #ifdef CONFIG_VFS

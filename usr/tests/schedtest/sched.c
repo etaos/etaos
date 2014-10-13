@@ -23,13 +23,14 @@ THREAD(test_th_handle, arg)
 	}
 }
 
+extern char __heap_start;
+
 int main(void)
 {
 	printf("Application started (M:%u)!\n", mm_heap_available());
-	test_t = thread_create("tst", &test_th_handle, NULL,
+	test_t = thread_create( "tst", &test_th_handle, NULL,
 			CONFIG_STACK_SIZE, test_thread_stack, 80);
-
-	printf("PROG EXIT\n");
+	
 	while(true) {
 		printf("maint\n");
 		sleep(500);

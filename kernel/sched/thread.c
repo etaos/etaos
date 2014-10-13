@@ -34,6 +34,8 @@ static void raw_thread_init(struct thread *tp, char *name,
 	tp->param = arg;
 	tp->prio = prio;
 	tp->flags = 0;
+	tp->rq = NULL;
+	tp->on_rq = false;
 #ifdef CONFIG_EVENT_MUTEX
 	tp->ec = 0;
 #endif
@@ -53,6 +55,7 @@ static void raw_thread_init(struct thread *tp, char *name,
 	sched_create_stack_frame(tp, stack, stack_size, handle);
 
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	barrier();
 }
 
 void sched_init_idle(struct thread *tp, char *name, 
@@ -67,7 +70,7 @@ struct thread *thread_create(char *name, thread_handle_t handle, void *arg,
 {
 	struct thread *tp;
 
-	tp = kmalloc(sizeof(*tp));
+	tp = kzalloc(sizeof(*tp));
 	if(!tp)
 		return NULL;
 

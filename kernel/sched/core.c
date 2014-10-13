@@ -440,8 +440,7 @@ resched:
 
 #ifdef CONFIG_TIMER
 	diff = tm_update_source(rq->source);
-	if(diff)
-		tm_process_clock(rq->source, diff);
+	tm_process_clock(rq->source, diff);
 #ifdef CONFIG_PREEMPT
 	if(diff < prev->slice) {
 		prev->slice -= diff;
@@ -496,7 +495,6 @@ void schedule(void)
 }
 
 static struct thread idle_thread, main_thread;
-#define CONFIG_IDLE_STACK_SIZE CONFIG_STACK_SIZE
 static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE];
 
 THREAD(idle_thread_func, arg)

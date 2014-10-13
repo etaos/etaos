@@ -1,7 +1,7 @@
 menuconfig LIBC
 	tristate "C library configuration"
 	depends on m
-	default y
+	default m
 	help
 	  Say 'y' here if you want to build a (and
 	  configure) a standard C library. If you

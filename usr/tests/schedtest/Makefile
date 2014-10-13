@@ -11,7 +11,7 @@ MCU=atmega328p
 PROGRAMMER=arduino
 BAUD=115200
 PORT=/dev/ttyACM0
-#PORT=/dev/pts/5
+#PORT=/dev/pts/2
 
 MAKEFLAGS += -rR --no-print-directory
 

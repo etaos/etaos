@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - Init
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - strchr
+ *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,17 +17,20 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/init.h>
 #include <etaos/types.h>
-#include <etaos/sched.h>
-#include <etaos/thread.h>
+#include <etaos/string.h>
 
-extern int main(void);
-#ifdef CONFIG_SCHED
-void main_thread_func(void *arg)
+void *memset(void *dst, int c, size_t n)
 {
-	main();
-	while(true);
-}
-#endif
+	volatile unsigned char *data;
 
+	if(dst && n) {
+		data = dst;
+
+		do {
+			*data++ = c;
+		} while(--n);
+	}
+
+	return dst;
+}

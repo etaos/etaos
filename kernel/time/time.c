@@ -88,7 +88,7 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 {
 	struct timer *timer;
 
-	if((timer = kmalloc(sizeof(*timer))) == NULL)
+	if((timer = kzalloc(sizeof(*timer))) == NULL)
 		return NULL;
 
 	timer->tleft = (cs->freq / 1000UL) * ms;

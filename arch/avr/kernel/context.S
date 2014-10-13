@@ -77,8 +77,8 @@ avr_switch_context:
 	pop r25
 	pop r24
 
-	out AVR_STACK_LOW_ADDR, r24
 	out AVR_STACK_HI_ADDR, r25
+	out AVR_STACK_LOW_ADDR, r24
 
 	pop r31
 	pop r30

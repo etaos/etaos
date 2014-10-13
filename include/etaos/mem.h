@@ -61,6 +61,36 @@ extern void mm_heap_add_block(void *start, size_t size);
 extern size_t mm_heap_available(void);
 extern void mm_init(void *start, size_t size);
 
+#if defined(CONFIG_STRING) || defined(CONFIG_STRING_MODULE)
+#include <etaos/string.h>
+static inline void *kzalloc(size_t size)
+{
+	void *data;
+
+	data = mm_alloc(size);
+	if(data)
+		memset(data, 0, size);
+
+	return data;
+}
+#else
+static inline void *kzalloc(size_t size)
+{
+	void *data;
+	volatile unsigned char *ptr;
+
+	data = mm_alloc(size);
+	if(data) {
+		ptr = data;
+		do {
+			*ptr++ = 0;
+		} while(--size);
+	}
+	
+	return data;
+}
+#endif
+
 #define kmalloc(__s) mm_alloc(__s)
 #define kfree(__ptr) mm_kfree(__ptr)
 
