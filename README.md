@@ -20,7 +20,7 @@ ETA/OS is licenced as GNU General Public Licence version 3 or newer.
 The COPYING file should contian more information about the licence, or
 if it's not included, look at http://www.gnu.org/licences/.
 
-ETA/OS
+    ETA/OS
     Copyright (C) 2014
 
     This program is free software: you can redistribute it and/or modify
