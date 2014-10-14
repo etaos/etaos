@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - STDIO putc
+ *  ETA/OS - STDIO printf
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file putc.c */
+/** @file printf.c */
 
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
@@ -27,13 +27,30 @@
  */
 
 /**
- * @brief Write one character to a stream.
- * @param c Character to write.
- * @param stream Stream to write \p c to.
+ * @brief Write a formated string to a stream.
+ * @param stream File to write to.
+ * @param fmt
+ * @parm ... Variable argument list.
+ *
+ * The first argument contains a formatted string, for example:
+ * @code{.c}
+   printf(stderr, "Hey there, it is %u:%uPM\n", 6, 23);
+   @endcode
+ *
+ * The %u means 'replace with unsigned integer from the variable argument list.
+ * What will be written to the file in the end:
+ * Hey there, it is 6:23PM
  */
-int putc(int c, FILE stream)
+int fprintf(FILE stream, const char *fmt, ...)
 {
-	return fputc(c, stream);
+	int i;
+	va_list va;
+
+	va_start(va, fmt);
+	i = vfprintf(stream, fmt, va);
+	va_end(va);
+
+	return i;
 }
 
 /** @} */

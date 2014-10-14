@@ -16,9 +16,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file printf.c */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
+/**
+ * @brief Write a formated string to stdout.
+ * @param fmt
+ * @parm ... Variable argument list.
+ *
+ * The first argument contains a formatted string, for example:
+ * @code{.c}
+   printf("Hey there, it is %u:%uPM\n", 6, 23);
+   @endcode
+ *
+ * The %u means 'replace with unsigned integer from the variable argument list.
+ * What will be written to stdout in the end:
+ * Hey there, it is 6:23PM
+ */
 int printf(const char *fmt, ...)
 {
 	int i;
@@ -30,4 +51,6 @@ int printf(const char *fmt, ...)
 
 	return i;
 }
+
+/** @} */
 
