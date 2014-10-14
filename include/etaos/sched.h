@@ -82,6 +82,7 @@ extern void cpu_reschedule(struct rq *rq,
 		struct thread *next);
 extern void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 				size_t stack_size, thread_handle_t handle);
+extern void sched_free_stack_frame(struct thread *tp);
 
 extern void raw_thread_add_to_wake_q(struct thread *tp);
 extern void raw_thread_add_to_kill_q(struct thread *tp);

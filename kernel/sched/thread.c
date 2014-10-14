@@ -93,6 +93,44 @@ int thread_initialise(struct thread *tp, char *name, thread_handle_t handle,
 	return -EOK;
 }
 
+void kill(void)
+{
+	struct thread *tp;
+
+	tp = current_thread();
+
+	set_bit(THREAD_EXIT_FLAG, &tp->flags);
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	thread_add_to_kill_q(tp);
+	schedule();
+}
+
+void wait(void)
+{
+	struct thread *tp;
+
+	tp = current_thread();
+	set_bit(THREAD_WAITING_FLAG, &tp->flags);
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	schedule();
+}
+
+void signal(struct thread *tp)
+{
+	struct rq *rq;
+
+	if(!tp)
+		return;
+
+	clear_bit(THREAD_WAITING_FLAG, &tp->flags);
+	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	rq = sched_get_cpu_rq();
+	rq_add_thread(rq, tp);
+	yield();
+}
+
 void yield(void)
 {
 	struct rq *rq;

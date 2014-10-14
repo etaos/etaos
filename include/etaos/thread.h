@@ -124,5 +124,8 @@ extern struct thread *current_thread();
 
 extern void yield(void);
 extern void sleep(unsigned ms);
+extern void kill(void);
+extern void wait(void);
+extern void signal(struct thread *tp);
 
 #endif /* __THREAD_H__ */

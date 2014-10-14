@@ -20,6 +20,7 @@
 #include <etaos/types.h>
 #include <etaos/init.h>
 #include <etaos/error.h>
+#include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
 #include <etaos/preempt.h>
@@ -354,6 +355,17 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
 	}
 }
 
+static void rq_destory_kill_q(struct rq *rq)
+{
+	struct thread *walker;
+
+	for(walker = rq->kill_queue; walker; walker = walker->rq_next) {
+		raw_rq_remove_kill_thread(rq, walker);
+		sched_free_stack_frame(walker);
+		kfree(walker);
+	}
+}
+
 #ifdef CONFIG_DYN_PRIO
 #define dyn_prio_reset(__t) (__t)->dprio = 0;
 #else
@@ -491,6 +503,7 @@ resched:
 	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
 		goto resched;
 
+	rq_destory_kill_q(rq);
 	return did_switch;
 }
 

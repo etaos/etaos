@@ -20,6 +20,7 @@
 #include <etaos/types.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/mem.h>
 
 #include <asm/time.h>
 #include <asm/sched.h>
@@ -77,6 +78,11 @@ void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 
 	tp->sp[8] = ((unsigned short)tp->param) & 0xFF; /* r24 */
 	tp->sp[7] = (((unsigned short)tp->param) >> 8) & 0xFF; /* r25 */
+}
+
+void sched_free_stack_frame(struct thread *tp)
+{
+	kfree(tp->stack);
 }
 
 void avr_save_stack(stack_t *sp, struct thread *current)
