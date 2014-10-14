@@ -16,3 +16,4 @@ include/generated
 .vimws/
 _theme_packages/
 *.*.swp
+.vimproject
