@@ -21,6 +21,8 @@
 
 #ifdef CONFIG_SCHED
 extern void main_thread_func(void *arg);
+#else
+extern void main_init(void);
 #endif
 
 #endif /* __INIT_H__ */

@@ -34,7 +34,7 @@ config MUTEX_TRADITIONAL
 
 config MUTEX_EVENT_QUEUE
 	bool "Event queue mutex"
-	select EVENT_MUTEX
+	depends on EVENT_MUTEX
 	help
 	  Say 'y' if you are interrested in using
 	  event queue's as the backend for mutex

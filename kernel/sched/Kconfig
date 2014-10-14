@@ -1,6 +1,7 @@
 menuconfig SCHED
 	bool "Scheduler"
 	select TIMER
+	select SYS_TICK
 	help
 	  Say 'y' here if you want to enable the scheduler. The
 	  scheduler is responsible for handeling the execution of

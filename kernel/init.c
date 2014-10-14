@@ -25,9 +25,11 @@
 extern int main(void);
 #ifdef CONFIG_SCHED
 void main_thread_func(void *arg)
+#else
+void main_init(void)
+#endif
 {
 	main();
 	while(true);
 }
-#endif
 

@@ -21,6 +21,7 @@
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 #include <etaos/mem.h>
+#include <etaos/init.h>
 
 #include <asm/sched.h>
 #include <asm/time.h>
@@ -33,7 +34,6 @@ extern void avr_init(void);
 extern void avr_install_irqs(void);
 extern char __heap_start;
 static const char *mm_heap_start = &__heap_start;
-extern int main(void);
 
 void avr_init(void)
 {
@@ -56,7 +56,7 @@ void avr_init(void)
 	avr_init_sched();
 	sched_init();
 #else
-	main();
+	main_init();
 #endif
 
 	while(1);
