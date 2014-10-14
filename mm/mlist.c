@@ -20,18 +20,18 @@
 #include <etaos/types.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
-#include <etaos/mutex.h>
+#include <etaos/spinlock.h>
 
-DEFINE_MUTEX(mlock);
+DEFINE_SPINLOCK(mlock);
 
 void mm_heap_add_block(void *start, size_t size)
 {
-	mutex_lock(&mlock);
+	spin_lock(&mlock);
 	if(!mm_head)
 		return;
 
 	mm_init_node(start, size - sizeof(struct heap_node));
-	mutex_unlock(&mlock);
+	spin_unlock(&mlock);
 	kfree(start+sizeof(struct heap_node));
 }
 
@@ -59,7 +59,7 @@ size_t mm_heap_available(void)
 	struct heap_node *c;
 	size_t total;
 	
-	mutex_lock(&mlock);
+	spin_lock(&mlock);
 	c = mm_head;
 	total = 0;
 	
@@ -68,7 +68,7 @@ size_t mm_heap_available(void)
 		c = c->next;
 	}
 
-	mutex_unlock(&mlock);
+	spin_unlock(&mlock);
 
 #ifdef CONFIG_MMDEBUG
 	printf("Mem avail: %u\n", total);

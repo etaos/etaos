@@ -24,6 +24,8 @@
 #include <etaos/spinlock.h>
 #include <etaos/list.h>
 
+struct sched_class;
+extern struct sched_class sys_sched_class;
 #ifdef CONFIG_THREAD_QUEUE
 #define DEFINE_THREAD_QUEUE(__name)			 \
 	static struct thread_queue __name = {		 \
@@ -37,6 +39,7 @@
 		.lock = STATIC_SPIN_LOCK_INIT,	 \
 		.qhead = SIGNALED,		 \
 	}
+
 #endif
 
 typedef void (*thread_handle_t)(void *arg);
@@ -55,6 +58,13 @@ struct thread_queue {
 	spinlock_t lock;
 	struct thread *qhead;
 };
+
+static inline void thread_queue_init(struct thread_queue *qp)
+{
+	qp->sched_class = &sys_sched_class;
+	qp->qhead = SIGNALED;
+	spinlock_init(&qp->lock);
+}
 #endif
 
 struct rq;
@@ -99,7 +109,6 @@ struct thread {
 #define THREAD_EXIT_FLAG 	 3
 #define THREAD_NEED_RESCHED_FLAG 4
 
-struct sched_class;
 extern void thread_wake_up_from_irq(struct thread *t);
 extern int thread_initialise(struct thread *tp, char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
@@ -107,11 +116,11 @@ extern int thread_initialise(struct thread *tp, char *name,
 
 extern struct thread *thread_create(char *name, thread_handle_t handle, 
 		void *arg, size_t stack_size, void *stack, unsigned char prio);
-extern struct sched_class sys_sched_class;
 
 extern void sched_init_idle(struct thread *tp, char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack);
+extern struct thread *current_thread();
 
 extern void yield(void);
 extern void sleep(unsigned ms);

@@ -25,8 +25,8 @@
 #include <etaos/thread.h>
 
 typedef struct mutex {
-#ifdef NEVER_SET
-	struct thread *queue;
+#ifdef CONFIG_MUTEX_EVENT_QUEUE
+	struct thread_queue qp;
 #else
 	uint8_t lock;
 #endif
@@ -35,10 +35,33 @@ typedef struct mutex {
 #endif
 } mutex_t;
 
-#define mutex_lock_irqsave(__l, __f) _mutex_lock_irqsave(__l, &__f)
-#define mutex_unlock_irqrestore(__l, __f) _mutex_unlock_irqrestore(__l, &__f)
+#ifdef CONFIG_MUTEX_EVENT_QUEUE
+#include <etaos/thread.h>
+#include <etaos/evm.h>
+#define STATIC_MUTEX_INIT { \
+		.qp = INIT_THREAD_QUEUE, \
+		.owner = NULL, \
+	}
+#define DEFINE_MUTEX(__n) mutex_t __n = STATIC_MUTEX_INIT
 
-#ifdef NEVER_SET
+static inline void mutex_init(mutex_t *mutex)
+{
+	thread_queue_init(&mutex->qp);
+	mutex->owner = NULL;
+}
+
+static inline void mutex_lock(mutex_t *mutex)
+{
+	evm_wait_event_queue(&mutex->qp, EVM_WAIT_INFINITE);
+	mutex->owner = current_thread();
+}
+
+static inline void mutex_unlock(mutex_t *mutex)
+{
+	mutex->owner = NULL;
+	evm_signal_event_queue(&mutex->qp);
+}
+
 #else
 
 #include <asm/mutex.h>
@@ -48,18 +71,6 @@ typedef struct mutex {
 static inline void mutex_init(mutex_t *mutex)
 {
 	mutex->lock = 0;
-}
-
-static inline void _mutex_lock_irqsave(mutex_t *lock, unsigned long *flags)
-{
-	irq_save_and_disable(flags);
-	arch_mutex_lock(lock);
-}
-
-static inline void _mutex_unlock_irqrestore(mutex_t *lock, unsigned long *flags)
-{
-	irq_restore(flags);
-	arch_mutex_unlock(lock);
 }
 
 #define mutex_lock(__l) arch_mutex_lock(__l)

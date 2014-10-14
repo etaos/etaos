@@ -34,7 +34,7 @@ MEM void *mm_alloc(size_t size)
 	void *rval;
 	struct heap_node *c, *prev;
 
-	mutex_lock(&mlock);
+	spin_lock(&mlock);
 	c = mm_head;
 	prev = NULL;
 
@@ -62,7 +62,7 @@ MEM void *mm_alloc(size_t size)
 	rval += sizeof(*c);
 
 err_l:
-	mutex_unlock(&mlock);
+	spin_unlock(&mlock);
 	return rval;
 }
 
@@ -71,7 +71,7 @@ int mm_kfree(void *ptr)
 	struct heap_node *node, *c;
 	int err = -1;
 
-	mutex_lock(&mlock);
+	spin_lock(&mlock);
 	node = ptr - sizeof(*node);
 	/*if(!test_bit(MM_ALLOC_FLAG, &node->flags))
 		goto err_l;*/
@@ -97,7 +97,7 @@ int mm_kfree(void *ptr)
 	err = 0;
 
 err_l:
-	mutex_unlock(&mlock);
+	spin_unlock(&mlock);
 	return err;
 }
 

@@ -21,7 +21,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/mutex.h>
+#include <etaos/spinlock.h>
 
 #ifdef CONFIG_MM_TRACE_OWNER
 #include <etaos/thread.h>
@@ -45,7 +45,7 @@ struct heap_node {
 #define MEM __attribute__((malloc))
 
 extern struct heap_node *mm_head;
-extern mutex_t mlock;
+extern spinlock_t mlock;
 
 extern MEM void* mm_alloc(size_t);
 

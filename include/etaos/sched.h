@@ -103,6 +103,7 @@ extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 
 extern void sched_init(void);
 
+extern struct sched_class sys_sched_class;
 #ifdef CONFIG_THREAD_QUEUE
 extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
 extern void queue_add_thread(struct thread_queue *qp, struct thread *tp);
@@ -117,16 +118,6 @@ static inline struct thread_queue *thread_to_queue(struct thread *tp)
 		return NULL;
 }
 #endif
-
-extern struct sched_class sys_sched_class;
-
-static inline struct thread *current_thread(void)
-{
-	struct rq *rq;
-
-	rq = sched_get_cpu_rq();
-	return rq->current;
-}
 
 static inline void thread_remove_from_wake_q(struct thread *tp)
 {

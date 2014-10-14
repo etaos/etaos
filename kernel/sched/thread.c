@@ -119,3 +119,11 @@ void sleep(unsigned ms)
 	schedule();
 }
 
+struct thread *current_thread(void)
+{
+	struct rq *rq;
+
+	rq = sched_get_cpu_rq();
+	return rq->current;
+}
+
