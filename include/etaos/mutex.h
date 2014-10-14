@@ -62,6 +62,12 @@ static inline void mutex_unlock(mutex_t *mutex)
 	evm_signal_event_queue(&mutex->qp);
 }
 
+static inline void mutex_unlock_from_irq(mutex_t *mutex)
+{
+	mutex->owner = NULL;
+	evm_signal_from_irq(&mutex->qp);
+}
+
 #else
 
 #include <asm/mutex.h>
