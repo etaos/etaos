@@ -16,9 +16,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file strchr.c */
+
 #include <etaos/kernel.h>
 #include <etaos/string.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
+/**
+ * @brief Find the first occurance of a character.
+ * @param str String to search.
+ * @param c Character to search for.
+ * @return Pointer to the character in \p str if \p c is found, NULL if nothing
+ *         was found.
+ */
 char *strchr(const char *str, int c)
 {
 	for(;; ++str) {
@@ -28,3 +42,6 @@ char *strchr(const char *str, int c)
 			return NULL;
 	}
 }
+
+/** @} */
+

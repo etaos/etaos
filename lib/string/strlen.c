@@ -16,9 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file strlen.c */
+
 #include <etaos/kernel.h>
 #include <etaos/string.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
+/**
+ * @brief Determine the length of a string.
+ * @param str String to determine the length of.
+ * @return Length of \p str.
+ */
 int strlen(const char *str)
 {
 	const char *s;
@@ -26,3 +38,5 @@ int strlen(const char *str)
 	for(s = str; *s; ++s);
 	return (s - str);
 }
+
+/** @} */

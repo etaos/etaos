@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file vfprintf */
+/** @file vfprintf.c */
 
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
