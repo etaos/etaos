@@ -10,6 +10,8 @@ portable embedded applications. Some of its features:
 
   * Memory management
   * Scheduler (semi-SMP ready)
+  * Interrupt management
+  * Timer management
   * Driver core
   * Bunch of basic drivers (USART etc..)
 
