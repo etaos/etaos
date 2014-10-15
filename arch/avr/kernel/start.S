@@ -175,20 +175,19 @@ __bad_interrupt:
 .section .init0,"ax",@progbits
 .weak	__init
 __init:
-.weak	__stack
 .weak	__heap_end
 .set	__heap_end, 0
 
 .section .init2,"ax",@progbits
 	clr	__zero_reg__
 	out	AVR_STATUS_ADDR, __zero_reg__
-	ldi	r28,lo8(__stack)
+	ldi	r28,lo8(RAMEND)
 #ifdef __AVR_XMEGA__
 	out	AVR_STACK_LOW_ADDR, r28
-	ldi	r29,hi8(__stack)
+	ldi	r29,hi8(RAMEND)
 	out	AVR_STACK_HI_ADDR, r29
 #else
-	ldi	r29,hi8(__stack)
+	ldi	r29,hi8(RAMEND)
 	out	AVR_STACK_HI_ADDR, r29
 	out	AVR_STACK_LOW_ADDR, r28
 #endif  /* __AVR_XMEGA__ */
@@ -200,7 +199,6 @@ __init:
 	out	AVR_RAMPZ_ADDR, __zero_reg__
 #endif
 
-.set __stack, RAMEND
 .section .init9,"ax",@progbits
 	XCALL avr_init
 	XJMP _exit

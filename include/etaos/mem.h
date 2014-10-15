@@ -27,7 +27,7 @@
  */
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/mutex.h>
+#include <etaos/spinlock.h>
 
 #ifdef CONFIG_MM_TRACE_OWNER
 #include <etaos/thread.h>
@@ -54,7 +54,7 @@ struct heap_node {
 #define MEM __attribute__((malloc))
 
 extern struct heap_node *mm_head;
-extern mutex_t mlock;
+extern spinlock_t mlock;
 
 extern MEM void* mm_alloc(size_t);
 
@@ -69,6 +69,36 @@ extern int mm_kfree(void *ptr);
 extern void mm_heap_add_block(void *start, size_t size);
 extern size_t mm_heap_available(void);
 extern void mm_init(void *start, size_t size);
+
+#if defined(CONFIG_STRING) || defined(CONFIG_STRING_MODULE)
+#include <etaos/string.h>
+static inline void *kzalloc(size_t size)
+{
+	void *data;
+
+	data = mm_alloc(size);
+	if(data)
+		memset(data, 0, size);
+
+	return data;
+}
+#else
+static inline void *kzalloc(size_t size)
+{
+	void *data;
+	volatile unsigned char *ptr;
+
+	data = mm_alloc(size);
+	if(data) {
+		ptr = data;
+		do {
+			*ptr++ = 0;
+		} while(--size);
+	}
+	
+	return data;
+}
+#endif
 
 /**
  * @brief Allocate a new memory region.

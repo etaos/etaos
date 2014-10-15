@@ -31,6 +31,11 @@ static struct clocksource sysclk = {
 	.name = "sys-clk",
 };
 
+struct clocksource *avr_get_sys_clk(void)
+{
+	return &sysclk;
+}
+
 static int avr_sysclk_enable(struct clocksource *cs)
 {
 	return -1;

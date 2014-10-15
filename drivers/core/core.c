@@ -166,7 +166,7 @@ static struct device *dev_allocate(const char *name, struct dev_file_ops *fops)
 {
 	struct device *dev;
 
-	dev = kmalloc(sizeof(*dev));
+	dev = kzalloc(sizeof(*dev));
 
 	if(!dev)
 		return NULL;

@@ -21,6 +21,7 @@
 #include <etaos/stdio.h>
 #include <etaos/usart.h>
 #include <etaos/error.h>
+#include <etaos/spinlock.h>
 
 #include <asm/io.h>
 #include <asm/usart.h>
@@ -30,11 +31,11 @@ static int atmega_usart_putc(struct usart *usart, int c)
 	if(c == '\n')
 		atmega_usart_putc(usart, '\r');
 
-	mutex_lock(&usart->bus_lock);
+	spin_lock(&usart->bus_lock);
 	while(( UCSR0A & BIT(UDRE0) ) == 0);
 	UCSR0A |= BIT(TXCn);
 	UDR0 = c;
-	mutex_unlock(&usart->bus_lock);
+	spin_unlock(&usart->bus_lock);
 
 	return c;
 }
@@ -43,10 +44,10 @@ static int atmega_usart_getc(struct usart *usart)
 {
 	int c;
 
-	mutex_lock(&usart->bus_lock);
+	spin_lock(&usart->bus_lock);
 	while(!(UCSR0A & BIT(RXC0)));
 	c = UDR0;
-	mutex_unlock(&usart->bus_lock);
+	spin_unlock(&usart->bus_lock);
 	return c;
 }
 
@@ -73,6 +74,7 @@ static int atmega_usart_write(struct usart *uart, const void *tx,
 	size_t i;
 	const char *txbuf = tx;
 
+	err = 0;
 	for(i = 0; i < txlen; i++) {
 		err = atmega_usart_putc(uart, txbuf[i]);
 		if(err != txbuf[i]) {
@@ -104,7 +106,7 @@ void atmega_usart_init(void)
 	UCSR0C = BIT(UCSZ01) | BIT(UCSZ00);
 	UCSR0B = BIT(TXEN0) | BIT(RXEN0);
 
-	mutex_init(&(atmega_usart.bus_lock));
+	spinlock_init(&(atmega_usart.bus_lock));
 	usart_initialise(&atmega_usart);
 }
 

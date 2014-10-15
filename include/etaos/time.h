@@ -27,8 +27,9 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/atomic.h>
 #include <etaos/spinlock.h>
+#include <etaos/atomic.h>
+
 
 /**
  * @struct clocksource
@@ -100,21 +101,7 @@ struct timer {
  */
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
-/**
- * @brief Update the timer source.
- * @param source Clock source which needs to be updated.
- * @return The time difference, in ticks, since the last update.
- * @warning Applications should NOT use this function.
- */
-static inline int64_t tm_update_source(struct clocksource *source)
-{
-	int64_t diff;
-
-	diff = atomic64_get(&source->tc);
-	diff -= source->tc_resume;
-	return diff;
-}
-
+extern int64_t tm_update_source(struct clocksource *source);
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
 		unsigned long flags);

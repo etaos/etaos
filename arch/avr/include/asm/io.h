@@ -33,5 +33,13 @@
 #include <asm/iom328.h>
 #endif
 
+#define irq_enter_critical() __asm__ __volatile__( \
+		"in __tmp_reg__, __SREG__" "\n\t" \
+		"cli"			   "\n\t" \
+		"push __tmp_reg__"	   "\n\t")
+#define irq_exit_critical() __asm__ __volatile__( \
+		"pop __tmp_reg__"	   "\n\t" \
+		"out __SREG__, __tmp_reg__""\n\t")
+
 #endif
 

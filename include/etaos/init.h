@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - Compiler definitions
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - Init
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPILER_H__
-#define __COMPILER_H__
+#ifndef __INIT_H__
+#define __INIT_H__
 
-#ifdef __GNUC__
-#include <etaos/compiler-gcc.h>
+#ifdef CONFIG_SCHED
+extern void main_thread_func(void *arg);
+#else
+extern void main_init(void);
 #endif
 
-#ifndef __hot
-#define __hot
-#endif
-
-#endif
+#endif /* __INIT_H__ */

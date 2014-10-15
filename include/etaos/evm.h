@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - Compiler definitions
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - Event driven mutexes
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPILER_H__
-#define __COMPILER_H__
+#ifndef __EVM_HEADER_H__
+#define __EVM_HEADER_H__
 
-#ifdef __GNUC__
-#include <etaos/compiler-gcc.h>
-#endif
+struct thread;
+struct thread_queue;
 
-#ifndef __hot
-#define __hot
-#endif
+extern void evm_signal_event_queue(struct thread_queue *qp);
+extern int evm_wait_event_queue(struct thread_queue *qp, unsigned ms);
+extern void evm_signal_from_irq(struct thread_queue *qp);
+extern int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms);
+
+#define EVM_WAIT_INFINITE 0
 
 #endif

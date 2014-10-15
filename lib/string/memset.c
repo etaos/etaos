@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - Compiler definitions
+ *  ETA/OS - strchr
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,15 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPILER_H__
-#define __COMPILER_H__
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/string.h>
 
-#ifdef __GNUC__
-#include <etaos/compiler-gcc.h>
-#endif
+void *memset(void *dst, int c, size_t n)
+{
+	volatile unsigned char *data;
 
-#ifndef __hot
-#define __hot
-#endif
+	if(dst && n) {
+		data = dst;
 
-#endif
+		do {
+			*data++ = c;
+		} while(--n);
+	}
+
+	return dst;
+}

@@ -74,6 +74,8 @@ void arch_irq_enable();
 #define irq_enable() arch_irq_enable()
 
 struct irq_data;
+struct irq_chip;
+
 /**
  * @brief IRQ return type.
  */
@@ -110,7 +112,7 @@ struct irq_data {
  * @brief Threaded IRQ data.
  */
 struct irq_thread_data {
-	struct thread *thread; //!< IRQ owner thread.
+	struct thread *owner; //!< IRQ owner.
 	struct irq_data idata; //!< IRQ data.
 };
 #endif

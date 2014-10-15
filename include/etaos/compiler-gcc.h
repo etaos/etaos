@@ -21,4 +21,8 @@
 
 #define __compiler_offsetof(a,b) __builtin_offsetof(a,b)
 
+#define barrier() __asm__ __volatile("" ::: "memory");
+
+#define __hot __attribute__((__hot__))
+
 #endif

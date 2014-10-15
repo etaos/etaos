@@ -108,7 +108,7 @@ int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 	struct irq_data *data;
 	int err;
 
-	data = kmalloc(sizeof(*data));
+	data = kzalloc(sizeof(*data));
 	if(!data)
 		return -ENOMEM;
 

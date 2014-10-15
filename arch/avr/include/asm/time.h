@@ -20,5 +20,6 @@
 #define __AVR_TIME_H__
 
 extern void avr_timer_init(void);
+struct clocksource *avr_get_sys_clk(void);
 
 #endif

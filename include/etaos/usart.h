@@ -22,10 +22,10 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/device.h>
-#include <etaos/mutex.h>
+#include <etaos/spinlock.h>
 
 struct usart {
-	mutex_t bus_lock;
+	spinlock_t bus_lock;
 	int timeout;
 
 	struct device dev;

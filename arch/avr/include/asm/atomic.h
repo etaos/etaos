@@ -16,18 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AVR_ATOMIC_H__
+#ifndef __ATOMIC_H__
 #error Do not include this file directly, use #include <etaos/atomic.h>
 #endif
 
 #ifndef __AVR_ASM_ATOMIC_H__
 #define __AVR_ASM_ATOMIC_H__
 
-#include <etaos/kernel.h>
-#include <etaos/types.h>
 #include <etaos/irq.h>
-
-#include <asm/io.h>
 
 static inline void atomic_add(int nr, atomic_t *atom)
 {

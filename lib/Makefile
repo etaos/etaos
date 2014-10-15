@@ -4,7 +4,8 @@ libc-files-$(CONFIG_STDIO) += stdio/putc.o stdio/printf.o stdio/vfprintf.o
 libc-files-$(CONFIG_STDIO) += stdio/fputs.o stdio/fputc.o stdio/fprintf.o
 
 libc-files-$(CONFIG_STRING) += string/strlen.o string/strchr.o
-libc-files-$(CONFIG_STRING) += string/strcmp.o string/strnlen.o
+libc-files-$(CONFIG_STRING) += string/strcmp.o string/strnlen.o 
+libc-files-$(CONFIG_STRING) += string/memset.o
 
 obj-$(CONFIG_LIBC) += c.o
 

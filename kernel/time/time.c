@@ -31,6 +31,7 @@
 #include <etaos/bitops.h>
 #include <etaos/spinlock.h>
 #include <etaos/string.h>
+#include <etaos/atomic.h>
 
 static struct list_head sources = STATIC_INIT_LIST_HEAD(sources);
 
@@ -74,10 +75,10 @@ static void tm_start_timer(struct timer *timer)
 	cs = timer->source;
 	prev_timer = NULL;
 
-	spin_lock(&cs->lock);
+	raw_spin_lock(&cs->lock);
 	if(list_empty(&cs->timers)) {
 		list_add(&timer->list, &cs->timers);
-		spin_unlock(&cs->lock);
+		raw_spin_unlock(&cs->lock);
 		return;
 	}
 
@@ -96,7 +97,7 @@ static void tm_start_timer(struct timer *timer)
 		list_add(&timer->list, &prev_timer->list);
 	else
 		list_add(&timer->list, &cs->timers);
-	spin_unlock(&cs->lock);
+	raw_spin_unlock(&cs->lock);
 }
 
 /**
@@ -114,16 +115,16 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 {
 	struct timer *timer;
 
-	if((timer = kmalloc(sizeof(*timer))) == NULL)
+	if((timer = kzalloc(sizeof(*timer))) == NULL)
 		return NULL;
 
 	timer->tleft = (cs->freq / 1000UL) * ms;
-	
+
 	if(test_bit(TIMER_ONESHOT_FLAG, &flags))
 		timer->ticks = 0;
 	else
 		timer->ticks = timer->tleft;
-
+	
 	timer->source = cs;
 	timer->tleft += (unsigned long) (atomic64_get(&cs->tc) - cs->tc_resume);
 	timer->handle = handle;
@@ -145,23 +146,36 @@ int tm_stop_timer(struct timer *timer)
 	struct clocksource *cs;
 	struct timer *next;
 
+	if(!timer || timer == SIGNALED)
+		return -1;
+
 	timer->ticks = 0;
+	timer->handle = NULL;
 	cs = timer->source;
 
 	if(timer->tleft) {
-		spin_lock(&cs->lock);
+		raw_spin_lock(&cs->lock);
 		if(!list_is_last(&timer->list, &cs->timers)) {
 			next = list_next_entry(timer, list);
 			next->tleft += timer->tleft;
 		}
 
 		list_del(&timer->list);
-		spin_unlock(&cs->lock);
+		raw_spin_unlock(&cs->lock);
 		kfree(timer);
-		return 0;
 	}
 
-	return 1;
+	return 0;
+}
+
+int64_t tm_update_source(struct clocksource *source)
+{
+	int64_t diff;
+
+	diff = atomic64_get(&source->tc);
+	diff -= source->tc_resume;
+	source->tc_resume = atomic64_get(&source->tc);
+	return diff;
 }
 
 /**
@@ -178,7 +192,7 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 	if(list_empty(&cs->timers) || diff < 0 || diff == 0)
 		return;
 
-	spin_lock(&cs->lock);
+	raw_spin_lock(&cs->lock);
 	list_for_each_safe(carriage, tmp, &cs->timers) {
 		timer = list_entry(carriage, struct timer, list);
 
@@ -192,15 +206,17 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 
 		if(!timer->tleft) {
 			if(timer->handle) {
-				spin_unlock(&cs->lock);
+				raw_spin_unlock(&cs->lock);
 				timer->handle(timer, timer->priv_data);
-				spin_lock(&cs->lock);
+				raw_spin_lock(&cs->lock);
 			}
 
 			list_del(&timer->list);
 			if(timer->ticks) {
 				timer->tleft = timer->ticks;
+				raw_spin_unlock(&cs->lock);
 				tm_start_timer(timer);
+				raw_spin_lock(&cs->lock);
 			} else {
 				kfree(timer);
 			}
@@ -210,7 +226,7 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 			break;
 	}
 
-	spin_unlock(&cs->lock);
+	raw_spin_unlock(&cs->lock);
 }
 
 /**
