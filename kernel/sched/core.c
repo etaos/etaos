@@ -371,7 +371,7 @@ static void rq_destory_kill_q(struct rq *rq)
 #else
 #define dyn_prio_reset(__t)
 #endif
-static void rq_switch_context(struct rq *rq, struct thread *prev,
+static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 						struct thread *new)
 {
 	struct sched_class *class = rq->sched_class;
@@ -432,7 +432,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 #endif
 
 #define current(_rq) ((_rq)->current)
-static bool rq_schedule(void)
+static bool __hot rq_schedule(void)
 {
 	struct rq *rq;
 	int64_t diff;
@@ -507,7 +507,7 @@ resched:
 	return did_switch;
 }
 
-void schedule(void)
+void __hot schedule(void)
 {
 #ifdef CONFIG_DYN_PRIO
 	bool need_prio_update;
