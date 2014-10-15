@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC strlen
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - STDIO printf
+ *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file strlen.c */
+/** @file printf.c */
 
 #include <etaos/kernel.h>
-#include <etaos/string.h>
+#include <etaos/stdio.h>
 
 /**
  * @addtogroup libc
@@ -27,16 +27,31 @@
  */
 
 /**
- * @brief Determine the length of a string.
- * @param str String to determine the length of.
- * @return Length of \p str.
+ * @brief Write a formated string to a stream.
+ * @param stream File to write to.
+ * @param fmt
+ * @param ... Variable argument list.
+ *
+ * The first argument contains a formatted string, for example:
+ * @code{.c}
+   printf(stderr, "Hey there, it is %u:%uPM\n", 6, 23);
+   @endcode
+ *
+ * The %u means 'replace with unsigned integer from the variable argument list.
+ * What will be written to the file in the end:
+ * Hey there, it is 6:23PM
  */
-int strlen(const char *str)
+int fprintf(FILE stream, const char *fmt, ...)
 {
-	const char *s;
+	int i;
+	va_list va;
 
-	for(s = str; *s; ++s);
-	return (s - str);
+	va_start(va, fmt);
+	i = vfprintf(stream, fmt, va);
+	va_end(va);
+
+	return i;
 }
 
 /** @} */
+

@@ -16,6 +16,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file etaos/tick.h */
+
 #ifndef __TICK_H__
 #define __TICK_H__
 

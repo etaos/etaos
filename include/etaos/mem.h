@@ -16,9 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file etaos/mem.h */
+
 #ifndef __MEM_H__
 #define __MEM_H__
 
+/**
+ * @addtogroup mm
+ * @{
+ */
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/mutex.h>
@@ -29,18 +35,21 @@
 
 #define MM_MAGIC_BYTE 0x99
 
+/**
+ * @brief Heap node structure
+ */
 struct heap_node {
-	struct heap_node *next;
-	uint8_t magic;
+	struct heap_node *next; //!< Pointer to the next node.
+	uint8_t magic; //!< Verfication byte for the freeing process.
 	
-	size_t size;
-	unsigned long flags;
+	size_t size; //!< Size of the node.
+	unsigned long flags; //!< Configuration flags.
 #ifdef CONFIG_MM_TRACE_OWNER
-	struct thread *owner;
+	struct thread *owner; //!< Owner of the memory region.
 #endif
 };
 
-#define MM_ALLOC_FLAG 0
+#define MM_ALLOC_FLAG 0 //!< This bit becomes set after allocation
 
 #define MEM __attribute__((malloc))
 
@@ -61,8 +70,17 @@ extern void mm_heap_add_block(void *start, size_t size);
 extern size_t mm_heap_available(void);
 extern void mm_init(void *start, size_t size);
 
+/**
+ * @brief Allocate a new memory region.
+ * @param __s Size of the memory region to allocate
+ */
 #define kmalloc(__s) mm_alloc(__s)
+/**
+ * @brief Free an allocated memory region.
+ * @param __ptr Memory region to free.
+ */
 #define kfree(__ptr) mm_kfree(__ptr)
 
+/** @} */
 #endif
 

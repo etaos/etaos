@@ -16,6 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @defgroup archapi Arch API
+ *
+ * The Arch API is an API all architectures have to implement. It contains
+ * functions which the generic system needs, but are specific to the arch.
+ */
+
+/**
+ * @addtogroup irq IRQ management
+ * @{
+ */
 #ifndef __IRQ_H__
 #define __IRQ_H__
 
@@ -26,60 +37,124 @@ extern void irq_save_and_disable(unsigned long *flags);
 extern void irq_restore(unsigned long *flags);
 
 /* arch functions */
-void arch_irq_restore_flags(unsigned long *flags);
-unsigned long arch_irq_get_flags();
-void arch_irq_disable();
+/**
+ * @ingroup archapi
+ * @brief Restore the IRQ flags.
+ * @param flags IRQ flags which have to be restored.
+ * @pure
+ */
+extern void arch_irq_restore_flags(unsigned long *flags);
+/**
+ * @ingroup archapi
+ * @brief Get the IRQ flags.
+ * @return IRQ flags.
+ * @pure
+ */
+extern unsigned long arch_irq_get_flags();
+/**
+ * @ingroup archapi
+ * @brief Disable the global interrupts.
+ * @pure
+ */
+extern void arch_irq_disable();
+/**
+ * @ingroup archapi
+ * @brief Enable the global interrupts.
+ * @pure
+ */
 void arch_irq_enable();
 
+/**
+ * @brief Enable interrupts
+ */
 #define irq_disable() arch_irq_disable()
+/**
+ * @brief Disable interrupts.
+ */
 #define irq_enable() arch_irq_enable()
 
 struct irq_data;
+/**
+ * @brief IRQ return type.
+ */
 typedef enum {
-	IRQ_NONE = 0 << 0,
-	IRQ_HANDLED = 1 << 0,
-	IRQ_WAKE_OWNER = 1 << 1,
+	IRQ_NONE = 0 << 0, //!< IRQ not handled.
+	IRQ_HANDLED = 1 << 0, //!< IRQ handled.
+	IRQ_WAKE_OWNER = 1 << 1, //!< Wake up the IRQ owner.
 } irqreturn_t;
+
+/**
+ * @brief IRQ handler type.
+ * @param irq IRQ the handle belongs to.
+ * @param data Private data of the IRQ.
+ */
 typedef irqreturn_t (*irq_vector_t)(struct irq_data *irq, void *data);
 
+/**
+ * @brief Interrupt descriptor.
+ */
 struct irq_data {
-	unsigned int irq;
-	struct list_head irq_list;
+	unsigned int irq; //!< IRQ vector number.
+	struct list_head irq_list; //!< List of IRQ's.
 
-	unsigned long flags;
-	uint64_t num;
-	struct irq_chip *chip;
+	unsigned long flags; //!< IRQ flags.
+	uint64_t num; //!< Number of triggers.
+	struct irq_chip *chip; //!< IRQ chip.
 
-	irq_vector_t handler;
-	void *private_data;
+	irq_vector_t handler; //!< IRQ handler.
+	void *private_data; //!< IRQ private data.
 };
 
 #ifdef CONFIG_SCHED
+/**
+ * @brief Threaded IRQ data.
+ */
 struct irq_thread_data {
-	struct thread *thread;
-	struct irq_data idata;
+	struct thread *thread; //!< IRQ owner thread.
+	struct irq_data idata; //!< IRQ data.
 };
 #endif
 
-#define IRQ_ENABLE_FLAG 0
-#define IRQ_RISING_FLAG 1
-#define IRQ_FALLING_FLAG 2
-#define IRQ_THREADED_FLAG 3
-#define IRQ_THREADED_TRIGGERED_FLAG 4
+#define IRQ_ENABLE_FLAG 0 //!< Enable the IRQ.
+#define IRQ_RISING_FLAG 1 //!< Rising edge IRQ.
+#define IRQ_FALLING_FLAG 2 //!< Falling edge IRQ.
+#define IRQ_THREADED_FLAG 3 //!< IRQ is handled by a thread.
+#define IRQ_THREADED_TRIGGERED_FLAG 4 //!< Thread has been woken up.
 
-#define IRQ_ENABLE_MASK (1 << IRQ_ENABLE_FLAG)
+/**
+ * @brief Enable mask.
+ */
+#define IRQ_ENABLE_MASK (1 << IRQ_ENABLE_FLAG) 
+/**
+ * @brief Rising edge mask.
+ */
 #define IRQ_RISING_MASK (1 << IRQ_RISING_FLAG)
+/**
+ * @brief Falling edge mask.
+ */
 #define IRQ_FALLING_MASK (1 << IRQ_FALLING_FLAG)
+/**
+ * @brief Threaded IRQ mask.
+ */
 #define IRQ_THREADED_MASK (1 << IRQ_THREADED_FLAG)
+/**
+ * @brief Thread triggered mask.
+ */
 #define IRQ_THREADED_TRIGGERED_MASK (1 << IRQ_THREADED_TRIGGERED_FLAG)
 
+/**
+ * @brief IRQ chip descriptor.
+ *
+ * An IRQ chip is a chip which is capable of triggering IRQ's. For example,
+ * the CPU.
+ */
 struct irq_chip {
-	const char *name;
-	struct list_head irqs;
+	const char *name; //!< Chip name.
+	struct list_head irqs; //!< Assigned irqs.
 
-	void (*chip_handle)(int irq);
-	void (*sleep)(struct irq_chip *chip);
-	void (*resume)(struct irq_chip *chip);
+	void (*chip_handle)(int irq); //!< Chip handler.
+	void (*sleep)(struct irq_chip *chip); //!< Put the chip to sleep.
+	void (*resume)(struct irq_chip *chip); //!< Resume the chip.
 };
 
 extern int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq);
@@ -94,14 +169,30 @@ extern void irq_handle(int irq);
 
 /* IRQ CHIP FUNCTIONS */
 
+/**
+ * @brief Get the architecture specific IRQ chip.
+ * @return The arch IRQ chip.
+ * @ingroup archapi
+ * @pure
+ */
 extern struct irq_chip *arch_get_irq_chip(void);
 
+/**
+ * @brief Set the sleep function for an IRQ chip.
+ * @param chip to set sleep for.
+ * @param sleep Function pointer.
+ */
 static inline void irq_chip_set_sleep(struct irq_chip *chip,
 				      void (*sleep)(struct irq_chip *))
 {
 	chip->sleep = sleep;
 }
 
+/**
+ * @brief Set the resume function for an IRQ chip.
+ * @param chip to set resume for.
+ * @param resume Function pointer.
+ */
 static inline void irq_chip_set_resume(struct irq_chip *chip,
 				      void (*resume)(struct irq_chip *))
 {
@@ -109,3 +200,4 @@ static inline void irq_chip_set_resume(struct irq_chip *chip,
 }
 #endif
 
+/** @} */

@@ -117,6 +117,7 @@ extern FILE __iob[];
 extern int putc(int c, FILE stream);
 extern int fputc(int c, FILE stream);
 extern int fputs(char *c, FILE stream);
+extern int fprintf(FILE stream, const char*, ...);
 extern int printf(const char *, ...);
 extern int vfprintf(FILE stream, const char *fmt, va_list va);
 extern int iob_add(FILE iob);

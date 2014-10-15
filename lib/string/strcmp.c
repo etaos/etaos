@@ -16,9 +16,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file strcmp.c */
+
 #include <etaos/kernel.h>
 #include <etaos/string.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
+/**
+ * @brief Compare two strings.
+ * @param s1 String 1.
+ * @param s2 String 2.
+ * @return An integer greater than, equal to or less than 0, according to
+ *         whether the first string is greater than, equal to or less than the
+ *         second string.
+ */
 int strcmp(const char *s1, const char *s2)
 {
 	while(*s1 == *s2++) {
@@ -28,3 +43,6 @@ int strcmp(const char *s1, const char *s2)
 
 	return (*(unsigned char *) s1 - *(unsigned char *) --s2);
 }
+
+/** @} */
+

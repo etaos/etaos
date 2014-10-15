@@ -16,9 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file fputs.c */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
+/**
+ * @brief Write a string to a stream.
+ * @param s String to write.
+ * @param stream Stream to write to.
+ * @note Uses fputc internally
+ */
 int fputs(char *s, FILE stream)
 {
 	for (; *s; s++) {
@@ -27,3 +40,5 @@ int fputs(char *s, FILE stream)
 	
 	return 0;
 }
+
+/** @} */

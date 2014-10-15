@@ -24,7 +24,7 @@ static void lock_test(void)
 
 	mainlock.lock = 0;
 	mutex_lock_irqsave(&mainlock, flags);
-	printf("First lock test: [OK]\n");
+	fprintf(stdout, "First lock test: [OK]\n");
 	mutex_unlock_irqrestore(&mainlock, flags);
 	mutex_lock(&mainlock);
 	printf("Last lock test: [OK]\n");

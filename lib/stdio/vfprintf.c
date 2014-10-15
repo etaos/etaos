@@ -16,9 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file vfprintf.c */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/types.h>
+
+/**
+ * @addtogroup libc
+ * @{
+ */
 
 #define BUFF 16
 #define FLT_DIGITS 2
@@ -129,6 +136,12 @@ static const char *vfprintf_long_int(va_list ap, const char *fmt,
 	return fmt;
 }
 
+/**
+ * @brief Backend for fprintf, printf, etc
+ * @param stream File to write to.
+ * @param fmt Format string.
+ * @param ap VA list to complete the format string.
+ */
 int vfprintf(FILE stream, const char *fmt, va_list ap)
 {
 	size_t i;
@@ -195,3 +208,4 @@ int vfprintf(FILE stream, const char *fmt, va_list ap)
 	return stream->length;
 }
 
+/** @} */
