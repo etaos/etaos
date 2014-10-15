@@ -16,6 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file kernel/time/systick.c
+ * @addtogroup tm
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/atomic.h>
@@ -24,6 +30,11 @@
 #include <etaos/tick.h>
 #include <etaos/stdio.h>
 
+/**
+ * @brief System tick IRQ handler.
+ * @param irq IRQ data.
+ * @param data Private data.
+ */
 static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 {
 	struct clocksource *cs = (struct clocksource*)data;
@@ -32,8 +43,15 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 	return IRQ_HANDLED;
 }
 
+/**
+ * @brief Setup the system tick.
+ * @param irq IRQ bound to the system tick.
+ * @param src Clock source handling the system tick.
+ */
 void systick_setup(int irq, struct clocksource *src)
 {
 	irq_request(irq, &systick_irq_handle, IRQ_RISING_MASK, src);
 }
+
+/** @} */
 

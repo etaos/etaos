@@ -16,12 +16,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup irq
+ * @{
+ * @addtogroup irqchip IRQ chip management
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/list.h>
 #include <etaos/irq.h>
 #include <etaos/error.h>
 
+/**
+ * @brief Add a new IRQ to an IRQ chip.
+ * @param chip The IRQ chip where the IRQ will be added to.
+ * @param irq IRQ data which has to be added.
+ * @return Error code.
+ * @retval -ENOTINITIALISED if chip or irq is set to NULL.
+ * @retval 0 on success.
+ */
 int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq)
 {
 	if(chip == NULL || irq == NULL)
@@ -32,6 +47,14 @@ int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq)
 	return 0;
 }
 
+/**
+ * @brief Initialise a new IRQ chip.
+ * @param chip Chip which has to be initialised.
+ * @param name Name of the IRQ chip.
+ * @return Error code.
+ * @retval -ENOTINITIALISED if chip == NULL.
+ * @retval -EOK on success.
+ */
 int irq_chip_init(struct irq_chip *chip, const char *name)
 {
 	if(!chip)
@@ -43,4 +66,6 @@ int irq_chip_init(struct irq_chip *chip, const char *name)
 	chip->chip_handle = &irq_handle;
 	return -EOK;
 }
+
+/** @} @} */
 

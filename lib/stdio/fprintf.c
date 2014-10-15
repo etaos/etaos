@@ -30,7 +30,7 @@
  * @brief Write a formated string to a stream.
  * @param stream File to write to.
  * @param fmt
- * @parm ... Variable argument list.
+ * @param ... Variable argument list.
  *
  * The first argument contains a formatted string, for example:
  * @code{.c}

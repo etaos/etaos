@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file irq/handle.c
+ * @addtogroup irq
+ * @{
+ */
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/list.h>
@@ -23,6 +28,10 @@
 #include <etaos/error.h>
 #include <etaos/bitops.h>
 
+/**
+ * @brief Handle a hardware IRQ.
+ * @param data IRQ which has to be handled.
+ */
 static void irq_handle_hard_irq(struct irq_data *data)
 {
 	irqreturn_t retv;
@@ -54,6 +63,10 @@ static void irq_handle_hard_irq(struct irq_data *data)
 	
 }
 
+/**
+ * @brief Handle an IRQ
+ * @param irq IRQ which has to be handled.
+ */
 void irq_handle(int irq)
 {
 	struct irq_data *data;
@@ -67,3 +80,6 @@ void irq_handle(int irq)
 
 	irq_handle_hard_irq(data);
 }
+
+/** @} */
+
