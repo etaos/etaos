@@ -18,7 +18,7 @@
 
 /**
  * @file etaos/time.h Time header.
- * @addtogroup tm Timer module
+ * @addtogroup tm
  * @{
  */
 

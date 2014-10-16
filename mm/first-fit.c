@@ -24,15 +24,9 @@
 #include <etaos/bitops.h>
 
 /**
- * @addtogroup mm Memory allocation
+ * @addtogroup mm
  * @{
- * @addtogroup ff First fit allocator
- * 
- * The first fit allocator is the most simple allocator out there. It maintains
- * a list of available memory and removes an entry whenever it gets allocated.
- * If a memeory region gets free'd up, the region is added back into the list
- * of available memory.
- *
+ * @addtogroup ff
  * @{
  */
 

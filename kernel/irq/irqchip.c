@@ -19,7 +19,7 @@
 /**
  * @addtogroup irq
  * @{
- * @addtogroup irqchip IRQ chip management
+ * @addtogroup irqchip
  * @{
  */
 

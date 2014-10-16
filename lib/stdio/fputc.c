@@ -23,13 +23,7 @@
 #include <etaos/bitops.h>
 
 /**
- * @addtogroup libc LibC
- * @brief C run time library
- * @note When linking your application, pass -lc as the last library to your
- *       linker.
- *
- * Complementary runtime C library. Normal C libraries (like glibc) are way
- * to big to fit into small chips. This is a copy of a very compact c library.
+ * @addtogroup libc
  * @{
  */
 

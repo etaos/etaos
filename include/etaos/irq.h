@@ -17,14 +17,7 @@
  */
 
 /**
- * @defgroup archapi Arch API
- *
- * The Arch API is an API all architectures have to implement. It contains
- * functions which the generic system needs, but are specific to the arch.
- */
-
-/**
- * @addtogroup irq IRQ management
+ * @addtogroup irq
  * @{
  */
 #ifndef __IRQ_H__
@@ -38,27 +31,27 @@ extern void irq_restore(unsigned long *flags);
 
 /* arch functions */
 /**
- * @ingroup archapi
+ * @ingroup archAPI
  * @brief Restore the IRQ flags.
  * @param flags IRQ flags which have to be restored.
  * @pure
  */
 extern void arch_irq_restore_flags(unsigned long *flags);
 /**
- * @ingroup archapi
+ * @ingroup archAPI
  * @brief Get the IRQ flags.
  * @return IRQ flags.
  * @pure
  */
 extern unsigned long arch_irq_get_flags();
 /**
- * @ingroup archapi
+ * @ingroup archAPI
  * @brief Disable the global interrupts.
  * @pure
  */
 extern void arch_irq_disable();
 /**
- * @ingroup archapi
+ * @ingroup archAPI
  * @brief Enable the global interrupts.
  * @pure
  */
@@ -174,7 +167,7 @@ extern void irq_handle(int irq);
 /**
  * @brief Get the architecture specific IRQ chip.
  * @return The arch IRQ chip.
- * @ingroup archapi
+ * @ingroup archAPI
  * @pure
  */
 extern struct irq_chip *arch_get_irq_chip(void);
