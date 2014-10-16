@@ -208,6 +208,27 @@ void yield(void)
 }
 
 /**
+ * @brief Set the priority of the current thread.
+ * @param prio Priority to set.
+ * @retval The old priority.
+ */
+unsigned char nice(unsigned char prio)
+{
+	struct thread *tp;
+	unsigned char old;
+
+	if(prio == 255)
+		prio = 254;
+
+	tp = current_thread();
+	old = tp->prio;
+	tp->prio = prio;
+	yield();
+
+	return old;
+}
+
+/**
  * @brief Put the current thread to sleep.
  * @param ms Miliseconds to sleep.
  */
