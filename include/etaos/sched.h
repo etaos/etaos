@@ -49,28 +49,60 @@ struct thread_queue;
  * insert and remove threads or to get the next runnable task.
  */
 struct sched_class {
-	/** @brief Get the next runnable task. */
+	/** 
+	 * @brief Get the next runnable task.
+	 * @param rq Run queue to get the next runnable task from
+	 */
 	struct thread *(*next_runnable)(struct rq*);
-	/** @brief post schedule. */
+	/** 
+	 * @brief Post schedule.
+	 * @param rq RQ which has just received a schedule call.
+	 *
+	 * This function pointer, if present is called after the context
+	 * switch has been done.
+	 */
 	void (*post_schedule)(struct rq*);
 #ifdef CONFIG_DYN_PRIO
-	/**< @brief update the dynamic prio. */
+	/** 
+	 * @brief update the dynamic priority of all threads on the given rq.
+	 * @param rq Run queue to update.
+	 */
 	void (*dyn_prio_update)(struct rq*);
 #endif
-	/** @brief Add a new thread to the run queue. */
+	/** 
+	 * @brief Add a new thread to the run queue.
+	 * @param rq RQ to add to.
+	 * @param tp Thread to add.
+	 */
 	void (*add_thread)(struct rq *rq, struct thread *tp);
-	/** @brief Remove a thread from the run queue. */
+	/** 
+	 * @brief Remove a thread from the run queue.
+	 * @param rq Run queue to remove from.
+	 * @param tp Thread to remove.
+	 * @return Error code.
+	 * @retval -EINVAL on error.
+	 * @retval -EOK on success.
+	 */
 	int (*rm_thread)(struct rq *rq, struct thread *tp);
 #ifdef CONFIG_EVENT_MUTEX
-	/** @brief Get the next thread after \p tp.
+	/** 
+	 * @brief Get the next thread after \p tp.
 	 * @param tp Thread to get the 'next' of.
 	 */
 	struct thread *(*thread_after)(struct thread *tp);
 #endif
 #ifdef CONFIG_THREAD_QUEUE
-	/** @brief Add a thread to the queue */
+	/** 
+	 * @brief Add a thread to the queue
+	 * @param q Queue to add to.
+	 * @param tp Thread to add.
+	 */
 	void (*queue_add)(struct thread_queue *q, struct thread *tp);
-	/** @brief Remove a thread from a queue. */
+	/** 
+	 * @brief Remove a thread from a queue.
+	 * @param q Queue to remove from.
+	 * @param tp Thread to remove.
+	 */
 	void (*queue_rm)(struct thread_queue *q, struct thread *tp);
 #endif
 };
