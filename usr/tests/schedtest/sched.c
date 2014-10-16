@@ -18,7 +18,7 @@ static struct thread *test_t;
 
 THREAD(test_th_handle, arg)
 {
-
+	nice(150);
 	while(true) {
 		printf("test_thread\n");
 		wait();

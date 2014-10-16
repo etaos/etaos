@@ -3,10 +3,10 @@
 #
 
 VERSION = 0
-PATCHLEVEL = 0
-SUBLEVEL = 1
-EXTRAVERSION =
-NAME = Sheep on Meth
+PATCHLEVEL = 1
+SUBLEVEL = 0
+EXTRAVERSION = rc1
+NAME = Shuffling Donkey
 
 MAKEFLAGS += -rR --no-print-directory
 # DO NOT make these files show up anywhere. For your own safety.
