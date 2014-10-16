@@ -90,6 +90,18 @@
  *       results in performance degradation.
  */
 
+/**
+ * @defgroup irqchip IRQ chip management
+ * @ingroup irq
+ * @brief IRQ chip support.
+ *
+ * IRQ chips are the chips responsible for generating IRQ's. Examples of IRQ
+ * chips are the CPU and on an x86 system the IOAPIC. IRQ's are registered
+ * on an IRQ chip when they are allocated using the ETA/OS IRQ API. When an
+ * interrupt is triggered, the IRQ chip is responsible for handling the
+ * interrupt.
+ */
+
 /* ================ Memory management ================ */
 
 /**
