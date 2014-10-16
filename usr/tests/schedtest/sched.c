@@ -16,12 +16,14 @@
 static unsigned char test_thread_stack[CONFIG_STACK_SIZE];
 static struct thread *test_t;
 
+static DEFINE_THREAD_QUEUE(test_q);
+
 THREAD(test_th_handle, arg)
 {
 	nice(150);
 	while(true) {
+		evm_wait_next_event_queue(&test_q, 1000);
 		printf("test_thread\n");
-		wait();
 	}
 }
 
@@ -32,9 +34,8 @@ int main(void)
 			CONFIG_STACK_SIZE, test_thread_stack, 80);
 	
 	while(true) {
+		evm_wait_next_event_queue(&test_q, 500);
 		printf("maint mem: %u\n", mm_heap_available());
-		signal(test_t);
-		sleep(500);
 	}
 	return 0;
 }

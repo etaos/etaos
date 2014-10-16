@@ -28,6 +28,7 @@
 #include <etaos/error.h>
 #include <etaos/bitops.h>
 #include <etaos/mem.h>
+#include <etaos/thread.h>
 
 #include <asm/io.h>
 
@@ -84,14 +85,26 @@ void irq_restore(unsigned long *flags)
 	arch_irq_restore_flags(flags);
 }
 
-#ifdef CONFIG_SCHED
+#ifdef CONFIG_IRQ_THREAD
+#define IRQ_THREAD_PRIO 20
 /**
  * @brief Request a threaded IRQ.
  * @param irq IRQ data.
  */
-static int irq_request_threaded_irq(struct irq_data *irq)
+static int irq_request_threaded_irq(struct irq_thread_data *data)
 {
-	return -EINVAL;
+	void *stack;
+
+	stack = kzalloc(CONFIG_STACK_SIZE);
+	if(!stack)
+		return -ENOMEM;
+
+	data->owner = thread_create("ithread", &irq_handle_fn, &data->idata,
+			CONFIG_STACK_SIZE, stack, IRQ_THREAD_PRIO);
+	if(!data->owner)
+		return -ENOMEM;
+
+	return -EOK;
 }
 #endif
 
@@ -108,7 +121,26 @@ int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 	struct irq_data *data;
 	int err;
 
+#ifdef CONFIG_IRQ_THREAD
+	struct irq_thread_data *idata;
+	if(test_bit(IRQ_THREADED_FLAG, &flags)) {
+		idata = kzalloc(sizeof(*data));
+		if(!idata)
+			return -ENOMEM;
+
+		data = &idata->idata;
+		err = irq_request_threaded_irq(idata);
+		if(err) {
+			kfree(idata);
+			return err;
+		}
+	} else {
+		data = kzalloc(sizeof(*data));
+	}
+#else
 	data = kzalloc(sizeof(*data));
+#endif
+
 	if(!data)
 		return -ENOMEM;
 
@@ -117,15 +149,6 @@ int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 	data->flags = flags;
 	data->private_data = priv;
 	data->chip = arch_get_irq_chip();
-#ifdef CONFIG_SCHED
-	if(test_bit(IRQ_THREADED_FLAG, &flags)) {
-		err = irq_request_threaded_irq(data);
-		if(err) {
-			kfree(data);
-			return err;
-		}
-	}
-#endif
 	err = irq_chip_add_irq(data->chip, data);
 	irq_store_data(irq, data);
 

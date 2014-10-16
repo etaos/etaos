@@ -156,6 +156,7 @@ extern int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq);
 extern int irq_chip_init(struct irq_chip *chip, const char *name);
 extern int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 			void *irq_data);
+extern void irq_handle_fn(void *data);
 extern int irq_set_handle(int irq, irq_vector_t vector);
 extern struct irq_data *irq_to_data(int irq);
 

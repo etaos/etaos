@@ -227,6 +227,11 @@ extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
 extern void rq_add_thread_no_lock(struct thread *tp);
+#ifdef CONFIG_IRQ_THREAD
+extern void irq_signal_threads(struct rq *rq);
+#else
+#define irq_signal_threads
+#endif
 
 
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);

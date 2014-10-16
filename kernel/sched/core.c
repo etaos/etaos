@@ -137,6 +137,7 @@ static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
 		}
 
 		tpp = &carriage->rq_next;
+		carriage = carriage->rq_next;
 		continue;
 	}
 
@@ -623,7 +624,8 @@ static bool __hot rq_schedule(void)
 	rq = sched_get_cpu_rq();
 	prev = current(rq);
 	did_switch = false;
-
+	
+	irq_signal_threads(rq);
 resched:
 	preempt_disable();
 	raw_spin_lock_irq(&rq->lock);

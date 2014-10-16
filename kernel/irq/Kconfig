@@ -13,4 +13,14 @@ config IRQ_DEBUG
 	  Say 'y' here if you want to build IRQ debugging. This
 	  option is useful for ETA/OS developers. If you are
 	  unsure say 'N' here.
+
+config IRQ_THREAD
+	bool "Threaded IRQ support"
+	depends on SCHED && THREAD_QUEUE
+	help
+	  Say 'y' here if you want to have the ability to
+	  handle threads out of IRQ context. Triggered IRQ's will
+	  execute (delayed) in a thread. The drawbacks are that
+	  these kind of interrupts arrive delayed and have extra
+	  overhead in the kernel. If unsure say 'n' here.
 endif
