@@ -71,6 +71,12 @@ static struct dev_file_ops usart_fops = {
 	.get = &usart_getc,
 };
 
+/**
+ * @brief Initialise a new USART device.
+ * @param usart USART which has to be initialised.
+ * @return Error code.
+ * @retval -EOK on success.
+ */
 int usart_initialise(struct usart *usart)
 {
 	FILE usart_stream;
