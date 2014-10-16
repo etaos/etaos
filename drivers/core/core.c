@@ -112,12 +112,14 @@ static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 		return -EINVAL;
 
 	file = dev->file;
+	file->name = dev->name;
 	file->write = fops->write;
 	file->read = fops->read;
 	file->put = fops->put;
 	file->get = fops->get;
 	file->close = fops->close;
 	file->flush = fops->flush;
+	vfs_add(file);
 	
 	return -EOK;
 }
