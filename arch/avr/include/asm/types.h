@@ -28,4 +28,6 @@ typedef long long int64_t;
 typedef unsigned int arch_size_t;
 typedef int arch_ssize_t;
 
+typedef unsigned char stack_t;
+
 #endif

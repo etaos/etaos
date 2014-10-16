@@ -16,6 +16,14 @@ config STACK_SIZE
 	  other threads if no stack size is given when a new
 	  thread is created.
 
+config IDLE_STACK_SIZE
+	int "Idle stack size"
+	default 128
+	help
+	  Set the size of the idle stack. The idle stack
+	  takes a seperate number from the main stack, due
+	  to the fact that the idle stack is much smaller.
+
 config FCPU
 	int "CPU frequency"
 	default 8000000

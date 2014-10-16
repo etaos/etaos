@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - IRQ chip
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - strchr
+ *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,27 +18,19 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/list.h>
-#include <etaos/irq.h>
-#include <etaos/error.h>
+#include <etaos/string.h>
 
-int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq)
+void *memset(void *dst, int c, size_t n)
 {
-	if(chip == NULL || irq == NULL)
-		return -ENOTINITIALISED;
+	volatile unsigned char *data;
 
-	list_add(&irq->irq_list, &chip->irqs);
-	return 0;
+	if(dst && n) {
+		data = dst;
+
+		do {
+			*data++ = c;
+		} while(--n);
+	}
+
+	return dst;
 }
-
-int irq_chip_init(struct irq_chip *chip, const char *name)
-{
-	if(!chip)
-		return -ENOTINITIALISED;
-
-	chip->name = name;
-	chip->sleep = NULL;
-	chip->resume = NULL;
-	return -EOK;
-}
-

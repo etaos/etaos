@@ -16,12 +16,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file etaos/mem.h */
+
 #ifndef __MEM_H__
 #define __MEM_H__
 
+/**
+ * @addtogroup mm
+ * @{
+ */
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/mutex.h>
+#include <etaos/spinlock.h>
 
 #ifdef CONFIG_MM_TRACE_OWNER
 #include <etaos/thread.h>
@@ -29,23 +35,26 @@
 
 #define MM_MAGIC_BYTE 0x99
 
+/**
+ * @brief Heap node structure
+ */
 struct heap_node {
-	struct heap_node *next;
-	uint8_t magic;
+	struct heap_node *next; //!< Pointer to the next node.
+	uint8_t magic; //!< Verfication byte for the freeing process.
 	
-	size_t size;
-	unsigned long flags;
+	size_t size; //!< Size of the node.
+	unsigned long flags; //!< Configuration flags.
 #ifdef CONFIG_MM_TRACE_OWNER
-	struct thread *owner;
+	struct thread *owner; //!< Owner of the memory region.
 #endif
 };
 
-#define MM_ALLOC_FLAG 0
+#define MM_ALLOC_FLAG 0 //!< This bit becomes set after allocation
 
 #define MEM __attribute__((malloc))
 
 extern struct heap_node *mm_head;
-extern mutex_t mlock;
+extern spinlock_t mlock;
 
 extern MEM void* mm_alloc(size_t);
 
@@ -61,8 +70,53 @@ extern void mm_heap_add_block(void *start, size_t size);
 extern size_t mm_heap_available(void);
 extern void mm_init(void *start, size_t size);
 
-#define kmalloc(__s) mm_alloc(__s)
-#define kfree(__ptr) mm_kfree(__ptr)
+#if defined(CONFIG_STRING) || defined(CONFIG_STRING_MODULE)
+#include <etaos/string.h>
+static inline void *kzalloc(size_t size)
+{
+	void *data;
 
+	data = mm_alloc(size);
+	if(data)
+		memset(data, 0, size);
+
+	return data;
+}
+#else
+static inline void *kzalloc(size_t size)
+{
+	void *data;
+	volatile unsigned char *ptr;
+
+	data = mm_alloc(size);
+	if(data) {
+		ptr = data;
+		do {
+			*ptr++ = 0;
+		} while(--size);
+	}
+	
+	return data;
+}
+#endif
+
+/**
+ * @brief Allocate a new memory region.
+ * @param size Size of the memory region to allocate
+ */
+static inline void *kmalloc(size_t size)
+{
+	return mm_alloc(size);
+}
+/**
+ * @brief Free an allocated memory region.
+ * @param size Memory region to free.
+ */
+static inline void kfree(void *ptr)
+{
+	mm_kfree(ptr);
+}
+
+/** @} */
 #endif
 

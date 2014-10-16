@@ -16,10 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file fputc.c */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/bitops.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
+/**
+ * @brief Write one character to a stream.
+ * @param c Character to write.
+ * @param stream Stream to write \p c to.
+ */
 int fputc(int c, FILE stream)
 {
 	int rc = -1;
@@ -31,3 +43,5 @@ int fputc(int c, FILE stream)
 	}
 	return rc;
 }
+
+/** @} */

@@ -23,9 +23,9 @@
 #include <etaos/types.h>
 
 /**
- *  * \def MAX_OPEN
- *   * \brief Maximum amount of files opened at the same time.
- *    */
+ * \def MAX_OPEN
+ * \brief Maximum amount of files opened at the same time.
+ */
 #define MAX_OPEN 16
 
 /* file flags */
@@ -99,7 +99,7 @@ typedef struct file {
 	int (*write)(struct file*, void*, size_t);
 	int (*flush)(struct file*);
 	int (*put)(int c, struct file*);
-	int (*get)(int c, struct file*);
+	int (*get)( struct file*);
 
 	void *data;
 	volatile unsigned char *buff;
@@ -117,6 +117,7 @@ extern FILE __iob[];
 extern int putc(int c, FILE stream);
 extern int fputc(int c, FILE stream);
 extern int fputs(char *c, FILE stream);
+extern int fprintf(FILE stream, const char*, ...);
 extern int printf(const char *, ...);
 extern int vfprintf(FILE stream, const char *fmt, va_list va);
 extern int iob_add(FILE iob);

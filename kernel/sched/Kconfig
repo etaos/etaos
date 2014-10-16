@@ -1,0 +1,68 @@
+menuconfig SCHED
+	bool "Scheduler"
+	select TIMER
+	select SYS_TICK
+	help
+	  Say 'y' here if you want to enable the scheduler. The
+	  scheduler is responsible for handeling the execution of
+	  threads, virtual timers and, if available, SMP processors.
+	  If you are unsure say 'n' here.
+
+if SCHED
+config SCHED_DBG
+	bool "Scheduling DBG"
+	help
+	  Say 'y' here to enable the scheduling debugger. This
+	  function is only useful for ETAO/OS developers. If you
+	  are unsure say 'n' here.
+
+choice
+	prompt "Algorithm"
+	help
+	  Select the scheduling algorithm.
+
+config RR
+	bool "Round robin scheduler"
+	help
+	  Say 'y' here to use the round robin algorithm to
+	  schedule different threads.
+
+endchoice
+
+config THREAD_QUEUE
+	bool "Thread queues"
+	help
+	  Enable support for thread queue's by saying 'y' here.
+	  Thread queue's are a storage mechanism for threads using
+	  the default scheduling policy as its storage mechanism.
+	  You can select a storage mechanism (aka scheduling
+	  algorithm) above.
+
+config EVENT_MUTEX
+	bool "Event mutexes"
+	select THREAD_QUEUE
+	help
+	  Enable to build more efficient mutexes, using
+	  the scheduler to queue threads in a mutex. After
+	  a signal has been given (from either IRQ or non-IRQ
+	  context) the thread will be released into the run queue
+	  again. If unsure say 'y' here.
+
+config DYN_PRIO
+	bool "Dynamic priorities"
+	help
+	  Say 'y' here to enable dynamic priorities. Dynamic
+	  priorities are an extra set of priorites set by
+	  the scheduler to make the scheduling process more fair
+	  and reduce the chance that 2 high priority threads
+	  dead swap the entire scheduling system. If you are
+	  unsure say 'y' here.
+
+config PREEMPT
+	bool "CPU preemption"
+	help
+	  Say 'y' here to enable preemption. Preemption allows
+	  the scheduler to preempt the currently running task at
+	  any given moment.
+
+endif

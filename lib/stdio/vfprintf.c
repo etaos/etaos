@@ -16,14 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file vfprintf.c */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/types.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #define BUFF 16
 #define FLT_DIGITS 2
 
-static int convert_to_num(uint32_t num, uint8_t base, bool sign, 
+static int convert_to_num(uint64_t num, uint8_t base, bool sign, 
 							  bool caps, FILE stream)
 {
 	char buff[BUFF];
@@ -34,7 +41,7 @@ static int convert_to_num(uint32_t num, uint8_t base, bool sign,
 	if(num == 0) {
 		putc('0', stream);
 		return 0;
-	} else if((int32_t)num < 0 && sign) {
+	} else if((int64_t)num < 0 && sign) {
 		putc('-', stream);
 	}
 	
@@ -102,6 +109,39 @@ static void print_flt(double num, FILE output)
 	}
 }
 
+static const char *vfprintf_long_int(va_list ap, const char *fmt, 
+		size_t fmt_i, FILE stream)
+{
+	switch(fmt[fmt_i]) {
+		case 'l':
+			fmt++;
+			if(fmt[fmt_i] == 'i' || fmt[fmt_i] == 'd')
+				convert_to_num(va_arg(ap, unsigned long long),
+					10, true, false, stream);
+			else
+				convert_to_num(va_arg(ap, unsigned long long),
+					10, false, false, stream);
+			break;
+			
+		case 'i':
+		case 'd':
+			convert_to_num(va_arg(ap, unsigned long), 10, true, 
+					false, stream);
+		case 'u':
+			convert_to_num(va_arg(ap, unsigned long), 10, false,
+					false, stream);
+			break;
+	}
+
+	return fmt;
+}
+
+/**
+ * @brief Backend for fprintf, printf, etc
+ * @param stream File to write to.
+ * @param fmt Format string.
+ * @param ap VA list to complete the format string.
+ */
 int vfprintf(FILE stream, const char *fmt, va_list ap)
 {
 	size_t i;
@@ -116,6 +156,10 @@ int vfprintf(FILE stream, const char *fmt, va_list ap)
 #if defined(PRINTF_FLT)
 #warning "vfprintf does NOT support floating points yet!"
 #endif
+			case 'l':
+				fmt++;
+				fmt =  vfprintf_long_int(ap, fmt, i, stream);
+				break;
 
 			case 'i':
 				convert_to_num(va_arg(ap, unsigned int), 10, true, false, stream);
@@ -164,3 +208,4 @@ int vfprintf(FILE stream, const char *fmt, va_list ap)
 	return stream->length;
 }
 
+/** @} */

@@ -3,10 +3,10 @@
 #
 
 VERSION = 0
-PATCHLEVEL = 0
-SUBLEVEL = 1
-EXTRAVERSION =
-NAME = Sheep on Meth
+PATCHLEVEL = 1
+SUBLEVEL = 0
+EXTRAVERSION = rc2
+NAME = Shuffling Donkey
 
 MAKEFLAGS += -rR --no-print-directory
 # DO NOT make these files show up anywhere. For your own safety.
@@ -208,6 +208,9 @@ drivers-y	:= $(patsubst %/, %/built-in.o, $(drivers-y))
 libs-y		:= $(patsubst %/, %/built-in.o, $(libs-y))
 
 etaos-deps := $(head-y) $(init-y) $(core-y) $(drivers-y) $(libs-y)
+etaos-link := $(init-y) $(core-y) $(drivers-y) $(libs-y)
+etaos-head := $(head-y)
+export etaos-deps etaos-head
 
 modules: prepare $(etaos-dirs)
 etaos: prepare $(etaos-img)
@@ -229,7 +232,7 @@ $(etaos-dirs): scripts
 $(sort $(etaos-deps)): $(etaos-dirs) ;
 
 quiet_cmd_link_etaos = LD      $@
-cmd_link_etaos = $(LD) $(LDFLAGS) -r -o $@ $(etaos-deps)
+cmd_link_etaos = $(LD) $(LDFLAGS) -r -o $@ $(etaos-link)
 $(etaos-img): $(etaos-deps)
 	$(call if_changed,link_etaos)
 

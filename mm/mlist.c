@@ -16,25 +16,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file mm/mlist.c */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
-#include <etaos/mutex.h>
+#include <etaos/spinlock.h>
 
-DEFINE_MUTEX(mlock);
+/**
+ * @addtogroup mm
+ * @{
+ */
 
+DEFINE_SPINLOCK(mlock);
+
+/**
+ * @brief Add a block to the mem list.
+ * @param start Starting address of the block.
+ * @param size Size of the block.
+ */
 void mm_heap_add_block(void *start, size_t size)
 {
-	mutex_lock(&mlock);
+	spin_lock(&mlock);
 	if(!mm_head)
 		return;
 
 	mm_init_node(start, size - sizeof(struct heap_node));
-	mutex_unlock(&mlock);
+	spin_unlock(&mlock);
 	kfree(start+sizeof(struct heap_node));
 }
 
+/**
+ * @brief Mark a memory block as used.
+ * @param node Node to mark as used.
+ * @param prev Node precending \p node (i.e. prev->next == node).
+ * @note Set \prev to \p NULL if you are passing the head of the heap.
+ */
 void mm_use_block(struct heap_node *node, struct heap_node *prev)
 {
 	set_bit(MM_ALLOC_FLAG, &node->flags);
@@ -54,12 +72,16 @@ void mm_use_block(struct heap_node *node, struct heap_node *prev)
 	}
 }
 
+/**
+ * @brief calculate how many bytes of memory there are left in the heap.
+ * @return Amount of bytes left in the heap.
+ */
 size_t mm_heap_available(void)
 {
 	struct heap_node *c;
 	size_t total;
 	
-	mutex_lock(&mlock);
+	spin_lock(&mlock);
 	c = mm_head;
 	total = 0;
 	
@@ -68,7 +90,7 @@ size_t mm_heap_available(void)
 		c = c->next;
 	}
 
-	mutex_unlock(&mlock);
+	spin_unlock(&mlock);
 
 #ifdef CONFIG_MMDEBUG
 	printf("Mem avail: %u\n", total);
@@ -76,6 +98,16 @@ size_t mm_heap_available(void)
 	return total;
 }
 
+/**
+ * @brief Merge to nodes.
+ * @param a First node.
+ * @param b Second node.
+ * @return Merged node.
+ * @retval \p NULL if the nodes can't merge.
+ *
+ * The order of the parameters doesn't matter. In other words \p a can be both
+ * the lower and higher node.
+ */
 struct heap_node *mm_merge_node(struct heap_node *a, 
 		struct heap_node *b)
 {
@@ -106,6 +138,15 @@ struct heap_node *mm_merge_node(struct heap_node *a,
 	return a;
 }
 
+/**
+ * @brief Split a node in two.
+ * @param node Node to split.
+ * @param ns New size of \p node.
+ *
+ * The given node \p node will be split in two. The new side of \p node is
+ * given in the \p ns parameter. The new node will, ofcourse be containing
+ * the remaining bytes.
+ */
 void mm_split_node(struct heap_node *node, size_t ns)
 {
 	struct heap_node *next;
@@ -128,37 +169,52 @@ void mm_split_node(struct heap_node *node, size_t ns)
 	node->size = ns;
 }
 
-int mm_return_node(struct heap_node *node)
+/**
+ * @brief Return a node into the heap.
+ * @brief node Node to return.
+ * @return Error code.
+ * @retval 0 If the node was returned succesfully.
+ * @retval -1 If the node couldn't be returned into the heap.
+ */
+int mm_return_node(struct heap_node *block)
 {
-	struct heap_node *carriage;
+	struct heap_node *node;
 
-	clear_bit(MM_ALLOC_FLAG, &node->flags);
+	clear_bit(MM_ALLOC_FLAG, &block->flags);
 
-	if(node < mm_head) {
-		node->next = mm_head;
-		mm_head = node;
+	if(block < mm_head) {
+		block->next = mm_head;
+		mm_head = block;
 		return 0;
 	}
 
-	carriage = mm_head;
-	while(carriage) {
-		if(node > carriage && node < carriage->next) {
-			node->next = carriage->next;
-			carriage->next = node;
-		}
-
-		if(carriage->next == NULL) {
-			carriage->next = node;
-			node->next = NULL;
+	node = mm_head;
+	while(node) {
+		if(block > node && block < node->next) {
+			block->next = node->next;
+			node->next = block;
 			return 0;
 		}
 
-		carriage = carriage->next;
+		if(node->next == NULL) {
+			node->next = block;
+			block->next = NULL;
+			return 0;
+		}
+
+		node = node->next;
 	}
 
 	return -1;
 }
 
+/**
+ * @brief Mark a node as used.
+ * @param node Node to mark as used.
+ * @return Error code.
+ * @retval 0 on success.
+ * @retval -1 if the given node was invalid.
+ */
 int mm_use_node(struct heap_node *node)
 {
 	if(node->magic != MM_MAGIC_BYTE)
@@ -167,6 +223,11 @@ int mm_use_node(struct heap_node *node)
 	return 0;
 }
 
+/**
+ * @brief Initialise a new node.
+ * @param node Node to initialise.
+ * @param size Size of \p node.
+ */
 void mm_init_node(struct heap_node *node, size_t size)
 {
 	node->magic = MM_MAGIC_BYTE;
@@ -175,3 +236,4 @@ void mm_init_node(struct heap_node *node, size_t size)
 	node->flags = 0UL;
 }
 
+/** @} */

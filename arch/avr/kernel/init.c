@@ -21,32 +21,43 @@
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 #include <etaos/mem.h>
+#include <etaos/init.h>
 
+#include <asm/sched.h>
+#include <asm/time.h>
 #include <asm/io.h>
+#include <asm/cpu.h>
 #include <asm/simulavr.h>
 #include <asm/usart.h>
 
 extern void avr_init(void);
-extern unsigned char __heap_start;
-extern int main(void);
+extern void avr_install_irqs(void);
+extern char __heap_start;
+static const char *mm_heap_start = &__heap_start;
 
 void avr_init(void)
 {
 #ifdef CONFIG_MALLOC
-	size_t hsize = RAMEND - CONFIG_STACK_SIZE - (size_t)&__heap_start;
-	mm_init((void*)&__heap_start, hsize);
+	size_t hsize = RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
+	mm_init((void*)mm_heap_start, hsize);
 #endif
 
 #ifdef CONFIG_VFS
 	vfs_init();
 #endif
-
-#ifdef CONFIG_STDIO_SIMUL_AVR
-	simul_avr_setup_streams();
-#elif CONFIG_STDIO_USART
-	avr_setup_usart_streams();
+#if defined(CONFIG_ATMEGA_USART) || defined(CONFIG_ATMEGA_USART_MODULE)
+	atmega_usart_init();
 #endif
-	main();
+#ifdef CONFIG_TIMER
+	avr_timer_init();
+#endif
+	irq_enable();
+#ifdef CONFIG_SCHED
+	avr_init_sched();
+	sched_init();
+#else
+	main_init();
+#endif
 
 	while(1);
 }

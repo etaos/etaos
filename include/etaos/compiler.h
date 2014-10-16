@@ -23,4 +23,8 @@
 #include <etaos/compiler-gcc.h>
 #endif
 
+#ifndef __hot
+#define __hot
+#endif
+
 #endif

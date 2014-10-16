@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file avr/include/asm/bitops.h
+ */
+
 #ifndef __AVR_BITOPS_H_
 #define __AVR_BITOPS_H_
 
@@ -26,44 +30,60 @@
 #define BITS_PER_LONG 32UL
 #define BITS_PER_BYTE  8UL
 
-static inline void clear_bit(unsigned nr, volatile unsigned long *flags)
+/**
+ * @brief Clear a bit in register.
+ * @param nr Bit to clear.
+ * @param flags Register that contains \p nr.
+ */
+static inline void clear_bit(unsigned nr, volatile void *flags)
 {
-	unsigned char *p = ((unsigned char*)flags) + (nr / BITS_PER_BYTE);
+	volatile unsigned char *p = ((volatile unsigned char*)flags) + (nr / BITS_PER_BYTE);
 	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	unsigned char tmp;
+	volatile unsigned char tmp;
 
 	__asm__ __volatile__(
 			"ld %0, %a2"	"\n\t"
 			"com %3"	"\n\t"
 			"and %0, %3"	"\n\t"
 			"st %a1, %0"	"\n\t"
-			: "=&d" (tmp), "=e" (p)
-			: "e" (p), "d" (msk)
+			: "=&r" (tmp), "=z" (p)
+			: "z" (p), "r" (msk)
 			: "memory"
 			);
 }
 
-static inline void set_bit(unsigned nr, volatile unsigned long *addr)
+/**
+ * @brief Set a bit in a register.
+ * @param nr Bit to set.
+ * @param addr Register containing \p nr.
+ */
+static inline void set_bit(unsigned nr, volatile void *addr)
 {
-	unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);
+	volatile unsigned char *p = ((volatile unsigned char*)addr) + (nr / BITS_PER_BYTE);
 	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	unsigned char tmp;
+	volatile unsigned char tmp;
 
 	__asm__ __volatile__(
 			"ld %0, %a2"	"\n\t"
 			"or %0, %3"	"\n\t"
 			"st %a1, %0"	"\n\t"
-			: "=&d" (tmp), "=e" (p)
-			: "e" (p), "d" (msk)
+			: "=&r" (tmp), "=z" (p)
+			: "z" (p), "r" (msk)
 			: "memory"
 			);
 }
 
-static inline int test_and_clear_bit(unsigned nr, volatile unsigned long *addr)
+/**
+ * @brief Clear a bit in register and return the value of \p nr before clearing.
+ * @param nr Bit to clear.
+ * @param flags Register that contains \p nr.
+ * @return Initial bit value of bit \p nr.
+ */
+static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
 {
-	unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);
+	volatile unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);
 	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	unsigned char tmp, old;
+	volatile unsigned char tmp, old;
 
 	__asm__ __volatile__(
 			"ld %0, %a3"	"\n\t"
@@ -72,18 +92,24 @@ static inline int test_and_clear_bit(unsigned nr, volatile unsigned long *addr)
 			"com %4"	"\n\t"
 			"and %0, %4"	"\n\t"
 			"st %a1, %0"	"\n\t"
-			: "=&r" (tmp), "=e" (p), "=&r" (old)
-			: "e" (p), "d" (msk)
+			: "=&r" (tmp), "=z" (p), "=&r" (old)
+			: "z" (p), "d" (msk)
 			: "memory"
 			);
 	return old != 0;
 }
 
-static inline int test_and_set_bit(unsigned nr, volatile unsigned long *addr)
+/**
+ * @brief Set a bit in register and return the value of \p nr before setting it.
+ * @param nr Bit to set.
+ * @param flags Register that contains \p nr.
+ * @return Initial bit value of bit \p nr.
+ */
+static inline int test_and_set_bit(unsigned nr, volatile void *addr)
 {
-	unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);
+	volatile unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);
 	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	unsigned char tmp, old;
+	volatile unsigned char tmp, old;
 
 	__asm__ __volatile__(
 			"ld %0, %a3"	"\n\t"
@@ -91,8 +117,8 @@ static inline int test_and_set_bit(unsigned nr, volatile unsigned long *addr)
 			"and %2, %4"	"\n\t"
 			"or %0, %4"	"\n\t"
 			"st %a1, %0"	"\n\t"
-			: "=&r" (tmp), "=e" (p), "=&r" (old)
-			: "e" (p), "d" (msk)
+			: "=&r" (tmp), "=z" (p), "=&r" (old)
+			: "z" (p), "d" (msk)
 			: "memory"
 			);
 	return old != 0;

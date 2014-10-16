@@ -20,6 +20,19 @@
 #include <etaos/types.h>
 #include <etaos/string.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
+/**
+ * @brief Determine the length of the string, while using a maximum.
+ * @param str String to determine the length of.
+ * @param size Maximum amount of characters to check in \p str.
+ * @return An integer smaller than or equal to size, according to whether
+ *         the length of \p str is smaller than equal to or greater than
+ *         \p size.
+ */
 int strnlen(const char *str, size_t size)
 {
 	size_t slen = (size_t)strlen(str);
@@ -29,3 +42,6 @@ int strnlen(const char *str, size_t size)
 	else
 		return slen;
 }
+
+/** @} */
+
