@@ -16,6 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/evm.h
+ */
+
+/**
+ * @addtogroup evm
+ */
+/* @{ */
+
 #ifndef __EVM_HEADER_H__
 #define __EVM_HEADER_H__
 
@@ -27,6 +36,12 @@ extern int evm_wait_event_queue(struct thread_queue *qp, unsigned ms);
 extern void evm_signal_from_irq(struct thread_queue *qp);
 extern int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms);
 
+/**
+ * @brief Put the thread in in an infinite wait for an event.
+ */
 #define EVM_WAIT_INFINITE 0
 
 #endif
+
+/* @} */
+

@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup thread
+ */
+/*@{*/
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -26,6 +31,16 @@
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
 
+/**
+ * @brief Thread initialise backend.
+ * @param tp Thread pointer.
+ * @param name Name of the thread.
+ * @param handle Thread handle function pointer.
+ * @param arg Thread argument.
+ * @param stack_size Size of the stack.
+ * @param stack Pointer to the stack.
+ * @param prio Priority of the thread.
+ */
 static void raw_thread_init(struct thread *tp, char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack, unsigned char prio)
@@ -65,6 +80,16 @@ void sched_init_idle(struct thread *tp, char *name,
 	raw_thread_init(tp, name, handle, arg, stack_size, stack, 255);
 }
 
+/**
+ * @brief Thread initialise backend.
+ * @param name Name of the thread.
+ * @param handle Thread handle function pointer.
+ * @param arg Thread argument.
+ * @param stack_size Size of the stack.
+ * @param stack Pointer to the stack.
+ * @param prio Priority of the thread.
+ * @return A pointer to the newly created thread.
+ */
 struct thread *thread_create(char *name, thread_handle_t handle, void *arg,
 			size_t stack_size, void *stack, unsigned char prio)
 {
@@ -78,6 +103,16 @@ struct thread *thread_create(char *name, thread_handle_t handle, void *arg,
 	return tp;
 }
 
+/**
+ * @brief Initialise a new thread.
+ * @param tp Pointer to the thread which has to be initialised.
+ * @param name Name of the thread.
+ * @param handle Thread handle function pointer.
+ * @param arg Thread argument.
+ * @param stack_size Size of the stack.
+ * @param stack Pointer to the stack.
+ * @param prio Priority of the thread.
+ */
 int thread_initialise(struct thread *tp, char *name, thread_handle_t handle, 
 		void *arg, size_t stack_size, void *stack, unsigned char prio)
 {
@@ -93,6 +128,10 @@ int thread_initialise(struct thread *tp, char *name, thread_handle_t handle,
 	return -EOK;
 }
 
+/**
+ * @brief Kill the current thread.
+ * @note This function doesn't return.
+ */
 void kill(void)
 {
 	struct thread *tp;
@@ -106,6 +145,11 @@ void kill(void)
 	schedule();
 }
 
+/**
+ * @brief Put the current thread in a waiting state.
+ * @note This function doesn't return untill it is signaled.
+ * @see signal
+ */
 void wait(void)
 {
 	struct thread *tp;
@@ -117,6 +161,11 @@ void wait(void)
 	schedule();
 }
 
+/**
+ * @brief Signal a waiting thread.
+ * @param tp Thread which has to be signaled.
+ * @see wait
+ */
 void signal(struct thread *tp)
 {
 	struct rq *rq;
@@ -124,13 +173,23 @@ void signal(struct thread *tp)
 	if(!tp)
 		return;
 
-	clear_bit(THREAD_WAITING_FLAG, &tp->flags);
-	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-	rq = sched_get_cpu_rq();
-	rq_add_thread(rq, tp);
-	yield();
+	if(test_and_clear_bit(THREAD_WAITING_FLAG, &tp->flags))
+	{
+		set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+		rq = sched_get_cpu_rq();
+		rq_add_thread(rq, tp);
+		yield();
+	}
 }
 
+/**
+ * @brief Yield the current thread, if necessary.
+ * @see schedule
+ *
+ * The current thread will be scheduled out if there is another thread on the
+ * run queue (i.e. another thread ready to run) with a higher priority than
+ * the calling thread.
+ */
 void yield(void)
 {
 	struct rq *rq;
@@ -148,6 +207,10 @@ void yield(void)
 	}
 }
 
+/**
+ * @brief Put the current thread to sleep.
+ * @param ms Miliseconds to sleep.
+ */
 void sleep(unsigned ms)
 {
 	struct thread *tp = current_thread();
@@ -157,6 +220,10 @@ void sleep(unsigned ms)
 	schedule();
 }
 
+/**
+ * @brief Get a pointer to the current thread.
+ * @return A pointer to the current thread.
+ */
 struct thread *current_thread(void)
 {
 	struct rq *rq;
@@ -165,3 +232,4 @@ struct thread *current_thread(void)
 	return rq->current;
 }
 
+/* @} */

@@ -102,14 +102,20 @@ static inline void *kzalloc(size_t size)
 
 /**
  * @brief Allocate a new memory region.
- * @param __s Size of the memory region to allocate
+ * @param size Size of the memory region to allocate
  */
-#define kmalloc(__s) mm_alloc(__s)
+static inline void *kmalloc(size_t size)
+{
+	return mm_alloc(size);
+}
 /**
  * @brief Free an allocated memory region.
- * @param __ptr Memory region to free.
+ * @param size Memory region to free.
  */
-#define kfree(__ptr) mm_kfree(__ptr)
+static inline void kfree(void *ptr)
+{
+	mm_kfree(ptr);
+}
 
 /** @} */
 #endif

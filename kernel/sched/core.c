@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup sched
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/init.h>
@@ -40,6 +45,11 @@ void thread_wake_up_from_irq(struct thread *thread)
 }
 
 #ifdef CONFIG_THREAD_QUEUE
+/**
+ * @brief Add a new thread to a queue.
+ * @param qp Queue to add to.
+ * @param tp Thread to add.
+ */
 static void raw_queue_add_thread(struct thread_queue *qp,
 					struct thread *tp)
 {
@@ -58,6 +68,12 @@ static void raw_queue_add_thread(struct thread_queue *qp,
 		cp->queue_add(qp, tp);
 }
 
+/**
+ * @brief Remove a thread from a thread_queue.
+ * @param qp Queue to remove from.
+ * @param tp Thread which has to be removed.
+ * @note No queue locks are aquired.
+ */
 static void raw_queue_remove_thread(struct thread_queue *qp,
 						struct thread *tp)
 {
@@ -68,6 +84,11 @@ static void raw_queue_remove_thread(struct thread_queue *qp,
 		cp->queue_rm(qp, tp);
 }
 
+/**
+ * @brief Add a new thread to a queue.
+ * @param qp Queue to add to.
+ * @param tp Thread to add.
+ */
 void queue_add_thread(struct thread_queue *qp, struct thread *tp)
 {
 	unsigned long flags;
@@ -77,6 +98,11 @@ void queue_add_thread(struct thread_queue *qp, struct thread *tp)
 	raw_spin_unlock_irqrestore(&qp->lock, flags);
 }
 
+/**
+ * @brief Remove a thread from a thread_queue.
+ * @param qp Queue to remove from.
+ * @param tp Thread which has to be removed.
+ */
 void queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 {
 	unsigned long flags;
@@ -87,6 +113,13 @@ void queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 }
 #endif
 
+/**
+ * @brief Remove a thread from the rq_list.
+ * @param tp Thread to remove.
+ * @param tpp Root queue pointer.
+ * @return Error code.
+ * @retval -EOK on success.
+ */
 static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
 {
 	struct thread *carriage;
@@ -110,6 +143,12 @@ static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
 	return -EOK;
 }
 
+/**
+ * @brief Remove a thread from a rq.
+ * @param rq RQ to remove from.
+ * @param tp Thread to remove.
+ * @note No locks are aquired.
+ */
 void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 {
 	unsigned long flags;
@@ -119,6 +158,11 @@ void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 	irq_restore(&flags);
 }
 
+/**
+ * @brief Remove a thread from the kill queue.
+ * @param rq RQ to remove from.
+ * @param tp Thread to remove.
+ */
 void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 {
 	unsigned long flags;
@@ -128,6 +172,11 @@ void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 	irq_restore(&flags);
 }
 
+/**
+ * @brief Remove a thread from a rq.
+ * @param rq RQ to remove from.
+ * @param tp Thread to remove.
+ */
 void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 {
 	raw_spin_lock(&rq->lock);
@@ -135,6 +184,11 @@ void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 	raw_spin_unlock(&rq->lock);
 }
 
+/**
+ * @brief Remove a thread from the kill queue.
+ * @param rq RQ to remove from.
+ * @param tp Thread to remove.
+ */
 void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 {
 	raw_spin_lock(&rq->lock);
@@ -142,11 +196,21 @@ void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 	raw_spin_unlock(&rq->lock);
 }
 
+/**
+ * @brief Add a thread to rq_list.
+ * @param new Thread to add.
+ * @param head New is add after this thread
+ */
 static inline void rq_list_add(struct thread *new, struct thread *head)
 {
 	new->rq_next = head;
 }
 
+/**
+ * @brief Add a wake thread.
+ * @param rq RQ to add to.
+ * @param new Thread to add.
+ */
 static void rq_add_wake_thread(struct rq *rq, struct thread *new)
 {
 	new->rq = rq;
@@ -154,6 +218,11 @@ static void rq_add_wake_thread(struct rq *rq, struct thread *new)
 	rq->wake_queue = new;
 }
 
+/**
+ * @brief Add a kill thread.
+ * @param rq RQ to add to.
+ * @param new Thread to add.
+ */
 static void rq_add_kill_thread(struct rq *rq, struct thread *new)
 {
 	new->rq = rq;
@@ -161,6 +230,10 @@ static void rq_add_kill_thread(struct rq *rq, struct thread *new)
 	rq->kill_queue = new;
 }
 
+/**
+ * @brief Add a wake thread to the current RQ.
+ * @param tp Thread to add.
+ */
 void raw_thread_add_to_wake_q(struct thread *tp)
 {
 	struct rq *rq;
@@ -169,6 +242,10 @@ void raw_thread_add_to_wake_q(struct thread *tp)
 	rq_add_wake_thread(rq, tp);
 }
 
+/**
+ * @brief Add a kill thread to the current RQ.
+ * @param tp Thread to add.
+ */
 void raw_thread_add_to_kill_q(struct thread *tp)
 {
 	struct rq *rq;
@@ -177,6 +254,10 @@ void raw_thread_add_to_kill_q(struct thread *tp)
 	rq_add_kill_thread(rq, tp);
 }
 
+/**
+ * @brief Add a wake thread to the current RQ.
+ * @param tp Thread to add.
+ */
 void thread_add_to_wake_q(struct thread *tp)
 {
 	struct rq *rq;
@@ -188,6 +269,10 @@ void thread_add_to_wake_q(struct thread *tp)
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
+/**
+ * @brief Add a kill thread to the current RQ.
+ * @param tp Thread to add.
+ */
 void thread_add_to_kill_q(struct thread *tp)
 {
 	struct rq *rq;
@@ -199,6 +284,11 @@ void thread_add_to_kill_q(struct thread *tp)
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
+/**
+ * @brief Add a thread to a run queue.
+ * @param rq Run queue to add \p tp to.
+ * @param tp Thread to add.
+ */
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp)
 {
 	struct sched_class *class = rq->sched_class;
@@ -211,6 +301,11 @@ static void raw_rq_add_thread(struct rq *rq, struct thread *tp)
 	return;
 }
 
+/**
+ * @brief Add a thread to a run queue.
+ * @param tp Thread to add.
+ * @note No locks are aquired.
+ */
 void rq_add_thread_no_lock(struct thread *tp)
 {
 	struct rq *rq;
@@ -226,6 +321,11 @@ void rq_add_thread_no_lock(struct thread *tp)
 	return;
 }
 
+/**
+ * @brief Add a thread to a run queue.
+ * @param rq Run queue to add \p tp to.
+ * @param tp Thread to add.
+ */
 int rq_add_thread(struct rq *rq, struct thread *tp)
 {
 	int err;
@@ -247,6 +347,11 @@ int rq_add_thread(struct rq *rq, struct thread *tp)
 	return err;
 }
 
+/**
+ * @brief Remove a thread from a run queue without rescheduling.
+ * @param rq RQ to remove from.
+ * @param tp Thread to remove.
+ */
 int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp)
 {
 	struct sched_class *class;
@@ -273,6 +378,11 @@ int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp)
 	return err;
 }
 
+/**
+ * @brief Remove a thread from a run queue.
+ * @param rq RQ to add to.
+ * @param tp Thread to remove.
+ */
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 {
 	int err;
@@ -287,6 +397,10 @@ static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 	return err;
 }
 
+/**
+ * @brief Remove a thread from a run queue.
+ * @param tp Thread to remove.
+ */
 int rq_remove_thread(struct thread *tp)
 {
 	int err;
@@ -305,6 +419,11 @@ int rq_remove_thread(struct thread *tp)
 	return err;
 }
 
+/**
+ * @brief Update a run queue.
+ * @param rq Run queue to update.
+ * @note Calls sched_class::post_schedule.
+ */
 static void rq_update(struct rq *rq)
 {
 	struct sched_class *class;
@@ -314,6 +433,11 @@ static void rq_update(struct rq *rq)
 		class->post_schedule(rq);
 }
 
+/**
+ * @brief Timer handle for sleeping threads.
+ * @param timer Timer pointer.
+ * @param arg Timer argument, which points to the sleeping thread.
+ */
 static void sched_sleep_timeout(struct timer *timer, void *arg)
 {
 	struct thread *tp;
@@ -327,6 +451,11 @@ static void sched_sleep_timeout(struct timer *timer, void *arg)
 	raw_rq_add_thread(rq, tp);
 }
 
+/**
+ * @brief Prepare a thread to go into sleeping mode.
+ * @param tp Thread to prepare.
+ * @param ms Time to sleep in miliseconds.
+ */
 void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 {
 	struct rq *rq;
@@ -339,6 +468,10 @@ void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 			tp, TIMER_ONESHOT_MASK);
 }
 
+/**
+ * @brief Obtain the next runnable task of a run queue.
+ * @param rq Run queue to get the next runnable from.
+ */
 static struct thread *sched_get_next_runnable(struct rq *rq)
 {
 	struct thread *next;
@@ -355,11 +488,20 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
 	}
 }
 
+/**
+ * @brief Destroy the kill queue.
+ * @param rq Run queue containing the kill queue head.
+ */
 static void rq_destory_kill_q(struct rq *rq)
 {
-	struct thread *walker;
+	struct thread *walker, *tmp;
 
-	for(walker = rq->kill_queue; walker; walker = walker->rq_next) {
+	walker = rq->kill_queue;
+	if(!walker)
+		return;
+
+	for(tmp = walker->rq_next; walker; 
+			walker = tmp, tmp = walker->rq_next) {
 		raw_rq_remove_kill_thread(rq, walker);
 		sched_free_stack_frame(walker);
 		kfree(walker);
@@ -367,10 +509,22 @@ static void rq_destory_kill_q(struct rq *rq)
 }
 
 #ifdef CONFIG_DYN_PRIO
+/**
+ * @def dyn_prio_reset
+ * @brief Reset the dynamic priority.
+ * @param __t Thread to reset the dynamic priority for.
+ */
 #define dyn_prio_reset(__t) (__t)->dprio = 0;
 #else
 #define dyn_prio_reset(__t)
 #endif
+
+/**
+ * @brief Switch context on a given run queue.
+ * @param rq Run queue to use for the context.
+ * @param prev Previous thread.
+ * @param new New thread to replace \p prev.
+ */
 static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 						struct thread *new)
 {
@@ -399,6 +553,11 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 }
 
 #ifdef CONFIG_EVENT_MUTEX
+/**
+ * @brief Signal a thread on a wake queue.
+ * @param rq Run queue of the thread.
+ * @param tp Thread to signal.
+ */
 static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 {
 	struct thread_queue *qp;
@@ -431,7 +590,23 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 }
 #endif
 
+/**
+ * @def current
+ * @param _rq Run queue to get the current thread from.
+ */
 #define current(_rq) ((_rq)->current)
+/**
+ * @brief Reschedule the current run queue.
+ * @return True or false based on whether there has been a context switch
+ *         or not.
+ * @retval true if there has been a context switch.
+ * @retval false if there has not been a context switch.
+ * @note This function also updates:
+ * 	   - Threads signaled from an IRQ;
+ * 	   - Timers;
+ * 	   - Threads which have used up their time slice;
+ * 	   - the kill queue of the run queue.
+ */
 static bool __hot rq_schedule(void)
 {
 	struct rq *rq;
@@ -507,6 +682,11 @@ resched:
 	return did_switch;
 }
 
+/**
+ * @brief Reschedule the current run queue.
+ *
+ * It also updates the dynamic priorities.
+ */
 void __hot schedule(void)
 {
 #ifdef CONFIG_DYN_PRIO
@@ -540,6 +720,10 @@ THREAD(idle_thread_func, arg)
 	}
 }
 
+/**
+ * @brief Initialise the scheduler.
+ * @note This function doesn't return.
+ */
 void sched_init(void)
 {
 	struct rq *rq;
@@ -575,6 +759,12 @@ void __preempt_sub(int num)
 }
 #endif
 
+/**
+ * @brief Check if a reschedule is needed.
+ * @return True or false based on whether a resched is needed or not.
+ * @retval true if a resched is needed.
+ * @retval false if no resched is needed.
+ */
 bool should_resched(void)
 {
 	struct thread *tp = current_thread();
@@ -586,6 +776,11 @@ bool should_resched(void)
 }
 
 #ifdef CONFIG_DYN_PRIO
+/**
+ * @brief Get the priority of a thread.
+ * @param tp Thread to calculate the priority off.
+ * @return The priority of \p tp.
+ */
 unsigned char prio(struct thread *tp)
 {
 	unsigned char retval;
@@ -607,4 +802,6 @@ unsigned char prio(struct thread *tp)
 		return 0;
 }
 #endif
+
+/* @} */
 
