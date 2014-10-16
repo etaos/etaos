@@ -34,6 +34,11 @@
 static DEFINE_THREAD_QUEUE(irq_thread_queue);
 static void irq_thread_wait();
 
+/**
+ * @brief Threaded IRQ handle.
+ * @param data IRQ data.
+ * @note This function is a thread handle.
+ */
 void irq_handle_fn(void *data)
 {
 	struct irq_data *irq = data;
@@ -107,6 +112,12 @@ void irq_handle(int irq)
 }
 
 #ifdef CONFIG_IRQ_THREAD
+/**
+ * @brief Put an IRQ thread in a waiting state.
+ * @note The thread wont wake up until it is signaled and woken up by
+ *       irq_signal_threads.
+ * @see irq_signal_threads schedule
+ */
 static void irq_thread_wait(void)
 {
 	struct thread *tp;
@@ -119,6 +130,11 @@ static void irq_thread_wait(void)
 	schedule();
 }
 
+/**
+ * @brief Wake up all signaled IRQ threads.
+ * @param rq Run queue to add threads to when they wake up.
+ * @warning Applications shouldn't call this function.
+ */
 void irq_signal_threads(struct rq *rq)
 {
 

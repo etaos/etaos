@@ -89,7 +89,7 @@ void irq_restore(unsigned long *flags)
 #define IRQ_THREAD_PRIO 20
 /**
  * @brief Request a threaded IRQ.
- * @param irq IRQ data.
+ * @param data IRQ data.
  */
 static int irq_request_threaded_irq(struct irq_thread_data *data)
 {
