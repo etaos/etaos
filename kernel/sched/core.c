@@ -492,7 +492,7 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
  * @brief Destroy the kill queue.
  * @param rq Run queue containing the kill queue head.
  */
-static void rq_destory_kill_q(struct rq *rq)
+static void rq_destroy_kill_q(struct rq *rq)
 {
 	struct thread *walker, *tmp;
 
@@ -500,12 +500,14 @@ static void rq_destory_kill_q(struct rq *rq)
 	if(!walker)
 		return;
 
+	raw_spin_lock_irq(&rq->lock);
 	for(tmp = walker->rq_next; walker; 
 			walker = tmp, tmp = walker->rq_next) {
 		raw_rq_remove_kill_thread(rq, walker);
 		sched_free_stack_frame(walker);
 		kfree(walker);
 	}
+	raw_spin_unlock_irq(&rq->lock);
 }
 
 #ifdef CONFIG_DYN_PRIO
@@ -678,7 +680,7 @@ resched:
 	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
 		goto resched;
 
-	rq_destory_kill_q(rq);
+	rq_destroy_kill_q(rq);
 	return did_switch;
 }
 
