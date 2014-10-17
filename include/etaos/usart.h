@@ -74,6 +74,7 @@ struct usart {
 };
 
 extern int usart_initialise(struct usart *usart);
+extern void setup_usart_streams(struct usart *uart);
 
 #endif
 

@@ -116,6 +116,9 @@ void atmega_usart_init(void)
 
 	spinlock_init(&(atmega_usart.bus_lock));
 	usart_initialise(&atmega_usart);
+#ifdef CONFIG_STDIO_USART
+	setup_usart_streams(&atmega_usart);
+#endif
 }
 
 /* @} */

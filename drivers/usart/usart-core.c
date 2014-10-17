@@ -71,6 +71,16 @@ static struct dev_file_ops usart_fops = {
 	.get = &usart_getc,
 };
 
+void setup_usart_streams(struct usart *usart)
+{
+	FILE usart_stream;
+
+	usart_stream = dev_to_file(&usart->dev);
+	stdout = usart_stream;
+	stdin = usart_stream;
+	stderr = usart_stream;
+}
+
 /**
  * @brief Initialise a new USART device.
  * @param usart USART which has to be initialised.
@@ -79,7 +89,6 @@ static struct dev_file_ops usart_fops = {
  */
 int usart_initialise(struct usart *usart)
 {
-	FILE usart_stream;
 	int err;
 
 	err = device_initialize(&usart->dev, &usart_fops);
@@ -87,13 +96,6 @@ int usart_initialise(struct usart *usart)
 		return err;
 
 	usart->dev.dev_data = usart;
-	usart_stream = dev_to_file(&usart->dev);
-
-#ifdef CONFIG_STDIO_USART
-	stdout = usart_stream;
-	stdin = usart_stream;
-	stderr = usart_stream;
-#endif
 
 	return -EOK;
 }
