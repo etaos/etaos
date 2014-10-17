@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - VFS driver.
- *  Copyright (C) 2012   Michel Megens
+ *  ETA/OS - LibC write
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __VFS_H__
-#define __VFS_H__
-
 #include <etaos/kernel.h>
+#include <etaos/error.h>
 #include <etaos/stdio.h>
+#include <etaos/bitops.h>
 
-extern void vfs_init(void);
-extern void vfs_add(FILE file);
-extern int vfs_delete(FILE f);
-extern FILE vfs_find(const char *name);
+/**
+ * @ingroup libc
+ * @brief Write to a file.
+ * @param fd File descriptor to write to.
+ * @param buff Buffer to write into.
+ * @param size Size of \p buff.
+ */
+int write(int fd, const void *buff, size_t size)
+{
+	FILE file;
 
-#endif
+	file = __iob[fd];
+	if(!file)
+		return -EINVAL;
+
+	if(test_bit(STREAM_WRITE_FLAG, &file->flags) && file->write)
+		return file->write(file, buff, size);
+	else
+		return -EINVAL;
+}
+

@@ -22,6 +22,8 @@
 /* @{ */
 
 #include <etaos/kernel.h>
+#include <etaos/error.h>
+#include <etaos/string.h>
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 
@@ -46,6 +48,23 @@ int iob_add(FILE stream)
 		}
 	}
 	return -1;
+}
+
+/**
+ * @brief Remove a file from the FD array.
+ * @param fd File descriptor to remove.
+ * @retval -EOK on success.
+ * @retval -EINVAL on error.
+ */
+int iob_remove(int fd)
+{
+	if(__iob[fd]) {
+		__iob[fd]->fd = 0;
+		__iob[fd] = NULL;
+		return -EOK;
+	} else {
+		return -EINVAL;
+	}
 }
 
 /**
@@ -92,4 +111,22 @@ int vfs_delete(FILE file)
 	return -1;
 }
 
+/**
+ * @brief Find a file in the VFS.
+ * @param name Name to look for.
+ * @return The file pointer.
+ * @retval NULL on error (i.e. file not found).
+ */
+FILE vfs_find(const char *name)
+{
+	FILE walker;
+
+	for(walker = vfshead; walker; walker = walker->next) {
+		if(strcmp(walker->name, name) == 0)
+			return walker;
+	}
+
+	return NULL;
+}
 /* @} */
+

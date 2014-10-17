@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - VFS driver.
+ *  ETA/OS - LibC close
  *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,15 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __VFS_H__
-#define __VFS_H__
-
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
+#include <etaos/vfs.h>
 
-extern void vfs_init(void);
-extern void vfs_add(FILE file);
-extern int vfs_delete(FILE f);
-extern FILE vfs_find(const char *name);
-
-#endif
+/**
+ * @ingroup libc
+ * @brief Close a file.
+ * @param fd File descriptor to close.
+ */
+void close(int fd)
+{
+	iob_remove(fd);
+}

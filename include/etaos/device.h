@@ -76,7 +76,7 @@ struct dev_file_ops {
 	int (*open)(struct file*); //!< Open a file.
 	int (*close)(struct file*); //!< File close.
 	int (*read)(struct file*, void*, size_t); //!< Read from a file.
-	int (*write)(struct file*, void*, size_t); //!< Write to a file.
+	int (*write)(struct file*, const void*, size_t); //!< Write to a file.
 	int (*flush)(struct file*); //!< Flush the file.
 	int (*put)(int c, struct file*); //!< Write 1 byte to a file.
 	int (*get)(struct file*); //!< Read 1 byte from a file.

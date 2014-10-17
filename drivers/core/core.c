@@ -28,6 +28,7 @@
 #include <etaos/device.h>
 #include <etaos/error.h>
 #include <etaos/mem.h>
+#include <etaos/vfs.h>
 
 /**
  * @addtogroup dev-core Device driver core
@@ -118,6 +119,9 @@ int device_initialize(struct device *dev, struct dev_file_ops *fops)
 	dev->release = &dev_release;
 	mutex_init(&dev->dev_lock);
 
+	dev->file.next = NULL;
+	dev->file.name = dev->name;
+	vfs_add(&dev->file);
 	dev_set_fops(dev, fops);
 
 	list_add(&dev->devs, &dev_root);
@@ -134,6 +138,7 @@ static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 	if(!fops)
 		return -EINVAL;
 
+	file = &dev->file;
 	file->open = fops->open;
 	file->write = fops->write;
 	file->read = fops->read;
