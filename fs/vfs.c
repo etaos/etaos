@@ -17,6 +17,8 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/error.h>
+#include <etaos/string.h>
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 
@@ -35,6 +37,17 @@ int iob_add(FILE stream)
 		}
 	}
 	return -1;
+}
+
+int iob_remove(int fd)
+{
+	if(__iob[fd]) {
+		__iob[fd]->fd = 0;
+		__iob[fd] = NULL;
+		return -EOK;
+	} else {
+		return -EINVAL;
+	}
 }
 
 void vfs_init(void)
@@ -66,5 +79,17 @@ int vfs_delete(FILE file)
 	}
 
 	return -1;
+}
+
+FILE vfs_find(const char *name)
+{
+	FILE walker;
+
+	for(walker = vfshead; walker; walker = walker->next) {
+		if(strcmp(walker->name, name) == 0)
+			return walker;
+	}
+
+	return NULL;
 }
 

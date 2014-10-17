@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - VFS driver.
- *  Copyright (C) 2012   Michel Megens
+ *  ETA/OS - STDIO open
+ *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __VFS_H__
-#define __VFS_H__
-
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
+#include <etaos/error.h>
+#include <etaos/vfs.h>
 
-extern void vfs_init(void);
-extern void vfs_add(FILE file);
-extern int vfs_delete(FILE f);
-extern FILE vfs_find(const char *name);
+/**
+ * @ingroup libc
+ * @brief Open a file on the virtual file system.
+ * @param name File name to look for.
+ * @param flags File flags.
+ */
+int open(const char *name, unsigned long flags)
+{
+	FILE file;
 
-#endif
+	file = vfs_find(name);
+	if(file) {
+		file->flags = flags;
+		iob_add(file);
+		return file->fd;
+	}
+
+	return -EINVAL;
+}

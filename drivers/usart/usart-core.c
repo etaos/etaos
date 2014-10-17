@@ -32,7 +32,7 @@ static inline struct usart *to_usart_dev(FILE file)
 	return dev->dev_data;
 }
 
-static int usart_write(FILE file, void *buff, size_t len)
+static int usart_write(FILE file, const void *buff, size_t len)
 {
 	struct usart *usart;
 
