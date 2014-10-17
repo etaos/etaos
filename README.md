@@ -67,9 +67,10 @@ to start the configuration process.
 
 When you are finished configuring the project run the following make commands
 to fully build ETA/OS:
-    make prepare ARCH=<archname>
-    make all ARCH=<archname>
-    make modules_install ARCH=<archname> INSTALL_MOD_PATH=<path>
+
+    make prepare ARCH=archname
+    make all ARCH=archname
+    make modules_install ARCH=archname INSTALL_MOD_PATH=path
 
 After that, you are ready to compile an application. To compile an application
 you need application sources and Kbuild file in a sepperate directory (anywhere).
