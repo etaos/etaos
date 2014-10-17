@@ -29,14 +29,14 @@
 #define MAX_OPEN 16
 
 /* file flags */
-#define __SRD	0x0001		/* OK to read */
-#define __SWR	0x0002		/* OK to write */
-#define __SRWB  0x0004		/* Read/write from buffer */
-#define __SPGM	0x0008		/* fmt string is in progmem */
-#define __SERR	0x0010		/* found error */
-#define __SEOF	0x0020		/* found EOF */
-#define __SUNGET 0x040		/* ungetc() happened */
-#define __SMALLOC 0x80		/* handle is malloc()ed */
+#define __SRD	0x0001 //!< OK to read
+#define __SWR	0x0002 //!< OK to write
+#define __SRWB  0x0004 //!< Read/write from buffer
+#define __SPGM	0x0008 //!< fmt string is in progmem
+#define __SERR	0x0010 //!< found error
+#define __SEOF	0x0020 //!< found EOF
+#define __SUNGET 0x040 //!< ungetc() happened
+#define __SMALLOC 0x80 //!< handle is malloc()ed
 
 #define STREAM_READ_FLAG 	0
 #define STREAM_WRITE_FLAG 	1
@@ -86,25 +86,29 @@ struct file;
 	.buff = NULL,		\
 }
 
-
+/**
+ * @ingroup vfs
+ * @brief File definition
+ */
 typedef struct file {
-	const char *name;
-	struct file *next;
+	const char *name; //!< File name.
+	struct file *next; //!< Next file.
 
-	unsigned long flags;
-	int fd;
+	unsigned long flags; //!< File flags.
+	int fd; //!< Assigned file descriptor.
 
-	int (*close)(struct file*);
-	int (*read)(struct file*, void*, size_t);
-	int (*write)(struct file*, void*, size_t);
-	int (*flush)(struct file*);
-	int (*put)(int c, struct file*);
-	int (*get)( struct file*);
+	int (*open)(struct file*); //!< Open a file.
+	int (*close)(struct file*); //!< File close.
+	int (*read)(struct file*, void*, size_t); //!< Read from a file.
+	int (*write)(struct file*, void*, size_t); //!< Write to a file.
+	int (*flush)(struct file*); //!< Flush the file.
+	int (*put)(int c, struct file*); //!< Write 1 byte to a file.
+	int (*get)(struct file*); //!< Read 1 byte from a file.
 
-	void *data;
-	volatile unsigned char *buff;
-	size_t length;
-	size_t index;
+	void *data; //!< Private file data.
+	volatile unsigned char *buff; //!< File buffer.
+	size_t length; //!< Length of buff.
+	size_t index; //!< Index in buff.
 
 } *FILE;
 

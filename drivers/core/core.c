@@ -134,6 +134,7 @@ static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 	if(!fops)
 		return -EINVAL;
 
+	file->open = fops->open;
 	file->write = fops->write;
 	file->read = fops->read;
 	file->put = fops->put;

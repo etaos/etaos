@@ -73,6 +73,7 @@ struct device {
  * is generally used during the setup of a device.
  */
 struct dev_file_ops {
+	int (*open)(struct file*); //!< Open a file.
 	int (*close)(struct file*); //!< File close.
 	int (*read)(struct file*, void*, size_t); //!< Read from a file.
 	int (*write)(struct file*, void*, size_t); //!< Write to a file.

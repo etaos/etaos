@@ -138,6 +138,19 @@
  * to big to fit into small chips. This is a copy of a very compact c library.
  */
 
+/* ================ File systems ================ */
+
+/**
+ * @defgroup fs Filesystem management
+ * @ingroup kernel
+ */
+
+/**
+ * @defgroup vfs Virtual filesystem API
+ * @ingroup fs
+ * @brief Volatile RAM filesystem
+ */
+
 /* ================ Device drivers ================ */
 
 /**

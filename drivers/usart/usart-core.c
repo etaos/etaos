@@ -69,6 +69,7 @@ static struct dev_file_ops usart_fops = {
 	.read = &usart_read,
 	.put = &usart_putc,
 	.get = &usart_getc,
+	.open = NULL,
 };
 
 void setup_usart_streams(struct usart *usart)
