@@ -47,5 +47,10 @@ config MUTEX_EVENT_QUEUE
 
 endchoice
 
+config SEM
+	bool "Semaphores"
+	help
+	  Say 'y' here if you want to build support for semaphore's.
+
 endmenu
 
