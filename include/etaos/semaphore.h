@@ -16,17 +16,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file semaphore.h
+ */
+
 #ifndef __SEMAPHORE_H_
 #define __SEMAPHORE_H_
 
+/**
+ * @addtogroup sem
+ */
+/* @{ */
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/thread.h>
 #include <etaos/evm.h>
 
+/**
+ * @brief Semaphore descriptor.
+ */
 typedef struct semaphore {
-	struct thread_queue qp;
-	short value;
+	struct thread_queue qp; //!< Thread queue to wait in.
+	short value; //!< Semaphore value.
 } sem_t;
 
 extern int sem_init(sem_t *sem, short value);
@@ -34,4 +45,6 @@ extern void sem_wait(sem_t *sem);
 extern void sem_signal(sem_t *sem);
 extern int sem_try_wait(sem_t *sem);
 
+/* @} */
 #endif
+

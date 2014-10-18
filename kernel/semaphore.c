@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup sem
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/thread.h>
@@ -23,6 +28,14 @@
 #include <etaos/types.h>
 #include <etaos/semaphore.h>
 
+/**
+ * @brief Initialise a a semaphore with a value.
+ * @param sem Semaphore to initialise.
+ * @param value Initial semaphore value.
+ * @return Error code.
+ * @retval -EINVAL on error.
+ * @retval -EOK on success.
+ */
 int sem_init(sem_t *sem, short value)
 {
 	if(!sem)
@@ -33,6 +46,13 @@ int sem_init(sem_t *sem, short value)
 	return -EOK;
 }
 
+/**
+ * @brief Lock a semaphore.
+ * @param sem Semaphore to lock.
+ *
+ * If the value of the semaphore is 0 or less, the calling thread will not
+ * return from this function untill the semaphore becomes available.
+ */
 void sem_wait(sem_t *sem)
 {
 	sem->value--;
@@ -40,6 +60,12 @@ void sem_wait(sem_t *sem)
 		evm_wait_event_queue(&sem->qp, EVM_WAIT_INFINITE);
 }
 
+/**
+ * @brief Signal a locked semaphore.
+ * @param sem Semaphore to unlock.
+ *
+ * Unlocks a held semaphore.
+ */
 void sem_signal(sem_t *sem)
 {
 	sem->value++;
@@ -47,6 +73,13 @@ void sem_signal(sem_t *sem)
 		evm_signal_event_queue(&sem->qp);
 }
 
+/**
+ * @brief Try to lock a semaphore without waiting.
+ * @param sem Semaphore to try.
+ * @return Error code.
+ * @retval -1 if semaphore couldn't be acquired.
+ * @retval 0 if The semaphore succesfully locked.
+ */
 int sem_try_wait(sem_t *sem)
 {
 	if(sem->value <= 0)
@@ -56,4 +89,6 @@ int sem_try_wait(sem_t *sem)
 
 	return 0;
 }
+
+/* @} */
 
