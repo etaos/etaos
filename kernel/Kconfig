@@ -49,7 +49,7 @@ endchoice
 
 config SEM
 	bool "Semaphores"
-	depends EVENT_MUTEX
+	depends on EVENT_MUTEX
 	help
 	  Say 'y' here if you want to build support for semaphore's.
 
