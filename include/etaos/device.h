@@ -90,6 +90,8 @@ extern int dev_register_pdev(struct platform_device *pdev,
 extern void dev_core_init();
 extern int dev_set_fops(struct device *dev, struct dev_file_ops *fops);
 extern struct device *dev_get_by_name(const char *name);
+extern void dev_unlock(struct device *dev);
+extern void dev_lock(struct device *dev);
 
 /**
  * @brief Return the IOBASE of a platform device.
