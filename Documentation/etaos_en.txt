@@ -11,6 +11,13 @@
  */
 
 /**
+ * @defgroup sem Semaphores
+ * @ingroup kernel
+ * @brief Semaphore API.
+ */
+
+
+/**
  * @defgroup archAPI Architecture API
  * @brief API to access the architecture of the system.
  *
