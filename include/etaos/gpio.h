@@ -23,6 +23,7 @@
 #include <etaos/types.h>
 #include <etaos/spinlock.h>
 #include <etaos/device.h>
+#include <etaos/bitops.h>
 
 struct gpio_pin {
 	struct gpio_chip *chip;
@@ -63,6 +64,22 @@ extern int gpio_direction_output(struct gpio_pin *pin, int value);
 extern int raw_gpio_direction_ouput(struct gpio_pin *pin, int value);
 extern int raw_gpio_pin_write(struct gpio_pin *pin, int val);
 extern int raw_gpio_read_pin(struct gpio_pin *pin);
+
+static inline void gpio_set_open_drain(struct gpio_pin *pin)
+{
+	if(test_bit(GPIO_OPEN_SOURCE, &pin->flags))
+		clear_bit(GPIO_OPEN_SOURCE, &pin->flags);
+
+	set_bit(GPIO_OPEN_DRAIN, &pin->flags);
+}
+
+static inline void gpio_set_open_source(struct gpio_pin *pin)
+{
+	if(test_bit(GPIO_OPEN_DRAIN, &pin->flags))
+		clear_bit(GPIO_OPEN_DRAIN, &pin->flags);
+
+	set_bit(GPIO_OPEN_SOURCE, &pin->flags);
+}
 
 #endif
 
