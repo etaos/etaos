@@ -1,0 +1,15 @@
+menuconfig I2C
+	tristate "I2C driver"
+	help
+	  Say 'y' or 'm' here to build support for I2C devices.
+
+if I2C
+
+config I2C_ATMEGA
+	tristate "ATmega I2C driver"
+	help
+	  Say 'y' or 'm' here to build the ATmega I2C driver. If you
+	  are unsure and building for an ATmega AVR target say 'm'
+	  here.
+endif
+

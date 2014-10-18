@@ -4,4 +4,6 @@ source "drivers/core/Kconfig"
 
 source "drivers/usart/Kconfig"
 
+source "drivers/i2c/Kconfig"
+
 endmenu
