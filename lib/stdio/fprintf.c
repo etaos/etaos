@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - STDIO fputc
+ *  ETA/OS - STDIO printf
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file fputc.c */
+/** @file printf.c */
 
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
-#include <etaos/bitops.h>
 
 /**
  * @addtogroup libc
@@ -28,20 +27,31 @@
  */
 
 /**
- * @brief Write one character to a stream.
- * @param c Character to write.
- * @param stream Stream to write \p c to.
+ * @brief Write a formated string to a stream.
+ * @param stream File to write to.
+ * @param fmt
+ * @param ... Variable argument list.
+ *
+ * The first argument contains a formatted string, for example:
+ * @code{.c}
+   printf(stderr, "Hey there, it is %u:%uPM\n", 6, 23);
+   @endcode
+ *
+ * The %u means 'replace with unsigned integer from the variable argument list.
+ * What will be written to the file in the end:
+ * Hey there, it is 6:23PM
  */
-int fputc(int c, FILE stream)
+int fprintf(FILE stream, const char *fmt, ...)
 {
-	int rc = -1;
+	int i;
+	va_list va;
 
-	if(test_bit(STREAM_WRITE_FLAG, &stream->flags)) {
-		rc = stream->put(c, stream);
-		if(rc != -EOF || rc == c)
-			stream->length++;
-	}
-	return rc;
+	va_start(va, fmt);
+	i = vfprintf(stream, fmt, va);
+	va_end(va);
+
+	return i;
 }
 
 /** @} */
+

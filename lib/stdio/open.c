@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - STDIO fputc
+ *  ETA/OS - STDIO open
  *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,32 +16,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file fputc.c */
-
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
-#include <etaos/bitops.h>
+#include <etaos/error.h>
+#include <etaos/vfs.h>
 
 /**
- * @addtogroup libc
- * @{
+ * @ingroup libc
+ * @brief Open a file on the virtual file system.
+ * @param name File name to look for.
+ * @param flags File flags.
  */
-
-/**
- * @brief Write one character to a stream.
- * @param c Character to write.
- * @param stream Stream to write \p c to.
- */
-int fputc(int c, FILE stream)
+int open(const char *name, unsigned long flags)
 {
-	int rc = -1;
+	FILE file;
 
-	if(test_bit(STREAM_WRITE_FLAG, &stream->flags)) {
-		rc = stream->put(c, stream);
-		if(rc != -EOF || rc == c)
-			stream->length++;
+	file = vfs_find(name);
+	if(file) {
+		file->flags = flags;
+		iob_add(file);
+		return file->fd;
 	}
-	return rc;
-}
 
-/** @} */
+	return -EINVAL;
+}

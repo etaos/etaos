@@ -16,12 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup rr
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/sched.h>
 #include <etaos/thread.h>
 
+/**
+ * @brief Insert a new thread into a queue.
+ * @param tpp Root queue pointer.
+ * @param tp Thread to insert.
+ */
 static void rr_queue_insert(struct thread *volatile*tpp, struct thread *tp)
 {
 	struct thread *thread;
@@ -53,6 +63,13 @@ static void rr_queue_insert(struct thread *volatile*tpp, struct thread *tp)
 #endif
 }
 
+/**
+ * @brief Remove a thread from a queue.
+ * @param tpp Root queue pointer.
+ * @param tp Thread to remove from.
+ * @retval -EOK on success.
+ * @return -EINVAL on error (no thread was removed).
+ */
 static int rr_queue_remove(struct thread *volatile*tpp, struct thread *tp)
 {
 	struct thread *thread;
@@ -88,27 +105,55 @@ static int rr_queue_remove(struct thread *volatile*tpp, struct thread *tp)
 }
 
 #ifdef CONFIG_THREAD_QUEUE
+/**
+ * @brief Add a new thread to a queue.
+ * @param qp Queue to add the thread to.
+ * @param tp Thread to add.
+ */
 static void rr_thread_queue_add(struct thread_queue *qp, struct thread *tp)
 {
 	rr_queue_insert(&qp->qhead, tp);
 }
 
+/**
+ * @brief Remove a thread from a queue.
+ * @param qp Queue to remove from.
+ * @param tp Thread to remove.
+ */
 static void rr_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
 {
 	rr_queue_remove(&qp->qhead, tp);
 }
 #endif
 
+/**
+ * @brief Add a new thread to the run queue.
+ * @param rq Run queue to add to.
+ * @param tp Thread to add.
+ */
 static void rr_add_thread(struct rq *rq, struct thread *tp)
 {
 	rr_queue_insert(&rq->rq.run_queue, tp);
 }
 
+/**
+ * @brief Remove a thread from a rq.
+ * @param rq Run queue to remove from.
+ * @param tp Thread to remove.
+ * @retval -EOK on success.
+ * @return -EINVAL on error (no thread was removed).
+ */
 static int rr_rm_thread(struct rq *rq, struct thread *tp)
 {
 	return rr_queue_remove(&rq->rq.run_queue, tp);
 }
 
+/**
+ * @brief Get the next runnable thread on the run queue.
+ * @param rq RQ to get the next runnable thread from.
+ * @return The next runnable thread.
+ * @retval NULL if no runnable thread was found.
+ */
 static struct thread *rr_next_runnable(struct rq *rq)
 {
 	struct thread *runnable;
@@ -125,6 +170,12 @@ static struct thread *rr_next_runnable(struct rq *rq)
 }
 
 #ifdef CONFIG_EVENT_MUTEX
+/**
+ * @brief Get the next runnable thread after \p tp.
+ * @param tp Thread to get the 'next' of.
+ * @return The next of \p tp.
+ * @retval NULL if \p tp has no next thread.
+ */
 static struct thread *rr_thread_after(struct thread *tp)
 {
 	if(tp)
@@ -135,6 +186,10 @@ static struct thread *rr_thread_after(struct thread *tp)
 #endif
 
 #ifdef CONFIG_DYN_PRIO
+/**
+ * @brief Update the dynamic prio of all threads in the run queue.
+ * @param rq Run queue which has to be updated.
+ */
 static void rr_update_dyn_prio(struct rq *rq)
 {
 	struct thread *walker;
@@ -148,6 +203,12 @@ static void rr_update_dyn_prio(struct rq *rq)
 }
 #endif
 
+/**
+ * @brief System scheduling class.
+ *
+ * If ETA/OS is configured as a round robin scheduler, this is the the
+ * system scheduling class used during run time.
+ */
 struct sched_class sys_sched_class = {
 	.rm_thread = &rr_rm_thread,
 	.add_thread = &rr_add_thread,
@@ -165,3 +226,4 @@ struct sched_class sys_sched_class = {
 #endif
 };
 
+/* @} */

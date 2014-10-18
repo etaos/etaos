@@ -26,7 +26,7 @@
 
 typedef struct semaphore {
 	struct thread_queue qp;
-	short val;
+	short value;
 } sem_t;
 
 #endif

@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - STDIO fputc
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - LibC write
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,32 +16,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file fputc.c */
-
 #include <etaos/kernel.h>
+#include <etaos/error.h>
 #include <etaos/stdio.h>
 #include <etaos/bitops.h>
 
 /**
- * @addtogroup libc
- * @{
+ * @ingroup libc
+ * @brief Write to a file.
+ * @param fd File descriptor to write to.
+ * @param buff Buffer to write into.
+ * @param size Size of \p buff.
  */
-
-/**
- * @brief Write one character to a stream.
- * @param c Character to write.
- * @param stream Stream to write \p c to.
- */
-int fputc(int c, FILE stream)
+int write(int fd, const void *buff, size_t size)
 {
-	int rc = -1;
+	FILE file;
 
-	if(test_bit(STREAM_WRITE_FLAG, &stream->flags)) {
-		rc = stream->put(c, stream);
-		if(rc != -EOF || rc == c)
-			stream->length++;
-	}
-	return rc;
+	file = __iob[fd];
+	if(!file)
+		return -EINVAL;
+
+	if(test_bit(STREAM_WRITE_FLAG, &file->flags) && file->write)
+		return file->write(file, buff, size);
+	else
+		return -EINVAL;
 }
 
-/** @} */

@@ -17,6 +17,9 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/error.h>
+#include <etaos/thread.h>
+#include <etaos/evm.h>
 #include <etaos/types.h>
 #include <etaos/semaphore.h>
 
@@ -27,11 +30,12 @@ int sem_init(sem_t *sem, short value)
 
 	sem->qp.qhead = NULL;
 	sem->value = value;
+	return -EOK;
 }
 
 void sem_wait(sem_t *sem)
 {
-	sem->vale--;
+	sem->value--;
 	if(sem->value < 0)
 		evm_wait_event_queue(&sem->qp, EVM_WAIT_INFINITE);
 }

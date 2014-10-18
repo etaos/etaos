@@ -16,6 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file kernel/time/time.c
+ * @addtogroup tm
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/list.h>
@@ -29,6 +35,14 @@
 
 static struct list_head sources = STATIC_INIT_LIST_HEAD(sources);
 
+/**
+ * @brief initialise a new clock source.
+ * @param name Name of the clocksource.
+ * @param cs Clock source which has to be initialised.
+ * @param freq Frequency of the clock source.
+ * @param enable Function pointer to enable the source.
+ * @param disable Function pointer to disable the source.
+ */
 int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 		unsigned long freq, int (*enable)(struct clocksource *cs),
 		void (*disable)(struct clocksource *cs))
@@ -48,6 +62,10 @@ int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 	return -EOK;
 }
 
+/**
+ * @brief Start a new timer.
+ * @param timer Timer to start.
+ */
 static void tm_start_timer(struct timer *timer)
 {
 	struct list_head *carriage;
@@ -82,6 +100,15 @@ static void tm_start_timer(struct timer *timer)
 	raw_spin_unlock(&cs->lock);
 }
 
+/**
+ * @brief Create a new timer.
+ * @param cs Clock source handling the timer.
+ * @param ms Timer interval in miliseconds.
+ * @param handle Timer handle.
+ * @param arg Private timer data (passed to handle on trigger).
+ * @param flags Timer flags.
+ * @return The created time, NULL if no timer was created.
+ */
 struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
 		unsigned long flags)
@@ -107,6 +134,13 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 	return timer;
 }	
 
+/**
+ * @brief Stop a timer.
+ * @param Timer to stop.
+ * @return Error code.
+ * @retval 0 on success.
+ * @retval 1 if no timer was stopped.
+ */
 int tm_stop_timer(struct timer *timer)
 {
 	struct clocksource *cs;
@@ -144,6 +178,12 @@ int64_t tm_update_source(struct clocksource *source)
 	return diff;
 }
 
+/**
+ * @brief Process a given clock source and its timers.
+ * @param cs Clock source to process.
+ * @param diff Time difference in ticks since last call to this function.
+ * @warning This function should NOT be called by applications.
+ */
 void tm_process_clock(struct clocksource *cs, int64_t diff)
 {
 	struct list_head *carriage, *tmp;
@@ -189,6 +229,12 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 	raw_spin_unlock(&cs->lock);
 }
 
+/**
+ * @brief Get a timer source based on its name.
+ * @param name Name to search for.
+ * @return The clock source, if found.
+ * @retval NULL if no clocksource was found.
+ */
 struct clocksource *tm_get_source_by_name(const char *name)
 {
 	struct clocksource *cs;
@@ -203,3 +249,4 @@ struct clocksource *tm_get_source_by_name(const char *name)
 	return NULL;
 }
 
+/** @} */

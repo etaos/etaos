@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Time core
+ *  ETA/OS - sysctl
  *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,42 +16,51 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @file kernel/time/systick.c
- * @addtogroup tm
- * @{
- */
-
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/atomic.h>
-#include <etaos/time.h>
-#include <etaos/irq.h>
-#include <etaos/tick.h>
+#include <etaos/error.h>
 #include <etaos/stdio.h>
+#include <etaos/stddef.h>
 
 /**
- * @brief System tick IRQ handler.
- * @param irq IRQ data.
- * @param data Private data.
+ * @ingroup kernel
+ * @brief sysctl - change system wide settings.
+ * @param ctl Setting you want to change.
+ * @param ... ctl arguments.
+ * @see sys_ctl_t
  */
-static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
+int sysctl(sys_ctl_t ctl, ...)
 {
-	struct clocksource *cs = (struct clocksource*)data;
+	int err;
+	FILE stream;
+	va_list va;
 
-	atomic64_inc(&cs->tc);
-	return IRQ_HANDLED;
+	va_start(va, ctl);
+	switch(ctl) {
+	case SYS_SET_STDOUT:
+		stream = (FILE) va_arg(va, size_t);
+		stdout = stream;
+		err = -EOK;
+		break;
+
+	case SYS_SET_STDERR:
+		stream = (FILE) va_arg(va, size_t);
+		stderr = stream;
+		err = -EOK;
+		break;
+
+	case SYS_SET_STDIN:
+		stream = (FILE) va_arg(va, size_t);
+		stdin = stream;
+		err = -EOK;
+		break;
+
+	default:
+		err = -EINVAL;
+		break;
+	}
+	va_end(va);
+
+	return err;
 }
-
-/**
- * @brief Setup the system tick.
- * @param irq IRQ bound to the system tick.
- * @param src Clock source handling the system tick.
- */
-void systick_setup(int irq, struct clocksource *src)
-{
-	irq_request(irq, &systick_irq_handle, IRQ_RISING_MASK, src);
-}
-
-/** @} */
 

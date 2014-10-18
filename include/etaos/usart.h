@@ -16,6 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/usart.h
+ */
+
+/**
+ * @addtogroup usart-core
+ */
+/*@{*/
+
 #ifndef __USART_H__
 #define __USART_H__
 
@@ -24,18 +33,50 @@
 #include <etaos/device.h>
 #include <etaos/spinlock.h>
 
+/**
+ * @struct usart
+ * @brief USART descriptor.
+ */
 struct usart {
-	spinlock_t bus_lock;
-	int timeout;
+	spinlock_t bus_lock; //!< USART bus lock.
+	int timeout; //!< Transmission timeout.
 
-	struct device dev;
+	struct device dev; //!< Backend USART device.
+	/**
+	 * @brief Write to the USART device.
+	 * @param uart USART to write to.
+	 * @param tx TX buffer.
+	 * @param txlen Length of \p tx.
+	 * @return Error code.
+	 */
 	int (*write)(struct usart *uart, const void *tx,
 			size_t txlen);
-	int (*putc)(struct usart*, int);
-	int (*getc)(struct usart*);
+	/**
+	 * @brief Write a single byte to the USART device.
+	 * @param uart USART to write to.
+	 * @param c Character to write.
+	 * @return The written character.
+	 */
+	int (*putc)(struct usart* uart, int c);
+	/**
+	 * @brief Read a single byte from the USART.
+	 * @param uart USART to read from.
+	 * @return The byte read.
+	 */
+	int (*getc)(struct usart* uart);
+	/**
+	 * @brief Read from a USART device.
+	 * @param rx RX buffer.
+	 * @param len Length of \p rx.
+	 * @return Error code.
+	 */
 	int (*read)(struct usart *uart, void *rx, size_t len);
 };
 
 extern int usart_initialise(struct usart *usart);
+extern void setup_usart_streams(struct usart *uart);
 
 #endif
+
+/* @} */
+

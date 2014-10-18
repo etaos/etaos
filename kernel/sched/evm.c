@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup evm
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -28,6 +33,11 @@
 #include <etaos/time.h>
 #include <etaos/spinlock.h>
 
+/**
+ * @brief Signal the queue head of a thread_queue.
+ * @param rq Run queue to place a woken up thread on.
+ * @param qp Thread queue which has to be signaled.
+ */
 static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 {
 	struct thread *tp;
@@ -88,6 +98,11 @@ static void evm_timeout(struct timer *timer, void *arg)
 	}
 }
 
+/**
+ * @brief Signal an event queue.
+ * @param qp thread_queue to signal.
+ * @warning NEVER call this from an ISR.
+ */
 void evm_signal_event_queue(struct thread_queue *qp)
 {
 	struct rq *rq;
@@ -107,6 +122,13 @@ void evm_signal_event_queue(struct thread_queue *qp)
 	yield();
 }
 
+/**
+ * @brief Wait for the next event on an event queue.
+ * @param qp Queue to wait on.
+ * @param ms Maximum time to wait in miliseconds.
+ * @note Set ms to 0 to wait infinitly.
+ * @see EVM_WAIT_INFINITE
+ */
 int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms)
 {
 	raw_spin_unlock_irq(&qp->lock);
@@ -117,6 +139,14 @@ int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms)
 	return evm_wait_event_queue(qp, ms);
 }
 
+/**
+ * @brief Wait for an event in a specified queue.
+ * @param qp Queue to wait in.
+ * @param ms Maximum time to wait in miliseconds.
+ *
+ * Give up the CPU untill an event is posted to this queue, or a timeout based
+ * on \p ms occurs.
+ */
 int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
 {
 	struct thread *tp;
@@ -155,6 +185,10 @@ int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
 	return 0;
 }
 
+/**
+ * @brief Signal an event from an IRQ.
+ * @param qp Queue to signel.
+ */
 void evm_signal_from_irq(struct thread_queue *qp)
 {
 	struct thread *tp;
@@ -165,3 +199,5 @@ void evm_signal_from_irq(struct thread_queue *qp)
 	else if(tp != SIGNALED)
 		tp->ec++;
 }
+
+/* @} */

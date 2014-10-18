@@ -32,7 +32,7 @@ static inline struct usart *to_usart_dev(FILE file)
 	return dev->dev_data;
 }
 
-static int usart_write(FILE file, void *buff, size_t len)
+static int usart_write(FILE file, const void *buff, size_t len)
 {
 	struct usart *usart;
 
@@ -69,11 +69,27 @@ static struct dev_file_ops usart_fops = {
 	.read = &usart_read,
 	.put = &usart_putc,
 	.get = &usart_getc,
+	.open = NULL,
 };
 
-int usart_initialise(struct usart *usart)
+void setup_usart_streams(struct usart *usart)
 {
 	FILE usart_stream;
+
+	usart_stream = dev_to_file(&usart->dev);
+	sysctl(SYS_SET_STDOUT, usart_stream);
+	sysctl(SYS_SET_STDERR, usart_stream);
+	sysctl(SYS_SET_STDIN, usart_stream);
+}
+
+/**
+ * @brief Initialise a new USART device.
+ * @param usart USART which has to be initialised.
+ * @return Error code.
+ * @retval -EOK on success.
+ */
+int usart_initialise(struct usart *usart)
+{
 	int err;
 
 	err = device_initialize(&usart->dev, &usart_fops);
@@ -81,13 +97,6 @@ int usart_initialise(struct usart *usart)
 		return err;
 
 	usart->dev.dev_data = usart;
-	usart_stream = dev_to_file(&usart->dev);
-
-#ifdef CONFIG_STDIO_USART
-	stdout = usart_stream;
-	stdin = usart_stream;
-	stderr = usart_stream;
-#endif
 
 	return -EOK;
 }

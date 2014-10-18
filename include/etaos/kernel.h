@@ -43,5 +43,30 @@
 		const typeof( ((type *)0)->member) *__mptr = (ptr); \
 		(type *)( ( char *)__mptr - offsetof(type,member) );})
 
+/**
+ * @ingroup kernel
+ * @brief sysctl settings type.
+ */
+typedef enum sys_ctl {
+	/**
+	 * @brief Set the stdout stream.
+	 * @note Second argument to sysctl needs to be the stream.
+	 */
+	SYS_SET_STDOUT,
+
+	/**
+	 * @brief Set the stdout stream.
+	 * @note Second argument to sysctl needs to be the stream.
+	 */
+	SYS_SET_STDERR,
+	
+	/**
+	 * @brief Set the stdout stream.
+	 * @note Second argument to sysctl needs to be the stream.
+	 */
+	SYS_SET_STDIN,
+} sys_ctl_t;
+
+extern int sysctl(sys_ctl_t ctl, ...);
 #endif
 

@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file avr/include/asm/bitops.h
+ */
+
 #ifndef __AVR_BITOPS_H_
 #define __AVR_BITOPS_H_
 
@@ -26,6 +30,11 @@
 #define BITS_PER_LONG 32UL
 #define BITS_PER_BYTE  8UL
 
+/**
+ * @brief Clear a bit in register.
+ * @param nr Bit to clear.
+ * @param flags Register that contains \p nr.
+ */
 static inline void clear_bit(unsigned nr, volatile void *flags)
 {
 	volatile unsigned char *p = ((volatile unsigned char*)flags) + (nr / BITS_PER_BYTE);
@@ -43,6 +52,11 @@ static inline void clear_bit(unsigned nr, volatile void *flags)
 			);
 }
 
+/**
+ * @brief Set a bit in a register.
+ * @param nr Bit to set.
+ * @param addr Register containing \p nr.
+ */
 static inline void set_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((volatile unsigned char*)addr) + (nr / BITS_PER_BYTE);
@@ -59,6 +73,12 @@ static inline void set_bit(unsigned nr, volatile void *addr)
 			);
 }
 
+/**
+ * @brief Clear a bit in register and return the value of \p nr before clearing.
+ * @param nr Bit to clear.
+ * @param flags Register that contains \p nr.
+ * @return Initial bit value of bit \p nr.
+ */
 static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);
@@ -79,6 +99,12 @@ static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
 	return old != 0;
 }
 
+/**
+ * @brief Set a bit in register and return the value of \p nr before setting it.
+ * @param nr Bit to set.
+ * @param flags Register that contains \p nr.
+ * @return Initial bit value of bit \p nr.
+ */
 static inline int test_and_set_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);

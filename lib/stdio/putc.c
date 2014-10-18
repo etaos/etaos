@@ -16,11 +16,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file putc.c */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
+/**
+ * @brief Write one character to a stream.
+ * @param c Character to write.
+ * @param stream Stream to write \p c to.
+ */
 int putc(int c, FILE stream)
 {
 	return fputc(c, stream);
 }
+
+/** @} */
 

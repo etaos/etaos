@@ -16,6 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/time.h Time header.
+ * @addtogroup tm
+ * @{
+ */
+
 #ifndef __TIMER_H__
 #define __TIMER_H__
 
@@ -25,34 +31,75 @@
 #include <etaos/atomic.h>
 
 
+/**
+ * @struct clocksource
+ * @brief The clocksource describes the source of a hardware time.
+ */
 struct clocksource {
-	const char *name;
+	const char *name; //!< Timer name.
 
-	int (*enable)(struct clocksource*);
-	void (*disable)(struct clocksource*);
-	unsigned long freq;
-	atomic64_t tc;
+	/**
+	 * @brief Enable the timer.
+	 * @param cs Clocksource to enable.
+	 */
+	int (*enable)(struct clocksource* cs);
+	/**
+	 * @brief disable the timer.
+	 * @param cs Clocksource to disable.
+	 */
+	void (*disable)(struct clocksource* cs);
+	unsigned long freq; //!< Frequency of the source (in Hz).
+	atomic64_t tc; //!< Tick counter.
+	/**
+	 * @brief Tick count when last updated.
+	 *
+	 * Every time a clocksource is updated, this field is used to
+	 * calculate how many ticks have passed since the previous update. As
+	 * soon as the update is done, tc_resume is set to tc.
+	 */
 	int64_t tc_resume;
-	spinlock_t lock;
+	spinlock_t lock; //!< Clocksource lock.
 
-	struct list_head list;
-	struct list_head timers;
+	struct list_head list; //!< List of clocksources.
+	struct list_head timers; //!< List head for assigned timers.
 };
 
+/**
+ * @struct timer
+ * @brief Describes a single (virtual) timer.
+ */
 struct timer {
-	struct list_head list;
+	struct list_head list; //!< Timer list.
 
-	struct clocksource *source;
+	struct clocksource *source; //!< Source of the timer.
+	/**
+	 * @brief Timer trigger.
+	 * @param timer 'This' timer.
+	 * @param arg Argument. Set to priv_data.
+	 *
+	 * This handle is called everytime tleft hits zero.
+	 */
 	void (*handle)(struct timer *timer, void *arg);
-	void *priv_data;
+	void *priv_data; //!< Private timer data.
 
-	unsigned long tleft;
-	unsigned long ticks;
+	unsigned long tleft; //!< Ticks left.
+	unsigned long ticks; //!< Total ticks,used for non ONE_SHOT timers.
 };
 
+/**
+ * @def TIMER_ONESHOT_FLAG
+ * @brief Sets the timer to one shot mode.
+ *
+ * One shot mode means that the timer will only trigger once. After it has
+ * triggered it will kill itself.
+ */
 #define TIMER_ONESHOT_FLAG 0
-#define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
+/**
+ * @def TIMER_ONESHOT_MASK
+ * @brief Mask for a one shot timer.
+ */
+#define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
 extern int64_t tm_update_source(struct clocksource *source);
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
@@ -66,4 +113,5 @@ extern void tm_process_clock(struct clocksource *cs, int64_t diff);
 extern struct clocksource *tm_get_source_by_name(const char *name);
 
 #endif /* __TIMER_H__ */
+/** @} */
 

@@ -1,5 +1,5 @@
 /*
- *  BermudaOS - VFS driver.
+ *  ETA/OS - VFS driver.
  *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -25,5 +25,6 @@
 extern void vfs_init(void);
 extern void vfs_add(FILE file);
 extern int vfs_delete(FILE f);
+extern FILE vfs_find(const char *name);
 
 #endif

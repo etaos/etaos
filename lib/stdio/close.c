@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - STDIO fputc
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - LibC close
+ *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,32 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file fputc.c */
-
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
-#include <etaos/bitops.h>
+#include <etaos/vfs.h>
 
 /**
- * @addtogroup libc
- * @{
+ * @ingroup libc
+ * @brief Close a file.
+ * @param fd File descriptor to close.
  */
-
-/**
- * @brief Write one character to a stream.
- * @param c Character to write.
- * @param stream Stream to write \p c to.
- */
-int fputc(int c, FILE stream)
+void close(int fd)
 {
-	int rc = -1;
-
-	if(test_bit(STREAM_WRITE_FLAG, &stream->flags)) {
-		rc = stream->put(c, stream);
-		if(rc != -EOF || rc == c)
-			stream->length++;
-	}
-	return rc;
+	iob_remove(fd);
 }
-
-/** @} */
