@@ -54,3 +54,26 @@ void ipm_post_msg(struct ipm_queue *iq, void *buff, size_t len)
 	evm_signal_event_queue(&iq->qp);
 }
 
+void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
+{
+	unsigned long flags;
+
+	evm_wait_event_queue(&iq->qp, EVM_WAIT_INFINITE);
+
+	spin_lock_irqsave(&iq->lock, flags);
+	if(iq->wr_idx == iq->rd_idx)
+		return;
+
+	*msg = iq->msgs[iq->rd_idx];
+	iq->rd_idx += 1;
+
+	if(iq->rd_idx != iq->wr_idx) {
+		spin_unlock_irqrestore(&iq->lock, flags);
+		evm_signal_event_queue(&iq->qp);
+		spin_lock_irqsave(&iq->lock, flags);
+	}
+
+	spin_unlock_irqrestore(&iq->lock, flags);
+	return;
+}
+
