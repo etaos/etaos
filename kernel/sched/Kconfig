@@ -48,6 +48,14 @@ config EVENT_MUTEX
 	  context) the thread will be released into the run queue
 	  again. If unsure say 'y' here.
 
+config IPM
+	bool "Inter-Process Messages"
+	depends on EVENT_MUTEX
+	help
+	  Build support for IPM (Inter-Process Messages) if you say
+	  'y' here. IPM can be used to communicate between different
+	  threads which might also be running on another CPU.
+
 config DYN_PRIO
 	bool "Dynamic priorities"
 	help
