@@ -40,6 +40,7 @@ struct gpio_chip {
 	
 	int (*direction_output)(struct gpio_chip *chip, int val, uint16_t nr);
 	int (*direction_input)(struct gpio_chip *chip, uint16_t nr);
+	int (*get_direction)(struct gpio_chip *chip, uint16_t nr);
 	int (*get)(struct gpio_chip *chip, uint16_t nr);
 	int (*set)(struct gpio_chip *chip, int val, uint16_t nr);
 };
@@ -64,6 +65,7 @@ extern int gpio_direction_output(struct gpio_pin *pin, int value);
 extern int raw_gpio_direction_ouput(struct gpio_pin *pin, int value);
 extern int raw_gpio_pin_write(struct gpio_pin *pin, int val);
 extern int raw_gpio_read_pin(struct gpio_pin *pin);
+extern int gpio_get_direction(struct gpio_pin *pin);
 
 static inline void gpio_set_open_drain(struct gpio_pin *pin)
 {
@@ -80,6 +82,9 @@ static inline void gpio_set_open_source(struct gpio_pin *pin)
 
 	set_bit(GPIO_OPEN_SOURCE, &pin->flags);
 }
+
+#define GPIO_DIR_OUT false
+#define GPIO_DIR_IN  true
 
 #endif
 
