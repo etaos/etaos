@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup ipm
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/thread.h>
 #include <etaos/types.h>
@@ -23,11 +28,24 @@
 #include <etaos/mem.h>
 #include <etaos/evm.h>
 
+static inline bool ipm_queue_is_full(struct ipm_queue *iq)
+{
+	if(iq->wr_idx >= iq->num)
+		return true;
+	else
+		return false;
+}
+
+/**
+ * @brief Initialise a new IPM queue.
+ * @param iq Queue to initialise.
+ */
 void ipm_queue_init(struct ipm_queue *iq, size_t len)
 {
 	void *ptr;
 
 	thread_queue_init(&iq->qp);
+	iq->qp.qhead = NULL;
 	ptr = kzalloc(sizeof(*iq->msgs) * len);
 	if(!ptr)
 		return;
@@ -38,10 +56,19 @@ void ipm_queue_init(struct ipm_queue *iq, size_t len)
 	iq->rd_idx = 0;
 }
 
+/**
+ * @brief Send a message to queue.
+ * @param iq Queue to post the message to.
+ * @param buff Message to send.
+ * @param len Length of \p buff.
+ */
 void ipm_post_msg(struct ipm_queue *iq, const void *buff, size_t len)
 {
 	unsigned long flags;
 	struct ipm *msg;
+
+	if(ipm_queue_is_full(iq))
+		return;
 
 	spin_lock_irqsave(&iq->lock, flags);
 	msg = &iq->msgs[iq->wr_idx];
@@ -54,6 +81,11 @@ void ipm_post_msg(struct ipm_queue *iq, const void *buff, size_t len)
 	evm_signal_event_queue(&iq->qp);
 }
 
+/**
+ * @brief Get a message from a queue.
+ * @param iq Queue to get the message from.
+ * @param msg Memory to store the message into.
+ */
 void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 {
 	unsigned long flags;
@@ -77,6 +109,13 @@ void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 	return;
 }
 
+/**
+ * @brief Reset a message queue.
+ * @param iq Queue which has to be reset.
+ * @return True or false based on whether there are still threads waiting.
+ * @retval false if there are still threads waiting.
+ * @retval true if the queue reset was succesfull.
+ */
 bool ipm_reset_queue(struct ipm_queue *iq)
 {
 	unsigned long flags;
@@ -94,4 +133,5 @@ bool ipm_reset_queue(struct ipm_queue *iq)
 
 	return true;
 }
+/* @} */
 

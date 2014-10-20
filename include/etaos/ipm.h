@@ -16,6 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/ipm.h
+ */
+
+/**
+ * @addtogroup ipm
+ */
+/* @{ */
+
 #ifndef __IPM_H__
 #define __IPM_H__
 
@@ -24,17 +33,26 @@
 #include <etaos/types.h>
 #include <etaos/spinlock.h>
 
+/**
+ * @struct ipm
+ * @brief IPM message structure
+ */
 struct ipm {
-	const void *data;
-	size_t len;
+	const void *data; //!< Message data.
+	size_t len; //!< Message data length.
 };
 
+/**
+ * @struct ipm_queue
+ * @brief IPM waiting queue.
+ */
 struct ipm_queue {
-	struct thread_queue qp;
-	uint8_t num;
-	uint8_t wr_idx, rd_idx;
-	struct ipm *msgs;
-	spinlock_t lock;
+	struct thread_queue qp; //!< Thread queue to wait in.
+	uint8_t num; //!< Length of the message array.
+	uint8_t wr_idx; //!< Write index.
+	uint8_t rd_idx; //!< Read index.
+	struct ipm *msgs; //!< Message array.
+	spinlock_t lock; //!< Concurrency lock.
 };
 
 extern void ipm_queue_init(struct ipm_queue *qp, size_t len);
@@ -42,3 +60,6 @@ extern void ipm_post_msg(struct ipm_queue *qp, const void *data, size_t len);
 extern void ipm_get_msg(struct ipm_queue *qp, struct ipm *msg);
 extern bool ipm_reset_queue(struct ipm_queue *iq);
 #endif
+
+/* @} */
+
