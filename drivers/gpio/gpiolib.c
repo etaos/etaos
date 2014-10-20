@@ -180,6 +180,27 @@ int gpio_pin_read(struct gpio_pin *pin)
 	return val;
 }
 
+int gpio_get_direction(struct gpio_pin *pin)
+{
+	int status = -EINVAL;
+	struct gpio_chip *chip;
+
+	chip = pin->chip;
+	if(!chip || chip->get_direction)
+		return status;
+
+	status = chip->get_direction(chip, pin->nr);
+	if(status > 0) {
+		status = GPIO_DIR_IN;
+		clear_bit(GPIO_IS_OUTPUT, &pin->flags);
+	} else if(!status) {
+		status = GPIO_DIR_OUT;
+		set_bit(GPIO_IS_OUTPUT, &pin->flags);
+	}
+
+	return status;
+}
+
 int raw_gpio_read_pin(struct gpio_pin *pin)
 {
 	struct gpio_chip *chp;
