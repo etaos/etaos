@@ -38,7 +38,7 @@ void ipm_queue_init(struct ipm_queue *iq, size_t len)
 	iq->rd_idx = 0;
 }
 
-void ipm_post_msg(struct ipm_queue *iq, void *buff, size_t len)
+void ipm_post_msg(struct ipm_queue *iq, const void *buff, size_t len)
 {
 	unsigned long flags;
 	struct ipm *msg;
@@ -75,5 +75,23 @@ void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 
 	spin_unlock_irqrestore(&iq->lock, flags);
 	return;
+}
+
+bool ipm_reset_queue(struct ipm_queue *iq)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&iq->lock, flags);
+	if(iq->qp.qhead != SIGNALED && iq->qp.qhead != NULL) {
+		spin_unlock_irqrestore(&iq->lock, flags);
+		return false;
+	}
+
+	iq->qp.qhead = NULL;
+	iq->wr_idx = 0;
+	iq->rd_idx = 0;
+	spin_unlock_irqrestore(&iq->lock, flags);
+
+	return true;
 }
 
