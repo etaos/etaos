@@ -45,6 +45,7 @@ void avr_init(void)
 #ifdef CONFIG_VFS
 	vfs_init();
 #endif
+	gpio_init();
 #if defined(CONFIG_ATMEGA_USART) || defined(CONFIG_ATMEGA_USART_MODULE)
 	atmega_usart_init();
 #endif

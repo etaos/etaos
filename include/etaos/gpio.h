@@ -35,7 +35,6 @@ struct gpio_chip {
 	struct gpio_pin *pins;
 	uint16_t num;
 
-	struct device dev;
 	spinlock_t lock;
 	
 	int (*direction_output)(struct gpio_chip *chip, int val, uint16_t nr);
@@ -54,7 +53,9 @@ struct gpio_chip {
 #define GPIO_OPEN_SOURCE	6 //!< Pin is connected to an open source.
 #define GPIO_IRQ		7 //!< If set, the pin is connected to an IRQ.
 
-extern void gpio_pin_init(struct gpio_pin *pin, unsigned long flags);
+extern void gpio_pin_init(struct gpio_chip *chp,
+		struct gpio_pin *pin, uint16_t nr, 
+		unsigned long flags);
 extern int gpio_chip_init(struct gpio_chip *chip, uint16_t pins);
 extern struct gpio_pin *gpio_chip_to_pin(struct gpio_chip *chip, uint16_t nr);
 extern int gpio_pin_request(struct gpio_pin *pin);
@@ -81,6 +82,13 @@ static inline void gpio_set_open_source(struct gpio_pin *pin)
 		clear_bit(GPIO_OPEN_DRAIN, &pin->flags);
 
 	set_bit(GPIO_OPEN_SOURCE, &pin->flags);
+}
+
+extern struct gpio_chip *gpio_sys_chip;
+
+static inline void gpio_set_sys_chip(struct gpio_chip *chip)
+{
+	gpio_sys_chip = chip;
 }
 
 #define GPIO_DIR_OUT false

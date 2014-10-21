@@ -24,6 +24,8 @@
 #include <etaos/gpio.h>
 #include <etaos/bitops.h>
 
+struct gpio_chip *gpio_sys_chip;
+
 int gpio_chip_init(struct gpio_chip *chip, uint16_t pins)
 {
 	int err;
@@ -40,13 +42,16 @@ int gpio_chip_init(struct gpio_chip *chip, uint16_t pins)
 	return err;
 }
 
-void gpio_pin_init(struct gpio_pin *pin, unsigned long flags)
+void gpio_pin_init(struct gpio_chip *chip, 
+		struct gpio_pin *pin, uint16_t nr, unsigned long flags)
 {
 	if(!pin)
 		return;
 
 	clear_bit(GPIO_REQUESTED, &flags);
+	pin->chip = chip;
 	pin->flags = flags;
+	pin->nr = nr;
 }
 
 struct gpio_pin *gpio_chip_to_pin(struct gpio_chip *chip, uint16_t nr)
