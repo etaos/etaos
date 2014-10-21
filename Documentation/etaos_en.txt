@@ -76,6 +76,16 @@
  */
 
 /**
+ * @defgroup ipm Message queue management
+ * @ingroup sched
+ * @brief Inter-Process messages.
+ *
+ * API to send message from one thread or process to another in a safe way.
+ * All threads expecting a message will be placed on a queue in a waiting
+ * state and remain there, untill a message arrives on that specific queue.
+ */
+
+/**
  * @defgroup preempt Preemption
  * @ingroup sched
  * @brief Preemption API
