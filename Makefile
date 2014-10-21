@@ -5,7 +5,7 @@
 VERSION = 0
 PATCHLEVEL = 2
 SUBLEVEL = 0
-EXTRAVERSION = -rc4
+EXTRAVERSION =
 NAME = Shuffling Donkey
 
 MAKEFLAGS += -rR --no-print-directory
