@@ -104,6 +104,26 @@ int gpio_pin_request(struct gpio_pin *pin)
 	return err;
 }
 
+int gpio_pin_release(struct gpio_pin *pin)
+{
+	struct gpio_chip *chip;
+	unsigned long flags;
+	int err;
+
+	chip = pin ? pin->chip : NULL;
+	if(!chip)
+		return -EINVAL;
+
+	spin_lock_irqsave(&chip->lock, flags);
+	if(test_and_clear_bit(GPIO_REQUESTED, &pin->flags))
+		err = -EOK;
+	else
+		err = 1;
+	spin_unlock_irqrestore(&chip->lock, flags);
+
+	return err;
+}
+
 #define pin_is_requested(__p) test_bit(GPIO_REQUESTED, &(__p)->flags)
 
 /**

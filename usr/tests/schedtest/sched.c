@@ -40,6 +40,8 @@ int main(void)
 {
 	struct gpio_pin *pin;
 	const char * ip_msg = "IPM message\n";
+	bool value = true;
+
 	printf("Application started (M:%u)!\n", mm_heap_available());
 	ipm_queue_init(&ipm_q, 2);
 	test_t = thread_create( "tst", &test_th_handle, NULL,
@@ -48,10 +50,17 @@ int main(void)
 	pin = gpio_chip_to_pin(gpio_sys_chip, 5);
 	gpio_pin_request(pin);
 	gpio_direction_output(pin, false);
+	gpio_pin_release(pin);
 
 	while(true) {
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));
 		printf("maint mem: %u\n", mm_heap_available());
+
+		gpio_pin_request(pin);
+		gpio_direction_output(pin, value);
+		gpio_pin_release(pin);
+		value = !value;
+
 		sleep(500);
 	}
 	return 0;
