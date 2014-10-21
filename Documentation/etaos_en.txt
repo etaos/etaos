@@ -214,6 +214,20 @@
  */
 
 /**
+ * @defgroup gpiolib GPIO library
+ * @ingroup dev
+ * @brief GPIO core library
+ */
+
+/**
+ * @defgroup atmega-gpio ATmega GPIO driver
+ * @ingroup gpiolib
+ * @brief ATmega GPIO driver
+ *
+ * GPIO driver for the AVR ATmega general I/O ports.
+ */
+
+/**
  * @defgroup usart-core USART API
  * @ingroup dev
  * @brief USART device core.
