@@ -203,12 +203,6 @@ static void rr_update_dyn_prio(struct rq *rq)
 }
 #endif
 
-/**
- * @brief System scheduling class.
- *
- * If ETA/OS is configured as a round robin scheduler, this is the the
- * system scheduling class used during run time.
- */
 struct sched_class sys_sched_class = {
 	.rm_thread = &rr_rm_thread,
 	.add_thread = &rr_add_thread,

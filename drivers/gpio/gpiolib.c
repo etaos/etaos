@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup gpiolib
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -24,6 +29,11 @@
 #include <etaos/gpio.h>
 #include <etaos/bitops.h>
 
+/**
+ * @brief GPIO system chip.
+ *
+ * The GPIO system chip is a pointer to the GPIO chip descriptor of the CPU.
+ */
 struct gpio_chip *gpio_sys_chip;
 
 /**
@@ -304,4 +314,6 @@ int raw_gpio_read_pin(struct gpio_pin *pin)
 	chp = pin->chip;
 	return chp->get ? chp->get(chp, pin->nr) : false;
 }
+
+/* @} */
 
