@@ -26,6 +26,7 @@
 #include <etaos/gpio.h>
 
 #include <asm/io.h>
+#include <asm/pgm.h>
 
 /**
  * @def PINS_PER_PORT
@@ -33,57 +34,57 @@
  */
 #define PINS_PER_PORT 8
 
-static volatile void *atmega_gpio_ports[] = {
+static const size_t __pgm atmega_gpio_ports[] = {
 #ifdef PORTA
-	&PORTA,
+	(size_t)&PORTA,
 #endif
 #ifdef PORTB
-	&PORTB,
+	(size_t)&PORTB,
 #endif
 #ifdef PORTC
-	&PORTC,
+	(size_t)&PORTC,
 #endif
 #ifdef PORTD
-	&PORTD,
+	(size_t)&PORTD,
 #endif
 #ifdef PORTE
-	&PORTE,
+	(size_t)&PORTE,
 #endif
 };
 
-static volatile void *atmega_gpio_pins[] = {
+static const size_t __pgm atmega_gpio_pins[] = {
 #ifdef PORTA
-	&PINA,
+	(size_t)&PINA,
 #endif
 #ifdef PORTB
-	&PINB,
+	(size_t)&PINB,
 #endif
 #ifdef PORTC
-	&PINC,
+	(size_t)&PINC,
 #endif
 #ifdef PORTD
-	&PIND,
+	(size_t)&PIND,
 #endif
 #ifdef PORTE
-	&PINE,
+	(size_t)&PINE,
 #endif
 };
 
-static volatile void *atmega_gpio_ddrs[] = {
+static const size_t __pgm atmega_gpio_ddrs[] = {
 #ifdef PORTA
-	&DDRA,
+	(size_t)&DDRA,
 #endif
 #ifdef PORTB
-	&DDRB,
+	(size_t)&DDRB,
 #endif
 #ifdef PORTC
-	&DDRC,
+	(size_t)&DDRC,
 #endif
 #ifdef PORTD
-	&DDRD,
+	(size_t)&DDRD,
 #endif
 #ifdef PORTE
-	&DDRE,
+	(size_t)&DDRE,
 #endif
 };
 
@@ -92,7 +93,7 @@ static inline volatile uint8_t *atmega_pin_to_ddr(struct gpio_pin *pin)
 	uint8_t idx;
 
 	idx = pin->nr / PINS_PER_PORT;
-	return (volatile uint8_t*)atmega_gpio_ddrs[idx];
+	return (volatile uint8_t*)pgm_read_word(atmega_gpio_ddrs+idx);
 }
 
 static inline volatile uint8_t *atmega_pin_to_pin_addr(struct gpio_pin *pin)
@@ -100,7 +101,7 @@ static inline volatile uint8_t *atmega_pin_to_pin_addr(struct gpio_pin *pin)
 	uint8_t idx;
 
 	idx = pin->nr / PINS_PER_PORT;
-	return (volatile uint8_t*)atmega_gpio_pins[idx];
+	return (volatile uint8_t*)pgm_read_word(atmega_gpio_pins+idx);
 }
 
 static inline volatile uint8_t *atmega_pin_to_port(struct gpio_pin *pin)
@@ -108,7 +109,7 @@ static inline volatile uint8_t *atmega_pin_to_port(struct gpio_pin *pin)
 	uint8_t idx;
 
 	idx = pin->nr / PINS_PER_PORT;
-	return (volatile uint8_t*)atmega_gpio_ports[idx];
+	return (volatile uint8_t*)pgm_read_word(atmega_gpio_ports+idx);
 }
 
 static inline uint8_t atmega_pin_index(struct gpio_pin *pin)
@@ -209,7 +210,7 @@ static struct gpio_chip atmega_gpio_chip = {
  * @note Also sets the gpio_sys_chip.
  * @see gpio_sys_chip
  */
-void atmega_init_gpio()
+void atmega_init_gpio(void)
 {
 	int err;
 	struct gpio_pin *pin;

@@ -6,4 +6,6 @@ source "drivers/usart/Kconfig"
 
 source "drivers/gpio/Kconfig"
 
+source "drivers/platform/Kconfig"
+
 endmenu
