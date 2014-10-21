@@ -12,6 +12,7 @@
 #include <etaos/mem.h>
 #include <etaos/mutex.h>
 #include <etaos/time.h>
+#include <etaos/gpio.h>
 
 static unsigned char test_thread_stack[CONFIG_STACK_SIZE];
 static struct thread *test_t;
@@ -40,10 +41,15 @@ THREAD(test_th_handle, arg)
 
 int main(void)
 {
+	struct gpio_pin *pin;
 	printf("Application started (M:%u)!\n", mm_heap_available());
 	test_t = thread_create( "tst", &test_th_handle, NULL,
 			CONFIG_STACK_SIZE, test_thread_stack, 80);
-	
+
+	pin = gpio_chip_to_pin(gpio_sys_chip, 5);
+	gpio_pin_request(pin);
+	gpio_direction_output(pin, false);
+
 	while(true) {
 		evm_wait_next_event_queue(&test_q, 500);
 		printf("maint mem: %u\n", mm_heap_available());

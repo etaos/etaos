@@ -41,5 +41,14 @@
 		"pop __tmp_reg__"	   "\n\t" \
 		"out __SREG__, __tmp_reg__""\n\t")
 
+#ifndef __ASSEMBLER__
+extern void atmega_init_gpio();
+
+#if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
+#define gpio_init() atmega_init_gpio()
+#else
+#define gpio_init()
+#endif
+#endif
 #endif
 
