@@ -126,7 +126,7 @@ extern int gpio_pin_release(struct gpio_pin *pin);
 
 /**
  * @brief Configure a pin as open drain.
- * @param Pin to configure.
+ * @param pin Pin to configure.
  */
 static inline void gpio_set_open_drain(struct gpio_pin *pin)
 {
@@ -138,7 +138,7 @@ static inline void gpio_set_open_drain(struct gpio_pin *pin)
 
 /**
  * @brief Configure a pin as open source.
- * @param Pin to configure.
+ * @param pin Pin to configure.
  */
 static inline void gpio_set_open_source(struct gpio_pin *pin)
 {

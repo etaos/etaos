@@ -81,7 +81,7 @@ void gpio_pin_init(struct gpio_chip *chip,
  * @brief Get a pin descriptor based on its pin number.
  * @param chip GPIO chip where the pin belongs to.
  * @param nr Pin number.
- * @retrun The GPIO pin descriptor.
+ * @return The GPIO pin descriptor.
  */
 struct gpio_pin *gpio_chip_to_pin(struct gpio_chip *chip, uint16_t nr)
 {

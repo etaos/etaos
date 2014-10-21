@@ -39,6 +39,7 @@ static inline bool ipm_queue_is_full(struct ipm_queue *iq)
 /**
  * @brief Initialise a new IPM queue.
  * @param iq Queue to initialise.
+ * @param len Amount of messages to allocate.
  */
 void ipm_queue_init(struct ipm_queue *iq, size_t len)
 {

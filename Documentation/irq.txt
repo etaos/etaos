@@ -1,0 +1,27 @@
+/* ================ IRQ support ================ */
+
+/**
+ * @defgroup irq IRQ management
+ * @ingroup kernel
+ * @brief Interrupt support.
+ *
+ * Support to register interrupt handlers to the kernel. They can be registered
+ * either as tradition IRQ handlers or as threaded IRQ's. Please note that
+ * threaded IRQ's are slower.
+ *
+ * @note Note, that it is not required to register interrupts with Nut/OS. 
+ *       Actually, this will route interrupts through the kernel, which 
+ *       results in performance degradation.
+ */
+
+/**
+ * @defgroup irqchip IRQ chip management
+ * @ingroup irq
+ * @brief IRQ chip support.
+ *
+ * IRQ chips are the chips responsible for generating IRQ's. Examples of IRQ
+ * chips are the CPU and on an x86 system the IOAPIC. IRQ's are registered
+ * on an IRQ chip when they are allocated using the ETA/OS IRQ API. When an
+ * interrupt is triggered, the IRQ chip is responsible for handling the
+ * interrupt.
+ */

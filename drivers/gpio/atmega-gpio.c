@@ -16,12 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup atmega-gpio
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/gpio.h>
 
 #include <asm/io.h>
 
+/**
+ * @def PINS_PER_PORT
+ * @brief Amount of pins per I/O port
+ */
 #define PINS_PER_PORT 8
 
 static volatile void *atmega_gpio_ports[] = {
@@ -195,6 +204,11 @@ static struct gpio_chip atmega_gpio_chip = {
 	.get_direction = &atmega_get_dir,
 };
 
+/**
+ * @brief Initialise the ATmega AVR GPIO chip.
+ * @note Also sets the gpio_sys_chip.
+ * @see gpio_sys_chip
+ */
 void atmega_init_gpio()
 {
 	int err;
@@ -213,3 +227,6 @@ void atmega_init_gpio()
 	gpio_set_sys_chip(&atmega_gpio_chip);
 	return;
 }
+
+/* @} */
+

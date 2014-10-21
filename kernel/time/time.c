@@ -136,7 +136,7 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 
 /**
  * @brief Stop a timer.
- * @param Timer to stop.
+ * @param timer Timer to stop.
  * @return Error code.
  * @retval 0 on success.
  * @retval 1 if no timer was stopped.

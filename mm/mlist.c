@@ -51,7 +51,7 @@ void mm_heap_add_block(void *start, size_t size)
  * @brief Mark a memory block as used.
  * @param node Node to mark as used.
  * @param prev Node precending \p node (i.e. prev->next == node).
- * @note Set \prev to \p NULL if you are passing the head of the heap.
+ * @note Set \p prev to \p NULL if you are passing the head of the heap.
  */
 void mm_use_block(struct heap_node *node, struct heap_node *prev)
 {

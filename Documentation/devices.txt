@@ -1,0 +1,78 @@
+/* ================ Device drivers ================ */
+
+/**
+ * @defgroup dev Device drivers
+ * @brief Standard device I/O functions.
+ *
+ * Device drivers are typically not accessed directly by an application. 
+ * Instead they are used by the standard C library to perform data I/O.
+ */
+
+/**
+ * @defgroup dev-core  Device core
+ * @ingroup dev
+ * @brief Device driver core.
+ * 
+ * The device driver core is responsible for internal handling of device
+ * drivers. Registering, and unregistering them for example.
+ */
+
+/* ================ GPIO drivers ================ */
+/**
+ * @defgroup gpiolib GPIO library
+ * @ingroup dev
+ * @brief GPIO core library
+ */
+
+/**
+ * @defgroup atmega-gpio ATmega GPIO driver
+ * @ingroup gpiolib
+ * @brief ATmega GPIO driver
+ *
+ * GPIO driver for the AVR ATmega general I/O ports.
+ */
+
+/* ================ USART drivers ================ */
+
+/**
+ * @defgroup usart-core USART API
+ * @ingroup dev
+ * @brief USART device core.
+ * 
+ * @section usart-gen Generic description
+ * A universal asynchronous receiver/transmitter, abbreviated UART, is a 
+ * piece of computer hardware that translates data between parallel and serial 
+ * forms. UARTs are commonly used in conjunction with communication standards 
+ * such as EIA, RS-232, RS-422 or RS-485. The universal designation indicates 
+ * that the data format and transmission speeds are configurable.
+ *
+ * @section usart-usage Usage
+ * Writing or reading from a usart device is done as following:
+ * @code{.c}
+   int fd = open("dev-name", _FDEV_SETUP_RW);
+   if(fd < 0)
+   	error();
+   write(fd, buff, length);
+   read(fd, rxbuff, rxlen);
+   close(fd);
+   @endcode
+ */
+
+/**
+ * @defgroup usart-atmega ATmega USART
+ * @ingroup usart-core
+ * @brief ATmega USART I/O device.
+ * 
+ *   * Full Duplex Operation (Independent Serial Receive and Transmit Registers)
+ *   * Asynchronous or Synchronous Operation
+ *   * Master or Slave Clocked Synchronous Operation
+ *   * High Resolution Baud Rate Generator
+ *   * Supports Serial Frames with 5, 6, 7, 8, or 9 Data Bits and 1 or 2 Stop Bits
+ *   * Odd or Even Parity Generation and Parity Check Supported by Hardware
+ *   * Data OverRun Detection
+ *   * Framing Error Detection
+ *   * Noise Filtering Includes False Start Bit Detection and Digital Low Pass Filter
+ *   * Three Separate Interrupts on TX Complete, TX Data Register Empty and RX Complete
+ *   * Multi-processor Communication Mode
+ *   * Double Speed Asynchronous Communication Mode
+ */
