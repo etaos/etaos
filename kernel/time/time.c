@@ -212,6 +212,7 @@ void tm_process_clock(struct clocksource *cs, int64_t diff)
 			}
 
 			list_del(&timer->list);
+
 			if(timer->ticks) {
 				timer->tleft = timer->ticks;
 				raw_spin_unlock(&cs->lock);

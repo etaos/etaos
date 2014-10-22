@@ -230,7 +230,7 @@ extern void rq_add_thread_no_lock(struct thread *tp);
 #ifdef CONFIG_IRQ_THREAD
 extern void irq_signal_threads(struct rq *rq);
 #else
-#define irq_signal_threads
+#define irq_signal_threads(rq)
 #endif
 
 

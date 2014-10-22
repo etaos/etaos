@@ -622,6 +622,9 @@ static bool __hot rq_schedule(void)
 	struct thread *carriage, *volatile*tpp;
 	unsigned char events;
 #endif
+#ifdef CONFIG_PREEMPT
+	unsigned int slice;
+#endif
 
 	rq = sched_get_cpu_rq();
 	prev = current(rq);
@@ -652,9 +655,10 @@ resched:
 	diff = tm_update_source(rq->source);
 	tm_process_clock(rq->source, diff);
 #ifdef CONFIG_PREEMPT
-	if(diff < prev->slice) {
-		prev->slice -= diff;
-	} else {
+	slice = (unsigned int)diff;
+	if(slice < prev->slice) {
+		prev->slice -= slice;
+	} else if(slice >= prev->slice) {
 		prev->slice = CONFIG_TIME_SLICE;
 		set_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags);
 	}

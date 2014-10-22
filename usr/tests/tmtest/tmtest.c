@@ -43,7 +43,7 @@ int main(void)
 	struct clocksource *cs;
 
 	printf("Application started!\n");
-	
+
 	cs = avr_get_sys_clk();
 	diff = tm_update_source(cs);
 	tmtest_init_timers();
