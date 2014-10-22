@@ -615,15 +615,12 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 static bool __hot rq_schedule(void)
 {
 	struct rq *rq;
-	int64_t diff;
+	unsigned int diff;
 	bool did_switch;
 	struct thread *tp, *prev;
 #ifdef CONFIG_EVENT_MUTEX
 	struct thread *carriage, *volatile*tpp;
 	unsigned char events;
-#endif
-#ifdef CONFIG_PREEMPT
-	unsigned int slice;
 #endif
 
 	rq = sched_get_cpu_rq();
@@ -653,12 +650,12 @@ resched:
 
 #ifdef CONFIG_TIMER
 	diff = tm_update_source(rq->source);
-	tm_process_clock(rq->source, diff);
+	if(diff)
+		tm_process_clock(rq->source, diff);
 #ifdef CONFIG_PREEMPT
-	slice = (unsigned int)diff;
-	if(slice < prev->slice) {
-		prev->slice -= slice;
-	} else if(slice >= prev->slice) {
+	if(diff < prev->slice) {
+		prev->slice -= diff;
+	} else if(diff >= prev->slice) {
 		prev->slice = CONFIG_TIME_SLICE;
 		set_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags);
 	}
@@ -685,8 +682,9 @@ resched:
 	}
 
 	preempt_enable_no_resched();
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
+	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags)) {
 		goto resched;
+	}
 
 	rq_destroy_kill_q(rq);
 	return did_switch;

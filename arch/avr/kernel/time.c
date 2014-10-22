@@ -23,6 +23,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/error.h>
 #include <etaos/time.h>
 
 #include <asm/time.h>

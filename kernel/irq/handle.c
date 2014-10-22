@@ -72,11 +72,8 @@ static void irq_handle_hard_irq(struct irq_data *data)
 	}
 
 	switch(retv) {
-	case IRQ_NONE:
-		break;
-
 	case IRQ_HANDLED:
-		data->num += 1;
+	case IRQ_NONE:
 		break;
 
 #ifdef CONFIG_IRQ_THREAD

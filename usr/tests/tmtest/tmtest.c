@@ -11,6 +11,7 @@
 #include <etaos/list.h>
 #include <etaos/irq.h>
 #include <etaos/time.h>
+#include <etaos/evm.h>
 
 #include <asm/io.h>
 #include <asm/time.h>
@@ -18,11 +19,12 @@
 
 static struct timer *tm1;
 static char *tm1_name = "tm1";
+unsigned long timer_cnt = 0;
 
 static void print_timer(struct timer *timer, void *data)
 {
-	char *name = data;
-	printf("Exec: %s\n", name);
+	printf("%lu\n", timer_cnt);
+	timer_cnt++;
 }
 
 static void tmtest_init_timers(void)
@@ -39,15 +41,15 @@ static void tmtest_init_timers(void)
 
 int main(void)
 {
-	int64_t diff;
+	unsigned int diff;
 	struct clocksource *cs;
-
+	
 	printf("Application started!\n");
 
 	cs = avr_get_sys_clk();
-	diff = tm_update_source(cs);
 	tmtest_init_timers();
 
+	diff = tm_update_source(cs);
 	while(true) {
 		tm_process_clock(cs, diff);
 		diff = tm_update_source(cs);
