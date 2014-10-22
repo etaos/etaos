@@ -24,3 +24,16 @@
  * the rest of ETA/OS succesfully.
  */
 
+/**
+ * @defgroup arch Architectures
+ * @brief Supported architectures
+ */
+
+/**
+ * @defgroup atmega ATmega AVR
+ * @ingroup arch
+ * @brief ATmega AVR support.
+ *
+ * Supported ATmega chips:
+ * * ATmega328(p)
+ */

@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup atmega
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
@@ -36,6 +41,12 @@ extern void avr_install_irqs(void);
 extern char __heap_start;
 static const char *mm_heap_start = &__heap_start;
 
+/**
+ * @brief AVR system initialisation.
+ *
+ * avr_init initialises the ATmega AVR system. It is called from the AVR
+ * bootstrap.
+ */
 void avr_init(void)
 {
 #ifdef CONFIG_MALLOC
@@ -51,3 +62,6 @@ void avr_init(void)
 
 	while(1);
 }
+
+/* @} */
+
