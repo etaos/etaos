@@ -17,6 +17,21 @@
  * drivers. Registering, and unregistering them for example.
  */
 
+/* ================ Platform drivers ================ */
+
+/**
+ * @defgroup platform Platform drivers
+ * @ingroup dev
+ * @brief Platform device drivers
+ * 
+ * A platform device driver is a driver for a specific platform. A few
+ * example platforms:
+ *
+ * * Arduino UNO
+ * * Arduino MEGA
+ * * ATmega128 M128
+ */
+
 /* ================ GPIO drivers ================ */
 /**
  * @defgroup gpiolib GPIO library
