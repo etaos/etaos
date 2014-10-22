@@ -41,24 +41,12 @@ void avr_init(void)
 	size_t hsize = RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
 	mm_init((void*)mm_heap_start, hsize);
 #endif
-
-#ifdef CONFIG_VFS
-	vfs_init();
-#endif
+	_vfs_init();
 	gpio_init();
-#if defined(CONFIG_ATMEGA_USART) || defined(CONFIG_ATMEGA_USART_MODULE)
-	atmega_usart_init();
-#endif
-#ifdef CONFIG_TIMER
-	avr_timer_init();
-#endif
 	irq_enable();
-#ifdef CONFIG_SCHED
-	avr_init_sched();
-	sched_init();
-#else
-	main_init();
-#endif
+	init_usart();
+	timer_init();
+	sys_init();
 
 	while(1);
 }
