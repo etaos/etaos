@@ -94,6 +94,11 @@ static void tm_start_timer(struct timer *timer)
 	raw_spin_unlock(&cs->lock);
 }
 
+/**
+ * @brief Calculate the clockskew of a clocksource.
+ * @param cs Clocksource to calculate the clockskew of.
+ * @return The clockskew of \p cs.
+ */
 static unsigned int cs_get_diff(struct clocksource *cs)
 {
 	return (unsigned int)(atomic64_get(&cs->tc) - cs->tc_resume);
@@ -169,6 +174,13 @@ int tm_stop_timer(struct timer *timer)
 	return 0;
 }
 
+/**
+ * @brief Update the clockskew of a clocksource.
+ * @param source Clocksource to update.
+ * @return The clockskew of \p source.
+ * @note You should call tm_process_clock as soon as possible after calling
+ *       this function to keep timers up to date.
+ */
 unsigned int tm_update_source(struct clocksource *source)
 {
 	unsigned int diff;
