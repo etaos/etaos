@@ -40,44 +40,5 @@
 #define irq_exit_critical() __asm__ __volatile__( \
 		"pop __tmp_reg__"	   "\n\t" \
 		"out __SREG__, __tmp_reg__""\n\t")
-
-#ifndef __ASSEMBLER__
-extern void atmega_init_gpio();
-
-#if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
-#define gpio_init() atmega_init_gpio()
-#else
-#define gpio_init()
-#endif
-
-#if defined(CONFIG_VFS) || defined(CONFIG_VFS_MODLE)
-#define _vfs_init() vfs_init();
-#else
-#define _vfs_init()
-#endif
-
-
-#if defined(CONFIG_ATMEGA_USART) || defined(CONFIG_ATMEGA_USART_MODULE)
-#define init_usart() atmega_usart_init();
-#else
-#define init_usart()
-#endif
-
-#ifdef CONFIG_TIMER
-#define timer_init() avr_timer_init();
-#else
-#define timer_init()
-#endif
-
-#ifdef CONFIG_SCHED
-#define sys_init() \
-	avr_init_sched(); \
-	sched_init();
-#else
-#define sys_init() main_init();
-#endif
-
-#endif
-
 #endif
 

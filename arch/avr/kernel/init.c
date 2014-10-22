@@ -29,6 +29,7 @@
 #include <asm/cpu.h>
 #include <asm/simulavr.h>
 #include <asm/usart.h>
+#include <asm/init.h>
 
 extern void avr_init(void);
 extern void avr_install_irqs(void);
