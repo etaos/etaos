@@ -13,6 +13,7 @@
 #include <etaos/mutex.h>
 #include <etaos/time.h>
 #include <etaos/gpio.h>
+#include <etaos/platform.h>
 #include <etaos/ipm.h>
 
 static unsigned char test_thread_stack[CONFIG_STACK_SIZE];
@@ -38,7 +39,6 @@ THREAD(test_th_handle, arg)
 
 int main(void)
 {
-	struct gpio_pin *pin;
 	const char * ip_msg = "IPM message\n";
 	bool value = true;
 
@@ -47,18 +47,17 @@ int main(void)
 	test_t = thread_create( "tst", &test_th_handle, NULL,
 			CONFIG_STACK_SIZE, test_thread_stack, 80);
 
-	pin = gpio_chip_to_pin(gpio_sys_chip, 5);
-	gpio_pin_request(pin);
-	gpio_direction_output(pin, false);
-	gpio_pin_release(pin);
+	pgpio_pin_request(13);
+	pgpio_direction_output(13, false);
+	pgpio_pin_release(13);
 
 	while(true) {
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));
 		printf("maint mem: %u\n", mm_heap_available());
 
-		gpio_pin_request(pin);
-		gpio_direction_output(pin, value);
-		gpio_pin_release(pin);
+		pgpio_pin_request(13);
+		pgpio_write_pin(13, value);
+		pgpio_pin_release(13);
 		value = !value;
 
 		sleep(500);

@@ -20,8 +20,10 @@
 #define __PLATFORM_H__
 
 extern int pgpio_write_pin(int pin, int val);
-extern int pgio_read_pin(int pin);
-extern int pgio_direction_ouput(int pin, int val);
-extern int pgio_direction_input(int pin);
+extern int pgpio_read_pin(int pin);
+extern int pgpio_direction_output(int pin, int val);
+extern int pgpio_direction_input(int pin);
+extern int pgpio_pin_release(int pin);
+extern int pgpio_pin_request(int pin);
 
 #endif
