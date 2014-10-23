@@ -12,6 +12,7 @@
 #include <etaos/mem.h>
 #include <etaos/mutex.h>
 #include <etaos/time.h>
+#include <etaos/tick.h>
 #include <etaos/gpio.h>
 #include <etaos/platform.h>
 #include <etaos/ipm.h>
@@ -41,6 +42,7 @@ int main(void)
 {
 	const char * ip_msg = "IPM message\n";
 	bool value = true;
+	int64_t tick_orig;
 
 	printf("Application started (M:%u)!\n", mm_heap_available());
 	ipm_queue_init(&ipm_q, 2);
@@ -51,7 +53,11 @@ int main(void)
 	pgpio_direction_output(13, false);
 	pgpio_pin_release(13);
 
+	tick_orig = sys_tick;
+
 	while(true) {
+		if(time_after(sys_tick, tick_orig + 3000))
+			printf("tm after: 3000\n");
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));
 		printf("maint mem: %u\n", mm_heap_available());
 

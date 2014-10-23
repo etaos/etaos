@@ -70,6 +70,7 @@ void avr_timer_init(void)
 	tm_clock_source_initialise(sysclk.name, &sysclk, AVR_SYSCLK_FRQ,
 					&avr_sysclk_enable, NULL);
 	avr_start_sysclk(TIMER0_OVERFLOW_VECTOR_NUM, &sysclk);
+	sysctl(SYS_SET_SYSCLK, &sysclk);
 }
 
 /* @} */

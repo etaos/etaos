@@ -30,6 +30,8 @@
 #include <etaos/tick.h>
 #include <etaos/stdio.h>
 
+struct clocksource *sys_clk;
+
 /**
  * @brief System tick IRQ handler.
  * @param irq IRQ data.

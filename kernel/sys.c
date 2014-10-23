@@ -20,6 +20,7 @@
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/stdio.h>
+#include <etaos/tick.h>
 #include <etaos/stddef.h>
 
 /**
@@ -32,7 +33,7 @@
 int sysctl(sys_ctl_t ctl, ...)
 {
 	int err;
-	FILE stream;
+	void *stream;
 	va_list va;
 
 	va_start(va, ctl);
@@ -52,6 +53,12 @@ int sysctl(sys_ctl_t ctl, ...)
 	case SYS_SET_STDIN:
 		stream = (FILE) va_arg(va, size_t);
 		stdin = stream;
+		err = -EOK;
+		break;
+
+	case SYS_SET_SYSCLK:
+		stream = (void*)va_arg(va, size_t);
+		sys_clk = stream;
 		err = -EOK;
 		break;
 
