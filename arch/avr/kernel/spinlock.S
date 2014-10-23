@@ -53,6 +53,26 @@ avr_spin_lock:
 	ret
 .endfunc
 
+.global avr_spin_wait
+.func avr_spin_wait
+avr_spin_wait:
+	push r30
+	push r31
+	push r20
+
+	mov r30, r24
+	mov r31, r25
+.L_spin_wait:
+	ld r20, Z
+	tst r20
+	brne .L_spin_wait
+
+	pop r20
+	pop r31
+	pop r30
+	ret
+.endfunc
+
 .global avr_spin_unlock
 .func avr_spin_unlock
 avr_spin_unlock:

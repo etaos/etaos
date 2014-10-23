@@ -26,6 +26,12 @@
 
 extern void avr_spin_lock(unsigned char *);
 extern void avr_spin_unlock(unsigned char*);
+extern void avr_spin_wait(unsigned char *);
+
+static inline void arch_mutex_wait(mutex_t *mutex)
+{
+	avr_spin_wait((unsigned char*)&mutex->lock);
+}
 
 static inline void arch_mutex_lock(mutex_t *mutex)
 {
