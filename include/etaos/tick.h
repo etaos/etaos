@@ -27,5 +27,12 @@
 
 extern void systick_setup(int irq, struct clocksource *src);
 
+extern struct clocksource *sys_clk;
+
+static inline struct clocksource *sys_get_clock(void)
+{
+	return sys_clk;
+}
+
 #endif /* __TICK_H__ */
 
