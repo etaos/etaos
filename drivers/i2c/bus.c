@@ -39,3 +39,11 @@ int i2c_init_bus(struct i2c_bus *bus)
 	return -EOK;
 }
 
+void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client)
+{
+	if(!bus || !client)
+		return;
+
+	list_add(&client->list_entry, &bus->clients);
+}
+

@@ -42,7 +42,7 @@ struct i2c_bus {
 };
 
 struct i2c_client {
-	struct list_head *list_entry;
+	struct list_head list_entry;
 
 	struct i2c_bus *bus;
 	struct device dev;
@@ -50,5 +50,6 @@ struct i2c_client {
 };
 
 extern int i2c_init_bus(struct i2c_bus *bus);
+extern void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client);
 
 #endif
