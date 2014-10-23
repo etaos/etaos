@@ -58,5 +58,7 @@ extern int i2c_master_send(const struct i2c_client *client,
 		const char *buf, int count);
 extern int i2c_master_recv(const struct i2c_client *client, 
 		char *buf, int count);
+extern int i2c_bus_xfer(struct i2c_bus *bus, 
+			struct i2c_msg msgs[], int len);
 
 #endif

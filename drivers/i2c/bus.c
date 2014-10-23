@@ -23,10 +23,22 @@
 #include <etaos/list.h>
 #include <etaos/bitops.h>
 
-static int i2c_bus_xfer(struct i2c_bus *bus, 
-		const struct i2c_msg msgs[], int len)
+static int __i2c_transfer(struct i2c_bus *bus,
+		struct i2c_msg msgs[], int len)
 {
-	return -EINVAL;
+	return 0;
+}
+
+int i2c_bus_xfer(struct i2c_bus *bus, 
+			struct i2c_msg msgs[], int len)
+{
+	int ret;
+
+	mutex_lock(&bus->lock);
+	ret = __i2c_transfer(bus, msgs, len);
+	mutex_unlock(&bus->lock);
+
+	return ret;
 }
 
 int i2c_master_send(const struct i2c_client *client, const char *buf, int count)
@@ -67,7 +79,6 @@ int i2c_init_bus(struct i2c_bus *bus)
 	if(!bus)
 		return -EINVAL;
 
-	bus->xfer = &i2c_bus_xfer;
 	mutex_init(&bus->lock);
 	list_head_init(&bus->clients);
 	return -EOK;
