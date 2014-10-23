@@ -8,6 +8,24 @@
  *     - Memory management
  *     - I/O drivers
  *     - Timer management
+ *
+ * @section min-app Minimal application
+ * An example of a most minimal application:
+ * @code{.c}
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+
+void main(void)
+{
+	for(;;);
+}
+  @endcode
+ */
+
+/**
+ * @defgroup sem Semaphores
+ * @ingroup kernel
+ * @brief Semaphore API.
  */
 
 /**
@@ -18,223 +36,36 @@
  * the rest of ETA/OS succesfully.
  */
 
-/* ================ Scheduler support ================ */
-
 /**
- * @defgroup thread Thread management
- * @ingroup kernel
- * @brief Cooperative multi-threading support.
- * 
- * Typically ETA/OS is at its most useful where there are several concurrent 
- * tasks that need to be undertaken at the same time. To support this 
- * requirement, ETA/OS offers some kind of light processes called threads. 
- * In this context a thread is a sequence of executing software that can be
- * considered to be logically independent from other software that is running 
- * on the same CPU.
+ * @defgroup arch Architectures
+ * @brief Supported architectures
  */
 
 /**
- * @defgroup sched Scheduling core
- * @ingroup kernel
- * @brief ETA/OS scheduling support.
+ * @defgroup atmega ATmega AVR
+ * @ingroup arch
+ * @brief ATmega AVR support.
  *
- * @section sched-desc Introduction
- * The scheduler is responsible for handling the available CPU time, and
- * distributing it around the available threads. The entry point for the
- * scheduler is the function schedule(). This function will check two
- * value's before it decides to switch context or not. It checks the flag
- * THREAD_NEED_RESCHED_FLAG on the currently running thread, and it checks
- * if the thread selected by the algorithm as 'next' is not equal to the one
- * already running. To manually request a reschedule the following stepds are
- * required:
-   @code{.c}
-   struct thread *tp = current_thread();
-
-   set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
-   schedule();
-   @endcode
+ * Supported ATmega chips:
+ * * ATmega328(p)
  *
- * @section sched-other Responsibilities
- * The scheduler is responsible for of switching the context of threads, of
- * course. But there is bunch of other features it is updating:
+ * @section atmega-init System initialisation
  *
- * * checking if a thread has used up its time slice;
- * * signaling events which have been signaled from an IRQ;
- * * signaling IRQ threads for threaded IRQ support;
- * * updating the timers and clocksource of the CPU clocksource;
- * * Free-ing the memory of killed threads;
- * * Updating the dynamic priorities of threads in the run queue
+ * After the AVR chip has been programmed and the power is turned on, the
+ * IP (Instruction Pointer) starts the execution at physical address 0x0
+ * in the program memory. At this address a so called vector table is defined.
+ * The vector table is a table of jmp instructions for interrupts. However,
+ * the first "interrupt" is the boot jump. This jump brings the IP to the
+ * __init label. The __init function initialises the stack and RAMPD registers.
+ * The rest of the content of this function is variable, depending on whether
+ * the application contains a data and/or bss segment. If it does, the compiler
+ * imported some code from libgcc to set the entire content of the bss section
+ * to zero and copy all values of the data segment from program memory into
+ * the data memory. Once that is done, the main section of ETA/OS will be
+ * started, avr_init is called.
  *
- * For this reason it is important that the scheduler gets called regularly.
- */
-
-/**
- * @defgroup preempt Preemption
- * @ingroup sched
- * @brief Preemption API
- *
- * API to manage the CPU preemption.
- */
-
-/**
- * @defgroup rr Round robin scheduler
- * @ingroup sched
- * @brief The round robin scheduling algorithm.
- */
-
-/**
- * @defgroup evm Event management
- * @ingroup kernel
- * @brief ETA/OS thread synchronisation.
- */
-
-/* ================ Timer support ================ */
-
-/**
- * @defgroup tm Timer management
- * @ingroup kernel
- * @brief Asynchronous timer support.
- *
- * The timer management provides functions to start and stop asynchronous 
- * timers, determine the CPU speed and let a thread give up the CPU for a 
- * specified time period.
- */
-
-/* ================ IRQ support ================ */
-
-/**
- * @defgroup irq IRQ management
- * @ingroup kernel
- * @brief Interrupt support.
- *
- * Support to register interrupt handlers to the kernel. They can be registered
- * either as tradition IRQ handlers or as threaded IRQ's. Please note that
- * threaded IRQ's are slower.
- *
- * @note Note, that it is not required to register interrupts with Nut/OS. 
- *       Actually, this will route interrupts through the kernel, which 
- *       results in performance degradation.
- */
-
-/**
- * @defgroup irqchip IRQ chip management
- * @ingroup irq
- * @brief IRQ chip support.
- *
- * IRQ chips are the chips responsible for generating IRQ's. Examples of IRQ
- * chips are the CPU and on an x86 system the IOAPIC. IRQ's are registered
- * on an IRQ chip when they are allocated using the ETA/OS IRQ API. When an
- * interrupt is triggered, the IRQ chip is responsible for handling the
- * interrupt.
- */
-
-/* ================ Memory management ================ */
-
-/**
- * @defgroup mm Memory management
- * @ingroup kernel
- * @brief Dynamic memory management.
- *
- * Dynamic memory allocations are made from the heap. The heap is a global 
- * resource containing all of the free memory in the system. The heap is 
- * handled in data structure of unused blocks of memory, the so called 
- * free-list.
- */
-
-/**
- * @defgroup ff First fit allocator
- * @ingroup mm
- * @brief First fit memeory allocation algorithm.
- * 
- * The first fit allocator is the most simple allocator out there. It maintains
- * a list of available memory and removes an entry whenever it gets allocated.
- * If a memeory region gets free'd up, the region is added back into the list
- * of available memory.
- */
-
-/* ================ LibC ================ */
-
-/**
- * @defgroup libc C runtime library
- * @brief C run time library
- * @note When linking your application, pass -lc as the last library to your
- *       linker.
- *
- * Complementary runtime C library. Normal C libraries (like glibc) are way
- * to big to fit into small chips. This is a copy of a very compact c library.
- */
-
-/* ================ File systems ================ */
-
-/**
- * @defgroup fs Filesystem management
- * @ingroup kernel
- */
-
-/**
- * @defgroup vfs Virtual filesystem API
- * @ingroup fs
- * @brief Volatile RAM filesystem
- */
-
-/* ================ Device drivers ================ */
-
-/**
- * @defgroup dev Device drivers
- * @brief Standard device I/O functions.
- *
- * Device drivers are typically not accessed directly by an application. 
- * Instead they are used by the standard C library to perform data I/O.
- */
-
-/**
- * @defgroup dev-core  Device core
- * @ingroup dev
- * @brief Device driver core.
- * 
- * The device driver core is responsible for internal handling of device
- * drivers. Registering, and unregistering them for example.
- */
-
-/**
- * @defgroup usart-core USART API
- * @ingroup dev
- * @brief USART device core.
- * 
- * @section usart-gen Generic description
- * A universal asynchronous receiver/transmitter, abbreviated UART, is a 
- * piece of computer hardware that translates data between parallel and serial 
- * forms. UARTs are commonly used in conjunction with communication standards 
- * such as EIA, RS-232, RS-422 or RS-485. The universal designation indicates 
- * that the data format and transmission speeds are configurable.
- *
- * @section usart-usage Usage
- * Writing or reading from a usart device is done as following:
- * @code{.c}
-   int fd = open("dev-name", _FDEV_SETUP_RW);
-   if(fd < 0)
-   	error();
-   write(fd, buff, length);
-   read(fd, rxbuff, rxlen);
-   close(fd);
-   @endcode
- */
-
-/**
- * @defgroup usart-atmega ATmega USART
- * @ingroup usart-core
- * @brief ATmega USART I/O device.
- * 
- *   * Full Duplex Operation (Independent Serial Receive and Transmit Registers)
- *   * Asynchronous or Synchronous Operation
- *   * Master or Slave Clocked Synchronous Operation
- *   * High Resolution Baud Rate Generator
- *   * Supports Serial Frames with 5, 6, 7, 8, or 9 Data Bits and 1 or 2 Stop Bits
- *   * Odd or Even Parity Generation and Parity Check Supported by Hardware
- *   * Data OverRun Detection
- *   * Framing Error Detection
- *   * Noise Filtering Includes False Start Bit Detection and Digital Low Pass Filter
- *   * Three Separate Interrupts on TX Complete, TX Data Register Empty and RX Complete
- *   * Multi-processor Communication Mode
- *   * Double Speed Asynchronous Communication Mode
+ * avr_init is main init routine of ETA/OS. It will initialise all configured
+ * features (e.g. the memory manager, scheduler, device drivers, etc..). Once
+ * everything is initialised, configured and running the application main
+ * routine will be called.
  */

@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup atmega
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
@@ -29,35 +34,34 @@
 #include <asm/cpu.h>
 #include <asm/simulavr.h>
 #include <asm/usart.h>
+#include <asm/init.h>
 
 extern void avr_init(void);
 extern void avr_install_irqs(void);
 extern char __heap_start;
 static const char *mm_heap_start = &__heap_start;
 
+/**
+ * @brief AVR system initialisation.
+ *
+ * avr_init initialises the ATmega AVR system. It is called from the AVR
+ * bootstrap.
+ */
 void avr_init(void)
 {
 #ifdef CONFIG_MALLOC
 	size_t hsize = RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
 	mm_init((void*)mm_heap_start, hsize);
 #endif
-
-#ifdef CONFIG_VFS
-	vfs_init();
-#endif
-#if defined(CONFIG_ATMEGA_USART) || defined(CONFIG_ATMEGA_USART_MODULE)
-	atmega_usart_init();
-#endif
-#ifdef CONFIG_TIMER
-	avr_timer_init();
-#endif
+	_vfs_init();
+	gpio_init();
 	irq_enable();
-#ifdef CONFIG_SCHED
-	avr_init_sched();
-	sched_init();
-#else
-	main_init();
-#endif
+	init_usart();
+	timer_init();
+	sys_init();
 
 	while(1);
 }
+
+/* @} */
+

@@ -1,0 +1,10 @@
+menu "Platform drivers"
+
+config ARD_UNO
+	bool "Arduino uno"
+	depends on ATMEGA_GPIO
+	help
+	  Say 'y' here to build support for the Arduiono UNO
+	  development board.
+
+endmenu

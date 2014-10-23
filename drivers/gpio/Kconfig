@@ -1,0 +1,16 @@
+menuconfig GPIO
+	tristate "GPIO driver"
+	help
+	  Say 'y' or 'm' here if you want to build support for the GPIO
+	  layer.
+
+if GPIO
+
+config ATMEGA_GPIO
+	tristate "ATmega GPIO"
+	help
+	  Say 'y' or 'm' here to build support for the AVR ATmega GPIO
+	  chip.
+
+endif
+

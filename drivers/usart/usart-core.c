@@ -77,9 +77,9 @@ void setup_usart_streams(struct usart *usart)
 	FILE usart_stream;
 
 	usart_stream = dev_to_file(&usart->dev);
-	stdout = usart_stream;
-	stdin = usart_stream;
-	stderr = usart_stream;
+	sysctl(SYS_SET_STDOUT, usart_stream);
+	sysctl(SYS_SET_STDERR, usart_stream);
+	sysctl(SYS_SET_STDIN, usart_stream);
 }
 
 /**

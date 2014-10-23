@@ -39,6 +39,12 @@ static struct rq avr_rq = {
 
 };
 
+/**
+ * @brief Initialise the AVR scheduling core.
+ * @see avr_get_sys_clk
+ *
+ * Basically initialises the clocksource of the AVR run queue.
+ */
 void avr_init_sched(void)
 {
 	avr_rq.source = avr_get_sys_clk();

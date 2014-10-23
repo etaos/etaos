@@ -67,5 +67,6 @@ int irq_chip_init(struct irq_chip *chip, const char *name)
 	return -EOK;
 }
 
-/** @} @} */
+/* @} */
+/* @} */
 

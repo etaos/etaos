@@ -1,0 +1,11 @@
+/* ================ Timer support ================ */
+
+/**
+ * @defgroup tm Timer management
+ * @ingroup kernel
+ * @brief Asynchronous timer support.
+ *
+ * The timer management provides functions to start and stop asynchronous 
+ * timers, determine the CPU speed and let a thread give up the CPU for a 
+ * specified time period.
+ */

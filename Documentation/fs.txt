@@ -1,0 +1,12 @@
+/* ================ File systems ================ */
+
+/**
+ * @defgroup fs Filesystem management
+ * @ingroup kernel
+ */
+
+/**
+ * @defgroup vfs Virtual filesystem API
+ * @ingroup fs
+ * @brief Volatile RAM filesystem
+ */

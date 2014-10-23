@@ -6,4 +6,8 @@ source "drivers/usart/Kconfig"
 
 source "drivers/i2c/Kconfig"
 
+source "drivers/gpio/Kconfig"
+
+source "drivers/platform/Kconfig"
+
 endmenu

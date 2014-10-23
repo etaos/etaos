@@ -1,0 +1,79 @@
+/* ================ Scheduler support ================ */
+
+/**
+ * @defgroup thread Thread management
+ * @ingroup kernel
+ * @brief Cooperative multi-threading support.
+ * 
+ * Typically ETA/OS is at its most useful where there are several concurrent 
+ * tasks that need to be undertaken at the same time. To support this 
+ * requirement, ETA/OS offers some kind of light processes called threads. 
+ * In this context a thread is a sequence of executing software that can be
+ * considered to be logically independent from other software that is running 
+ * on the same CPU.
+ */
+
+/**
+ * @defgroup sched Scheduling core
+ * @ingroup kernel
+ * @brief ETA/OS scheduling support.
+ *
+ * @section sched-desc Introduction
+ * The scheduler is responsible for handling the available CPU time, and
+ * distributing it around the available threads. The entry point for the
+ * scheduler is the function schedule(). This function will check two
+ * value's before it decides to switch context or not. It checks the flag
+ * THREAD_NEED_RESCHED_FLAG on the currently running thread, and it checks
+ * if the thread selected by the algorithm as 'next' is not equal to the one
+ * already running. To manually request a reschedule the following stepds are
+ * required:
+   @code{.c}
+   struct thread *tp = current_thread();
+
+   set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+   schedule();
+   @endcode
+ *
+ * @section sched-other Responsibilities
+ * The scheduler is responsible for of switching the context of threads, of
+ * course. But there is bunch of other features it is updating:
+ *
+ * * checking if a thread has used up its time slice;
+ * * signaling events which have been signaled from an IRQ;
+ * * signaling IRQ threads for threaded IRQ support;
+ * * updating the timers and clocksource of the CPU clocksource;
+ * * Free-ing the memory of killed threads;
+ * * Updating the dynamic priorities of threads in the run queue
+ *
+ * For this reason it is important that the scheduler gets called regularly.
+ */
+
+/**
+ * @defgroup ipm Message queue management
+ * @ingroup sched
+ * @brief Inter-Process messages.
+ *
+ * API to send message from one thread or process to another in a safe way.
+ * All threads expecting a message will be placed on a queue in a waiting
+ * state and remain there, untill a message arrives on that specific queue.
+ */
+
+/**
+ * @defgroup preempt Preemption
+ * @ingroup sched
+ * @brief Preemption API
+ *
+ * API to manage the CPU preemption.
+ */
+
+/**
+ * @defgroup rr Round robin scheduler
+ * @ingroup sched
+ * @brief The round robin scheduling algorithm.
+ */
+
+/**
+ * @defgroup evm Event management
+ * @ingroup kernel
+ * @brief ETA/OS thread synchronisation.
+ */

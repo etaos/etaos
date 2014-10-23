@@ -1,6 +1,6 @@
 /*
- *  ETA/OS arch IO
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - Semaphore header
+ *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,29 +16,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ARCH_IO_H_
-#define __ARCH_IO_H_
+/**
+ * @file semaphore.h
+ */
 
-#include <asm/config.h>
+#ifndef __SEMAPHORE_H_
+#define __SEMAPHORE_H_
 
-#define BIT(__x) (1 << (__x))
-#define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
-#define F_CPU CONFIG_FCPU
+/**
+ * @addtogroup sem
+ */
+/* @{ */
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/thread.h>
+#include <etaos/evm.h>
 
-#ifdef CONFIG_ATMEGA328P
-#define CONFIG_ATMEGA328
-#endif
+/**
+ * @brief Semaphore descriptor.
+ */
+typedef struct semaphore {
+	struct thread_queue qp; //!< Thread queue to wait in.
+	short value; //!< Semaphore value.
+} sem_t;
 
-#ifdef CONFIG_ATMEGA328
-#include <asm/iom328.h>
-#endif
+extern int sem_init(sem_t *sem, short value);
+extern void sem_wait(sem_t *sem);
+extern void sem_signal(sem_t *sem);
+extern int sem_try_wait(sem_t *sem);
 
-#define irq_enter_critical() __asm__ __volatile__( \
-		"in __tmp_reg__, __SREG__" "\n\t" \
-		"cli"			   "\n\t" \
-		"push __tmp_reg__"	   "\n\t")
-#define irq_exit_critical() __asm__ __volatile__( \
-		"pop __tmp_reg__"	   "\n\t" \
-		"out __SREG__, __tmp_reg__""\n\t")
+/* @} */
 #endif
 

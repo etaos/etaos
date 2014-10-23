@@ -62,7 +62,9 @@ or
   * embedded hardware (arduino's etc..)
 
 Before you can build ETA/OS you have to configure it. Run
-    make menuconfig ARCH=<archname>
+
+    make menuconfig ARCH=archname
+
 to start the configuration process.
 
 When you are finished configuring the project run the following make commands

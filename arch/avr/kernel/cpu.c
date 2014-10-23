@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup atmega
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
@@ -33,11 +38,20 @@ static struct irq_chip avr_irq_chip = {
 	.resume = NULL,
 };
 
+/**
+ * @brief Get the AVR IRQ chip.
+ * @return ATmega AVR IRQ chip.
+ */
 struct irq_chip *arch_get_irq_chip(void)
 {
 	return &avr_irq_chip;
 }
 
+/**
+ * @brief Start the AVR system clock.
+ * @param irq IRQ vector number.
+ * @param src Clocksource structure for the AVR sysclk.
+ */
 void avr_start_sysclk(int irq, struct clocksource *src)
 {
 	systick_setup(irq, src);
@@ -52,4 +66,5 @@ void avr_start_sysclk(int irq, struct clocksource *src)
 	TCCR0A = WGM00 | WGM01;
 	TCCR0B = WGM02 | CS00 | CS01;
 }
+/* @} */
 

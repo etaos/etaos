@@ -230,7 +230,7 @@ extern void rq_add_thread_no_lock(struct thread *tp);
 #ifdef CONFIG_IRQ_THREAD
 extern void irq_signal_threads(struct rq *rq);
 #else
-#define irq_signal_threads
+#define irq_signal_threads(rq)
 #endif
 
 
@@ -239,7 +239,10 @@ extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 extern void sched_init(void);
 
 /**
- * @brief System scheduling policy
+ * @brief System scheduling policy.
+ *
+ * This variable is implemented by the scheduling algorithm configured at
+ * compile time.
  */
 extern struct sched_class sys_sched_class;
 #ifdef CONFIG_THREAD_QUEUE

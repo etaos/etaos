@@ -30,7 +30,7 @@
 #include <etaos/spinlock.h>
 #include <etaos/atomic.h>
 
-
+struct timer;
 /**
  * @struct clocksource
  * @brief The clocksource describes the source of a hardware time.
@@ -57,11 +57,11 @@ struct clocksource {
 	 * calculate how many ticks have passed since the previous update. As
 	 * soon as the update is done, tc_resume is set to tc.
 	 */
-	int64_t tc_resume;
+	uint64_t tc_resume;
 	spinlock_t lock; //!< Clocksource lock.
 
 	struct list_head list; //!< List of clocksources.
-	struct list_head timers; //!< List head for assigned timers.
+	struct timer *thead;
 };
 
 /**
@@ -69,7 +69,8 @@ struct clocksource {
  * @brief Describes a single (virtual) timer.
  */
 struct timer {
-	struct list_head list; //!< Timer list.
+	struct timer *next;
+	struct timer *prev;
 
 	struct clocksource *source; //!< Source of the timer.
 	/**
@@ -101,7 +102,7 @@ struct timer {
  */
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
-extern int64_t tm_update_source(struct clocksource *source);
+extern unsigned int tm_update_source(struct clocksource *source);
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
 		unsigned long flags);
@@ -109,7 +110,7 @@ extern int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 		unsigned long freq, int (*enable)(struct clocksource *cs),
 		void (*disable)(struct clocksource *cs));
 extern int tm_stop_timer(struct timer *timer);
-extern void tm_process_clock(struct clocksource *cs, int64_t diff);
+extern void tm_process_clock(struct clocksource *cs, unsigned int diff);
 extern struct clocksource *tm_get_source_by_name(const char *name);
 
 #endif /* __TIMER_H__ */

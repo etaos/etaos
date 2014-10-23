@@ -168,6 +168,24 @@ int dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 	return -EOK;
 }
 
+/**
+ * @brief Lock a device mutex.
+ * @param dev Device which mutex has to be locked.
+ */
+void dev_lock(struct device *dev)
+{
+	mutex_lock(&dev->dev_lock);
+}
+
+/**
+ * @brief Unlock the mutex of a device.
+ * @param dev Device which mutex has to be unlocked.
+ */
+void dev_unlock(struct device *dev)
+{
+	mutex_unlock(&dev->dev_lock);
+}
+
 static struct device *dev_allocate(const char *name, struct dev_file_ops *fops)
 {
 	struct device *dev;
