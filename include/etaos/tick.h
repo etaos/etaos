@@ -27,5 +27,17 @@
 
 extern void systick_setup(int irq, struct clocksource *src);
 
+extern struct clocksource *sys_clk;
+
+static inline struct clocksource *sys_get_clock(void)
+{
+	return sys_clk;
+}
+
+#define sys_tick atomic64_get(&sys_clk->tc)
+
+#define time_after(x, y) ((int64_t)((y) - (x)) < 0)
+#define time_before(a, b) time_after(b, a)
+
 #endif /* __TICK_H__ */
 

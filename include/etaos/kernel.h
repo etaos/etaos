@@ -65,6 +65,8 @@ typedef enum sys_ctl {
 	 * @note Second argument to sysctl needs to be the stream.
 	 */
 	SYS_SET_STDIN,
+
+	SYS_SET_SYSCLK,
 } sys_ctl_t;
 
 extern int sysctl(sys_ctl_t ctl, ...);
