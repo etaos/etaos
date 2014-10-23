@@ -21,11 +21,45 @@
 #include <etaos/types.h>
 #include <etaos/i2c.h>
 #include <etaos/list.h>
+#include <etaos/bitops.h>
 
 static int i2c_bus_xfer(struct i2c_bus *bus, 
 		const struct i2c_msg msgs[], int len)
 {
 	return -EINVAL;
+}
+
+int i2c_master_send(const struct i2c_client *client, const char *buf, int count)
+{
+	int ret;
+	struct i2c_bus *bus;
+	struct i2c_msg msg;
+
+	bus = client->bus;
+	msg.dest_addr = client->addr;
+	msg.flags = 0;
+	msg.len = count;
+	msg.buff = (char*)buf;
+
+	ret = i2c_bus_xfer(bus, &msg, 1);
+
+	return (ret == 1) ? count : -EINVAL;
+}
+
+int i2c_master_recv(const struct i2c_client *client, char *buf, int count)
+{
+	struct i2c_bus *bus = client->bus;
+	struct i2c_msg msg;
+	int ret;
+
+	msg.dest_addr = client->addr;
+	set_bit(I2C_RD_FLAG, &msg.flags);
+	msg.len = count;
+	msg.buff = buf;
+
+	ret = i2c_bus_xfer(bus, &msg, 1);
+
+	return (ret == 1) ? count : -EINVAL;
 }
 
 int i2c_init_bus(struct i2c_bus *bus)
@@ -45,5 +79,6 @@ void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client)
 		return;
 
 	list_add(&client->list_entry, &bus->clients);
+	client->bus = bus;
 }
 

@@ -31,6 +31,7 @@ struct i2c_msg {
 	uint16_t dest_addr;
 	void *buff;
 	size_t len;
+	unsigned long flags;
 };
 
 struct i2c_bus {
@@ -49,7 +50,13 @@ struct i2c_client {
 	uint16_t addr;
 };
 
+#define I2C_RD_FLAG 0
+
 extern int i2c_init_bus(struct i2c_bus *bus);
 extern void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client);
+extern int i2c_master_send(const struct i2c_client *client, 
+		const char *buf, int count);
+extern int i2c_master_recv(const struct i2c_client *client, 
+		char *buf, int count);
 
 #endif
