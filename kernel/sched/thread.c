@@ -30,6 +30,7 @@
 #include <etaos/spinlock.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
+#include <etaos/string.h>
 
 /**
  * @brief Thread initialise backend.
@@ -45,6 +46,7 @@ static void raw_thread_init(struct thread *tp, char *name,
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack, unsigned char prio)
 {
+	memset(tp, 0, sizeof(*tp));
 	tp->name = name;
 	tp->param = arg;
 	tp->prio = prio;
@@ -58,7 +60,6 @@ static void raw_thread_init(struct thread *tp, char *name,
 	tp->rq_next = NULL;
 	tp->queue = NULL;
 	tp->timer = NULL;
-	tp->se.next = NULL;
 #ifdef CONFIG_PREEMPT
 	tp->slice = CONFIG_TIME_SLICE;
 	tp->preemt_cnt = 0;
