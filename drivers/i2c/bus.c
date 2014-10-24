@@ -22,11 +22,27 @@
 #include <etaos/i2c.h>
 #include <etaos/list.h>
 #include <etaos/bitops.h>
+#include <etaos/time.h>
+#include <etaos/tick.h>
 
 static int __i2c_transfer(struct i2c_bus *bus,
 		struct i2c_msg msgs[], int len)
 {
-	return 0;
+	int ret;
+	char retries;
+	int64_t orig_tick;
+
+	orig_tick = sys_tick;
+	for(retries = 0, ret = 0; retries < bus->retries; retries++) {
+		ret = bus->xfer(bus, msgs, retries);
+
+		if(ret != -EAGAIN)
+			break;
+		if(time_after(orig_tick, orig_tick + bus->timeout))
+			break;
+	}
+
+	return ret;
 }
 
 int i2c_bus_xfer(struct i2c_bus *bus, 
@@ -38,7 +54,7 @@ int i2c_bus_xfer(struct i2c_bus *bus,
 	ret = __i2c_transfer(bus, msgs, len);
 	mutex_unlock(&bus->lock);
 
-	return ret;
+	return (ret == -EOK) ? len : ret;
 }
 
 int i2c_master_send(const struct i2c_client *client, const char *buf, int count)

@@ -37,6 +37,7 @@ struct i2c_msg {
 struct i2c_bus {
 	struct list_head clients;
 	int timeout;
+	char retries;
 	
 	int (*xfer)(struct i2c_bus *bus, const struct i2c_msg msgs[], int num);
 	mutex_t lock;

@@ -22,4 +22,3 @@
 #include <etaos/i2c.h>
 #include <etaos/list.h>
 
-

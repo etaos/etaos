@@ -24,5 +24,6 @@
 #define EBUSY		 2
 #define ENOTINITIALISED  3
 #define EINVAL		 4
+#define EAGAIN		 5
 
 #endif
