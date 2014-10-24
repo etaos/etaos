@@ -127,7 +127,7 @@ struct rr_rq {
 struct rq {
 	/** @brief System scheduling class */
 	struct sched_class *sched_class;
-#ifdef CONFIG_RR
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO)
 	/** @brief Round robin run queue */
 	struct rr_rq rq;
 #endif

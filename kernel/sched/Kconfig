@@ -27,6 +27,15 @@ config RR
 	  Say 'y' here to use the round robin algorithm to
 	  schedule different threads.
 
+config FIFO
+	bool "FIFO scheduler"
+	help
+	  Say 'y' here to use the FIFO scheduling algorithm to
+	  schedule threads. The FIFO scheduler does not take
+	  priorities into account when scheduling new threads.
+	  The queue's are sorted with the time of insertion used
+	  as the sorting key.
+
 endchoice
 
 config THREAD_QUEUE
@@ -58,6 +67,7 @@ config IPM
 
 config DYN_PRIO
 	bool "Dynamic priorities"
+	depends on RR
 	help
 	  Say 'y' here to enable dynamic priorities. Dynamic
 	  priorities are an extra set of priorites set by

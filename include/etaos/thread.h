@@ -164,7 +164,7 @@ struct thread {
 #endif
 
 	void *param; //!< Thread parameter.
-#ifdef CONFIG_RR
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO)
 	struct rr_entity se; //!< Scheduling entity.
 #endif
 };
