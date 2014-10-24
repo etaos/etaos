@@ -1,5 +1,6 @@
 menuconfig SCHED
 	bool "Scheduler"
+	depends on STRING
 	select TIMER
 	select SYS_TICK
 	help
