@@ -76,7 +76,7 @@ static inline void set_bit(unsigned nr, volatile void *addr)
 /**
  * @brief Clear a bit in register and return the value of \p nr before clearing.
  * @param nr Bit to clear.
- * @param flags Register that contains \p nr.
+ * @param addr Register that contains \p nr.
  * @return Initial bit value of bit \p nr.
  */
 static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
@@ -102,7 +102,7 @@ static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
 /**
  * @brief Set a bit in register and return the value of \p nr before setting it.
  * @param nr Bit to set.
- * @param flags Register that contains \p nr.
+ * @param addr Register that contains \p nr.
  * @return Initial bit value of bit \p nr.
  */
 static inline int test_and_set_bit(unsigned nr, volatile void *addr)

@@ -50,6 +50,12 @@ static inline void mutex_init(mutex_t *mutex)
 	mutex->owner = NULL;
 }
 
+static inline void mutex_wait(mutex_t *mutex)
+{
+	mutex->owner = NULL;
+	evm_wait_next_event_queue(&mutex->qp, EVM_WAIT_INFINITE);
+}
+
 static inline void mutex_lock(mutex_t *mutex)
 {
 	evm_wait_event_queue(&mutex->qp, EVM_WAIT_INFINITE);
@@ -77,6 +83,13 @@ static inline void mutex_unlock_from_irq(mutex_t *mutex)
 static inline void mutex_init(mutex_t *mutex)
 {
 	mutex->lock = 0;
+}
+
+static inline void mutex_wait(mutex_t *mutex)
+{
+	mutex->lock = 1;
+	barrier();
+	arch_mutex_wait(mutex);
 }
 
 #define mutex_lock(__l) arch_mutex_lock(__l)

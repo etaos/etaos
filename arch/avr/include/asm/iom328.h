@@ -92,6 +92,20 @@
 #define OCF0A 0x2
 #define OCF0B 0x4
 
+#define PINB MEM_IO8(0x23)
+#define DDRB MEM_IO8(0x24)
+#define PORTB MEM_IO8(0x25)
 
+
+#define PINC MEM_IO8(0x26)
+#define DDRC MEM_IO8(0x27)
+#define PORTC MEM_IO8(0x28)
+
+
+#define PIND MEM_IO8(0x29)
+#define DDRD MEM_IO8(0x2A)
+#define PORTD MEM_IO8(0x2B)
+
+#define GPIO_PINS 24
 #endif
 

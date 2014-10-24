@@ -197,7 +197,7 @@ void yield(void)
 
 	rq = sched_get_cpu_rq();
 	tp = rq->sched_class->next_runnable(rq);
-	if(preempt_test() && tp) {
+	if(tp != rq->current) {
 		if(prio(tp) <= prio(rq->current)) {
 			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
 		}

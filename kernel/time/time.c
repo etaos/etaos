@@ -50,13 +50,13 @@ int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 	if(!cs || !name)
 		return -EINVAL;
 
-	list_head_init(&cs->timers);
+	cs->thead = NULL;
 	cs->name = name;
 	cs->freq = freq;
 	cs->enable = enable;
 	cs->disable = disable;
 	atomic64_init(&cs->tc);
-	cs->tc_resume = 0;
+	cs->tc_resume = 0LL;
 	spin_lock_init(&cs->lock);
 	list_add(&cs->list, &sources);
 	return -EOK;
@@ -68,36 +68,40 @@ int tm_clock_source_initialise(const char *name, struct clocksource *cs,
  */
 static void tm_start_timer(struct timer *timer)
 {
-	struct list_head *carriage;
 	struct clocksource *cs;
-	struct timer *_timer, *prev_timer;
+	struct timer *_timer;
 
 	cs = timer->source;
-	prev_timer = NULL;
 
 	raw_spin_lock(&cs->lock);
-	if(list_empty(&cs->timers)) {
-		list_add(&timer->list, &cs->timers);
-		raw_spin_unlock(&cs->lock);
-		return;
-	}
-
-	list_for_each(carriage, &cs->timers) {
-		_timer = list_entry(carriage, struct timer, list);
+	for(_timer = cs->thead; _timer; _timer = _timer->next) {
 		if(timer->tleft < _timer->tleft) {
 			_timer->tleft -= timer->tleft;
 			break;
 		}
 
 		timer->tleft -= _timer->tleft;
-		prev_timer = _timer;
+		timer->prev = _timer;
 	}
 
-	if(prev_timer)
-		list_add(&timer->list, &prev_timer->list);
+	timer->next = _timer;
+	if(timer->next)
+		timer->next->prev = timer;
+	if(timer->prev)
+		timer->prev->next = timer;
 	else
-		list_add(&timer->list, &cs->timers);
+		cs->thead = timer;
 	raw_spin_unlock(&cs->lock);
+}
+
+/**
+ * @brief Calculate the clockskew of a clocksource.
+ * @param cs Clocksource to calculate the clockskew of.
+ * @return The clockskew of \p cs.
+ */
+static unsigned int cs_get_diff(struct clocksource *cs)
+{
+	return (unsigned int)(atomic64_get(&cs->tc) - cs->tc_resume);
 }
 
 /**
@@ -124,9 +128,9 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		timer->ticks = 0;
 	else
 		timer->ticks = timer->tleft;
-	
+
+	timer->tleft += cs_get_diff(cs);
 	timer->source = cs;
-	timer->tleft += (unsigned long) (atomic64_get(&cs->tc) - cs->tc_resume);
 	timer->handle = handle;
 	timer->priv_data = arg;
 
@@ -136,7 +140,7 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 
 /**
  * @brief Stop a timer.
- * @param Timer to stop.
+ * @param timer Timer to stop.
  * @return Error code.
  * @retval 0 on success.
  * @retval 1 if no timer was stopped.
@@ -144,7 +148,6 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 int tm_stop_timer(struct timer *timer)
 {
 	struct clocksource *cs;
-	struct timer *next;
 
 	if(!timer || timer == SIGNALED)
 		return -1;
@@ -155,25 +158,34 @@ int tm_stop_timer(struct timer *timer)
 
 	if(timer->tleft) {
 		raw_spin_lock(&cs->lock);
-		if(!list_is_last(&timer->list, &cs->timers)) {
-			next = list_next_entry(timer, list);
-			next->tleft += timer->tleft;
+		if(timer->prev)
+			timer->prev->next = timer->next;
+		else
+			cs->thead = timer->next;
+		if(timer->next) {
+			timer->next->prev = timer->prev;
+			timer->next->tleft += timer->tleft;
 		}
-
-		list_del(&timer->list);
 		raw_spin_unlock(&cs->lock);
-		kfree(timer);
+		timer->tleft = 0;
+		tm_start_timer(timer);
 	}
 
 	return 0;
 }
 
-int64_t tm_update_source(struct clocksource *source)
+/**
+ * @brief Update the clockskew of a clocksource.
+ * @param source Clocksource to update.
+ * @return The clockskew of \p source.
+ * @note You should call tm_process_clock as soon as possible after calling
+ *       this function to keep timers up to date.
+ */
+unsigned int tm_update_source(struct clocksource *source)
 {
-	int64_t diff;
+	unsigned int diff;
 
-	diff = atomic64_get(&source->tc);
-	diff -= source->tc_resume;
+	diff = cs_get_diff(source);
 	source->tc_resume = atomic64_get(&source->tc);
 	return diff;
 }
@@ -184,48 +196,44 @@ int64_t tm_update_source(struct clocksource *source)
  * @param diff Time difference in ticks since last call to this function.
  * @warning This function should NOT be called by applications.
  */
-void tm_process_clock(struct clocksource *cs, int64_t diff)
+void tm_process_clock(struct clocksource *cs, unsigned int diff)
 {
-	struct list_head *carriage, *tmp;
 	struct timer *timer;
 	
-	if(list_empty(&cs->timers) || diff < 0 || diff == 0)
+	if(!cs->thead || diff < 0 || diff == 0)
 		return;
 
 	raw_spin_lock(&cs->lock);
-	list_for_each_safe(carriage, tmp, &cs->timers) {
-		timer = list_entry(carriage, struct timer, list);
+	while(cs->thead && diff) {
+		timer = cs->thead;
 
-		if(timer->tleft < diff) {
-			diff -= timer->tleft;
-			timer->tleft = 0;
-		} else {
+		if(diff < timer->tleft) {
 			timer->tleft -= diff;
 			diff = 0;
+		} else {
+			diff -= timer->tleft;
+			timer->tleft = 0;
 		}
 
-		if(!timer->tleft) {
+		if(timer->tleft == 0) {
 			if(timer->handle) {
 				raw_spin_unlock(&cs->lock);
 				timer->handle(timer, timer->priv_data);
 				raw_spin_lock(&cs->lock);
 			}
 
-			list_del(&timer->list);
-			if(timer->ticks) {
-				timer->tleft = timer->ticks;
+			cs->thead = cs->thead->next;
+			if(cs->thead)
+				cs->thead->prev = NULL;
+			if((timer->tleft = timer->ticks) == 0)
+				kfree(timer);
+			else {
 				raw_spin_unlock(&cs->lock);
 				tm_start_timer(timer);
 				raw_spin_lock(&cs->lock);
-			} else {
-				kfree(timer);
 			}
 		}
-
-		if(!diff)
-			break;
 	}
-
 	raw_spin_unlock(&cs->lock);
 }
 

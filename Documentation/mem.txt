@@ -1,0 +1,23 @@
+/* ================ Memory management ================ */
+
+/**
+ * @defgroup mm Memory management
+ * @ingroup kernel
+ * @brief Dynamic memory management.
+ *
+ * Dynamic memory allocations are made from the heap. The heap is a global 
+ * resource containing all of the free memory in the system. The heap is 
+ * handled in data structure of unused blocks of memory, the so called 
+ * free-list.
+ */
+
+/**
+ * @defgroup ff First fit allocator
+ * @ingroup mm
+ * @brief First fit memeory allocation algorithm.
+ * 
+ * The first fit allocator is the most simple allocator out there. It maintains
+ * a list of available memory and removes an entry whenever it gets allocated.
+ * If a memeory region gets free'd up, the region is added back into the list
+ * of available memory.
+ */

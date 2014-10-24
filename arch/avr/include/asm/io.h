@@ -40,6 +40,5 @@
 #define irq_exit_critical() __asm__ __volatile__( \
 		"pop __tmp_reg__"	   "\n\t" \
 		"out __SREG__, __tmp_reg__""\n\t")
-
 #endif
 

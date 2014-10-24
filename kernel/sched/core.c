@@ -598,6 +598,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
  * @param _rq Run queue to get the current thread from.
  */
 #define current(_rq) ((_rq)->current)
+
 /**
  * @brief Reschedule the current run queue.
  * @return True or false based on whether there has been a context switch
@@ -605,15 +606,16 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
  * @retval true if there has been a context switch.
  * @retval false if there has not been a context switch.
  * @note This function also updates:
- * 	   - Threads signaled from an IRQ;
- * 	   - Timers;
- * 	   - Threads which have used up their time slice;
- * 	   - the kill queue of the run queue.
+ * 	   - threads signaled from an IRQ;
+ * 	   - timers;
+ * 	   - threads which have used up their time slice;
+ * 	   - the kill queue of the run queue;
+ * 	   - irq threads which have to be woken up.
  */
 static bool __hot rq_schedule(void)
 {
 	struct rq *rq;
-	int64_t diff;
+	unsigned int diff;
 	bool did_switch;
 	struct thread *tp, *prev;
 #ifdef CONFIG_EVENT_MUTEX
@@ -648,11 +650,12 @@ resched:
 
 #ifdef CONFIG_TIMER
 	diff = tm_update_source(rq->source);
-	tm_process_clock(rq->source, diff);
+	if(diff)
+		tm_process_clock(rq->source, diff);
 #ifdef CONFIG_PREEMPT
 	if(diff < prev->slice) {
 		prev->slice -= diff;
-	} else {
+	} else if(diff >= prev->slice) {
 		prev->slice = CONFIG_TIME_SLICE;
 		set_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags);
 	}
@@ -664,8 +667,8 @@ resched:
 	/* Only have to reschedule if the THREAD_NEED_RESCHED_FLAG
 	   is set on the current thread, and iff the next runnable
 	   isn't the same thread as the one currently running. */
-	if(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
-			&current(rq)->flags) && tp != current(rq)) {
+	if(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags) && 
+			tp != prev) {
 		rq->current = tp;
 		rq->switch_count++;
 		dyn_prio_reset(tp);
@@ -679,8 +682,9 @@ resched:
 	}
 
 	preempt_enable_no_resched();
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
+	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags)) {
 		goto resched;
+	}
 
 	rq_destroy_kill_q(rq);
 	return did_switch;

@@ -72,6 +72,12 @@ extern void mm_init(void *start, size_t size);
 
 #if defined(CONFIG_STRING) || defined(CONFIG_STRING_MODULE)
 #include <etaos/string.h>
+/**
+ * @brief Allocate a memory regeion.
+ * @param size Size of the region.
+ *
+ * The content of the allocated region will be set to 0.
+ */
 static inline void *kzalloc(size_t size)
 {
 	void *data;
@@ -110,7 +116,7 @@ static inline void *kmalloc(size_t size)
 }
 /**
  * @brief Free an allocated memory region.
- * @param size Memory region to free.
+ * @param ptr Memory region to free.
  */
 static inline void kfree(void *ptr)
 {
