@@ -25,8 +25,11 @@
 #include <etaos/list.h>
 #include <etaos/mutex.h>
 
-struct i2c_client;
+typedef enum {
+	I2C_SET_SPEED,
+} i2c_control_t;
 
+struct i2c_client;
 struct i2c_msg {
 	uint16_t dest_addr;
 	void *buff;
@@ -39,7 +42,8 @@ struct i2c_bus {
 	int timeout;
 	char retries;
 	
-	int (*xfer)(struct i2c_bus *bus, const struct i2c_msg msgs[], int num);
+	int (*xfer)(struct i2c_bus *bus, struct i2c_msg msgs[], int num);
+	int (*ctrl)(struct i2c_bus *bus, unsigned long reg, void *value);
 	mutex_t lock;
 };
 
@@ -61,5 +65,6 @@ extern int i2c_master_recv(const struct i2c_client *client,
 		char *buf, int count);
 extern int i2c_bus_xfer(struct i2c_bus *bus, 
 			struct i2c_msg msgs[], int len);
+extern int i2c_set_bus_speed(struct i2c_bus *bus, uint32_t bps);
 
 #endif

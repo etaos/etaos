@@ -22,6 +22,8 @@
 #include <etaos/types.h>
 #include <asm/bitops.h>
 
+#define BIT(x) (1 << x)
+
 #ifndef CONFIG_ARCH_TEST_BIT
 static inline bool test_bit(unsigned bit, volatile unsigned long *flags)
 {

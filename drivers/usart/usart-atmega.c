@@ -27,6 +27,7 @@
 #include <etaos/usart.h>
 #include <etaos/error.h>
 #include <etaos/spinlock.h>
+#include <etaos/bitops.h>
 
 #include <asm/io.h>
 #include <asm/usart.h>

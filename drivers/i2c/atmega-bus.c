@@ -43,10 +43,10 @@
 /* addr reg */
 #define TWGCE 	0
 
-#define I2C_PRES_1 B0
-#define I2C_PRES_4 B1
-#define I2C_PRES_16 B10
-#define I2C_PRES_64 B11
+#define I2C_PRES_1  0
+#define I2C_PRES_4  1
+#define I2C_PRES_16 2
+#define I2C_PRES_64 3
 
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
 #define I2C_FRQ(x, n) \
@@ -110,7 +110,30 @@ static volatile uint8_t twi_slarw;
 static volatile uint8_t twi_stop;
 static volatile uint8_t twi_rep_start;
 
-static struct i2c_bus atmega_i2c_bus = {
+static int atmega_i2c_xfer(struct i2c_bus *bus, struct i2c_msg *msgs, int num)
+{
+	return -EINVAL;
+}
 
+static int atmega_i2c_ctrl(struct i2c_bus *bus, unsigned long ctrl, void *val)
+{
+	return -EINVAL;
+}
+
+static struct i2c_bus atmega_i2c_bus = {
+	.xfer = &atmega_i2c_xfer,
+	.ctrl = &atmega_i2c_ctrl,
 };
+
+#define ATMEGA_I2C_TMO 500
+#define ATMEGA_I2C_RETRY 3
+
+void atmega_i2c_init(void)
+{
+	atmega_i2c_bus.timeout = ATMEGA_I2C_TMO;
+	atmega_i2c_bus.retries = ATMEGA_I2C_RETRY;
+	TWCR = BIT(TWINT) | BIT(TWEN) | BIT(TWIE);
+
+	i2c_init_bus(&atmega_i2c_bus);
+}
 
