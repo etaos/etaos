@@ -19,11 +19,13 @@
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/types.h>
+#include <etaos/irq.h>
 #include <etaos/i2c.h>
 #include <etaos/list.h>
 #include <etaos/bitops.h>
 #include <etaos/time.h>
 #include <etaos/tick.h>
+#include <etaos/mutex.h>
 
 #include <asm/io.h>
 
@@ -103,15 +105,45 @@
 #define TW_NO_INFO		0xF8
 #define TW_BUS_ERROR		0x00
 
-static int msg_index = 0;
+static volatile uint8_t tw_mm_error = 0;
+static volatile bool tw_if_busy = false;
+static volatile uint8_t msg_index = 0;
+static volatile uint8_t msg_num = 0;
 static struct i2c_msg *atmega_xfer_msgs = NULL;
-static volatile uint8_t twi_state = 0;
-static volatile uint8_t twi_stop = 0;
-static volatile uint8_t twi_rep_start = 0;
+
+static mutex_t mtr_xfer_mutex;
 
 static int atmega_i2c_xfer(struct i2c_bus *bus, struct i2c_msg *msgs, int num)
 {
-	return -EINVAL;
+	int ret;
+	uint8_t twcr, twsr;
+
+	twcr = 0;
+	twsr = 0;
+	while(tw_if_busy);
+
+	irq_enter_critical();
+	atmega_xfer_msgs = msgs;
+	msg_index = 0;
+	msg_num = num;
+
+	if(!tw_if_busy) {
+		twcr = TWCR;
+		twsr = TWSR;
+		if((twsr & 0xF8) == TW_NO_INFO)
+			TWCR = BIT(TWEN) | BIT(TWIE) | BIT(TWSTA) | 
+				(twcr & BIT(TWSTO));
+
+	}
+	irq_exit_critical();
+
+	mutex_wait(&mtr_xfer_mutex);
+	if(tw_mm_error)
+		ret = tw_mm_error;
+	else
+		ret = -EOK; 
+	
+	return ret;
 }
 
 static unsigned char atmega_prescalers[] = {
@@ -176,6 +208,7 @@ void atmega_i2c_init(void)
 {
 	atmega_i2c_bus.timeout = ATMEGA_I2C_TMO;
 	atmega_i2c_bus.retries = ATMEGA_I2C_RETRY;
+	mutex_init(&mtr_xfer_mutex);
 
 	i2c_init_bus(&atmega_i2c_bus);
 	atmega_i2c_setspeed(ATMEGA_SPEED_DEFAULT);
