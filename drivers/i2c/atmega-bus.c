@@ -103,21 +103,64 @@
 #define TW_NO_INFO		0xF8
 #define TW_BUS_ERROR		0x00
 
-static int msg_index;
-static struct i2c_msg *atmega_xfer_msgs;
-static volatile uint8_t twi_state;
-static volatile uint8_t twi_slarw;
-static volatile uint8_t twi_stop;
-static volatile uint8_t twi_rep_start;
+static int msg_index = 0;
+static struct i2c_msg *atmega_xfer_msgs = NULL;
+static volatile uint8_t twi_state = 0;
+static volatile uint8_t twi_stop = 0;
+static volatile uint8_t twi_rep_start = 0;
 
 static int atmega_i2c_xfer(struct i2c_bus *bus, struct i2c_msg *msgs, int num)
 {
 	return -EINVAL;
 }
 
+static unsigned char atmega_prescalers[] = {
+	1,
+	4,
+	16,
+	64,
+};
+
+static void atmega_i2c_setspeed(uint32_t speed)
+{
+	unsigned char i;
+	unsigned char pres, bitrate_reg;
+	uint32_t tmp_speed;
+
+	for(i = 0; i < sizeof(atmega_prescalers); i++) {
+		pres = atmega_prescalers[i];
+		if(!pres) {
+			i = -1;
+			return;
+		}
+		bitrate_reg = (F_CPU - (16*speed)) / (2*pres*speed);
+		tmp_speed = F_CPU / (( (2*bitrate_reg) * pres) + 16);
+		if(tmp_speed == speed)
+			break;
+	}
+
+	if(i < sizeof(atmega_prescalers) && tmp_speed == speed) {
+		TWSR = i & 0x3;
+		TWBR = bitrate_reg;
+	}
+}
+
 static int atmega_i2c_ctrl(struct i2c_bus *bus, unsigned long ctrl, void *val)
 {
-	return -EINVAL;
+	int retval;
+
+	switch(ctrl) {
+	case I2C_SET_SPEED:
+		atmega_i2c_setspeed(*((uint32_t*)val));
+		retval = -EOK;
+		break;
+
+	default:
+		retval = -EINVAL;
+		break;
+	}
+
+	return retval;
 }
 
 static struct i2c_bus atmega_i2c_bus = {
@@ -127,13 +170,15 @@ static struct i2c_bus atmega_i2c_bus = {
 
 #define ATMEGA_I2C_TMO 500
 #define ATMEGA_I2C_RETRY 3
+#define ATMEGA_SPEED_DEFAULT 100000
 
 void atmega_i2c_init(void)
 {
 	atmega_i2c_bus.timeout = ATMEGA_I2C_TMO;
 	atmega_i2c_bus.retries = ATMEGA_I2C_RETRY;
-	TWCR = BIT(TWINT) | BIT(TWEN) | BIT(TWIE);
 
 	i2c_init_bus(&atmega_i2c_bus);
+	atmega_i2c_setspeed(ATMEGA_SPEED_DEFAULT);
+	TWCR = BIT(TWINT) | BIT(TWEN) | BIT(TWIE);
 }
 
