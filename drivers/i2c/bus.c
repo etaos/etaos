@@ -25,6 +25,8 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 
+struct i2c_bus *i2c_sysbus;
+
 static int __i2c_transfer(struct i2c_bus *bus,
 		struct i2c_msg msgs[], int len)
 {

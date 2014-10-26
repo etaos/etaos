@@ -18,9 +18,12 @@
 
 #include <etaos/kernel.h>
 #include <etaos/error.h>
+#include <etaos/mem.h>
 #include <etaos/types.h>
 #include <etaos/i2c.h>
 #include <etaos/list.h>
+#include <etaos/device.h>
+#include <etaos/bitops.h>
 
 int i2c_master_send(const struct i2c_client *client, const char *buf, int count)
 {
@@ -54,3 +57,29 @@ int i2c_master_recv(const struct i2c_client *client, char *buf, int count)
 
 	return (ret == 1) ? count : -EINVAL;
 }
+
+struct i2c_client *i2c_new_device(struct i2c_device_info *info)
+{
+	struct i2c_client *client;
+	struct i2c_bus *bus;
+
+	if(!info)
+		return NULL;
+
+	client = kzalloc(sizeof(*client));
+	if(!client)
+		return NULL;
+
+	client->dev.name = info->name;
+	client->addr = info->addr;
+	if(info->bus)
+		bus = info->bus;
+	else
+		bus = i2c_sysbus;
+	
+	device_initialize(&client->dev, &info->fops);
+	i2c_add_client(bus, client);
+
+	return client;
+}
+

@@ -20,6 +20,8 @@
 #define __I2C_HEADER__
 
 #include <etaos/kernel.h>
+#include <etaos/error.h>
+#include <etaos/mem.h>
 #include <etaos/device.h>
 #include <etaos/stdio.h>
 #include <etaos/list.h>
@@ -55,6 +57,29 @@ struct i2c_client {
 	uint16_t addr;
 };
 
+struct i2c_device_info {
+	const char *name;
+
+	uint16_t addr;
+	struct dev_file_ops fops;
+	struct i2c_bus *bus;
+};
+
+static inline struct i2c_device_info *i2c_create_info(const char *name)
+{
+	struct i2c_device_info *info;
+
+	info = kzalloc(sizeof(*info));
+
+	if(!info)
+		return NULL;
+
+	info->name = name;
+	return info;
+}
+
+extern struct i2c_bus *i2c_sysbus;
+
 #define I2C_RD_FLAG 0
 
 extern int i2c_init_bus(struct i2c_bus *bus);
@@ -66,5 +91,6 @@ extern int i2c_master_recv(const struct i2c_client *client,
 extern int i2c_bus_xfer(struct i2c_bus *bus, 
 			struct i2c_msg msgs[], int len);
 extern int i2c_set_bus_speed(struct i2c_bus *bus, uint32_t bps);
+extern struct i2c_client *i2c_new_device(struct i2c_device_info *info);
 
 #endif

@@ -213,5 +213,7 @@ void atmega_i2c_init(void)
 	i2c_init_bus(&atmega_i2c_bus);
 	atmega_i2c_setspeed(ATMEGA_SPEED_DEFAULT);
 	TWCR = BIT(TWINT) | BIT(TWEN) | BIT(TWIE);
+
+	i2c_sysbus = &atmega_i2c_bus;
 }
 
