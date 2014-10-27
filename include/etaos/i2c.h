@@ -35,7 +35,7 @@ struct i2c_client;
 struct i2c_msg {
 	uint16_t dest_addr;
 	void *buff;
-	size_t len;
+	size_t len, idx;
 	unsigned long flags;
 };
 

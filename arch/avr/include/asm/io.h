@@ -21,6 +21,10 @@
 
 #include <asm/config.h>
 
+#ifndef __ASSEMBLER__
+#include <asm/init.h>
+#endif
+
 #define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
 #define F_CPU CONFIG_FCPU
 

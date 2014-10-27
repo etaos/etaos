@@ -35,6 +35,7 @@ int i2c_master_send(const struct i2c_client *client, const char *buf, int count)
 	msg.dest_addr = client->addr;
 	msg.flags = 0;
 	msg.len = count;
+	msg.idx = 0;
 	msg.buff = (char*)buf;
 
 	ret = i2c_bus_xfer(bus, &msg, 1);
@@ -52,6 +53,7 @@ int i2c_master_recv(const struct i2c_client *client, char *buf, int count)
 	set_bit(I2C_RD_FLAG, &msg.flags);
 	msg.len = count;
 	msg.buff = buf;
+	msg.idx = 0;
 
 	ret = i2c_bus_xfer(bus, &msg, 1);
 

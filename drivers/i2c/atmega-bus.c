@@ -26,8 +26,10 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 #include <etaos/mutex.h>
+#include <etaos/irq.h>
 
 #include <asm/io.h>
+#include <asm/irq.h>
 
 #define TWINT	7
 #define TWEA	6
@@ -112,6 +114,11 @@ static volatile uint8_t msg_num = 0;
 static struct i2c_msg *atmega_xfer_msgs = NULL;
 
 static mutex_t mtr_xfer_mutex;
+
+static irqreturn_t atmega_i2c_stc_irq(struct irq_data *irq, void *data)
+{
+	return IRQ_HANDLED;
+}
 
 static int atmega_i2c_xfer(struct i2c_bus *bus, struct i2c_msg *msgs, int num)
 {
@@ -212,6 +219,8 @@ void atmega_i2c_init(void)
 
 	i2c_init_bus(&atmega_i2c_bus);
 	atmega_i2c_setspeed(ATMEGA_SPEED_DEFAULT);
+	irq_request(TWI_STC_VECTOR_NUM, &atmega_i2c_stc_irq, IRQ_FALLING_MASK,
+			&atmega_i2c_bus);
 	TWCR = BIT(TWINT) | BIT(TWEN) | BIT(TWIE);
 
 	i2c_sysbus = &atmega_i2c_bus;
