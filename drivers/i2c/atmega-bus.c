@@ -118,6 +118,7 @@ static struct i2c_msg *atmega_xfer_msgs = NULL;
 static mutex_t mtr_xfer_mutex;
 
 #define i2c_msg_byte(_msg, _idx) (((uint8_t*)msg->buff)[_idx])
+#define i2c_write_msg(_msg, _idx, _b) (((uint8_t*)msg->buff)[_idx] = _b)
 
 static irqreturn_t atmega_i2c_stc_irq(struct irq_data *irq, void *data)
 {
@@ -181,8 +182,40 @@ static irqreturn_t atmega_i2c_stc_irq(struct irq_data *irq, void *data)
 		TWCR |= TWSTA;
 		tw_if_busy = 0;
 		break;
+
+	case TW_MR_DATA_ACK:
+		i2c_write_msg(msg, msg->idx, TWDR);
+		msg->idx++;
+
+	case TW_MR_SLA_ACK:
+		if((msg->idx + 1) < msg->len)
+			TWCR = TWGO | BIT(TWEA);
+		else
+			TWCR = TWGO;
+		break;
+
+	case TW_MR_DATA_NACK:
+		i2c_write_msg(msg, msg->idx, TWDR);
+		msg->idx++;
+		msg->len = 0;
+		
+		if((msg_index + 1) < msg_num) {
+			msg_index++;
+			TWCR = TWGO | BIT(TWEA) | BIT(TWSTA);
+			break;
+		}
+
+		mutex_unlock_from_irq(&mtr_xfer_mutex);
+
+		TWCR = TWGO | BIT(TWSTO);
+		tw_if_busy = false;
+		tw_mm_error = -EOK;
+		break;
 	
 	default:
+		mutex_unlock_from_irq(&mtr_xfer_mutex);
+		tw_mm_error = -EINVAL;
+		tw_if_busy = false;
 		break;
 	}
 
