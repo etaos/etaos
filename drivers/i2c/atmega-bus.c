@@ -107,6 +107,8 @@
 #define TW_NO_INFO		0xF8
 #define TW_BUS_ERROR		0x00
 
+#define TWGO (BIT(TWINT) | BIT(TWEN) | BIT(TWIE))
+
 static volatile uint8_t tw_mm_error = 0;
 static volatile bool tw_if_busy = false;
 static volatile uint8_t msg_index = 0;
@@ -115,8 +117,75 @@ static struct i2c_msg *atmega_xfer_msgs = NULL;
 
 static mutex_t mtr_xfer_mutex;
 
+#define i2c_msg_byte(_msg, _idx) (((uint8_t*)msg->buff)[_idx])
+
 static irqreturn_t atmega_i2c_stc_irq(struct irq_data *irq, void *data)
 {
+	struct i2c_msg *msg;
+	uint8_t twsr;
+	register uint8_t twcr = TWCR;
+
+	twsr = TWSR;
+	twsr &= 0xF8;
+	msg = &atmega_xfer_msgs[msg_index];
+
+	switch(twsr) {
+	case TW_START:
+	case TW_REP_START:
+		tw_if_busy = true;
+		msg->idx = 0;
+
+		if(test_bit(I2C_RD_FLAG, &msg->flags))
+			TWDR = msg->dest_addr | 0x1;
+		else
+			TWDR = msg->dest_addr;
+
+		TWCR = TWGO | (twcr & BIT(TWEA));
+		break;
+
+	case TW_MT_SLA_ACK:
+	case TW_MT_DATA_ACK:
+		if(msg->idx < msg->len) {
+			TWDR = i2c_msg_byte(msg, msg->idx);
+			msg->idx++;
+			TWCR = TWGO | (twcr & BIT(TWEA));
+			break;
+		}
+
+		/* all outgoing bytes have been sent */
+		msg->len = 0;
+		if((msg_index + 1) < msg_num) {
+			msg_index++;
+			TWCR = TWGO | (twcr & BIT(TWEA)) | BIT(TWSTA);
+			break;
+		}
+
+	case TW_MT_SLA_NACK:
+	case TW_MT_DATA_NACK:
+	case TW_MR_SLA_NACK:
+		if(twsr == TW_MT_SLA_NACK || twsr == TW_MR_SLA_NACK) {
+			tw_mm_error = -EINVAL;
+			msg->len = 0;
+			msg_num = 0;
+		} else {
+			tw_mm_error = -EOK;
+		}
+
+		mutex_unlock_from_irq(&mtr_xfer_mutex);
+		TWCR = TWGO | BIT(TWSTO);
+		tw_if_busy = 0;
+		break;
+
+	/* lost bus control */
+	case TW_MT_ARB_LOST:
+		TWCR |= TWSTA;
+		tw_if_busy = 0;
+		break;
+	
+	default:
+		break;
+	}
+
 	return IRQ_HANDLED;
 }
 
