@@ -10,4 +10,6 @@ source "drivers/gpio/Kconfig"
 
 source "drivers/platform/Kconfig"
 
+source "drivers/eeprom/Kconfig"
+
 endmenu
