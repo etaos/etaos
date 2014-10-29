@@ -136,8 +136,9 @@ static irqreturn_t atmega_i2c_stc_irq(struct irq_data *irq, void *data)
 		tw_if_busy = true;
 		msg->idx = 0;
 
-		if(test_bit(I2C_RD_FLAG, &msg->flags))
+		if(test_bit(I2C_RD_FLAG, &msg->flags)) {
 			TWDR = msg->dest_addr | 0x1;
+		}
 		else
 			TWDR = msg->dest_addr;
 

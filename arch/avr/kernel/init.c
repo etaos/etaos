@@ -58,6 +58,7 @@ void avr_init(void)
 	irq_enable();
 	init_usart();
 	timer_init();
+	i2c_init();
 	sys_init();
 
 	while(1);

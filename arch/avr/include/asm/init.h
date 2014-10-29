@@ -47,10 +47,10 @@ extern void atmega_i2c_init(void);
 #define init_usart()
 #endif
 
-#if defined(CONFIG_ATMEGA_I2C) || defined(CONFIG_ATMEGA_I2C_MODULE)
-#define init_i2c() atmega_i2c_init()
+#if defined(CONFIG_I2C_ATMEGA) || defined(CONFIG_I2C_ATMEGA_MODULE)
+#define i2c_init() atmega_i2c_init()
 #else
-#define init_i2c()
+#define i2c_init()
 #endif
 
 #ifdef CONFIG_TIMER

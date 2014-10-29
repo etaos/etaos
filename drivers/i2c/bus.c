@@ -36,7 +36,7 @@ static int __i2c_transfer(struct i2c_bus *bus,
 
 	orig_tick = sys_tick;
 	for(retries = 0, ret = 0; retries < bus->retries; retries++) {
-		ret = bus->xfer(bus, msgs, retries);
+		ret = bus->xfer(bus, msgs, len);
 
 		if(ret != -EAGAIN)
 			break;
