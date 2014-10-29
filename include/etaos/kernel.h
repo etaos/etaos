@@ -67,6 +67,7 @@ typedef enum sys_ctl {
 	SYS_SET_STDIN,
 
 	SYS_SET_SYSCLK,
+
 } sys_ctl_t;
 
 extern int sysctl(sys_ctl_t ctl, ...);

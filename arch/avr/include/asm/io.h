@@ -21,7 +21,10 @@
 
 #include <asm/config.h>
 
-#define BIT(__x) (1 << (__x))
+#ifndef __ASSEMBLER__
+#include <asm/init.h>
+#endif
+
 #define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
 #define F_CPU CONFIG_FCPU
 

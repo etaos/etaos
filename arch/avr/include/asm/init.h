@@ -26,6 +26,7 @@ extern void atmega_usart_init();
 extern void avr_timer_init();
 extern void avr_init_sched();
 extern void sched_init();
+extern void atmega_i2c_init(void);
 
 #if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
 #define gpio_init() atmega_init_gpio()
@@ -44,6 +45,12 @@ extern void sched_init();
 #define init_usart() atmega_usart_init();
 #else
 #define init_usart()
+#endif
+
+#if defined(CONFIG_I2C_ATMEGA) || defined(CONFIG_I2C_ATMEGA_MODULE)
+#define i2c_init() atmega_i2c_init()
+#else
+#define i2c_init()
 #endif
 
 #ifdef CONFIG_TIMER
