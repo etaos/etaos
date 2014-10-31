@@ -47,6 +47,20 @@
  * GPIO driver for the AVR ATmega general I/O ports.
  */
 
+/* ================ I2C drivers ================ */
+/**
+ * @defgroup i2c I2C drivers
+ * @ingroup dev
+ * @brief I2C core driver.
+ */
+
+/**
+ * @defgroup i2c-atmega ATmega I2C driver
+ * @ingroup i2c
+ * @brief ATmega AVR I2C bus driver.
+ */
+ 
+
 /* ================ USART drivers ================ */
 
 /**

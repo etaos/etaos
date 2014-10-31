@@ -1,0 +1,11 @@
+menu "EEPROM support"
+
+config 24C02
+	tristate "AT24C02 EEPROM chip"
+	depends on I2C
+	help
+	  Say 'y' or 'm' here to build support for the Atmel 24C02
+	  EEPROM chip. If you are unsure say 'n' here.
+
+endmenu
+

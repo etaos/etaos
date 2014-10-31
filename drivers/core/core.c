@@ -16,8 +16,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file drivers/core/core.c */
-
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/stdio.h>
@@ -31,10 +29,7 @@
 #include <etaos/vfs.h>
 
 /**
- * @addtogroup dev-core Device driver core
- *
- * The device driver core is responsible for internal handling of device
- * drivers. Registering, and unregistering them for example
+ * @addtogroup dev-core
  * @{
  */
 
