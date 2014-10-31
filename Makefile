@@ -5,7 +5,7 @@
 VERSION = 1
 PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION = rc1
+EXTRAVERSION = rc2
 NAME = Shuffling Donkey
 
 MAKEFLAGS += -rR --no-print-directory
