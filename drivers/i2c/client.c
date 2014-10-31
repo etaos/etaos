@@ -25,6 +25,13 @@
 #include <etaos/device.h>
 #include <etaos/bitops.h>
 
+/**
+ * @brief Sent a single buffer to a chip in master mode.
+ * @param client I2C client to set \p buff to.
+ * @param buf Buffer which has to be sent over an I2C bus.
+ * @return count Length of \p buf in bytes.
+ * @return Amount of bytes sent if succesfull, otherwise an error code.
+ */
 int i2c_master_send(const struct i2c_client *client, const char *buf, int count)
 {
 	int ret;
@@ -43,6 +50,12 @@ int i2c_master_send(const struct i2c_client *client, const char *buf, int count)
 	return (ret == 1) ? count : -EINVAL;
 }
 
+/**
+ * @brief Receive an amount of bytes from an I2C chip in master mode.
+ * @param client I2C client to receive data from.
+ * @param buf Buffer to store the received data in.
+ * @return count Length of \p buf in bytes.
+ */
 int i2c_master_recv(const struct i2c_client *client, char *buf, int count)
 {
 	struct i2c_bus *bus = client->bus;
@@ -60,6 +73,11 @@ int i2c_master_recv(const struct i2c_client *client, char *buf, int count)
 	return (ret == 1) ? count : -EINVAL;
 }
 
+/**
+ * @brief Create a new I2C client for a chip device driver.
+ * @param info I2C chip descriptor.
+ * @return Pointer to the newly created I2C client.
+ */
 struct i2c_client *i2c_new_device(struct i2c_device_info *info)
 {
 	struct i2c_client *client;
