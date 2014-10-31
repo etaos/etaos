@@ -24,9 +24,16 @@
 #include <etaos/stddef.h>
 #include <etaos/compiler.h>
 
+#ifdef __cplusplus
+#define NULL (0)
+#define SIGNALED ((void*)-1)
+#define ERR_PTR (-1)
+#else
 #define NULL ((void*)0)
 #define SIGNALED ((void*)-1)
 #define ERR_PTR ((void*)-1)
+#endif
+
 #define FALSE 0
 #define TRUE !FALSE
 
@@ -42,6 +49,25 @@
 #define container_of(ptr, type, member) ({		\
 		const typeof( ((type *)0)->member) *__mptr = (ptr); \
 		(type *)( ( char *)__mptr - offsetof(type,member) );})
+
+#ifdef __cplusplus
+
+__extension__ typedef int __guard __attribute__((mode (__DI__)));
+
+extern "C" int __cxa_guard_acquire(__guard *);
+extern "C" void __cxa_guard_release (__guard *);
+extern "C" void __cxa_guard_abort (__guard *);
+extern "C" void __cxa_pure_virtual(void);
+
+extern void * operator new(size_t size);
+extern void operator delete(void * ptr);
+
+#define CDECL extern "C" {
+#define CDECL_END }
+#else
+#define CDECL
+#define CDECL_END
+#endif
 
 /**
  * @ingroup kernel
@@ -70,6 +96,10 @@ typedef enum sys_ctl {
 
 } sys_ctl_t;
 
+CDECL
+
 extern int sysctl(sys_ctl_t ctl, ...);
+
+CDECL_END
 #endif
 

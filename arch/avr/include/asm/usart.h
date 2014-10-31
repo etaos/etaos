@@ -101,8 +101,10 @@
 #define TXCIE0 6
 #define UDRIE0 5
 
+CDECL
 extern void avr_setup_usart_streams(void);
 extern void atmega_usart_init(void);
+CDECL_END
 
 #endif /* __ATMEGA_USART_H */
 

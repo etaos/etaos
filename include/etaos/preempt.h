@@ -28,6 +28,9 @@
  */
 /* @{ */
 struct thread;
+
+CDECL
+
 extern void schedule(void);
 
 #ifdef CONFIG_PREEMPT
@@ -113,6 +116,9 @@ static inline void preempt_disable(void)
 {
 	preempt_count_inc;
 }
+
+CDECL_END
+
 #else /* !CONFIG_PREEMPT */
 
 #define __preempt_add(_i)

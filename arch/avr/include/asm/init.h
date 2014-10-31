@@ -20,6 +20,7 @@
 #define __AVR_INIT_H__
 
 #ifndef __ASSEMBLER__
+CDECL
 extern void atmega_init_gpio();
 extern void vfs_init();
 extern void atmega_usart_init();
@@ -27,6 +28,7 @@ extern void avr_timer_init();
 extern void avr_init_sched();
 extern void sched_init();
 extern void atmega_i2c_init(void);
+CDECL_END
 
 #if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
 #define gpio_init() atmega_init_gpio()

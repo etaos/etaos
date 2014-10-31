@@ -26,6 +26,8 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 
+CDECL
+
 extern void irq_save_and_disable(unsigned long *flags);
 extern void irq_restore(unsigned long *flags);
 
@@ -56,6 +58,8 @@ extern void arch_irq_disable();
  * @pure
  */
 void arch_irq_enable();
+
+CDECL_END
 
 /**
  * @brief Enable interrupts
@@ -152,6 +156,8 @@ struct irq_chip {
 	void (*resume)(struct irq_chip *chip); //!< Resume the chip.
 };
 
+CDECL
+
 extern int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq);
 extern int irq_chip_init(struct irq_chip *chip, const char *name);
 extern int irq_request(int irq, irq_vector_t vector, unsigned long flags,
@@ -194,6 +200,8 @@ static inline void irq_chip_set_resume(struct irq_chip *chip,
 {
 	chip->resume = resume;
 }
+
+CDECL_END
 #endif
 
 /** @} */

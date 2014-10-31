@@ -40,10 +40,14 @@ typedef struct semaphore {
 	short value; //!< Semaphore value.
 } sem_t;
 
+CDECL
+
 extern int sem_init(sem_t *sem, short value);
 extern void sem_wait(sem_t *sem);
 extern void sem_signal(sem_t *sem);
 extern int sem_try_wait(sem_t *sem);
+
+CDECL_END
 
 /* @} */
 #endif

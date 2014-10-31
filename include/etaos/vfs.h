@@ -22,9 +22,13 @@
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 
+CDECL
+
 extern void vfs_init(void);
 extern void vfs_add(FILE file);
 extern int vfs_delete(FILE f);
 extern FILE vfs_find(const char *name);
+
+CDECL_END
 
 #endif

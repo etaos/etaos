@@ -24,6 +24,7 @@
 #ifndef __AVR_MUTEX_H__
 #define __AVR_MUTEX_H__
 
+CDECL
 extern void avr_spin_lock(unsigned char *);
 extern void avr_spin_unlock(unsigned char*);
 extern void avr_spin_wait(unsigned char *);
@@ -42,5 +43,6 @@ static inline void arch_mutex_unlock(mutex_t *mutex)
 {
 	avr_spin_unlock((unsigned char*)&mutex->lock);
 }
+CDECL_END
 
 #endif /* __AVR_MUTEX_H__ */

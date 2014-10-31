@@ -7,7 +7,7 @@ DEFCONF-$(CONFIG_ATMEGA328) += arch/avr/defconf/atmega328.dc
 
 include $(DEFCONF-y)
 
-KBUILD_CFLAGS += -nostdlib -nostdinc -ffreestanding -std=gnu89 -Os
+KBUILD_CFLAGS += -nostdlib -nostdinc -ffreestanding -Os
 KBUILD_CFLAGS += -Iarch/avr/include $(KBUILD_DBG)
 KBUILD_CFLAGS += -ffunction-sections -fdata-sections
 KBUILD_AFLAGS += -Iarch/avr/include
@@ -40,6 +40,8 @@ LIB_GCC = $(dir $(shell $(CC) $(KBUILD_CFLAGS) --print-libgcc-file-name))
 ETAOS_EXTRA_LIBS += -L$(LIB_GCC) --start-group -lgcc $(softfloat-m) --end-group
 export ETAOS_EXTRA_LIBS
 endif
+
+KBUILD_CXXFLAGS += $(KBUILD_CFLAGS)
 
 head-y += arch/avr/kernel/start.o
 init-y += arch/avr/kernel/init.o

@@ -42,7 +42,7 @@
  * @param stack Pointer to the stack.
  * @param prio Priority of the thread.
  */
-static void raw_thread_init(struct thread *tp, char *name, 
+static void raw_thread_init(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack, unsigned char prio)
 {
@@ -74,7 +74,7 @@ static void raw_thread_init(struct thread *tp, char *name,
 	barrier();
 }
 
-void sched_init_idle(struct thread *tp, char *name, 
+void sched_init_idle(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack)
 {
@@ -91,7 +91,7 @@ void sched_init_idle(struct thread *tp, char *name,
  * @param prio Priority of the thread.
  * @return A pointer to the newly created thread.
  */
-struct thread *thread_create(char *name, thread_handle_t handle, void *arg,
+struct thread *thread_create(const char *name, thread_handle_t handle, void *arg,
 			size_t stack_size, void *stack, unsigned char prio)
 {
 	struct thread *tp;
@@ -114,8 +114,9 @@ struct thread *thread_create(char *name, thread_handle_t handle, void *arg,
  * @param stack Pointer to the stack.
  * @param prio Priority of the thread.
  */
-int thread_initialise(struct thread *tp, char *name, thread_handle_t handle, 
-		void *arg, size_t stack_size, void *stack, unsigned char prio)
+int thread_initialise(struct thread *tp, const char *name, 
+		thread_handle_t handle, void *arg, size_t stack_size, 
+		void *stack, unsigned char prio)
 {
 	struct rq *rq;
 

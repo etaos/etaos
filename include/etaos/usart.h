@@ -73,8 +73,12 @@ struct usart {
 	int (*read)(struct usart *uart, void *rx, size_t len);
 };
 
+CDECL
+
 extern int usart_initialise(struct usart *usart);
 extern void setup_usart_streams(struct usart *uart);
+
+CDECL_END
 
 #endif
 

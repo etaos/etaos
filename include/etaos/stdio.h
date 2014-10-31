@@ -117,6 +117,8 @@ typedef struct file {
 
 } *FILE;
 
+CDECL
+
 extern FILE __iob[];
 
 #define stdin 	__iob[0]
@@ -134,6 +136,8 @@ extern int iob_remove(int fd);
 extern void close(int fd);
 extern int open(const char *name, unsigned long flags);
 extern int write(int fd, const void *buff, size_t size);
+
+CDECL_END
 
 #endif
 

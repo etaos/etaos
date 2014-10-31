@@ -21,10 +21,14 @@
 
 #include <etaos/types.h>
 
+CDECL
+
 extern char *strchr(const char *str, int c);
 extern int strlen(const char *str);
 extern int strnlen(const char *str, size_t size);
 extern int strcmp(const char *s1, const char *s2);
 extern void *memset(void *dst, int c, size_t n);
+
+CDECL_END
 
 #endif

@@ -24,6 +24,7 @@
 
 #define BIT(x) (1 << x)
 
+CDECL
 #ifndef CONFIG_ARCH_TEST_BIT
 static inline bool test_bit(unsigned bit, volatile unsigned long *flags)
 {
@@ -58,5 +59,5 @@ static inline void clear_bit(unsigned nr, volatile unsigned long *addr)
 	return 0;
 }
 #endif
-
+CDECL_END
 #endif

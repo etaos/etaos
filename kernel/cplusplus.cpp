@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR CPU
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - C++ support
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AVR_CPU_H__
-#define __AVR_CPU_H__
-
 #include <etaos/kernel.h>
-#include <etaos/time.h>
+#include <etaos/types.h>
+#include <etaos/mem.h>
 
-CDECL
-extern void avr_start_sysclk(int irq, struct clocksource *src);
-CDECL_END
-#endif
+void *operator new(size_t num)
+{
+	return kmalloc(num);
+}
+
+void operator delete(void *ptr)
+{
+	if(!ptr)
+		kfree(ptr);
+}
+
+int __cxa_guard_acquire(__guard *g) 
+{
+	return !*(char *)(g);
+}
+
+void __cxa_guard_release (__guard *g) 
+{
+	*(char *)g = 1;
+}
+
+void __cxa_pure_virtual(void)
+{
+	/*
+	 * TODO: Do some big time complaining here
+	 */
+}
+
+void __cxa_guard_abort (__guard *)
+{
+}
 

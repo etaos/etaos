@@ -110,9 +110,15 @@ else
 debug_flags =
 endif
 
-orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
-                 $(ccflags-y) $(CFLAGS_$(basetarget).o)
+orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -std=gnu89 \
+                      $(KBUILD_SUBDIR_CCFLAGS) \
+                      $(ccflags-y) $(CFLAGS_$(basetarget).o)
+
+orig_cxx_flags   = $(KBUILD_CPPFLAGS) -fpermissive $(KBUILD_CXXFLAGS) \
+      $(cxxflags-y) $(CXXFLAGS_$(basetarget).o)
+
 _c_flags       = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o), $(orig_c_flags))
+_cxx_flags       = $(filter-out $(CXXFLAGS_REMOVE_$(basetarget).o), $(orig_cxx_flags))
 _a_flags       = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) $(KBUILD_SUBDIR_ASFLAGS) \
                  $(asflags-y) $(AFLAGS_$(basetarget).o)
 _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(@F))
@@ -153,6 +159,11 @@ endif
 
 c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
 		 $(__c_flags) $(modkern_cflags)                           \
+		 -D"KBUILD_STR(s)=\#s" $(basename_flags) $(modname_flags) \
+                 $(debug_flags)
+
+cxx_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+		 $(_cxx_flags) $(modkern_cflags)                           \
 		 -D"KBUILD_STR(s)=\#s" $(basename_flags) $(modname_flags) \
 		  $(debug_flags)
 

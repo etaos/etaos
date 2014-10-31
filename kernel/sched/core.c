@@ -45,6 +45,18 @@ void thread_wake_up_from_irq(struct thread *thread)
 }
 
 #ifdef CONFIG_THREAD_QUEUE
+
+/**
+ * @brief Initialise a thread queue during run time.
+ * @param qp Thread queue which has to be initialised.
+ */
+void thread_queue_init(struct thread_queue *qp)
+{
+	qp->sched_class = &sys_sched_class;
+	qp->qhead = SIGNALED;
+	spinlock_init(&qp->lock);
+}
+
 /**
  * @brief Add a new thread to a queue.
  * @param qp Queue to add to.

@@ -28,6 +28,8 @@ typedef struct spinlock {
 	uint8_t lock;
 } spinlock_t;
 
+CDECL
+
 extern void avr_spin_lock(unsigned char *);
 extern void avr_spin_unlock(unsigned char*);
 extern void avr_spin_wait(unsigned char *);
@@ -51,6 +53,7 @@ static inline void arch_spin_unlock(spinlock_t *spin)
 {
 	avr_spin_unlock((unsigned char*)&spin->lock);
 }
+CDECL_END
 
 #endif
 

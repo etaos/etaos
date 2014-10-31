@@ -25,6 +25,7 @@
 
 #include <etaos/irq.h>
 
+CDECL
 static inline void atomic_add(int nr, atomic_t *atom)
 {
 	unsigned long flags;
@@ -84,6 +85,7 @@ static inline int64_t atomic64_get(atomic64_t *atom)
 
 	return value;
 }
+CDECL_END
 
 #define atomic_inc(atom) atomic_add(1, atom)
 #define atomic64_inc(atom) atomic64_add(1LL, atom)

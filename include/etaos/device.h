@@ -82,6 +82,7 @@ struct dev_file_ops {
 	int (*get)(struct file*); //!< Read 1 byte from a file.
 };
 
+CDECL
 extern struct device *device_create(const char *name, void *data,
 		struct dev_file_ops *fops);
 extern int device_initialize(struct device *dev, struct dev_file_ops *fops);
@@ -119,7 +120,7 @@ static inline void *dev_get_iobase(struct device *dev)
 
 	return NULL;
 }
-
+CDECL_END
 #define dev_to_file(__d) (&(__d)->file)
 
 #endif

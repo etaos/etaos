@@ -108,6 +108,7 @@ struct gpio_chip {
 #define GPIO_IRQ		7 //!< If set, the pin is connected to an IRQ.
 /* @} */
 
+CDECL
 extern void gpio_pin_init(struct gpio_chip *chp,
 		struct gpio_pin *pin, uint16_t nr, 
 		unsigned long flags);
@@ -160,6 +161,7 @@ static inline void gpio_set_sys_chip(struct gpio_chip *chip)
 	gpio_sys_chip = chip;
 }
 
+CDECL_END
 /**
  * @name GPIO pin direction flags
  */

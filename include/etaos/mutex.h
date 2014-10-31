@@ -44,6 +44,8 @@ typedef struct mutex {
 	}
 #define DEFINE_MUTEX(__n) mutex_t __n = STATIC_MUTEX_INIT
 
+CDECL
+
 static inline void mutex_init(mutex_t *mutex)
 {
 	thread_queue_init(&mutex->qp);
@@ -74,12 +76,15 @@ static inline void mutex_unlock_from_irq(mutex_t *mutex)
 	evm_signal_from_irq(&mutex->qp);
 }
 
+CDECL_END
+
 #else
 
 #include <asm/mutex.h>
 
 #define DEFINE_MUTEX(__n) mutex_t __n = { .lock = 0, }
 
+CDECL
 static inline void mutex_init(mutex_t *mutex)
 {
 	mutex->lock = 0;
@@ -91,6 +96,7 @@ static inline void mutex_wait(mutex_t *mutex)
 	barrier();
 	arch_mutex_wait(mutex);
 }
+CDECL_END
 
 #define mutex_lock(__l) arch_mutex_lock(__l)
 #define mutex_unlock(__l) arch_mutex_unlock(__l)

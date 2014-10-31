@@ -30,6 +30,7 @@
 #define BITS_PER_LONG 32UL
 #define BITS_PER_BYTE  8UL
 
+CDECL
 /**
  * @brief Clear a bit in register.
  * @param nr Bit to clear.
@@ -123,5 +124,6 @@ static inline int test_and_set_bit(unsigned nr, volatile void *addr)
 			);
 	return old != 0;
 }
+CDECL_END
 
 #endif

@@ -161,6 +161,8 @@ struct rq {
 #define sched_need_resched(__t) test_bit(THREAD_NEED_RESCHED_FLAG, \
 				&__t->flags)
 
+CDECL
+
 extern unsigned char prio(struct thread *tp);
 extern void schedule(void);
 extern bool should_resched(void);
@@ -285,6 +287,7 @@ static inline void thread_remove_from_kill_q(struct thread *tp)
 	if(tp->rq)
 		rq_remove_kill_thread(tp->rq, tp);
 }
+CDECL_END
 
 /* @} */
 #endif

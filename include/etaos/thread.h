@@ -34,6 +34,8 @@
 /** @{ */
 
 struct sched_class;
+
+CDECL
 /**
  * @brief System scheduling class.
  *
@@ -66,6 +68,8 @@ extern struct sched_class sys_sched_class;
 	}
 
 #endif
+
+CDECL_END
 
 /**
  * @brief Thread handle type definition.
@@ -115,16 +119,6 @@ struct thread_queue {
 	struct thread *qhead;
 };
 
-/**
- * @brief Initialise a thread queue during run time.
- * @param qp Thread queue which has to be initialised.
- */
-static inline void thread_queue_init(struct thread_queue *qp)
-{
-	qp->sched_class = &sys_sched_class;
-	qp->qhead = SIGNALED;
-	spinlock_init(&qp->lock);
-}
 #endif
 
 struct rq;
@@ -180,15 +174,17 @@ struct thread {
 #define THREAD_NEED_RESCHED_FLAG 4 //!< Thread nees a resched.
 /** @} */
 
+CDECL
+
 extern void thread_wake_up_from_irq(struct thread *t);
-extern int thread_initialise(struct thread *tp, char *name, 
+extern int thread_initialise(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack, unsigned char prio);
 
-extern struct thread *thread_create(char *name, thread_handle_t handle, 
+extern struct thread *thread_create(const char *name, thread_handle_t handle, 
 		void *arg, size_t stack_size, void *stack, unsigned char prio);
 
-extern void sched_init_idle(struct thread *tp, char *name, 
+extern void sched_init_idle(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack);
 extern struct thread *current_thread();
@@ -199,6 +195,10 @@ extern void kill(void);
 extern void wait(void);
 extern void signal(struct thread *tp);
 extern unsigned char nice(unsigned char prio);
+
+extern void thread_queue_init(struct thread_queue *qp);
+
+CDECL_END
 
 #endif /* __THREAD_H__ */
 

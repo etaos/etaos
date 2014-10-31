@@ -65,6 +65,8 @@ struct i2c_device_info {
 	struct i2c_bus *bus;
 };
 
+CDECL
+
 static inline struct i2c_device_info *i2c_create_info(const char *name)
 {
 	struct i2c_device_info *info;
@@ -92,5 +94,6 @@ extern int i2c_bus_xfer(struct i2c_bus *bus,
 			struct i2c_msg msgs[], int len);
 extern int i2c_set_bus_speed(struct i2c_bus *bus, uint32_t bps);
 extern struct i2c_client *i2c_new_device(struct i2c_device_info *info);
+CDECL_END
 
 #endif

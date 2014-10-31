@@ -102,6 +102,8 @@ struct timer {
  */
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
+CDECL
+
 extern unsigned int tm_update_source(struct clocksource *source);
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
@@ -112,6 +114,8 @@ extern int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 extern int tm_stop_timer(struct timer *timer);
 extern void tm_process_clock(struct clocksource *cs, unsigned int diff);
 extern struct clocksource *tm_get_source_by_name(const char *name);
+
+CDECL_END
 
 #endif /* __TIMER_H__ */
 /** @} */

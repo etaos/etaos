@@ -25,6 +25,8 @@
 #include <etaos/types.h>
 #include <etaos/time.h>
 
+CDECL
+
 extern void systick_setup(int irq, struct clocksource *src);
 
 extern struct clocksource *sys_clk;
@@ -33,6 +35,8 @@ static inline struct clocksource *sys_get_clock(void)
 {
 	return sys_clk;
 }
+
+CDECL_END
 
 #define sys_tick atomic64_get(&sys_clk->tc)
 

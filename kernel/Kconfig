@@ -15,6 +15,14 @@ config ARCH_CLEAR_BIT
 
 menu "Generic system configuration"
 
+config CPP
+	bool "C++ supoort"
+	default y
+	help
+	  Say 'y' here to build support for the C++ programming
+	  language. If you are unsure, say leave this option set
+	  to 'y'.
+
 source "kernel/irq/Kconfig"
 
 source "kernel/time/Kconfig"

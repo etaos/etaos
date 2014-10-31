@@ -34,6 +34,7 @@ typedef struct {
 
 #include <asm/atomic.h>
 
+CDECL
 static inline void atomic_init(atomic_t *atom)
 {
 	atom->value = 0;
@@ -43,5 +44,5 @@ static inline void atomic64_init(atomic64_t *atom)
 {
 	atom->value = 0LL;
 }
-
+CDECL_END
 #endif

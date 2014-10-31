@@ -28,6 +28,8 @@
 #ifndef __PLATFORM_H__
 #define __PLATFORM_H__
 
+CDECL
+
 /**
  * @brief Write a value to a platform pin.
  * @param pin pin to write to.
@@ -82,6 +84,8 @@ extern int pgpio_pin_release(int pin);
  * @retval -EOK on success.
  */
 extern int pgpio_pin_request(int pin);
+
+CDECL_END
 
 #endif
 

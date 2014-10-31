@@ -53,6 +53,7 @@ struct heap_node {
 
 #define MEM __attribute__((malloc))
 
+CDECL
 extern struct heap_node *mm_head;
 extern spinlock_t mlock;
 
@@ -122,6 +123,7 @@ static inline void kfree(void *ptr)
 {
 	mm_kfree(ptr);
 }
+CDECL_END
 
 /** @} */
 #endif

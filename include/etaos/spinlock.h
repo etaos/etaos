@@ -30,6 +30,8 @@
 #define raw_spin_lock(__l) arch_spin_lock(__l)
 #define raw_spin_unlock(__l) arch_spin_unlock(__l)
 
+CDECL
+
 static inline void spin_lock(spinlock_t *lock)
 {
 #ifdef CONFIG_PREEMPT
@@ -90,6 +92,8 @@ static inline void raw_spin_unlock_irq(spinlock_t *lock)
 	local_irq_enable();
 	arch_spin_unlock(lock);
 }
+
+CDECL_END
 
 #define spin_lock_irqsave(__l, __f) _spin_lock_irqsave(__l, &__f)
 #define spin_unlock_irqrestore(__l, __f) _spin_unlock_irqrestore(__l, &__f)
