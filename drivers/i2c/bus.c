@@ -25,8 +25,24 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 
+/**
+ * @var i2c_sysbus
+ * @brief Default system bus.
+ *
+ * The i2c_sysbus will be used as default bus for all registering clients,
+ * unless they supply their own bus in the i2c_client_info.
+ */
 struct i2c_bus *i2c_sysbus;
 
+/**
+ * @brief Transfer a given amount of I2C messages.
+ * @param bus I2C bus to use for the transmission.
+ * @param msgs Array of messages to transmit from or receive data into.
+ * @param len Length of the message array.
+ * @return Error code.
+ * @retval -EOK on success.
+ * @retval -EINVAL on error.
+ */
 static int __i2c_transfer(struct i2c_bus *bus,
 		struct i2c_msg msgs[], int len)
 {
@@ -47,6 +63,14 @@ static int __i2c_transfer(struct i2c_bus *bus,
 	return ret;
 }
 
+/**
+ * @brief Transfer a given amount of I2C messages.
+ * @param bus I2C bus to use for the transmission.
+ * @param msgs Array of messages to transmit from or receive data into.
+ * @param len Length of the message array.
+ * @return Amount of messages transferred or an error code.
+ * @retval -EINVAL on error.
+ */
 int i2c_bus_xfer(struct i2c_bus *bus, 
 			struct i2c_msg msgs[], int len)
 {
@@ -59,7 +83,14 @@ int i2c_bus_xfer(struct i2c_bus *bus,
 	return (ret == -EOK) ? len : ret;
 }
 
-
+/**
+ * @brief Set the I2C bus operating speed.
+ * @param bus I2C bus to set the speed for.
+ * @param bps New speed in bits per second (or Hertz).
+ * @return An error code.
+ * @retval -EOK on success.
+ * @retval -EINVAL on error.
+ */
 int i2c_set_bus_speed(struct i2c_bus *bus, uint32_t bps)
 {
 	int ret;
@@ -74,6 +105,13 @@ int i2c_set_bus_speed(struct i2c_bus *bus, uint32_t bps)
 	return ret;
 }
 
+/**
+ * @brief Initialise a new I2C bus.
+ * @param bus I2C bus which has to be initialised.
+ * @return Error code.
+ * @retval -EINVAL if \p bus is invalid.
+ * @retval -EOK if \p bus is succesfully initialised.
+ */
 int i2c_init_bus(struct i2c_bus *bus)
 {
 	if(!bus)
@@ -84,6 +122,11 @@ int i2c_init_bus(struct i2c_bus *bus)
 	return -EOK;
 }
 
+/**
+ * @brief Add a new client to a bus.
+ * @param bus Bus to add \p client to.
+ * @param client I2C client to add to \p bus.
+ */
 void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client)
 {
 	if(!bus || !client)
