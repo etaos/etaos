@@ -26,12 +26,10 @@
 #include <etaos/tick.h>
 
 /**
- * @var i2c_sysbus
- * @brief Default system bus.
- *
- * The i2c_sysbus will be used as default bus for all registering clients,
- * unless they supply their own bus in the i2c_client_info.
+ * @addtogroup i2c
  */
+/* @{ */
+
 struct i2c_bus *i2c_sysbus;
 
 /**
@@ -135,4 +133,6 @@ void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client)
 	list_add(&client->list_entry, &bus->clients);
 	client->bus = bus;
 }
+
+/* @} */
 

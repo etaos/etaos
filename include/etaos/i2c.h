@@ -16,6 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/i2c.h
+ */
+
+/**
+ * @addtogroup i2c
+ */
+/* @{ */
+
 #ifndef __I2C_HEADER__
 #define __I2C_HEADER__
 
@@ -103,6 +112,12 @@ struct i2c_device_info {
 	struct i2c_bus *bus; //!< i2c_bus the client should be registered to.
 };
 
+/**
+ * @brief Default system bus.
+ *
+ * The i2c_sysbus will be used as default bus for all registering clients,
+ * unless they supply their own bus in the i2c_client_info.
+ */
 extern struct i2c_bus *i2c_sysbus;
 
 /**
@@ -153,4 +168,5 @@ extern int i2c_bus_xfer(struct i2c_bus *bus,
 extern int i2c_set_bus_speed(struct i2c_bus *bus, uint32_t bps);
 extern struct i2c_client *i2c_new_device(struct i2c_device_info *info);
 
+/* @} */
 #endif
