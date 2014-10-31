@@ -16,12 +16,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/eeprom.h
+ */
+
 #ifndef __EEPROM__
 #define __EEPROM__
 
+/**
+ * @brief EEPROM chip descriptor.
+ */
 struct eeprom {
-	unsigned long addr_idx;
-	void *priv;
+	unsigned long addr_idx; //!< Read/write index.
+	void *priv; //!< Private data, usually set to the i2c_client.
 };
 
 #endif
