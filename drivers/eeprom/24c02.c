@@ -28,6 +28,12 @@ static struct eeprom ee_chip;
 #define BASE_SLA_24C02 0xA0
 #define SCL_FRQ_24C02 100000UL
 
+/**
+ * @brief Write a single byte to a 24C02 EEPROM chip.
+ * @param addr EEPROM address to write to.
+ * @param data Data byte to write to \p addr.
+ * @return Error code.
+ */
 int eeprom_24c02_write_byte(unsigned char addr, unsigned char data)
 {
 	int rc;
@@ -40,6 +46,12 @@ int eeprom_24c02_write_byte(unsigned char addr, unsigned char data)
 
 #define MSG_TX 0
 #define MSG_RX 1
+/**
+ * @brief Read a byte from a 24C02 EEPROM chip.
+ * @param addr EEPROM address to read from.
+ * @param storage Pointer to an address to store the byte read from EEPROM.
+ * @return An error code.
+ */
 int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 {
 	int rc;
@@ -67,6 +79,9 @@ int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 	return (rc == 2) ? -EOK : rc;
 }
 
+/**
+ * @brief Initialise an 24C02 EEPROM chip.
+ */
 void eeprom_init_24c02(void)
 {
 	struct i2c_device_info *info;
