@@ -20,27 +20,48 @@
 #include <etaos/types.h>
 #include <etaos/mem.h>
 
+/**
+ * @brief Create a new object and call the constructor.
+ * @param num Number of bytes to allocate.
+ * @return Allocated memory for the new object.
+ */
 void *operator new(size_t num)
 {
 	return kmalloc(num);
 }
 
+/**
+ * @brief Free the memory of an allocated object.
+ * @param ptr Memory region to free.
+ */
 void operator delete(void *ptr)
 {
 	if(!ptr)
 		kfree(ptr);
 }
 
+/**
+ * @brief Lock for data initialisation.
+ * @param g Lock to aquire.
+ * @return Non zero if the lock was aquired succesfully.
+ */
 int __cxa_guard_acquire(__guard *g) 
 {
 	return !*(char *)(g);
 }
 
+/**
+ * @brief Release the lock aquired with __cxa_guard_acquire
+ */
 void __cxa_guard_release (__guard *g) 
 {
 	*(char *)g = 1;
 }
 
+/**
+ * @brief Temporary implementation for pure virtual functions.
+ * @todo Implement some big time complaining and add a panic.
+ */
 void __cxa_pure_virtual(void)
 {
 	/*
@@ -48,6 +69,9 @@ void __cxa_pure_virtual(void)
 	 */
 }
 
+/**
+ * @brief Abort the program.
+ */
 void __cxa_guard_abort (__guard *)
 {
 }
