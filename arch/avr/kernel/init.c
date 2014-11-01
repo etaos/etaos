@@ -41,6 +41,8 @@ extern void avr_install_irqs(void);
 extern char __heap_start;
 static const char *mm_heap_start = &__heap_start;
 
+extern void __attribute__((noinline)) dev_init(void);
+
 /**
  * @brief AVR system initialisation.
  *
@@ -59,6 +61,7 @@ void avr_init(void)
 	init_usart();
 	timer_init();
 	i2c_init();
+
 	sys_init();
 
 	while(1);

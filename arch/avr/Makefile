@@ -44,7 +44,7 @@ endif
 KBUILD_CXXFLAGS += $(KBUILD_CFLAGS)
 
 head-y += arch/avr/kernel/start.o
-init-y += arch/avr/kernel/init.o
+init-y += arch/avr/kernel/devinit.o arch/avr/kernel/init.o
 
 core-y += arch/avr/kernel/
 libs-y += arch/avr/libflt/
