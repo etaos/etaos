@@ -55,6 +55,8 @@ void avr_init(void)
 	size_t hsize = RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
 	mm_init((void*)mm_heap_start, hsize);
 #endif
+	dev_init();
+
 	_vfs_init();
 	gpio_init();
 	irq_enable();

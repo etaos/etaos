@@ -22,6 +22,7 @@
 #include <etaos/mutex.h>
 #include <etaos/usart.h>
 #include <etaos/error.h>
+#include <etaos/init.h>
 
 static inline struct usart *to_usart_dev(FILE file)
 {
@@ -100,4 +101,10 @@ int usart_initialise(struct usart *usart)
 
 	return -EOK;
 }
+
+static void __used usart_core_init(void)
+{
+}
+
+subsys_init(usart_core_init)
 

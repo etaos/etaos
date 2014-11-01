@@ -100,20 +100,6 @@ SECTIONS
     KEEP (*(.init8))
     *(.init9)  /* Call main().  */
     KEEP (*(.init9))
-
-    *(.devinit0)
-    KEEP (*(.devinit0))
-
-    *(.subsysinit)
-    KEEP (*(.subsysinit))
-    *(.modinit)
-    KEEP (*(.modinit))
-    *(.devinit1)
-    KEEP (*(.devinit1))
-
-    *(.devinit2)
-    KEEP (*(.devinit2))
-
     *(.text)
     *(.text.*)
     *(.fini9)  /* _exit() starts here.  */

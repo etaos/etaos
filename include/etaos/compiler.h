@@ -23,6 +23,10 @@
 #include <etaos/compiler-gcc.h>
 #endif
 
+#ifndef __used
+#define __used
+#endif
+
 #ifndef __hot
 #define __hot
 #endif

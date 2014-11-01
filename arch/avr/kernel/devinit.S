@@ -16,11 +16,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <asm/config.h>
+#include <asm/io.h>
+
 .section .devinit0
 .global dev_init
 .func dev_init
 dev_init:
+#if defined(CONFIG_DRIVER_CORE) || defined(CONFIG_DRIVER_CORE_MODULE)
+	call dev_core_init
+#else
 	mov r1, r1
+#endif
 .endfunc
 
 .section .devinit2

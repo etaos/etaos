@@ -19,6 +19,17 @@
 #ifndef __INIT_H__
 #define __INIT_H__
 
+#include <etaos/compiler.h>
+#include <asm/init.h>
+
+#ifndef SUBSYS_ATTRIB
+#define SUBSYS_ATTRIB
+#endif
+
+#ifndef SUBSYS_INIT_CALL
+#define SUBSYS_INIT_CALL
+#endif
+
 CDECL
 #ifdef CONFIG_SCHED
 extern void main_thread_func(void *arg);
@@ -26,5 +37,11 @@ extern void main_thread_func(void *arg);
 extern void main_init(void);
 #endif
 CDECL_END
+
+#define subsys_init(ss_init_fn) \
+	static __used SUBSYS_ATTRIB void __ ## ss_init_fn(void) \
+	{ \
+		SUBSYS_INIT_CALL(ss_init_fn); \
+	}
 
 #endif /* __INIT_H__ */
