@@ -55,6 +55,7 @@ extern void main_init(void);
 CDECL_END
 
 /**
+ * @ingroup kern-init
  * @brief Automated subsytem init.
  * @param ss_init_fn Init functions.
  */
@@ -65,6 +66,7 @@ CDECL_END
 	}
 
 /**
+ * @ingroup kern-init
  * @brief Automated module init.
  * @param ss_init_fn Init functions.
  */
@@ -75,6 +77,7 @@ CDECL_END
 	}
 
 /**
+ * @ingroup kern-init
  * @brief Automated device init.
  * @param ss_init_fn Init functions.
  */
