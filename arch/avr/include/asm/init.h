@@ -39,36 +39,6 @@ CDECL_END
 #define MOD_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
 #define DEV_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
 
-#if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
-#define gpio_init() atmega_init_gpio()
-#else
-#define gpio_init()
-#endif
-
-#if defined(CONFIG_VFS) || defined(CONFIG_VFS_MODLE)
-#define _vfs_init() vfs_init();
-#else
-#define _vfs_init()
-#endif
-
-#if defined(CONFIG_ATMEGA_USART) || defined(CONFIG_ATMEGA_USART_MODULE)
-#define init_usart() atmega_usart_init();
-#else
-#define init_usart()
-#endif
-
-#if defined(CONFIG_I2C_ATMEGA) || defined(CONFIG_I2C_ATMEGA_MODULE)
-#define i2c_init() atmega_i2c_init()
-#else
-#define i2c_init()
-#endif
-
-#ifdef CONFIG_TIMER
-#define timer_init() avr_timer_init();
-#else
-#define timer_init()
-#endif
-
 #ifdef CONFIG_SCHED
 #define sys_init() \
 	avr_init_sched(); \
