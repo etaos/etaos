@@ -16,16 +16,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file kernel/time/time.c
+ * @addtogroup tm
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/tick.h>
 #include <etaos/delay.h>
 
+/**
+ * @brief Delay for a certain amount of micro seconds.
+ * @param us Amount of micro seconds to delay.
+ */
 void delay_us(double us)
 {
 	arch_delay_us(us);
 }
 
+/**
+ * @brief Delay for a certain amount of miliseconds.
+ * @param ms Miliseconds to delay.
+ * @note Avoid usage if the scheduler is in use. Use sleep instead.
+ * @see sleep
+ */
 void delay(unsigned int ms)
 {
 	int64_t count;

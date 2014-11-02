@@ -55,7 +55,7 @@ static int __i2c_transfer(struct i2c_bus *bus,
 
 		if(ret != -EAGAIN)
 			break;
-		if(time_after(orig_tick, orig_tick + bus->timeout))
+		if(time_after(sys_tick, orig_tick + bus->timeout))
 			break;
 	}
 
