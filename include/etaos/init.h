@@ -30,6 +30,22 @@
 #define SUBSYS_INIT_CALL
 #endif
 
+#ifndef MOD_ATTRIB
+#define MOD_ATTRIB
+#endif
+
+#ifndef MOD_INIT_CALL
+#define MOD_INIT_CALL
+#endif
+
+#ifndef DEV_ATTRIB
+#define DEV_ATTRIB
+#endif
+
+#ifndef DEV_INIT_CALL
+#define DEV_INIT_CALL
+#endif
+
 CDECL
 #ifdef CONFIG_SCHED
 extern void main_thread_func(void *arg);
@@ -42,6 +58,18 @@ CDECL_END
 	static __used SUBSYS_ATTRIB void __ ## ss_init_fn(void) \
 	{ \
 		SUBSYS_INIT_CALL(ss_init_fn); \
+	}
+
+#define module_init(ss_init_fn) \
+	static __used MOD_ATTRIB void __ ## ss_init_fn(void) \
+	{ \
+		MOD_INIT_CALL(ss_init_fn); \
+	}
+
+#define device_init(ss_init_fn) \
+	static __used DEV_ATTRIB void __ ## ss_init_fn(void) \
+	{ \
+		DEV_INIT_CALL(ss_init_fn); \
 	}
 
 #endif /* __INIT_H__ */

@@ -19,10 +19,6 @@
 #ifndef __AVR_TIME_H__
 #define __AVR_TIME_H__
 
-CDECL
-extern void avr_timer_init(void);
-CDECL_END
-
 struct clocksource *avr_get_sys_clk(void);
 
 #endif

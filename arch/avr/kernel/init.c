@@ -56,14 +56,7 @@ void avr_init(void)
 	mm_init((void*)mm_heap_start, hsize);
 #endif
 	dev_init();
-
-	_vfs_init();
-	gpio_init();
 	irq_enable();
-	init_usart();
-	timer_init();
-	i2c_init();
-
 	sys_init();
 
 	while(1);
