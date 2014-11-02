@@ -25,6 +25,7 @@
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/time.h>
+#include <etaos/delay.h>
 #include <etaos/init.h>
 
 #include <asm/time.h>
@@ -72,6 +73,47 @@ static void __used avr_timer_init(void)
 					&avr_sysclk_enable, NULL);
 	avr_start_sysclk(TIMER0_OVERFLOW_VECTOR_NUM, &sysclk);
 	sysctl(SYS_SET_SYSCLK, &sysclk);
+}
+
+#define delay_loop2(__count) \
+	__asm__ __volatile__( \
+		"1: sbiw %0,1" "\n\t" \
+		"brne 1b" \
+		: "=w" (__count) \
+		: "0" (__count) \
+	);
+
+#define delay_loop(__count) \
+	__asm__ volatile ( \
+		"1: dec %0" "\n\t" \
+		"brne 1b" \
+		: "=r" (__count) \
+		: "0" (__count) \
+	);
+
+void arch_delay_us(double __us)
+{
+	double __tmp;
+	uint16_t __ticks;
+	double __tmp2;
+
+	__tmp = ((F_CPU) / 3e6) * __us;
+	__tmp2 = ((F_CPU) / 4e6) * __us;
+	if (__tmp < 1.0) {
+		__ticks = 1;
+	}
+	else if (__tmp2 > 65535) {
+		delay(__us / 1000);
+		return;
+	} else if (__tmp > 255) {
+		__ticks = (uint16_t)__tmp2;
+		delay_loop2(__ticks);
+		return;
+	} else {
+		__ticks = (uint8_t)__tmp;
+	}
+
+	delay_loop(__ticks);
 }
 
 subsys_init(avr_timer_init);
