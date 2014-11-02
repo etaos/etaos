@@ -26,3 +26,22 @@ config SYS_TICK
 	  that require precision timing (scheduler, etc..). If unsure
 	  say 'y'.
 endif
+
+config DELAY_US
+	bool "Micro second delay"
+	help
+	  Say 'y' here to build support for a microsecond delay
+	  API function. This is implemented using a loop based delay
+	  (i.e. it will loop for X amount of microseconds before
+	  passing control back).
+
+config DELAY_MS
+	bool "Milisecond delay"
+	depends on SYS_TICK
+	help
+	  Say 'y' here to build an API function to loop delay
+	  for a certain amount of miliseconds. This function should
+	  be avoided when using the scheduler, since it can derail
+	  virtual timers and the scheduler. When using the scheduler
+	  use sleep instead.
+

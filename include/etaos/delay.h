@@ -27,7 +27,11 @@
  * @param us Amount of micro seconds to delay.
  */
 extern void arch_delay_us(double us);
+#ifdef CONFIG_DELAY_US
 extern void delay_us(double us);
+#endif
+#ifdef CONFIG_DELAY_MS
 extern void delay(unsigned int ms);
+#endif
 
 #endif
