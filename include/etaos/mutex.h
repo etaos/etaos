@@ -96,6 +96,12 @@ static inline void mutex_wait(mutex_t *mutex)
 	barrier();
 	arch_mutex_wait(mutex);
 }
+
+static inline void mutex_unlock_from_irq(mutex_t *mutex)
+{
+	mutex->lock = 0;
+	barrier();
+}
 CDECL_END
 
 #define mutex_lock(__l) arch_mutex_lock(__l)
