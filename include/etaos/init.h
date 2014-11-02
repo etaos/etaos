@@ -54,18 +54,30 @@ extern void main_init(void);
 #endif
 CDECL_END
 
+/**
+ * @brief Automated subsytem init.
+ * @param ss_init_fn Init functions.
+ */
 #define subsys_init(ss_init_fn) \
 	static __used SUBSYS_ATTRIB void __ ## ss_init_fn(void) \
 	{ \
 		SUBSYS_INIT_CALL(ss_init_fn); \
 	}
 
+/**
+ * @brief Automated module init.
+ * @param ss_init_fn Init functions.
+ */
 #define module_init(ss_init_fn) \
 	static __used MOD_ATTRIB void __ ## ss_init_fn(void) \
 	{ \
 		MOD_INIT_CALL(ss_init_fn); \
 	}
 
+/**
+ * @brief Automated device init.
+ * @param ss_init_fn Init functions.
+ */
 #define device_init(ss_init_fn) \
 	static __used DEV_ATTRIB void __ ## ss_init_fn(void) \
 	{ \
@@ -73,3 +85,4 @@ CDECL_END
 	}
 
 #endif /* __INIT_H__ */
+
