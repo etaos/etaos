@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR time
- *  Copyright (C) 2014   Michel Megens
+ *  Eta/OS - AVR5 device init
+ *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AVR_TIME_H__
-#define __AVR_TIME_H__
+#include <asm/config.h>
+#include <asm/io.h>
 
-struct clocksource *avr_get_sys_clk(void);
-
+.section .devinit0
+.global dev_init
+.func dev_init
+dev_init:
+#if defined(CONFIG_DRIVER_CORE) || defined(CONFIG_DRIVER_CORE_MODULE)
+	call dev_core_init
+#else
+	mov r1, r1
 #endif
+.endfunc
+
+.section .devinit2
+.func dev_init_exit
+dev_init_exit:
+	ret
+.endfunc
+

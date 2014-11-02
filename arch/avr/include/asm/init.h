@@ -21,14 +21,23 @@
 
 #ifndef __ASSEMBLER__
 CDECL
-extern void atmega_init_gpio();
-extern void vfs_init();
-extern void atmega_usart_init();
-extern void avr_timer_init();
 extern void avr_init_sched();
 extern void sched_init();
-extern void atmega_i2c_init(void);
 CDECL_END
+
+#define SUBSYS_ATTRIB __attribute__((section (".subsysinit"))) \
+	__attribute__((naked))
+#define MOD_ATTRIB __attribute__((section (".modinit"))) \
+	__attribute__((naked))
+#define DEV_ATTRIB __attribute__((section (".devinit1"))) \
+	__attribute__((naked))
+
+#define DEV_INIT_CONTENT(init_fn) \
+	__asm__ __volatile__("call "  #init_fn ::: )
+
+#define SUBSYS_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
+#define MOD_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
+#define DEV_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
 
 #if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
 #define gpio_init() atmega_init_gpio()
@@ -41,7 +50,6 @@ CDECL_END
 #else
 #define _vfs_init()
 #endif
-
 
 #if defined(CONFIG_ATMEGA_USART) || defined(CONFIG_ATMEGA_USART_MODULE)
 #define init_usart() atmega_usart_init();

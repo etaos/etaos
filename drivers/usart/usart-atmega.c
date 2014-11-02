@@ -28,6 +28,7 @@
 #include <etaos/error.h>
 #include <etaos/spinlock.h>
 #include <etaos/bitops.h>
+#include <etaos/init.h>
 
 #include <asm/io.h>
 #include <asm/usart.h>
@@ -107,7 +108,7 @@ static struct usart atmega_usart = {
 /**
  * @brief Initialise the ATmega USART.
  */
-void atmega_usart_init(void)
+static __used void atmega_usart_init(void)
 {
 	UBRR0H = UBRR0H_VALUE;
 	UBRR0L = UBRR0L_VALUE;
@@ -121,6 +122,8 @@ void atmega_usart_init(void)
 	setup_usart_streams(&atmega_usart);
 #endif
 }
+
+module_init(atmega_usart_init);
 
 /* @} */
 

@@ -24,6 +24,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/gpio.h>
+#include <etaos/init.h>
 
 #include <asm/io.h>
 #include <asm/pgm.h>
@@ -228,6 +229,8 @@ void atmega_init_gpio(void)
 	gpio_set_sys_chip(&atmega_gpio_chip);
 	return;
 }
+
+module_init(atmega_init_gpio);
 
 /* @} */
 

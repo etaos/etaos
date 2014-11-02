@@ -24,6 +24,7 @@
 #include <etaos/bitops.h>
 #include <etaos/time.h>
 #include <etaos/tick.h>
+#include <etaos/init.h>
 
 /**
  * @addtogroup i2c
@@ -133,6 +134,12 @@ void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client)
 	list_add(&client->list_entry, &bus->clients);
 	client->bus = bus;
 }
+
+static void __used i2c_core_init(void)
+{
+}
+
+subsys_init(i2c_core_init);
 
 /* @} */
 

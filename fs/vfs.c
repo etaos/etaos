@@ -26,6 +26,7 @@
 #include <etaos/string.h>
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
+#include <etaos/init.h>
 
 FILE __iob[MAX_OPEN];
 static struct file *vfshead;
@@ -128,5 +129,8 @@ FILE vfs_find(const char *name)
 
 	return NULL;
 }
+
+subsys_init(vfs_init);
+
 /* @} */
 

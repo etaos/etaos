@@ -28,6 +28,7 @@
 #include <etaos/spinlock.h>
 #include <etaos/gpio.h>
 #include <etaos/bitops.h>
+#include <etaos/init.h>
 
 /**
  * @brief GPIO system chip.
@@ -314,6 +315,12 @@ int raw_gpio_read_pin(struct gpio_pin *pin)
 	chp = pin->chip;
 	return chp->get ? chp->get(chp, pin->nr) : false;
 }
+
+static void __used gpiolib_init(void)
+{
+}
+
+subsys_init(gpiolib_init);
 
 /* @} */
 

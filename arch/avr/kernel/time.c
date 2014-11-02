@@ -25,6 +25,7 @@
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/time.h>
+#include <etaos/init.h>
 
 #include <asm/time.h>
 #include <asm/irq.h>
@@ -65,13 +66,15 @@ static int avr_sysclk_enable(struct clocksource *cs)
  * @brief Start the AVR timers.
  * @see avr_sysclk_enable avr_start_sysclk
  */
-void avr_timer_init(void)
+static void __used avr_timer_init(void)
 {
 	tm_clock_source_initialise(sysclk.name, &sysclk, AVR_SYSCLK_FRQ,
 					&avr_sysclk_enable, NULL);
 	avr_start_sysclk(TIMER0_OVERFLOW_VECTOR_NUM, &sysclk);
 	sysctl(SYS_SET_SYSCLK, &sysclk);
 }
+
+subsys_init(avr_timer_init);
 
 /* @} */
 

@@ -41,6 +41,8 @@ extern void avr_install_irqs(void);
 extern char __heap_start;
 static const char *mm_heap_start = &__heap_start;
 
+extern void __attribute__((noinline)) dev_init(void);
+
 /**
  * @brief AVR system initialisation.
  *
@@ -53,12 +55,8 @@ void avr_init(void)
 	size_t hsize = RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
 	mm_init((void*)mm_heap_start, hsize);
 #endif
-	_vfs_init();
-	gpio_init();
+	dev_init();
 	irq_enable();
-	init_usart();
-	timer_init();
-	i2c_init();
 	sys_init();
 
 	while(1);

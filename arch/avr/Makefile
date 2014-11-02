@@ -31,20 +31,21 @@ KBUILD_CFLAGS += $(cflags-y)
 KBUILD_AFLAGS += $(aflags-y)
 LDFLAGS += $(lflags-y) -T$(lscript-r-y)
 LDFLAGS_etaos += $(lflags-y) -T$(lscript-y) -Tdata $(DATA_LOAD_OFFSET)
-LDFLAGS_etaos += --gc-sections
+LDFLAGS_etaos += --gc-sections --whole-archive
 
 softfloat-$(CONFIG_LIBFLT) = -lflt
 
 ifneq ($(NOLIBGCC),1)
 LIB_GCC = $(dir $(shell $(CC) $(KBUILD_CFLAGS) --print-libgcc-file-name))
-ETAOS_EXTRA_LIBS += -L$(LIB_GCC) --start-group -lgcc $(softfloat-m) --end-group
+ETAOS_EXTRA_LIBS += -L$(LIB_GCC) --no-whole-archive \
+		    --start-group -lgcc $(softfloat-m) --end-group
 export ETAOS_EXTRA_LIBS
 endif
 
 KBUILD_CXXFLAGS += $(KBUILD_CFLAGS)
 
 head-y += arch/avr/kernel/start.o
-init-y += arch/avr/kernel/init.o
+init-y += arch/avr/kernel/devinit.o arch/avr/kernel/init.o
 
 core-y += arch/avr/kernel/
 libs-y += arch/avr/libflt/
