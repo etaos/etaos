@@ -16,7 +16,6 @@ int main(void)
 	unsigned char readback;
 	int rc;
 	
-	eeprom_init_24c02();
 	rc = eeprom_24c02_write_byte(100, 0xAC);
 	printf("Write error: %i\n", rc);
 

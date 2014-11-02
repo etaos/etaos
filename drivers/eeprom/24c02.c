@@ -22,6 +22,7 @@
 #include <etaos/eeprom.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
+#include <etaos/init.h>
 
 static struct eeprom ee_chip;
 
@@ -94,4 +95,7 @@ void eeprom_init_24c02(void)
 
 	return;
 }
+
+device_init(eeprom_init_24c02);
+
 

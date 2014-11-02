@@ -27,6 +27,7 @@
 #include <etaos/tick.h>
 #include <etaos/mutex.h>
 #include <etaos/irq.h>
+#include <etaos/init.h>
 
 #include <asm/io.h>
 #include <asm/irq.h>
@@ -314,7 +315,7 @@ static struct i2c_bus atmega_i2c_bus = {
 #define ATMEGA_I2C_RETRY 3
 #define ATMEGA_SPEED_DEFAULT 100000
 
-void atmega_i2c_init(void)
+static void __used atmega_i2c_init(void)
 {
 	atmega_i2c_bus.timeout = ATMEGA_I2C_TMO;
 	atmega_i2c_bus.retries = ATMEGA_I2C_RETRY;
@@ -328,4 +329,6 @@ void atmega_i2c_init(void)
 
 	i2c_sysbus = &atmega_i2c_bus;
 }
+
+module_init(atmega_i2c_init);
 
