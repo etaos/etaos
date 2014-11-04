@@ -73,6 +73,15 @@
  */
 
 /**
+ * @defgroup fifo FIFO scheduler
+ * @ingroup sched
+ * @brief First-in First-out scheduler.
+ *
+ * The FIFO scheduler is a round robin scheduler without priorities. It is
+ * most useful as a scheduler for I/O queue's.
+ */
+
+/**
  * @defgroup evm Event management
  * @ingroup kernel
  * @brief ETA/OS thread synchronisation.

@@ -23,6 +23,11 @@
 #include <etaos/thread.h>
 
 /**
+ * @addtogroup fifo
+ * @{
+ */
+
+/**
  * @brief Insert a new thread into a queue.
  * @param tpp Root queue pointer.
  * @param tp Thread to insert.
@@ -181,6 +186,9 @@ static struct thread *fifo_thread_after(struct thread *tp)
 }
 #endif
 
+/**
+ * @brief FIFO scheduling class.
+ */
 struct sched_class fifo_class = {
 	.rm_thread = &fifo_rm_thread,
 	.add_thread = &fifo_add_thread,
@@ -195,3 +203,4 @@ struct sched_class fifo_class = {
 #endif
 };
 
+/* @} */
