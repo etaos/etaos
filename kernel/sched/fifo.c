@@ -181,7 +181,7 @@ static struct thread *fifo_thread_after(struct thread *tp)
 }
 #endif
 
-struct sched_class sys_sched_class = {
+struct sched_class fifo_class = {
 	.rm_thread = &fifo_rm_thread,
 	.add_thread = &fifo_add_thread,
 	.next_runnable = &fifo_next_runnable,

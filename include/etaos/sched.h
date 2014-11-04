@@ -240,13 +240,16 @@ extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 
 extern void sched_init(void);
 
-/**
- * @brief System scheduling policy.
- *
- * This variable is implemented by the scheduling algorithm configured at
- * compile time.
- */
-extern struct sched_class sys_sched_class;
+#if defined(CONFIG_RR)
+extern struct sched_class rr_class;
+#define sys_sched_class rr_class
+
+#elif defined(CONFIG_FIFO)
+
+extern struct sched_class fifo_class;
+#define sys_sched_class fifo_class;
+#endif
+
 #ifdef CONFIG_THREAD_QUEUE
 extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
 extern void queue_add_thread(struct thread_queue *qp, struct thread *tp);

@@ -203,7 +203,7 @@ static void rr_update_dyn_prio(struct rq *rq)
 }
 #endif
 
-struct sched_class sys_sched_class = {
+struct sched_class rr_class = {
 	.rm_thread = &rr_rm_thread,
 	.add_thread = &rr_add_thread,
 	.next_runnable = &rr_next_runnable,
