@@ -240,11 +240,11 @@ extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 
 extern void sched_init(void);
 
-#if defined(CONFIG_RR)
+#if defined(CONFIG_SYS_RR)
 extern struct sched_class rr_class;
 #define sys_sched_class rr_class
 
-#elif defined(CONFIG_FIFO)
+#elif defined(CONFIG_SYS_FIFO)
 
 extern struct sched_class fifo_class;
 #define sys_sched_class fifo_class;

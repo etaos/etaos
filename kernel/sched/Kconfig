@@ -17,10 +17,7 @@ config SCHED_DBG
 	  function is only useful for ETAO/OS developers. If you
 	  are unsure say 'n' here.
 
-choice
-	prompt "Algorithm"
-	help
-	  Select the scheduling algorithm.
+menu "Scheduling algorithms"
 
 config RR
 	bool "Round robin scheduler"
@@ -37,10 +34,25 @@ config FIFO
 	  The queue's are sorted with the time of insertion used
 	  as the sorting key.
 
+endmenu
+
+choice
+	prompt "Default algorithm"
+	help
+	  Select the default scheduling policy.
+
+config SYS_RR
+	bool "Round robin scheduler"
+	depends on RR
+
+config SYS_FIFO
+	bool "FIFO scheduler"
+	depends on FIFO
 endchoice
 
 config THREAD_QUEUE
 	bool "Thread queues"
+	select FIFO
 	help
 	  Enable support for thread queue's by saying 'y' here.
 	  Thread queue's are a storage mechanism for threads using
