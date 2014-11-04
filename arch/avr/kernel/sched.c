@@ -28,8 +28,8 @@
 
 static struct rq avr_rq = {
 	.sched_class = &sys_sched_class,
-#ifdef CONFIG_RR
-	.rq = { .run_queue = NULL, },
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO)
+	.rr_rq = { .run_queue = NULL, },
 #endif
 	.wake_queue = NULL,
 	.kill_queue = NULL,

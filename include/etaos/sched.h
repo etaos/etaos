@@ -129,7 +129,7 @@ struct rq {
 	struct sched_class *sched_class;
 #if defined(CONFIG_RR) || defined(CONFIG_FIFO)
 	/** @brief Round robin run queue */
-	struct rr_rq rq;
+	struct rr_rq rr_rq;
 #endif
 	/**
 	 * @brief Wake queue.

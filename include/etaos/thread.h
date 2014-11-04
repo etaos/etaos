@@ -36,13 +36,7 @@
 struct sched_class;
 
 CDECL
-/**
- * @brief System scheduling class.
- *
- * The sys_sched_class is a pointer to the scheduling class configured
- * at compile time.
- */
-extern struct sched_class sys_sched_class;
+extern struct sched_class fifo_class;
 #ifdef CONFIG_THREAD_QUEUE
 /**
  * @brief Define a new thread queue.
@@ -50,7 +44,7 @@ extern struct sched_class sys_sched_class;
  */
 #define DEFINE_THREAD_QUEUE(__name)			 \
 	struct thread_queue __name = {		 	 \
-		.sched_class = &sys_sched_class,	 \
+		.sched_class = &fifo_class,	 \
 		.lock = STATIC_SPIN_LOCK_INIT,		 \
 		.qhead = SIGNALED,			 \
 	}
@@ -62,7 +56,7 @@ extern struct sched_class sys_sched_class;
  * macro.
  */
 #define INIT_THREAD_QUEUE {			 \
-		.sched_class = &sys_sched_class, \
+		.sched_class = &fifo_class, \
 		.lock = STATIC_SPIN_LOCK_INIT,	 \
 		.qhead = SIGNALED,		 \
 	}

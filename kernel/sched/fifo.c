@@ -129,7 +129,7 @@ static void fifo_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
  */
 static void fifo_add_thread(struct rq *rq, struct thread *tp)
 {
-	fifo_queue_insert(&rq->rq.run_queue, tp);
+	fifo_queue_insert(&rq->rr_rq.run_queue, tp);
 }
 
 /**
@@ -141,7 +141,7 @@ static void fifo_add_thread(struct rq *rq, struct thread *tp)
  */
 static int fifo_rm_thread(struct rq *rq, struct thread *tp)
 {
-	return fifo_queue_remove(&rq->rq.run_queue, tp);
+	return fifo_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 
 /**
@@ -154,7 +154,7 @@ static struct thread *fifo_next_runnable(struct rq *rq)
 {
 	struct thread *runnable;
 
-	for(runnable = rq->rq.run_queue; runnable; 
+	for(runnable = rq->rr_rq.run_queue; runnable; 
 			runnable = runnable->se.next) {
 		if(!test_bit(THREAD_RUNNING_FLAG, &runnable->flags))
 			continue;

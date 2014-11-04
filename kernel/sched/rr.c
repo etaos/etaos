@@ -133,7 +133,7 @@ static void rr_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
  */
 static void rr_add_thread(struct rq *rq, struct thread *tp)
 {
-	rr_queue_insert(&rq->rq.run_queue, tp);
+	rr_queue_insert(&rq->rr_rq.run_queue, tp);
 }
 
 /**
@@ -145,7 +145,7 @@ static void rr_add_thread(struct rq *rq, struct thread *tp)
  */
 static int rr_rm_thread(struct rq *rq, struct thread *tp)
 {
-	return rr_queue_remove(&rq->rq.run_queue, tp);
+	return rr_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 
 /**
@@ -158,7 +158,7 @@ static struct thread *rr_next_runnable(struct rq *rq)
 {
 	struct thread *runnable;
 
-	for(runnable = rq->rq.run_queue; runnable; 
+	for(runnable = rq->rr_rq.run_queue; runnable; 
 			runnable = runnable->se.next) {
 		if(!test_bit(THREAD_RUNNING_FLAG, &runnable->flags))
 			continue;
@@ -194,7 +194,7 @@ static void rr_update_dyn_prio(struct rq *rq)
 {
 	struct thread *walker;
 
-	walker = rq->rq.run_queue;
+	walker = rq->rr_rq.run_queue;
 
 	while(walker) {
 		walker->dprio += 1;

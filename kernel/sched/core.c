@@ -52,7 +52,7 @@ void thread_wake_up_from_irq(struct thread *thread)
  */
 void thread_queue_init(struct thread_queue *qp)
 {
-	qp->sched_class = &sys_sched_class;
+	qp->sched_class = &fifo_class;
 	qp->qhead = SIGNALED;
 	spinlock_init(&qp->lock);
 }
