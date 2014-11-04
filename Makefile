@@ -2,9 +2,9 @@
 # ETA/OS root Makefile
 #
 
-VERSION = 1
-PATCHLEVEL = 1
-SUBLEVEL = 2
+VERSION = 2
+PATCHLEVEL = 0
+SUBLEVEL = 0
 EXTRAVERSION =
 NAME = Shuffling Donkey
 
