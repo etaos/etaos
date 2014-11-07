@@ -117,8 +117,6 @@ static inline void preempt_disable(void)
 	preempt_count_inc;
 }
 
-CDECL_END
-
 #else /* !CONFIG_PREEMPT */
 
 #define __preempt_add(_i)
@@ -132,6 +130,8 @@ CDECL_END
 #define preempt_disable()
 #define preempt_test() 1
 #endif /* CONFIG_PREEMPT */
+
+CDECL_END
 
 /* @} */
 #endif /* __PREEMPT_H__ */

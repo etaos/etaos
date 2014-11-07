@@ -59,9 +59,6 @@ extern "C" void __cxa_guard_release (__guard *);
 extern "C" void __cxa_guard_abort (__guard *);
 extern "C" void __cxa_pure_virtual(void);
 
-extern void * operator new(size_t size);
-extern void operator delete(void * ptr);
-
 #define CDECL extern "C" {
 #define CDECL_END }
 #else
@@ -97,9 +94,8 @@ typedef enum sys_ctl {
 } sys_ctl_t;
 
 CDECL
-
 extern int sysctl(sys_ctl_t ctl, ...);
-
 CDECL_END
+
 #endif
 

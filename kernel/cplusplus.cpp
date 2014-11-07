@@ -72,7 +72,7 @@ void __cxa_pure_virtual(void)
 /**
  * @brief Abort the program.
  */
-void __cxa_guard_abort (__guard *)
+void __cxa_guard_abort (__guard *g)
 {
 }
 
