@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup ee-24c02
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/i2c.h>
@@ -119,4 +124,6 @@ void eeprom_init_24c02(void)
 }
 
 device_init(eeprom_init_24c02);
+
+/** @} */
 

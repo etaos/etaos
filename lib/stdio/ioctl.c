@@ -24,6 +24,7 @@
 /**
  * @ingroup libc
  * @brief Drive file control options.
+ * @param stream Stream to set the IOCTL to.
  * @param reg Control option to read from or write to.
  * @param buf Buffer which can be read from or written into.
  * @note Make sure that buf is long enough. See the documentation of the

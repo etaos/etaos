@@ -20,6 +20,11 @@
  * @file etaos/eeprom.h
  */
 
+/**
+ * @addtogroup ee
+ * @{
+ */
+
 #ifndef __EEPROM__
 #define __EEPROM__
 
@@ -31,7 +36,7 @@
  * @brief EEPROM chip descriptor.
  */
 struct eeprom {
-	const char *name;
+	const char *name; //!< EEPROM chip name.
 
 	unsigned long rd_idx; //!< Chip address read index.
 	unsigned long wr_idx; //!< Chip address write index.
@@ -39,15 +44,46 @@ struct eeprom {
 	mutex_t lock; //!< Chip lock.
 	void *priv; //!< Private data, usually set to the i2c_client.
 
+	/**
+	 * @brief Read function pointer.
+	 * @param ee EEPROM chip descriptor.
+	 * @param buf Buffer to read data into.
+	 * @param len Length of \p buf.
+	 * @return Error code.
+	 */
 	int (*read)(struct eeprom *ee, void *buf, size_t len);
+
+	/**
+	 * @brief Write function pointer.
+	 * @param ee EEPROM chip descriptor.
+	 * @param buf Buffer which has to be written.
+	 * @param len Length of \p buf.
+	 * @return Error code.
+	 */
 	int (*write)(struct eeprom *ee, const void *buf, size_t len);
+
+	/**
+	 * @brief Read a single byte from the EEPROM chip memory.
+	 * @param ee EEPROM chip descriptor.
+	 * @return Error code.
+	 */
 	int (*read_byte)(struct eeprom *ee);
+
+	/**
+	 * @brief Write a single byte to the EEPROM chip memory.
+	 * @param ee EEPROM chip descriptor.
+	 * @param c Byte which has to be written.
+	 * @return Error code.
+	 */
 	int (*write_byte)(struct eeprom *ee, int c);
 };
 
+/**
+ * @brief EEPROM ioctl register enumerator.
+ */
 typedef enum {
-	EEPROM_RESET_WR_IDX,
-	EEPROM_RESET_RD_IDX,
+	EEPROM_RESET_WR_IDX, //!< IOCTL write index reset.
+	EEPROM_RESET_RD_IDX, //!< IOCTL read index reset.
 } eeprom_ioctl_t;
 
 CDECL
@@ -55,3 +91,6 @@ extern void eeprom_chip_init(struct eeprom *ee, struct device *dev);
 CDECL_END
 
 #endif
+
+/** @} */
+

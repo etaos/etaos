@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup ee
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/eeprom.h>
@@ -157,6 +162,12 @@ static struct dev_file_ops eeprom_ops = {
 	.ioctl = &eeprom_ioctl,
 };
 
+/**
+ * @brief Initialise a new EEPROM chip driver.
+ * @param ee EEPROM chip descriptor which should be initialised.
+ * @param dev Device descriptor for \p ee.
+ * @note ee::name should be initialised when calling this function.
+ */
 void eeprom_chip_init(struct eeprom *ee, struct device *dev)
 {
 	ee->wr_idx = 0;
@@ -175,4 +186,6 @@ static void __used eeprom_init(void)
 }
 
 subsys_init(eeprom_init);
+
+/** @} */
 
