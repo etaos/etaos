@@ -139,6 +139,9 @@ extern int iob_remove(int fd);
 extern void close(int fd);
 extern int open(const char *name, unsigned long flags);
 extern int write(int fd, const void *buff, size_t size);
+extern int ioctl(FILE stream, unsigned long reg, void *buf);
+extern int getc(FILE stream);
+extern int fgetc(FILE stream);
 
 CDECL_END
 
