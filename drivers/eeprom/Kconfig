@@ -1,4 +1,9 @@
-menu "EEPROM support"
+menuconfig EEPROM
+	tristate "EEPROM support"
+	help
+	  Say 'y' or 'm' here to build support for EEPROM chips.
+
+if EEPROM
 
 config 24C02
 	tristate "AT24C02 EEPROM chip"
@@ -7,5 +12,5 @@ config 24C02
 	  Say 'y' or 'm' here to build support for the Atmel 24C02
 	  EEPROM chip. If you are unsure say 'n' here.
 
-endmenu
+endif
 

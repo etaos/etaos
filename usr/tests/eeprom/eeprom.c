@@ -15,20 +15,29 @@
 int main(void)
 {
 	unsigned char readback;
-	int rc;
+	int fd;
+
+	fd = open("24C02", _FDEV_SETUP_RW);
+
+	if(fd >= 0) {
+		printf("Writng to eeprom!\n");
+		putc(0xAC, filep(fd));
+	}
+	close(fd);
 	
-	rc = eeprom_24c02_write_byte(100, 0xAC);
-	printf("Write error: %i\n", rc);
-
 	delay(200);
-
 	while(true) {
-		rc = eeprom_24c02_read_byte(100, &readback);
+		fd = open("24C02", _FDEV_SETUP_RW);
+		if(fd >= 0)
+			readback = getc(filep(fd));
+		else
+			readback = (unsigned char)-1;
+		close(fd);
+
 		if(readback == 0xAC)
 			printf("[OK] readback: %u\n", readback);
 		else
 			printf("[ERR] readback: %u\n", readback);
-		printf("Read error: %i\n", rc);
 
 		delay(500);
 	}

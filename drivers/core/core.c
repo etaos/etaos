@@ -141,6 +141,7 @@ static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 	file->get = fops->get;
 	file->close = fops->close;
 	file->flush = fops->flush;
+	file->ioctl = fops->ioctl;
 	
 	return -EOK;
 }

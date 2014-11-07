@@ -105,3 +105,20 @@
  *   * Multi-processor Communication Mode
  *   * Double Speed Asynchronous Communication Mode
  */
+
+/* ================ USART drivers ================ */
+
+/**
+ * @defgroup ee EEPROM drivers
+ * @ingroup dev
+ * @brief EEPROM core API.
+ *
+ * The EEPROM core defines a device file based API.
+ */
+
+/**
+ * @defgroup ee-24c02 24C02 EEPROM driver
+ * @ingroup ee
+ * @brief Atmel 24C02 EEPROM chip driver.
+ */
+

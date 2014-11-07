@@ -40,7 +40,6 @@
 #define __SEOF	0x0020 //!< found EOF
 #define __SUNGET 0x040 //!< ungetc() happened
 #define __SMALLOC 0x80 //!< handle is malloc()ed
-#define __SMALLOC 0x80		/* handle is malloc()ed */
 /* @} */
 
 #define STREAM_READ_FLAG 	0
@@ -109,6 +108,7 @@ typedef struct file {
 	int (*flush)(struct file*); //!< Flush the file.
 	int (*put)(int c, struct file*); //!< Write 1 byte to a file.
 	int (*get)(struct file*); //!< Read 1 byte from a file.
+	int (*ioctl)(struct file*, unsigned long reg, void *buf);
 
 	void *data; //!< Private file data.
 	volatile unsigned char *buff; //!< File buffer.
@@ -125,6 +125,8 @@ extern FILE __iob[];
 #define stdout 	__iob[1]
 #define stderr 	__iob[2]
 
+#define filep(__idx) __iob[__idx]
+
 extern int putc(int c, FILE stream);
 extern int fputc(int c, FILE stream);
 extern int fputs(char *c, FILE stream);
@@ -136,6 +138,9 @@ extern int iob_remove(int fd);
 extern void close(int fd);
 extern int open(const char *name, unsigned long flags);
 extern int write(int fd, const void *buff, size_t size);
+extern int ioctl(FILE stream, unsigned long reg, void *buf);
+extern int getc(FILE stream);
+extern int fgetc(FILE stream);
 
 CDECL_END
 

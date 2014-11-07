@@ -235,17 +235,15 @@ $(obj)/%.o: $(src)/%.c FORCE
 
 # Single-part modules are special since we need to mark them in $(MODVERDIR)
 
-quiet_cmd_ar_single-m = AR [M]  $(single-used-modname)
-cmd_ar_single-m = $(AR) rcs $(single-used-modname) $@ $(cmd_secanalysis)
-
-single-used-modname := $(addprefix $(dir $(single-used-m))lib,$(notdir $(single-used-m:.o=.a)))
-single-used-tmpmodname := $(addprefix lib,$(notdir $(single-used-m:.o=.mod)))
+quiet_cmd_ar_single-m = AR [M]  $(@:.o=.a)
+cmd_ar_single-m = $(AR) rcs $(addprefix $(obj)/lib, $(notdir $(@:.o=.a))) \
+	$@ $(cmd_secanalysis)
 
 $(single-used-m): $(obj)/%.o: $(src)/%.c FORCE
 	$(call cmd,force_checksrc)
 	$(call if_changed,link_single-m)
 	$(call if_changed,ar_single-m)
-	@{ echo $(single-used-modname); echo $@; } > $(MODVERDIR)/$(single-used-tmpmodname)
+	$(call if_changed,tmpmod)
 
 quiet_cmd_cc_lst_c = MKLST   $@
       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
