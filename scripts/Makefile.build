@@ -225,7 +225,7 @@ define rule_cc_o_c
 	mv -f $(dot-target).tmp $(dot-target).cmd
 endef
 
-quiet_cmd_link_single-m = AR [M]  $@
+quiet_cmd_link_single-m = CC [M]  $@
 cmd_link_single-m = $(CC) $(c_flags) -c -o $@ $<
 
 # Built-in and composite module parts
