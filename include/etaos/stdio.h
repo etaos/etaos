@@ -109,6 +109,7 @@ typedef struct file {
 	int (*flush)(struct file*); //!< Flush the file.
 	int (*put)(int c, struct file*); //!< Write 1 byte to a file.
 	int (*get)(struct file*); //!< Read 1 byte from a file.
+	int (*ioctl)(struct file*, unsigned long reg, void *buf);
 
 	void *data; //!< Private file data.
 	volatile unsigned char *buff; //!< File buffer.

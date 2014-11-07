@@ -80,6 +80,11 @@ struct dev_file_ops {
 	int (*flush)(struct file*); //!< Flush the file.
 	int (*put)(int c, struct file*); //!< Write 1 byte to a file.
 	int (*get)(struct file*); //!< Read 1 byte from a file.
+
+	/**
+	 * @brief I/O control function pointer.
+	 */
+	int (*ioctl)(struct file*, unsigned long reg, void *buf);
 };
 
 CDECL

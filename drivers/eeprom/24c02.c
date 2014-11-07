@@ -24,10 +24,28 @@
 #include <etaos/bitops.h>
 #include <etaos/init.h>
 
-static struct eeprom ee_chip;
+#include <etaos/eeprom/24c02.h>
 
 #define BASE_SLA_24C02 0xA0
 #define SCL_FRQ_24C02 100000UL
+
+static int __eeprom_24c02_read_byte(struct eeprom *ee)
+{
+	unsigned char store;
+
+	eeprom_24c02_read_byte(ee->rd_idx, &store);
+	return store;
+}
+
+static int __eeprom_24c02_write_byte(struct eeprom *ee, int c)
+{
+	return eeprom_24c02_write_byte(ee->wr_idx, (unsigned char)c);
+}
+
+static struct eeprom ee_chip = {
+	.write_byte = &__eeprom_24c02_write_byte,
+	.read_byte = &__eeprom_24c02_read_byte,
+};
 
 /**
  * @brief Write a single byte to a 24C02 EEPROM chip.
@@ -86,12 +104,15 @@ int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 void eeprom_init_24c02(void)
 {
 	struct i2c_device_info *info;
+	struct i2c_client *client;
 
-	ee_chip.addr_idx = 0;
 	info = i2c_create_info("24C02");
 	info->addr = BASE_SLA_24C02;
 	ee_chip.priv = i2c_new_device(info);
+	client = ee_chip.priv;
 	kfree(info);
+
+	eeprom_chip_init(&ee_chip, &client->dev);
 
 	return;
 }

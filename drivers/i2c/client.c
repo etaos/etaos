@@ -104,7 +104,6 @@ struct i2c_client *i2c_new_device(struct i2c_device_info *info)
 	else
 		bus = i2c_sysbus;
 	
-	device_initialize(&client->dev, &info->fops);
 	i2c_add_client(bus, client);
 
 	return client;
