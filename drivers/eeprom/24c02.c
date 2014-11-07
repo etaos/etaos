@@ -43,6 +43,7 @@ static int __eeprom_24c02_write_byte(struct eeprom *ee, int c)
 }
 
 static struct eeprom ee_chip = {
+	.name = "24C02",
 	.write_byte = &__eeprom_24c02_write_byte,
 	.read_byte = &__eeprom_24c02_read_byte,
 };
@@ -118,5 +119,4 @@ void eeprom_init_24c02(void)
 }
 
 device_init(eeprom_init_24c02);
-
 

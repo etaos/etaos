@@ -31,6 +31,8 @@
  * @brief EEPROM chip descriptor.
  */
 struct eeprom {
+	const char *name;
+
 	unsigned long rd_idx; //!< Chip address read index.
 	unsigned long wr_idx; //!< Chip address write index.
 

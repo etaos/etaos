@@ -126,6 +126,8 @@ extern FILE __iob[];
 #define stdout 	__iob[1]
 #define stderr 	__iob[2]
 
+#define filep(__idx) __iob[__idx]
+
 extern int putc(int c, FILE stream);
 extern int fputc(int c, FILE stream);
 extern int fputs(char *c, FILE stream);
