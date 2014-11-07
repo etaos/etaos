@@ -21,6 +21,14 @@
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
+/**
+ * @ingroup libc
+ * @brief Drive file control options.
+ * @param reg Control option to read from or write to.
+ * @param buf Buffer which can be read from or written into.
+ * @note Make sure that buf is long enough. See the documentation of the
+ *       specific device driver for information on the length of the buffer.
+ */
 int ioctl(FILE stream, unsigned long reg, void *buf)
 {
 	int rc;

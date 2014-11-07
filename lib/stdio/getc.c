@@ -21,6 +21,11 @@
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
+/**
+ * @ingroup libc
+ * @brief Write a single byte from a file.
+ * @param stream Stream to write from.
+ */
 int getc(FILE stream)
 {
 	return fgetc(stream);

@@ -21,6 +21,11 @@
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
+/**
+ * @ingroup libc
+ * @brief Write a single byte from a file.
+ * @param stream Stream to write from.
+ */
 int fgetc(FILE stream)
 {
 	if(test_bit(STREAM_READ_FLAG, &stream->flags) && stream->get)
