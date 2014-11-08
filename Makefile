@@ -4,7 +4,7 @@
 
 VERSION = 2
 PATCHLEVEL = 0
-SUBLEVEL = 1
+SUBLEVEL = 2
 EXTRAVERSION =
 NAME = Shuffling Donkey
 
