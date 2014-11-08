@@ -139,6 +139,7 @@ static int eeprom_ioctl(FILE stream, unsigned long reg, void *buf)
 	else
 		idx = *((unsigned long*)buf);
 
+	mutex_lock(&ee->lock);
 	switch(reg) {
 	case EEPROM_RESET_WR_IDX:
 		ee->wr_idx = idx;
@@ -154,6 +155,7 @@ static int eeprom_ioctl(FILE stream, unsigned long reg, void *buf)
 		rc = -EINVAL;
 		break;
 	}
+	mutex_unlock(&ee->lock);
 
 	return rc;
 }
