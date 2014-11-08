@@ -39,6 +39,12 @@ static inline struct eeprom *to_eeprom_chip(FILE file)
 	return dev->dev_data;
 }
 
+/**
+ * @brief Write to an EEPROM chip.
+ * @param stream File stream.
+ * @param buf Buffer with data to write.
+ * @param len Length of \p buf.
+ */
 static int eeprom_write(FILE stream, const void *buf, size_t len)
 {
 	int rc;
@@ -60,6 +66,12 @@ static int eeprom_write(FILE stream, const void *buf, size_t len)
 	return rc;
 }
 
+/**
+ * @brief Read from an EEPROM chip.
+ * @param stream File stream.
+ * @param buf Buffer to read data into.
+ * @param len Length of \p buf.
+ */
 static int eeprom_read(FILE stream, void *buf, size_t len)
 {
 	int rc;
@@ -81,6 +93,12 @@ static int eeprom_read(FILE stream, void *buf, size_t len)
 	return rc;
 }
 
+/**
+ * @brief Write a single byte to an EEROM chip.
+ * @param c Byte to write.
+ * @param stream File stream.
+ * @return Error code.
+ */
 static int eeprom_put(int c, FILE stream)
 {
 	int rc;
@@ -102,6 +120,11 @@ static int eeprom_put(int c, FILE stream)
 	return rc;
 }
 
+/**
+ * @brief Read a single byte from an EEPROM chip.
+ * @param stream File stream.
+ * @return The byte read from the chip or an error code.
+ */
 static int eeprom_get(FILE stream)
 {
 	int rc;
@@ -123,6 +146,14 @@ static int eeprom_get(FILE stream)
 	return rc;
 }
 
+/**
+ * @brief EEPROM core IOCTL.
+ * @param stream File stream.
+ * @param reg Control register.
+ * @param buf Optional argument for reg.
+ * 
+ * Available control options are found in eeprom_ioctl_t.
+ */
 static int eeprom_ioctl(FILE stream, unsigned long reg, void *buf)
 {
 	int rc;
