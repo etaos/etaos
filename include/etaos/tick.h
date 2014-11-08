@@ -31,6 +31,10 @@ extern void systick_setup(int irq, struct clocksource *src);
 
 extern struct clocksource *sys_clk;
 
+/**
+ * @brief Get the system clock.
+ * @note The system clock has to be set first using sysctl.
+ */
 static inline struct clocksource *sys_get_clock(void)
 {
 	return sys_clk;
@@ -40,7 +44,19 @@ CDECL_END
 
 #define sys_tick atomic64_get(&sys_clk->tc)
 
+/**
+ * @brief Calculate if a certain time unit has passed.
+ * @param x Time 1.
+ * @param y Time 2.
+ *
+ * Calculates if \p y is after \p x.
+ */
 #define time_after(x, y) ((int64_t)((y) - (x)) < 0)
+/**
+ * @brief Calculate if a \p b is before \p a.
+ * @param a Time 1.
+ * @param b Time 2.
+ */
 #define time_before(a, b) time_after(b, a)
 
 #endif /* __TICK_H__ */
