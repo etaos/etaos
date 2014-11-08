@@ -16,6 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/kernel.h.
+ */
+
+/**
+ * @addtogroup kernel
+ * @{
+ */
+
 #ifndef __ETAOS_KERNEL_H__
 #define __ETAOS_KERNEL_H__
 
@@ -41,11 +50,22 @@
 #define false FALSE
 
 #ifdef __compiler_offsetof
+/**
+ * @brief Calculate the offset of a member in a structure.
+ * @param TYPE Type of the member.
+ * @param MEMBER Member to calculate the offset of.
+ */
 #define offsetof(TYPE, MEMBER) __compiler_offsetof(TYPE,MEMBER)
 #else
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #endif
 
+/**
+ * @brief Get the container of a pointer member.
+ * @param ptr Pointer to get the container of.
+ * @param type Type of the container.
+ * @param member Member name of \p ptr in the container.
+ */
 #define container_of(ptr, type, member) ({		\
 		const typeof( ((type *)0)->member) *__mptr = (ptr); \
 		(type *)( ( char *)__mptr - offsetof(type,member) );})
@@ -67,7 +87,6 @@ extern "C" void __cxa_pure_virtual(void);
 #endif
 
 /**
- * @ingroup kernel
  * @brief sysctl settings type.
  */
 typedef enum sys_ctl {
@@ -99,3 +118,4 @@ CDECL_END
 
 #endif
 
+/** @} */
