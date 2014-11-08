@@ -54,6 +54,7 @@ static int eeprom_write(FILE stream, const void *buf, size_t len)
 
 	mutex_lock(&ee->lock);
 	rc = ee->write(ee, buf, len);
+	ee->wr_idx += len;
 	mutex_unlock(&ee->lock);
 
 	return rc;
@@ -74,6 +75,7 @@ static int eeprom_read(FILE stream, void *buf, size_t len)
 
 	mutex_lock(&ee->lock);
 	rc = ee->read(ee, buf, len);
+	ee->rd_idx += len;
 	mutex_unlock(&ee->lock);
 
 	return rc;
@@ -94,6 +96,7 @@ static int eeprom_put(int c, FILE stream)
 
 	mutex_lock(&ee->lock);
 	rc = ee->write_byte(ee, c);
+	ee->wr_idx++;
 	mutex_unlock(&ee->lock);
 
 	return rc;
@@ -114,6 +117,7 @@ static int eeprom_get(FILE stream)
 
 	mutex_lock(&ee->lock);
 	rc = ee->read_byte(ee);
+	ee->rd_idx++;
 	mutex_unlock(&ee->lock);
 
 	return rc;
