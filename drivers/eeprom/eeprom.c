@@ -122,7 +122,7 @@ static int eeprom_get(FILE stream)
 static int eeprom_ioctl(FILE stream, unsigned long reg, void *buf)
 {
 	int rc;
-	unsigned char idx;
+	unsigned long idx;
 	struct eeprom *ee;
 
 	if(!stream)
@@ -133,7 +133,7 @@ static int eeprom_ioctl(FILE stream, unsigned long reg, void *buf)
 	if(!buf)
 		idx = 0;
 	else
-		idx = *((unsigned char*)buf);
+		idx = *((unsigned long*)buf);
 
 	switch(reg) {
 	case EEPROM_RESET_WR_IDX:
