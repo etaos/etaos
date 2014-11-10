@@ -1,0 +1,6 @@
+/* ================ GPIO drivers ================ */
+/**
+ * @defgroup gpiolib GPIO library
+ * @ingroup dev
+ * @brief GPIO core library
+ */

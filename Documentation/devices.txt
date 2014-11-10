@@ -32,21 +32,6 @@
  * * ATmega128 M128
  */
 
-/* ================ GPIO drivers ================ */
-/**
- * @defgroup gpiolib GPIO library
- * @ingroup dev
- * @brief GPIO core library
- */
-
-/**
- * @defgroup atmega-gpio ATmega GPIO driver
- * @ingroup gpiolib
- * @brief ATmega GPIO driver
- *
- * GPIO driver for the AVR ATmega general I/O ports.
- */
-
 /* ================ I2C drivers ================ */
 /**
  * @defgroup i2c I2C drivers

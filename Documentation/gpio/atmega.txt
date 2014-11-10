@@ -1,0 +1,7 @@
+/**
+ * @defgroup atmega-gpio ATmega GPIO driver
+ * @ingroup gpiolib
+ * @brief ATmega GPIO driver
+ *
+ * GPIO driver for the AVR ATmega general I/O ports.
+ */
