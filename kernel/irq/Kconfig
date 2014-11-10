@@ -6,14 +6,6 @@ menuconfig IRQ_SUPPORT
 	  IRQ chips. If you are unsure say 'y'.
 
 if IRQ_SUPPORT
-
-config IRQ_DEBUG
-	bool "IRQ debug support"
-	help
-	  Say 'y' here if you want to build IRQ debugging. This
-	  option is useful for ETA/OS developers. If you are
-	  unsure say 'N' here.
-
 config IRQ_THREAD
 	bool "Threaded IRQ support"
 	depends on SCHED && THREAD_QUEUE
@@ -23,4 +15,11 @@ config IRQ_THREAD
 	  execute (delayed) in a thread. The drawbacks are that
 	  these kind of interrupts arrive delayed and have extra
 	  overhead in the kernel. If unsure say 'n' here.
+
+config IRQ_DEBUG
+	bool "IRQ debug support"
+	help
+	  Say 'y' here if you want to build IRQ debugging. This
+	  option is useful for ETA/OS developers. If you are
+	  unsure say 'N' here.
 endif

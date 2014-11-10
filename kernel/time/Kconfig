@@ -9,14 +9,6 @@ menuconfig TIMER
 	  run on top of this susbystem.
 
 if TIMER
-config TIMER_DBG
-	bool "Timer debugging"
-	default n
-	help
-	  Saying 'y' here enables various debugging messages
-	  in the timer subsystem. This option is mostly useful
-	  for ETA/OS developers. If you are unsure say 'n' here.
-
 config SYS_TICK
 	bool "System tick"
 	default y
@@ -25,6 +17,14 @@ config SYS_TICK
 	  This timer is mandatory for all systems within ETA/OS itself
 	  that require precision timing (scheduler, etc..). If unsure
 	  say 'y'.
+
+config TIMER_DBG
+	bool "Timer debugging"
+	default n
+	help
+	  Saying 'y' here enables various debugging messages
+	  in the timer subsystem. This option is mostly useful
+	  for ETA/OS developers. If you are unsure say 'n' here.
 endif
 
 config DELAY_US

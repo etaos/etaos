@@ -10,12 +10,6 @@ menuconfig SCHED
 	  If you are unsure say 'n' here.
 
 if SCHED
-config SCHED_DBG
-	bool "Scheduling DBG"
-	help
-	  Say 'y' here to enable the scheduling debugger. This
-	  function is only useful for ETAO/OS developers. If you
-	  are unsure say 'n' here.
 
 menu "Scheduling algorithms"
 
@@ -96,4 +90,12 @@ config PREEMPT
 	  the scheduler to preempt the currently running task at
 	  any given moment.
 
+config SCHED_DBG
+	bool "Scheduling DBG"
+	help
+	  Say 'y' here to enable the scheduling debugger. This
+	  function is only useful for ETAO/OS developers. If you
+	  are unsure say 'n' here.
+
 endif
+
