@@ -127,6 +127,8 @@ static void irq_thread_wait(void)
 	schedule();
 }
 
+bool testy = false;
+
 /**
  * @brief Wake up all signaled IRQ threads.
  * @param rq Run queue to add threads to when they wake up.
@@ -134,36 +136,21 @@ static void irq_thread_wait(void)
  */
 void irq_signal_threads(struct rq *rq)
 {
-
-	struct thread_queue *qp = &irq_thread_queue;
 	struct thread *walker;
-	unsigned long flags;
 
-	irq_save_and_disable(&flags);
-
-	walker = qp->qhead;
+	walker = irq_thread_queue.qhead;
 	while(walker && walker != SIGNALED) {
 		if(walker->ec) {
-			queue_remove_thread(qp, walker);
-
-			if(rq->current != walker) {
-				rq_add_thread_no_lock(walker);
-			} else {
-				set_bit(THREAD_RUNNING_FLAG, &walker->flags);
-				walker->on_rq = true;
-				walker->rq = rq;
-			}
-			
-			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
+			queue_remove_thread(&irq_thread_queue, walker);
+			rq_add_thread_no_lock(walker);
 			clear_bit(THREAD_WAITING_FLAG, &walker->flags);
+			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
 		}
-		walker = qp->sched_class->thread_after(walker);
+		walker = irq_thread_queue.sched_class->thread_after(walker);
 	}
 
-	if(!qp->qhead)
-		qp->qhead = SIGNALED;
-
-	irq_restore(&flags);
+	if(!(&irq_thread_queue.qhead))
+		irq_thread_queue.qhead = SIGNALED;
 }
 #endif
 

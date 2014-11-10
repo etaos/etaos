@@ -639,10 +639,10 @@ static bool __hot rq_schedule(void)
 	prev = current(rq);
 	did_switch = false;
 	
-	irq_signal_threads(rq);
 resched:
 	preempt_disable();
 	raw_spin_lock_irq(&rq->lock);
+	irq_signal_threads(rq);
 
 #ifdef CONFIG_EVENT_MUTEX
 	carriage = rq->wake_queue;
