@@ -750,13 +750,17 @@ INPUT                  = . \
                          Documentation/mem.txt \
                          Documentation/sched.txt \
                          Documentation/timer.txt \
-                         Documentation/gpio \
                          Documentation/device-core.txt \
-                         Documentation/arch \
-                         Documentation/eeprom \
-                         Documentation/i2c \
-                         Documentation/usart \
-                         Documentation/kernel.txt
+                         Documentation/kernel.txt \
+                         Documentation/arch/avr.txt \
+                         Documentation/eeprom/24c02.txt \
+                         Documentation/eeprom/eeprom.txt \
+                         Documentation/gpio/atmega.txt \
+                         Documentation/gpio/gpio.txt \
+                         Documentation/i2c/atmega.txt \
+                         Documentation/i2c/i2c.txt \
+                         Documentation/usart/atmega.txt \
+                         Documentation/usart/usart.txt
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
