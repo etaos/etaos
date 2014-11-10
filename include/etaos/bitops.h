@@ -35,29 +35,40 @@ static inline bool test_bit(unsigned bit, volatile unsigned long *flags)
 #ifndef CONFIG_ARCH_TNC
 static inline int test_and_clear_bit(unsigned nr, volatile unsigned long *addr)
 {
-	return 0;
+	unsigned long old;
+
+	old = addr[bit / BITS_PER_LONG] >> (bit % BITS_PER_LONG);
+	addr[bit / BITS_PER_LONG] &= ~(1UL << (bit % BITS_PER_LONG));
+
+	return old & 1UL;
 }
 #endif
 
 #ifndef CONFIG_ARCH_TNS
 static inline int test_and_set_bit(unsigned nr, volatile unsigned long *addr)
 {
-	return 0;
+	unsigned long old;
+
+	old = addr[bit / BITS_PER_LONG] >> (bit % BITS_PER_LONG);
+	addr[bit / BITS_PER_LONG] |= ~(1UL << (bit % BITS_PER_LONG));
+
+	return old & 1UL;
 }
 #endif
 
 #ifndef CONFIG_ARCH_SET_BIT
 static inline void set_bit(unsigned nr, volatile unsigned long *addr)
 {
-	return 0;
+	addr[bit / BITS_PER_LONG] |= ~(1UL << (bit % BITS_PER_LONG));
 }
 #endif
 
 #ifndef CONFIG_ARCH_CLEAR_BIT
 static inline void clear_bit(unsigned nr, volatile unsigned long *addr)
 {
-	return 0;
+	addr[bit / BITS_PER_LONG] &= ~(1UL << (bit % BITS_PER_LONG));
 }
 #endif
 CDECL_END
 #endif
+
