@@ -26,7 +26,7 @@ CONFIG_ARCH_CLEAR_BIT=y
 #
 # Generic system configuration
 #
-CONFIG_CPP=y
+# CONFIG_CPP is not set
 CONFIG_IRQ_SUPPORT=y
 # CONFIG_IRQ_DEBUG is not set
 CONFIG_TIMER=y
@@ -34,19 +34,7 @@ CONFIG_TIMER=y
 CONFIG_SYS_TICK=y
 CONFIG_DELAY_US=y
 CONFIG_DELAY_MS=y
-CONFIG_SCHED=y
-# CONFIG_SCHED_DBG is not set
-
-#
-# Scheduling algorithms
-#
-CONFIG_RR=y
-# CONFIG_FIFO is not set
-CONFIG_SYS_RR=y
-# CONFIG_THREAD_QUEUE is not set
-# CONFIG_EVENT_MUTEX is not set
-CONFIG_DYN_PRIO=y
-CONFIG_PREEMPT=y
+# CONFIG_SCHED is not set
 CONFIG_MUTEX_TRADITIONAL=y
 
 #

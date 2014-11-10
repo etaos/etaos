@@ -21,6 +21,7 @@ int main(void)
 
 	if(fd >= 0) {
 		printf("Writng to eeprom!\n");
+		ioctl(filep(fd), EEPROM_RESET_WR_IDX, NULL);
 		putc(0xAC, filep(fd));
 	}
 	close(fd);
@@ -28,8 +29,10 @@ int main(void)
 	delay(200);
 	while(true) {
 		fd = open("24C02", _FDEV_SETUP_RW);
-		if(fd >= 0)
+		if(fd >= 0) {
+			ioctl(filep(fd), EEPROM_RESET_RD_IDX, NULL);
 			readback = getc(filep(fd));
+		}
 		else
 			readback = (unsigned char)-1;
 		close(fd);
