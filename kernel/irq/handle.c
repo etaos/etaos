@@ -142,6 +142,7 @@ void irq_signal_threads(struct rq *rq)
 	walker = qp->qhead;
 	while(walker && walker != SIGNALED) {
 		if(walker->ec) {
+			walker->ec--;
 			queue_remove_thread(qp, walker);
 			rq_add_thread_no_lock(walker);
 			clear_bit(THREAD_WAITING_FLAG, &walker->flags);
