@@ -1,0 +1,7 @@
+/**
+ * @defgroup ee EEPROM drivers
+ * @ingroup dev
+ * @brief EEPROM core API.
+ *
+ * The EEPROM core defines a device file based API.
+ */

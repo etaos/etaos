@@ -1,0 +1,17 @@
+/**
+ * @defgroup dev Device drivers
+ * @brief Standard device I/O functions.
+ *
+ * Device drivers are typically not accessed directly by an application. 
+ * Instead they are used by the standard C library to perform data I/O.
+ */
+
+/**
+ * @defgroup dev-core  Device core
+ * @ingroup dev
+ * @brief Device driver core.
+ * 
+ * The device driver core is responsible for internal handling of device
+ * drivers. Registering, and unregistering them for example.
+ */
+

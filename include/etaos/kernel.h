@@ -17,7 +17,7 @@
  */
 
 /**
- * @file etaos/kernel.h.
+ * @file etaos/kernel.h
  */
 
 /**

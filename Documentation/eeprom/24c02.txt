@@ -1,0 +1,6 @@
+/**
+ * @defgroup ee-24c02 24C02 EEPROM driver
+ * @ingroup ee
+ * @brief Atmel 24C02 EEPROM chip driver.
+ */
+

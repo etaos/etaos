@@ -744,15 +744,19 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = . \
-                         Documentation/devices.txt \
-                         Documentation/etaos_en.txt \
                          Documentation/fs.txt \
                          Documentation/irq.txt \
                          Documentation/libc.txt \
                          Documentation/mem.txt \
                          Documentation/sched.txt \
                          Documentation/timer.txt \
-                         Documentation/gpio
+                         Documentation/gpio \
+                         Documentation/device-core.txt \
+                         Documentation/arch \
+                         Documentation/eeprom \
+                         Documentation/i2c \
+                         Documentation/usart \
+                         Documentation/kernel.txt
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

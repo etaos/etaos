@@ -1,0 +1,6 @@
+/**
+ * @defgroup i2c I2C drivers
+ * @ingroup dev
+ * @brief I2C core driver.
+ */
+

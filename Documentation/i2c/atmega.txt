@@ -1,0 +1,5 @@
+/**
+ * @defgroup i2c-atmega ATmega I2C driver
+ * @ingroup i2c
+ * @brief ATmega AVR I2C bus driver.
+ */

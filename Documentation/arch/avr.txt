@@ -1,0 +1,28 @@
+/**
+ * @defgroup atmega ATmega AVR
+ * @ingroup arch
+ * @brief ATmega AVR support.
+ *
+ * Supported ATmega chips:
+ * * ATmega328(p)
+ *
+ * @section atmega-init System initialisation
+ *
+ * After the AVR chip has been programmed and the power is turned on, the
+ * IP (Instruction Pointer) starts the execution at physical address 0x0
+ * in the program memory. At this address a so called vector table is defined.
+ * The vector table is a table of jmp instructions for interrupts. However,
+ * the first "interrupt" is the boot jump. This jump brings the IP to the
+ * __init label. The __init function initialises the stack and RAMPD registers.
+ * The rest of the content of this function is variable, depending on whether
+ * the application contains a data and/or bss segment. If it does, the compiler
+ * imported some code from libgcc to set the entire content of the bss section
+ * to zero and copy all values of the data segment from program memory into
+ * the data memory. Once that is done, the main section of ETA/OS will be
+ * started, avr_init is called.
+ *
+ * avr_init is main init routine of ETA/OS. It will initialise all configured
+ * features (e.g. the memory manager, scheduler, device drivers, etc..). Once
+ * everything is initialised, configured and running the application main
+ * routine will be called.
+ */
