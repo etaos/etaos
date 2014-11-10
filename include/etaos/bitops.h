@@ -26,6 +26,12 @@
 
 CDECL
 #ifndef CONFIG_ARCH_TEST_BIT
+/**
+ * @brief Test a bit for its valule.
+ * @param bit Bit number to test.
+ * @param flags Address of the flags register.
+ * @return The value of the tested bit.
+ */
 static inline bool test_bit(unsigned bit, volatile unsigned long *flags)
 {
 	return 1UL & (flags[bit / BITS_PER_LONG] >> (bit % BITS_PER_LONG));
