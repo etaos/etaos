@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/bitops.h
+ */
+
 #ifndef __BITOPS_H__
 #define __BITOPS_H__
 
