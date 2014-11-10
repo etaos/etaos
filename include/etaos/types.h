@@ -16,26 +16,62 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/types.h
+ */
+
 #ifndef __ETAOS_TYPES_H_
 #define __ETAOS_TYPES_H_
 
 #include <asm/types.h>
 
 #ifndef __cplusplus
+/**
+ * @brief C boolean type.
+ *
+ * Although it is actually a byte width type, it should only be set to
+ * \p true or \p false, for C++ compatibility.
+ */
 typedef unsigned char bool;
 #endif
+
+/**
+ * @brief Unsigned 8-bit integer.
+ */
 typedef unsigned char uint8_t;
+/**
+ * @brief Unsigned 16-bit integer.
+ */
 typedef unsigned short uint16_t;
 
+/**
+ * @brief Signed 8-bit integer
+ */
 typedef char int8_t;
+/**
+ * @brief Signed 16-bi integer.
+ */
 typedef short int16_t;
 
+/**
+ * @brief Unsigned pointer width type.
+ *
+ * The size_t type always has the same width as a void pointer.
+ */
 typedef arch_size_t size_t;
+/**
+ * @brief Signed pointer width type.
+ * @see size_t
+ */
 typedef arch_ssize_t ssize_t;
 
+/**
+ * @brief Linked list structure.
+ * @see list_add list_del
+ */
 struct list_head {
-	struct list_head *next;
-	struct list_head *prev;
+	struct list_head *next; //!< Next node pointer.
+	struct list_head *prev; //!< Previous node pointer.
 };
 
 #endif
