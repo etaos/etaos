@@ -80,16 +80,16 @@ int eeprom_24c02_write_byte(unsigned char addr, unsigned char data)
 int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 {
 	int rc;
-	unsigned char rx, tx;
+	unsigned char rx;
 	struct i2c_client *client = ee_chip.priv;
-	struct i2c_msg msgs[2];
+	struct i2c_msg *msgs;
 
-	tx = addr;
+	msgs = kzalloc(sizeof(*msgs)*2);
 	msgs[MSG_TX].dest_addr = client->addr;
 	msgs[MSG_TX].flags = 0;
 	msgs[MSG_TX].len = 1;
 	msgs[MSG_TX].idx = 0;
-	msgs[MSG_TX].buff = &tx;
+	msgs[MSG_TX].buff = &addr;
 
 	msgs[MSG_RX].dest_addr = client->addr;
 	msgs[MSG_RX].flags = 0;
@@ -100,6 +100,7 @@ int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 
 	rc = i2c_bus_xfer(client->bus, msgs, 2);
 	*storage = rx;
+	kfree(msgs);
 
 	return (rc == 2) ? -EOK : rc;
 }
