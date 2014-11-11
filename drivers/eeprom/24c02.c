@@ -96,7 +96,7 @@ int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 	msgs[MSG_RX].len = 1;
 	msgs[MSG_RX].idx = 0;
 	msgs[MSG_RX].buff = &rx;
-	set_bit(I2C_RD_FLAG, &msgs[MSG_RX]);
+	set_bit(I2C_RD_FLAG, &msgs[MSG_RX].flags);
 
 	rc = i2c_bus_xfer(client->bus, msgs, 2);
 	*storage = rx;
