@@ -86,15 +86,11 @@ int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 
 	msgs = kzalloc(sizeof(*msgs)*2);
 	msgs[MSG_TX].dest_addr = client->addr;
-	msgs[MSG_TX].flags = 0;
 	msgs[MSG_TX].len = 1;
-	msgs[MSG_TX].idx = 0;
 	msgs[MSG_TX].buff = &addr;
 
 	msgs[MSG_RX].dest_addr = client->addr;
-	msgs[MSG_RX].flags = 0;
 	msgs[MSG_RX].len = 1;
-	msgs[MSG_RX].idx = 0;
 	msgs[MSG_RX].buff = &rx;
 	set_bit(I2C_RD_FLAG, &msgs[MSG_RX].flags);
 
