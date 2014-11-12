@@ -51,13 +51,13 @@ CDECL_END
  *
  * Calculates if \p y is after \p x.
  */
-#define time_after(x, y) ((int64_t)((y) - (x)) < 0)
+#define time_after(x, y) ((x) > (y))
 /**
  * @brief Calculate if a \p b is before \p a.
  * @param a Time 1.
  * @param b Time 2.
  */
-#define time_before(a, b) time_after(b, a)
+#define time_before(a, b) ((a) < (b))
 
 #endif /* __TICK_H__ */
 
