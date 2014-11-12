@@ -49,15 +49,10 @@ struct clocksource {
 	 */
 	void (*disable)(struct clocksource* cs);
 	unsigned long freq; //!< Frequency of the source (in Hz).
-	atomic64_t tc; //!< Tick counter.
-	/**
-	 * @brief Tick count when last updated.
-	 *
-	 * Every time a clocksource is updated, this field is used to
-	 * calculate how many ticks have passed since the previous update. As
-	 * soon as the update is done, tc_resume is set to tc.
-	 */
-	uint64_t tc_resume;
+
+	tick_t count;
+	tick_t tc_update;
+
 	spinlock_t lock; //!< Clocksource lock.
 
 	struct list_head list; //!< List of clocksources.
@@ -103,6 +98,17 @@ struct timer {
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
 CDECL
+static inline tick_t tm_get_tick(struct clocksource *cs)
+{
+	tick_t rv;
+	unsigned long flags;
+
+	spin_lock_irqsave(&cs->lock, flags);
+	rv = cs->count;
+	spin_unlock_irqrestore(&cs->lock, flags);
+
+	return rv;
+}
 
 extern unsigned int tm_update_source(struct clocksource *source);
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,

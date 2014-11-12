@@ -42,7 +42,7 @@ static inline struct clocksource *sys_get_clock(void)
 
 CDECL_END
 
-#define sys_tick atomic64_get(&sys_clk->tc)
+#define sys_tick tm_get_tick(sys_clk)
 
 /**
  * @brief Calculate if a certain time unit has passed.
