@@ -27,6 +27,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/irq.h>
 #include <etaos/spinlock.h>
 #include <etaos/atomic.h>
 
@@ -108,6 +109,23 @@ static inline tick_t tm_get_tick(struct clocksource *cs)
 	spin_unlock_irqrestore(&cs->lock, flags);
 
 	return rv;
+}
+
+static inline void tm_source_inc(struct clocksource *cs)
+{
+	unsigned int diff;
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	if((cs->count + 1UL) == 0) {
+		diff = cs->count - cs->tc_update;
+		diff += 1;
+		cs->tc_update = 0;
+		cs->count = diff;
+	} else {
+		cs->count++;
+	}
+	irq_restore(&flags);
 }
 
 extern unsigned int tm_update_source(struct clocksource *source);
