@@ -51,8 +51,8 @@ struct clocksource {
 	void (*disable)(struct clocksource* cs);
 	unsigned long freq; //!< Frequency of the source (in Hz).
 
-	volatile tick_t count;
-	tick_t tc_update;
+	volatile tick_t count; //!< Tick counter.
+	tick_t tc_update; //!< Timer update value.
 
 	spinlock_t lock; //!< Clocksource lock.
 
@@ -99,6 +99,11 @@ struct timer {
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
 CDECL
+/**
+ * @brief Get the tick count from a clock source.
+ * @param cs Clock source which tick count is requested.
+ * @return The struct clocksource::count attribute of \p cs.
+ */
 static inline tick_t tm_get_tick(struct clocksource *cs)
 {
 	tick_t rv;
@@ -111,6 +116,13 @@ static inline tick_t tm_get_tick(struct clocksource *cs)
 	return rv;
 }
 
+/**
+ * @brief Safely increment the tick count of a clock source.
+ * @param cs Clock source which tick count is to be incremented.
+ * @note The lock of \p cs won't be aquired, only interrupts will be
+ * 	 disabled.
+ * @note This function does provide overflow protection.
+ */
 static inline void tm_source_inc(struct clocksource *cs)
 {
 	unsigned int diff;
