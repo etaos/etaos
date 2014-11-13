@@ -48,7 +48,7 @@ CDECL_END
  * The sys_tick variable gets the tick count of the system clock and returns
  * it to the user.
  */
-#define sys_tick atomic64_get(&sys_clk->tc)
+#define sys_tick tm_get_tick(sys_clk)
 
 /**
  * @brief Calculate if a certain time unit has passed.
@@ -57,13 +57,13 @@ CDECL_END
  *
  * Calculates if \p y is after \p x.
  */
-#define time_after(x, y) ((int64_t)((y) - (x)) < 0)
+#define time_after(x, y) ((x) > (y))
 /**
  * @brief Calculate if a \p b is before \p a.
  * @param a Time 1.
  * @param b Time 2.
  */
-#define time_before(a, b) time_after(b, a)
+#define time_before(a, b) ((a) < (b))
 
 #endif /* __TICK_H__ */
 

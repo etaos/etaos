@@ -41,7 +41,7 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 {
 	struct clocksource *cs = (struct clocksource*)data;
 
-	atomic64_inc(&cs->tc);
+	tm_source_inc(cs);
 	return IRQ_HANDLED;
 }
 

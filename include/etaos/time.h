@@ -27,6 +27,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/irq.h>
 #include <etaos/spinlock.h>
 #include <etaos/atomic.h>
 
@@ -49,15 +50,10 @@ struct clocksource {
 	 */
 	void (*disable)(struct clocksource* cs);
 	unsigned long freq; //!< Frequency of the source (in Hz).
-	atomic64_t tc; //!< Tick counter.
-	/**
-	 * @brief Tick count when last updated.
-	 *
-	 * Every time a clocksource is updated, this field is used to
-	 * calculate how many ticks have passed since the previous update. As
-	 * soon as the update is done, tc_resume is set to tc.
-	 */
-	uint64_t tc_resume;
+
+	volatile tick_t count;
+	tick_t tc_update;
+
 	spinlock_t lock; //!< Clocksource lock.
 
 	struct list_head list; //!< List of clocksources.
@@ -103,6 +99,34 @@ struct timer {
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
 CDECL
+static inline tick_t tm_get_tick(struct clocksource *cs)
+{
+	tick_t rv;
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	rv = cs->count;
+	irq_restore(&flags);
+
+	return rv;
+}
+
+static inline void tm_source_inc(struct clocksource *cs)
+{
+	unsigned int diff;
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	if((cs->count + 1UL) == 0) {
+		diff = cs->count - cs->tc_update;
+		diff += 1;
+		cs->tc_update = 0;
+		cs->count = diff;
+	} else {
+		cs->count++;
+	}
+	irq_restore(&flags);
+}
 
 extern unsigned int tm_update_source(struct clocksource *source);
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,

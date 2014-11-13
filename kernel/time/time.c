@@ -55,8 +55,8 @@ int tm_clock_source_initialise(const char *name, struct clocksource *cs,
 	cs->freq = freq;
 	cs->enable = enable;
 	cs->disable = disable;
-	atomic64_init(&cs->tc);
-	cs->tc_resume = 0LL;
+	cs->count = 0UL;
+	cs->tc_update = 0UL;
 	spin_lock_init(&cs->lock);
 	list_add(&cs->list, &sources);
 	return -EOK;
@@ -101,7 +101,12 @@ static void tm_start_timer(struct timer *timer)
  */
 static unsigned int cs_get_diff(struct clocksource *cs)
 {
-	return (unsigned int)(atomic64_get(&cs->tc) - cs->tc_resume);
+	unsigned int update;
+
+	update = tm_get_tick(cs);
+	update -= cs->tc_update;
+
+	return update;
 }
 
 /**
@@ -186,7 +191,7 @@ unsigned int tm_update_source(struct clocksource *source)
 	unsigned int diff;
 
 	diff = cs_get_diff(source);
-	source->tc_resume = atomic64_get(&source->tc);
+	source->tc_update = tm_get_tick(source);
 	return diff;
 }
 

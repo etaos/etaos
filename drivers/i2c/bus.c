@@ -47,11 +47,16 @@ static int __i2c_transfer(struct i2c_bus *bus,
 {
 	int ret;
 	char retries;
+	tick_t ref = sys_tick, click;
 
 	for(retries = 0, ret = 0; retries < bus->retries; retries++) {
 		ret = bus->xfer(bus, msgs, len);
 
 		if(ret != -EAGAIN)
+			break;
+
+		click = sys_tick;
+		if(time_after(click, ref+bus->timeout))
 			break;
 	}
 
