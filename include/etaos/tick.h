@@ -42,6 +42,12 @@ static inline struct clocksource *sys_get_clock(void)
 
 CDECL_END
 
+/**
+ * @brief Get the system tick.
+ *
+ * The sys_tick variable gets the tick count of the system clock and returns
+ * it to the user.
+ */
 #define sys_tick atomic64_get(&sys_clk->tc)
 
 /**
