@@ -51,7 +51,7 @@ struct clocksource {
 	void (*disable)(struct clocksource* cs);
 	unsigned long freq; //!< Frequency of the source (in Hz).
 
-	tick_t count;
+	volatile tick_t count;
 	tick_t tc_update;
 
 	spinlock_t lock; //!< Clocksource lock.
@@ -104,9 +104,9 @@ static inline tick_t tm_get_tick(struct clocksource *cs)
 	tick_t rv;
 	unsigned long flags;
 
-	spin_lock_irqsave(&cs->lock, flags);
+	irq_save_and_disable(&flags);
 	rv = cs->count;
-	spin_unlock_irqrestore(&cs->lock, flags);
+	irq_restore(&flags);
 
 	return rv;
 }
