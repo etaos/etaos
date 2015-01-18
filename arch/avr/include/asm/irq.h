@@ -23,7 +23,6 @@
 
 #define irq_vector(num) __vector_ ## num
 
-
 #define SIGNAL(_vector) \
 	void _vector(void) __attribute__((IRQ_ENTRY_ATTRIBS)); \
 	void _vector(void)

@@ -61,12 +61,6 @@
 	(F_CPU - (16*__freq)) / (2*__pres*__freq)
 #endif
 
-#define TWBR  MEM_IO8(0xB8)
-#define TWCR  MEM_IO8(0xBC)
-#define TWSR  MEM_IO8(0xB9)
-#define TWDR  MEM_IO8(0xBB)
-#define TWAR  MEM_IO8(0xBA)
-#define TWAMR MEM_IO8(0xBD)
 
 /* Master */
 #define TW_START		0x08

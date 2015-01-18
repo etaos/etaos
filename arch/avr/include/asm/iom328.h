@@ -126,5 +126,13 @@
 #define UCSR0B MEM_IO8(0xC1)
 #define UCSR0C MEM_IO8(0xC2)
 
+/* TWI defs */
+#define TWBR  MEM_IO8(0xB8)
+#define TWCR  MEM_IO8(0xBC)
+#define TWSR  MEM_IO8(0xB9)
+#define TWDR  MEM_IO8(0xBB)
+#define TWAR  MEM_IO8(0xBA)
+#define TWAMR MEM_IO8(0xBD)
+
 #endif /* __IOM328_H_ */
 
