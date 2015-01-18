@@ -23,13 +23,23 @@
 #define INTERNAL_RAMEND RAMEND
 #define RAMSTART 0x100
 
+/* interrupt defs */
 #define CONFIG_ARCH_VECTORS CONFIG_ATMEGA328_VECTORS
 
 #define _VECTORS_SIZE (26*4)
 
+#define TIMER0_OVERFLOW_VECTOR_NUM 16
+#define SPI_STC_VECTOR_NUM	   17
+#define TWI_STC_VECTOR_NUM	   24
+
+#define TIMER0_OVERFLOW_VECTOR irq_vector(16)
+#define SPI_STC_VECTOR irq_vector(17)
+#define TWI_STC_VECTOR irq_vector(24)
+
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
 
+/* stack defs */
 #define AVR_STACK_LOW_ADDR 0x3D
 #define AVR_STACK_HI_ADDR 0x3E
 #define AVR_STATUS_ADDR 0x3F
@@ -92,20 +102,29 @@
 #define OCF0A 0x2
 #define OCF0B 0x4
 
+/* GPIO defs */
 #define PINB MEM_IO8(0x23)
 #define DDRB MEM_IO8(0x24)
 #define PORTB MEM_IO8(0x25)
 
-
 #define PINC MEM_IO8(0x26)
 #define DDRC MEM_IO8(0x27)
 #define PORTC MEM_IO8(0x28)
-
 
 #define PIND MEM_IO8(0x29)
 #define DDRD MEM_IO8(0x2A)
 #define PORTD MEM_IO8(0x2B)
 
 #define GPIO_PINS 24
-#endif
+
+/* USART defs */
+#define UBRR0L MEM_IO8(0xC4)
+#define UBRR0H MEM_IO8(0xC5)
+#define UDR0 MEM_IO8(0xC6)
+
+#define UCSR0A MEM_IO8(0xC0)
+#define UCSR0B MEM_IO8(0xC1)
+#define UCSR0C MEM_IO8(0xC2)
+
+#endif /* __IOM328_H_ */
 

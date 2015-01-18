@@ -79,14 +79,6 @@
 #  define UBRR0H_VALUE (UBRR_VALUE >> 8)
 #endif
 
-#define UBRR0L MEM_IO8(0xC4)
-#define UBRR0H MEM_IO8(0xC5)
-#define UDR0 MEM_IO8(0xC6)
-
-#define UCSR0A MEM_IO8(0xC0)
-#define UCSR0B MEM_IO8(0xC1)
-#define UCSR0C MEM_IO8(0xC2)
-
 #define U2X0 1
 #define UCSZ00 1
 #define UCSZ01 2

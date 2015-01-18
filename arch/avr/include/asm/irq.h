@@ -23,13 +23,6 @@
 
 #define irq_vector(num) __vector_ ## num
 
-#define TIMER0_OVERFLOW_VECTOR_NUM 16
-#define SPI_STC_VECTOR_NUM	   17
-#define TWI_STC_VECTOR_NUM	   24
-
-#define TIMER0_OVERFLOW_VECTOR irq_vector(16)
-#define SPI_STC_VECTOR irq_vector(17)
-#define TWI_STC_VECTOR irq_vector(24)
 
 #define SIGNAL(_vector) \
 	void _vector(void) __attribute__((IRQ_ENTRY_ATTRIBS)); \
