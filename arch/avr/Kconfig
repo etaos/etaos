@@ -87,6 +87,16 @@ config ATMEGA328
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega328p
 	  AVR core.
+
+config ATMEGA1280
+	bool "ATmega 1280"
+	select ARCH_CLEAR_BIT
+	select ARCH_TNC
+	select ARCH_TNS
+	select ARCH_SET_BIT
+	help
+	  Select if you are building for the Atmel ATmega328 or ATmega1280
+	  AVR core.
 endchoice
 
 config PICO_POWER

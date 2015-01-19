@@ -235,6 +235,7 @@ static int atmega_i2c_xfer(struct i2c_bus *bus, struct i2c_msg *msgs, int num)
 	return ret;
 }
 
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
 static unsigned char atmega_prescalers[] = {
 	1,
 	4,
@@ -242,7 +243,6 @@ static unsigned char atmega_prescalers[] = {
 	64,
 };
 
-#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
 static void atmega_i2c_setspeed(uint32_t speed)
 {
 	unsigned char i;

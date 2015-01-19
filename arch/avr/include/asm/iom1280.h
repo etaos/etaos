@@ -17,7 +17,7 @@
  */
 
 #ifndef __IO1280_H__
-#ifndef __IO1280_H__
+#define __IO1280_H__
 
 #define RAMEND 0x1FFF
 #define INTERNAL_RAMEND RAMEND
@@ -38,6 +38,37 @@
 
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
+
+/* stack defs */
+#define AVR_STACK_LOW_ADDR 0x3D
+#define AVR_STACK_HI_ADDR 0x3E
+#define AVR_STATUS_ADDR 0x3F
+
+#define XJMP jmp
+#define XCALL call
+
+#if !defined(__zero_reg__)
+    #if defined(CONFIG_AVRTINY)
+        #define __zero_reg__ r17
+    #else
+        #define __zero_reg__ r1
+    #endif
+#endif
+
+#define cli() __asm__ __volatile__("cli")
+#define sei() __asm__ __volatile__("sei")
+
+#define SREG (*((volatile unsigned char*)0x5F))
+
+#ifdef CONFIG_SIMUL_AVR
+
+#define SIMO (*((volatile unsigned char*)0x20))
+#define SIMI (*((volatile unsigned char*)0x21))
+#define SIME (*((volatile unsigned char*)0x22))
+
+#define STDOUT_PORT SIMO
+#define STDIN_PORT SIMI
+#endif /* CONFIG_SIMUL_AVR */
 
 /* TIMER 0 */ 
 #define TCCR0A MEM_IO8(0x44)
@@ -98,6 +129,8 @@
 #define PING MEM_IO8(0x32)
 #define DDRG MEM_IO8(0x33)
 #define PORTG MEM_IO8(0x34)
+
+#define GPIO_PINS 54
 
 /* USART defs */
 #define UBRR0L MEM_IO8(0xC4)
