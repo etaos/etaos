@@ -1,5 +1,5 @@
 /*
- *  ETA/OS ATmega328 IO defs
+ *  ETA/OS ATmega1280 IO defs
  *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,60 +16,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __IOM328_H_
-#define __IOM328_H_
+#ifndef __IO1280_H__
+#ifndef __IO1280_H__
 
-#define RAMEND 0x7FF
+#define RAMEND 0x1FFF
 #define INTERNAL_RAMEND RAMEND
-#define RAMSTART 0x100
+#define RAMSTART 0x200
 
 /* interrupt defs */
-#define CONFIG_ARCH_VECTORS 26
+#define CONFIG_ARCH_VECTORS 57
 
-#define _VECTORS_SIZE (26*4)
+#define _VECTORS_SIZE (57*4)
 
 #define TIMER0_OVERFLOW_VECTOR_NUM 16
 #define SPI_STC_VECTOR_NUM	   17
 #define TWI_STC_VECTOR_NUM	   24
 
-#define TIMER0_OVERFLOW_VECTOR irq_vector(16)
-#define SPI_STC_VECTOR irq_vector(17)
-#define TWI_STC_VECTOR irq_vector(24)
+#define TIMER0_OVERFLOW_VECTOR irq_vector(23)
+#define SPI_STC_VECTOR irq_vector(24)
+#define TWI_STC_VECTOR irq_vector(39)
 
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
-
-/* stack defs */
-#define AVR_STACK_LOW_ADDR 0x3D
-#define AVR_STACK_HI_ADDR 0x3E
-#define AVR_STATUS_ADDR 0x3F
-
-#define XJMP jmp
-#define XCALL call
-
-#if !defined(__zero_reg__)
-    #if defined(CONFIG_AVRTINY)
-        #define __zero_reg__ r17
-    #else
-        #define __zero_reg__ r1
-    #endif
-#endif
-
-#define cli() __asm__ __volatile__("cli")
-#define sei() __asm__ __volatile__("sei")
-
-
-#define SREG (*((volatile unsigned char*)0x5F))
-
-#ifdef CONFIG_SIMUL_AVR
-
-#define SIMO (*((volatile unsigned char*)0x20))
-#define SIMI (*((volatile unsigned char*)0x21))
-#define SIME (*((volatile unsigned char*)0x22))
-
-#define STDOUT_PORT SIMO
-#define STDIN_PORT SIMI
-#endif /* CONFIG_SIMUL_AVR */
 
 /* TIMER 0 */ 
 #define TCCR0A MEM_IO8(0x44)
@@ -103,6 +71,10 @@
 #define OCF0B 0x4
 
 /* GPIO defs */
+#define PINA MEM_IO8(0x20)
+#define DDRA MEM_IO8(0x21)
+#define PORTA MEM_IO8(0x22)
+
 #define PINB MEM_IO8(0x23)
 #define DDRB MEM_IO8(0x24)
 #define PORTB MEM_IO8(0x25)
@@ -115,7 +87,17 @@
 #define DDRD MEM_IO8(0x2A)
 #define PORTD MEM_IO8(0x2B)
 
-#define GPIO_PINS 24
+#define PINE MEM_IO8(0x2C)
+#define DDRE MEM_IO8(0x2D)
+#define PORTE MEM_IO8(0x2E)
+
+#define PINF MEM_IO8(0x2F)
+#define DDRF MEM_IO8(0x30)
+#define PORTF MEM_IO8(0x31)
+
+#define PING MEM_IO8(0x32)
+#define DDRG MEM_IO8(0x33)
+#define PORTG MEM_IO8(0x34)
 
 /* USART defs */
 #define UBRR0L MEM_IO8(0xC4)
@@ -134,5 +116,5 @@
 #define TWAR  MEM_IO8(0xBA)
 #define TWAMR MEM_IO8(0xBD)
 
-#endif /* __IOM328_H_ */
+#endif /* __IO1280_H__ */
 

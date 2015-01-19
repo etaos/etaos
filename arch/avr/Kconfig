@@ -97,13 +97,6 @@ config PICO_POWER
 	  of your CPU. Do not select this option of you are not
 	  planning to run on a pico power CPU.
 
-config ATMEGA328_VECTORS
-	int "ATmega328 vectors"
-	depends on ATMEGA328
-	default 26
-	help
-	  Set the amount of available vectors.
-
 endmenu
 
 source "kernel/Kconfig"

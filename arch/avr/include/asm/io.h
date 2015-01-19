@@ -36,6 +36,10 @@
 #include <asm/iom328.h>
 #endif
 
+#ifdef CONFIG_ATMEGA1280
+#include <asm/iom1280.h>
+#endif
+
 #define irq_enter_critical() __asm__ __volatile__( \
 		"in __tmp_reg__, __SREG__" "\n\t" \
 		"cli"			   "\n\t" \

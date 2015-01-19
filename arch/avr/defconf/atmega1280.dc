@@ -1,0 +1,9 @@
+DATA_LOAD_OFFSET := 0x800200
+
+mcu-$(CONFIG_ATMEGA1280) = atmega1280
+
+aflags-$(CONFIG_ATMEGA1280) += -mmcu=avr51
+lflags-$(CONFIG_ATMEGA1280) += -mavr51 -nostdlib -nostdinc
+
+lscript-$(CONFIG_ATMEGA1280) += arch/avr/ldscripts/avr51.xn
+lscript-r-$(CONFIG_ATMEGA1280) += arch/avr/ldscripts/avr51.xr

@@ -4,6 +4,7 @@
 #
 
 DEFCONF-$(CONFIG_ATMEGA328) += arch/avr/defconf/atmega328.dc
+DEFCONF-$(CONFIG_ATMEGA1280) += arch/avr/defconf/atmega1280.dc
 
 include $(DEFCONF-y)
 
@@ -12,8 +13,6 @@ KBUILD_CFLAGS += -Iarch/avr/include $(KBUILD_DBG)
 KBUILD_CFLAGS += -ffunction-sections -fdata-sections
 KBUILD_AFLAGS += -Iarch/avr/include
 
-mcu-$(CONFIG_ATMEGA328) = atmega328
-
 ifneq ($(CONFIG_PICO_POWER),)
 	MCU=$(addsuffix p, $(mcu-y))
 else
@@ -21,11 +20,6 @@ else
 endif
 
 cflags-y += -mmcu=$(MCU)
-aflags-$(CONFIG_ATMEGA328) += -mmcu=avr5
-lflags-$(CONFIG_ATMEGA328) += -mavr5 -nostdlib -nostdinc
-
-lscript-$(CONFIG_ATMEGA328) += arch/avr/ldscripts/avr5.xn
-lscript-r-$(CONFIG_ATMEGA328) += arch/avr/ldscripts/avr5.xr
 
 KBUILD_CFLAGS += $(cflags-y)
 KBUILD_AFLAGS += $(aflags-y)
