@@ -258,6 +258,7 @@ static unsigned char atmega_prescalers[] = {
 	64,
 };
 
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
 static void atmega_i2c_setspeed(uint32_t speed)
 {
 	unsigned char i;
@@ -281,6 +282,13 @@ static void atmega_i2c_setspeed(uint32_t speed)
 		TWBR = bitrate_reg;
 	}
 }
+#else
+static void atmega_i2c_setspeed(uint32_t speed)
+{
+	TWBR = TWBR_VAL;
+	TWSR = TWSR_VAL;
+}
+#endif
 
 static int atmega_i2c_ctrl(struct i2c_bus *bus, unsigned long ctrl, void *val)
 {

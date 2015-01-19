@@ -116,5 +116,13 @@
 #define TWAR  MEM_IO8(0xBA)
 #define TWAMR MEM_IO8(0xBD)
 
+#if F_CPU == 8000000
+#define TWBR_VAL 32
+#define TWSR_VAL (TWSR & 0xF8)
+#elif F_CPU == 16000000
+#define TWBR_VAL 72
+#define TWSR_VAL (TWSR & 0xF8)
+#endif
+
 #endif /* __IO1280_H__ */
 
