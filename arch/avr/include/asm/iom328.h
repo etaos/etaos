@@ -128,10 +128,26 @@
 
 /* TWI defs */
 #define TWBR  MEM_IO8(0xB8)
+
 #define TWCR  MEM_IO8(0xBC)
+#define TWINT	7
+#define TWEA	6
+#define TWSTA	5
+#define TWSTO	4
+#define TWWC	3
+#define TWEN	2
+#define TWIE	0
+
 #define TWSR  MEM_IO8(0xB9)
+#define TWPS1	1
+#define TWPS0	0
+#define I2C_NOINFO 0xF8
+
 #define TWDR  MEM_IO8(0xBB)
+
 #define TWAR  MEM_IO8(0xBA)
+#define TWGCE 	0
+
 #define TWAMR MEM_IO8(0xBD)
 
 #endif /* __IOM328_H_ */

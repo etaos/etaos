@@ -32,22 +32,6 @@
 #include <asm/io.h>
 #include <asm/irq.h>
 
-#define TWINT	7
-#define TWEA	6
-#define TWSTA	5
-#define TWSTO	4
-#define TWWC	3
-#define TWEN	2
-#define TWIE	0
-
-/* status reg */
-#define TWPS1	1
-#define TWPS0	0
-#define I2C_NOINFO 0xF8
-
-/* addr reg */
-#define TWGCE 	0
-
 #define I2C_PRES_1  0
 #define I2C_PRES_4  1
 #define I2C_PRES_16 2
