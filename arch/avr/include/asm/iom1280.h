@@ -19,18 +19,22 @@
 #ifndef __IO1280_H__
 #define __IO1280_H__
 
-#define RAMEND 0x1FFF
-#define INTERNAL_RAMEND RAMEND
+#define RAMEND INTERNAL_RAMEND + CONFIG_EXT_MEM
+#define INTERNAL_RAMEND 0x1FFF
 #define RAMSTART 0x200
+
+#if defined(CONFIG_ATMEGA2560)
+#define AVR_22BIT_PC 1
+#endif
 
 /* interrupt defs */
 #define CONFIG_ARCH_VECTORS 57
 
 #define _VECTORS_SIZE (57*4)
 
-#define TIMER0_OVERFLOW_VECTOR_NUM 16
-#define SPI_STC_VECTOR_NUM	   17
-#define TWI_STC_VECTOR_NUM	   24
+#define TIMER0_OVERFLOW_VECTOR_NUM 23
+#define SPI_STC_VECTOR_NUM	   24
+#define TWI_STC_VECTOR_NUM	   39
 
 #define TIMER0_OVERFLOW_VECTOR irq_vector(23)
 #define SPI_STC_VECTOR irq_vector(24)
@@ -43,6 +47,12 @@
 #define AVR_STACK_LOW_ADDR 0x3D
 #define AVR_STACK_HI_ADDR 0x3E
 #define AVR_STATUS_ADDR 0x3F
+
+#define AVR_HAVE_RAMPD 1
+#define AVR_RAMPD_ADDR 0x3C
+
+#define AVR_HAVE_RAMPZ 1
+#define AVR_RAMPZ_ADDR 0x3B
 
 #define XJMP jmp
 #define XCALL call
