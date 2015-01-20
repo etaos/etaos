@@ -257,7 +257,7 @@ all: etaos modules
 # mrproper - Delete all generated files, including .config
 #
 
-quiet_cmd_mrproper_dirs = CLEAN $(mrproper-rmdirs)
+quiet_cmd_mrproper_dirs = CLEAN   $(mrproper-rmdirs)
       cmd_mrproper_dirs = rm -rf $(mrproper-rmdirs)
 mrproper-dirs      := $(addprefix _mrproper_,scripts)
 mrproper-rmdirs += include/config include/generated
