@@ -5,6 +5,7 @@
 
 DEFCONF-$(CONFIG_ATMEGA328) += arch/avr/defconf/atmega328.dc
 DEFCONF-$(CONFIG_ATMEGA1280) += arch/avr/defconf/atmega1280.dc
+DEFCONF-$(CONFIG_ATMEGA2560) += arch/avr/defconf/atmega2560.dc
 
 include $(DEFCONF-y)
 

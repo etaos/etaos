@@ -7,4 +7,11 @@ config ARD_UNO
 	  Say 'y' here to build support for the Arduiono UNO
 	  development board.
 
+config ARD_MEGA
+	bool "Arduino mega"
+	depends on ATMEGA_GPIO
+	help
+	  Say 'y' here to build support for the Arduino MEGA
+	  development board.
+
 endmenu

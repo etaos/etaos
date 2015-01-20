@@ -73,6 +73,9 @@ void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 	tp->sp = &stack[stack_size-1];
 	*(tp->sp--) = (unsigned short)handle & 0xff;
 	*(tp->sp--) = ((unsigned short)handle >> 8) & 0xff;
+#ifdef AVR_22BIT_PC
+	*(tp->sp--) = 0;
+#endif
 
 	/* add the SREG register */
 	*(tp->sp--) = 0x0; // location of r0 normally

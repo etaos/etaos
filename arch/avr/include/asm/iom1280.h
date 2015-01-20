@@ -19,18 +19,22 @@
 #ifndef __IO1280_H__
 #define __IO1280_H__
 
-#define RAMEND 0x1FFF
-#define INTERNAL_RAMEND RAMEND
+#define RAMEND INTERNAL_RAMEND + CONFIG_EXT_MEM
+#define INTERNAL_RAMEND 0x1FFF
 #define RAMSTART 0x200
+
+#if defined(CONFIG_ATMEGA2560)
+#define AVR_22BIT_PC 1
+#endif
 
 /* interrupt defs */
 #define CONFIG_ARCH_VECTORS 57
 
 #define _VECTORS_SIZE (57*4)
 
-#define TIMER0_OVERFLOW_VECTOR_NUM 16
-#define SPI_STC_VECTOR_NUM	   17
-#define TWI_STC_VECTOR_NUM	   24
+#define TIMER0_OVERFLOW_VECTOR_NUM 23
+#define SPI_STC_VECTOR_NUM	   24
+#define TWI_STC_VECTOR_NUM	   39
 
 #define TIMER0_OVERFLOW_VECTOR irq_vector(23)
 #define SPI_STC_VECTOR irq_vector(24)
@@ -43,6 +47,12 @@
 #define AVR_STACK_LOW_ADDR 0x3D
 #define AVR_STACK_HI_ADDR 0x3E
 #define AVR_STATUS_ADDR 0x3F
+
+#define AVR_HAVE_RAMPD 1
+#define AVR_RAMPD_ADDR 0x3C
+
+#define AVR_HAVE_RAMPZ 1
+#define AVR_RAMPZ_ADDR 0x3B
 
 #define XJMP jmp
 #define XCALL call
@@ -129,6 +139,22 @@
 #define PING MEM_IO8(0x32)
 #define DDRG MEM_IO8(0x33)
 #define PORTG MEM_IO8(0x34)
+
+#define PINH MEM_IO8(0x100)
+#define DDRH MEM_IO8(0x101)
+#define PORTH MEM_IO8(0x102)
+
+#define PINJ MEM_IO8(0x103)
+#define DDRJ MEM_IO8(0x104)
+#define PORTJ MEM_IO8(0x105)
+
+#define PINK MEM_IO8(0x106)
+#define DDRK MEM_IO8(0x107)
+#define PORTK MEM_IO8(0x108)
+
+#define PINL MEM_IO8(0x109)
+#define DDRL MEM_IO8(0x10A)
+#define PORTL MEM_IO8(0x10B)
 
 #define GPIO_PINS 54
 
