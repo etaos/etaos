@@ -85,6 +85,14 @@ extern int pgpio_pin_release(int pin);
  */
 extern int pgpio_pin_request(int pin);
 
+/**
+ * @brief Convert a platform based pin number to an ETA/OS GPIO pin.
+ * @param pin Platform based pin number.
+ * @return A structure pointer pointing to an ETA/OS GPIO pin.
+ * @retval NULL if an error occurred.
+ */
+extern struct gpio_pin *platform_pin_to_gpio(int pin);
+
 CDECL_END
 
 #endif
