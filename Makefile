@@ -2,11 +2,11 @@
 # ETA/OS root Makefile
 #
 
-VERSION = 2
+VERSION = 3
 PATCHLEVEL = 0
-SUBLEVEL = 5
+SUBLEVEL = 0
 EXTRAVERSION =
-NAME = Shuffling Donkey
+NAME = Blazing Flower Power
 
 MAKEFLAGS += -rR --no-print-directory
 # DO NOT make these files show up anywhere. For your own safety.
