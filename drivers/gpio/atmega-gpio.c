@@ -57,6 +57,18 @@ static const size_t __pgm atmega_gpio_ports[] = {
 #ifdef PORTG
 	(size_t)&PORTG,
 #endif
+#ifdef PORTH
+	(size_t)&PORTH,
+#endif
+#ifdef PORTJ
+	(size_t)&PORTJ,
+#endif
+#ifdef PORTK
+	(size_t)&PORTK,
+#endif
+#ifdef PORTL
+	(size_t)&PORTL,
+#endif
 };
 
 static const size_t __pgm atmega_gpio_pins[] = {
@@ -81,6 +93,18 @@ static const size_t __pgm atmega_gpio_pins[] = {
 #ifdef PORTG
 	(size_t)&PING,
 #endif
+#ifdef PORTH
+	(size_t)&PINH,
+#endif
+#ifdef PORTJ
+	(size_t)&PINJ,
+#endif
+#ifdef PORTK
+	(size_t)&PINK,
+#endif
+#ifdef PORTL
+	(size_t)&PINL,
+#endif
 };
 
 static const size_t __pgm atmega_gpio_ddrs[] = {
@@ -102,8 +126,20 @@ static const size_t __pgm atmega_gpio_ddrs[] = {
 #ifdef PORTF
 	(size_t)&DDRF,
 #endif
-#ifdef PORTE
+#ifdef PORTG
 	(size_t)&DDRG,
+#endif
+#ifdef PORTH
+	(size_t)&DDRH,
+#endif
+#ifdef PORTJ
+	(size_t)&DDRJ,
+#endif
+#ifdef PORTK
+	(size_t)&DDRK,
+#endif
+#ifdef PORTL
+	(size_t)&DDRL,
 #endif
 };
 

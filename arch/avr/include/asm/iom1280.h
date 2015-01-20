@@ -130,6 +130,22 @@
 #define DDRG MEM_IO8(0x33)
 #define PORTG MEM_IO8(0x34)
 
+#define PINH MEM_IO8(0x100)
+#define DDRH MEM_IO8(0x101)
+#define PORTH MEM_IO8(0x102)
+
+#define PINJ MEM_IO8(0x103)
+#define DDRJ MEM_IO8(0x104)
+#define PORTJ MEM_IO8(0x105)
+
+#define PINK MEM_IO8(0x106)
+#define DDRK MEM_IO8(0x107)
+#define PORTK MEM_IO8(0x108)
+
+#define PINL MEM_IO8(0x109)
+#define DDRL MEM_IO8(0x10A)
+#define PORTL MEM_IO8(0x10B)
+
 #define GPIO_PINS 54
 
 /* USART defs */

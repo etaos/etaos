@@ -2,9 +2,16 @@ menu "Platform drivers"
 
 config ARD_UNO
 	bool "Arduino uno"
-	depends on ATMEGA_GPIO
+	depends on ATMEGA_GPIO && !ARD_MEGA
 	help
 	  Say 'y' here to build support for the Arduiono UNO
+	  development board.
+
+config ARD_MEGA
+	bool "Arduino mega"
+	depends on ATMEGA_GPIO && !ARD_UNO
+	help
+	  Say 'y' here to build support for the Arduino MEGA
 	  development board.
 
 endmenu
