@@ -102,9 +102,44 @@ err_l:
 	return NULL;
 }
 
+/**
+ * @brief Free an allocated memory region.
+ * @param ptr Memory region to free.
+ * @return Error code.
+ * @retval 0 Region succesfully free'd.
+ * @retval -1 Given region is not located within the heap.
+ */
 int mm_kfree(void *ptr)
 {
-	return -1;
+	struct heap_node *node, *c;
+	int err = -1;
+
+	spin_lock(&mlock);
+	node = ptr - sizeof(*node);
+
+	if(node->magic != MM_MAGIC_BYTE)
+		goto err_l;
+
+	c = mm_head;
+	mm_return_node(node);
+
+	while(c) {
+		if(((void*)c) + c->size + sizeof(*c) == node || ((void*)node) +
+				node->size + sizeof(*node) == c) {
+			node = mm_merge_node(c, node);
+			if(node == NULL)
+				goto err_l;
+			else
+				c = node;
+		}
+		c = c->next;
+	}
+
+	err = 0;
+
+err_l:
+	spin_unlock(&mlock);
+	return err;
 }
 
 /** @} @} */
