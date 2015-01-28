@@ -38,7 +38,7 @@ typedef unsigned char bool;
 /**
  * @brief System tick type.
  */
-typedef uint32_t tick_t;
+typedef uint64_t tick_t;
 
 /**
  * @brief Unsigned 8-bit integer.

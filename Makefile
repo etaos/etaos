@@ -2,11 +2,11 @@
 # ETA/OS root Makefile
 #
 
-VERSION = 2
+VERSION = 3
 PATCHLEVEL = 0
-SUBLEVEL = 5
+SUBLEVEL = 0
 EXTRAVERSION =
-NAME = Shuffling Donkey
+NAME = Blazing Flower Power
 
 MAKEFLAGS += -rR --no-print-directory
 # DO NOT make these files show up anywhere. For your own safety.
@@ -257,7 +257,7 @@ all: etaos modules
 # mrproper - Delete all generated files, including .config
 #
 
-quiet_cmd_mrproper_dirs = CLEAN $(mrproper-rmdirs)
+quiet_cmd_mrproper_dirs = CLEAN   $(mrproper-rmdirs)
       cmd_mrproper_dirs = rm -rf $(mrproper-rmdirs)
 mrproper-dirs      := $(addprefix _mrproper_,scripts)
 mrproper-rmdirs += include/config include/generated

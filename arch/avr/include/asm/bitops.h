@@ -38,7 +38,8 @@ CDECL
  */
 static inline void clear_bit(unsigned nr, volatile void *flags)
 {
-	volatile unsigned char *p = ((volatile unsigned char*)flags) + (nr / BITS_PER_BYTE);
+	volatile unsigned char *p = ((volatile unsigned char*)flags) + 
+		(nr / BITS_PER_BYTE);
 	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
 	volatile unsigned char tmp;
 
@@ -60,7 +61,8 @@ static inline void clear_bit(unsigned nr, volatile void *flags)
  */
 static inline void set_bit(unsigned nr, volatile void *addr)
 {
-	volatile unsigned char *p = ((volatile unsigned char*)addr) + (nr / BITS_PER_BYTE);
+	volatile unsigned char *p = ((volatile unsigned char*)addr) + 
+		(nr / BITS_PER_BYTE);
 	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
 	volatile unsigned char tmp;
 
@@ -82,7 +84,8 @@ static inline void set_bit(unsigned nr, volatile void *addr)
  */
 static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
 {
-	volatile unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);
+	volatile unsigned char *p = ((unsigned char*)addr) + 
+		(nr / BITS_PER_BYTE);
 	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
 	volatile unsigned char tmp, old;
 
@@ -108,7 +111,8 @@ static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
  */
 static inline int test_and_set_bit(unsigned nr, volatile void *addr)
 {
-	volatile unsigned char *p = ((unsigned char*)addr) + (nr / BITS_PER_BYTE);
+	volatile unsigned char *p = ((unsigned char*)addr) + 
+		(nr / BITS_PER_BYTE);
 	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
 	volatile unsigned char tmp, old;
 
@@ -127,3 +131,4 @@ static inline int test_and_set_bit(unsigned nr, volatile void *addr)
 CDECL_END
 
 #endif
+
