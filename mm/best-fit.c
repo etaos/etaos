@@ -43,11 +43,26 @@ void mm_init(void *start, size_t size)
 	mm_init_node(start, size - sizeof(*mm_head));
 }
 
+/**
+ * @brief Allocated a new memory region.
+ * @param size Length of the wanted region.
+ *
+ * If a memory region which is exactly equal to or at most 4 bytes larger than
+ * size, this region is selected. If a free region is found which is 4 bytes
+ * larger than size, the region is split in two.
+ */
 MEM void *mm_alloc(size_t size)
 {
 	return NULL;
 }
 
+/**
+ * @brief Free an allocated memory region.
+ * @param ptr Memory region to free.
+ * @return Error code.
+ * @retval 0 Region succesfully free'd.
+ * @retval -1 Given region is not located within the heap.
+ */
 int mm_kfree(void *ptr)
 {
 	return -1;
