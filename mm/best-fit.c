@@ -43,6 +43,19 @@ void mm_init(void *start, size_t size)
 	mm_init_node(start, size - sizeof(*mm_head));
 }
 
+static inline bool bf_select_new_node(struct heap_node *old,
+		struct heap_node *new)
+{
+	if(old) {
+		if(old->size > new->size)
+			return true;
+		else
+			return false;
+	}
+
+	return true;
+}
+
 /**
  * @brief Allocated a new memory region.
  * @param size Length of the wanted region.
@@ -53,7 +66,49 @@ void mm_init(void *start, size_t size)
  */
 MEM void *mm_alloc(size_t size)
 {
-	return NULL;
+	void *rval = NULL;
+	struct heap_node *c, *bf, *bf_prev, *prev;
+
+	spin_lock(&mlock);
+	c = mm_head;
+	prev = NULL;
+	bf = NULL;
+	bf_prev = NULL;
+
+	while(c) {
+		if(c->size == size)
+			break;
+
+		if(c->size > size) {
+			if(c->size <= size+sizeof(*c)+4)
+				break;
+			if(bf_select_new_node(bf, c)) {
+				bf = c;
+				bf_prev = prev;
+			}
+		}
+
+		prev = c;
+		c = c->next;
+	}
+
+	if(bf) {
+		prev = bf_prev;
+		c = bf;
+		if(bf->size > size+sizeof(*bf)+4)
+			mm_split_node(bf, size);
+	}
+
+	if(!c)
+		goto err_l;
+
+	mm_use_block(c, prev);
+	rval = c;
+	rval += sizeof(*c);
+
+err_l:
+	spin_unlock(&mlock);
+	return rval;
 }
 
 /**
@@ -65,7 +120,35 @@ MEM void *mm_alloc(size_t size)
  */
 int mm_kfree(void *ptr)
 {
-	return -1;
+	struct heap_node *node, *c;
+	int err = -1;
+
+	spin_lock(&mlock);
+	node = ptr - sizeof(*node);
+
+	if(node->magic != MM_MAGIC_BYTE)
+		goto err_l;
+
+	c = mm_head;
+	mm_return_node(node);
+
+	while(c) {
+		if(((void*)c) + c->size + sizeof(*c) == node || ((void*)node) +
+				node->size + sizeof(*node) == c) {
+			node = mm_merge_node(c, node);
+			if(node == NULL)
+				goto err_l;
+			else
+				c = node;
+		}
+		c = c->next;
+	}
+
+	err = 0;
+
+err_l:
+	spin_unlock(&mlock);
+	return err;
 }
 
 /** @} @} */
