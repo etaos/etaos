@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - Bit ops
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - Bit ops
+ *  Copyright (C) 2014, 2015   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

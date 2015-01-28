@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - ROM I/O
- *  Copyright (C) 2012, 2014   AVR-LibC, Michel Megens
+ *  Copyright (C) 2012, 2014, 2015   AVR-LibC, Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
