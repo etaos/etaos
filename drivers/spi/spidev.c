@@ -25,6 +25,8 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 
+struct spi_driver *spi_sysbus;
+
 int spi_dev_set_mode(struct spidev *dev, spi_ctrl_t mode)
 {
 	int rv;
@@ -105,8 +107,12 @@ int spi_enable_2x(struct spidev *dev)
 	mutex_lock(&master->lock);
 	ret = master->ctrl(dev, SPI_2X, NULL);
 	
-	if(!ret)
-		set_bit(SPI_2X_FLAG, &dev->flags);
+	if(!ret) {
+		if(test_bit(SPI_2X_FLAG, &dev->flags))
+			clear_bit(SPI_2X_FLAG, &dev->flags);
+		else
+			set_bit(SPI_2X_FLAG, &dev->flags);
+	}
 	mutex_unlock(&master->lock);
 
 	return ret;
