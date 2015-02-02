@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - SPI driver header
+ *  ETA/OS - ATmega SPI driver
  *  Copyright (C) 2015   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify

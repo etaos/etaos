@@ -1,0 +1,17 @@
+menuconfig SRAM
+	tristate "SRAM support"
+	help
+	  Say 'y' or 'm' here to build support for external SRAM chips,
+	  usually conntected through I2C or SPI. If you are unsure say
+	  'n' here.
+
+if SRAM
+
+config 23K256
+	tristate "23K256 SPI SRAM chip"
+	depends on SPI
+	help
+	  Say 'y' or 'm' here to build a driver for the 23K256
+	  external SRAM chip. If you are unsure say 'n' here.
+
+endif

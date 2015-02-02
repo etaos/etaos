@@ -92,6 +92,7 @@ static inline void spi_free_msg(struct spi_msg *msg)
 	kfree(msg);
 }
 
+CDECL
 extern struct spi_driver *spi_sysbus;
 extern int spi_bus_init(struct spi_driver *driver);
 extern void spi_add_device(struct spi_driver *driver, struct spidev *dev);
@@ -99,6 +100,7 @@ extern int spi_set_speed(struct spidev *dev, uint32_t bps);
 extern int spi_enable_2x(struct spidev *dev);
 extern int spi_transfer(struct spidev *dev, struct spi_msg *msg);
 extern int spi_dev_set_mode(struct spidev *dev, spi_ctrl_t mode);
+CDECL_END
 
 #endif
 
