@@ -25,4 +25,40 @@
 #include <etaos/device.h>
 #include <etaos/mutex.h>
 
+struct spidev;
+
+typedef enum spi_ctrl {
+	SPI_MODE0, /* CPOL:0 CPHA:0 */
+	SPI_MODE1, /* CPOL:0 CPHA:1 */
+	SPI_MODE2, /* CPOL:1 CPHA:0 */
+	SPI_MODE3, /* CPOL:1 CPHA:1 */
+	SPI_2X,
+} spi_ctrl_t;
+
+struct spi_msg {
+	void *rx;
+	void *tx;
+	size_t len;
+};
+
+struct spi_driver {
+	const char *name;
+	mutex_t bus_lock;
+
+	struct gpio_pin *mosi,
+			*miso,
+			*clk;
+	int (*transfer)(struct spidev *spi, struct spi_msg *msg);
+	int (*ctrl)(struct spidev *spi, spi_ctrl_t cmd, 
+			unsigned long arg);
+};
+
+struct spidev {
+	struct device dev;
+	struct spi_master *master;
+	
+	struct gpio_pin *cs;
+	unsigned long flags;
+};
+
 #endif
