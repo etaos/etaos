@@ -108,8 +108,8 @@ static int atmega_spi_setspeed(struct spidev *dev, uint32_t rate)
 /**
  * @brief Lead up on the control registers.
  * @param dev Device driver requesting a control register change.
- * @param @ctrl Control register to change.
- * @param data Parameter for \ctrl.
+ * @param ctrl Control register to change.
+ * @param data Parameter for \p ctrl.
  */
 static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
 {

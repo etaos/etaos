@@ -16,6 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file sram/23k256.c
+ * @addtogroup spi
+ * @{
+ * @addtogroup 23k256
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/spi.h>
@@ -55,6 +63,10 @@ static struct sram sram_23k256_chip = {
 	.read = NULL,
 };
 
+/**
+ * @brief Change the mode of the 23K256 chip.
+ * @param mode Mode to set.
+ */
 static void sram_set_mode(unsigned short mode)
 {
 	unsigned char buff[2];
@@ -71,6 +83,12 @@ static void sram_set_mode(unsigned short mode)
 	spi_free_msg(msg);
 }
 
+/**
+ * @brief Write a single byte.
+ * @param ram SRAM chip descriptor.
+ * @param c Character to write.
+ * @return Error code or the amount of bytes written.
+ */
 static int __sram_put(struct sram *ram, int c)
 {
 	int rv;
@@ -89,6 +107,11 @@ static int __sram_put(struct sram *ram, int c)
 	return rv;
 }
 
+/**
+ * @brief Read a single byte from a 23K256 chip.
+ * @param ram SRAM chip descriptor.
+ * @return The value of the byte read.
+ */
 static int __sram_get(struct sram *ram)
 {
 	uint8_t read_seq[] = {
@@ -103,6 +126,11 @@ static int __sram_get(struct sram *ram)
 	return read_seq[3];
 }
 
+/**
+ * @brief Initialise a 23K256 SRAM chip.
+ * @note This function is not automatically called, unlike other device
+ *       driver initialisators.
+ */
 void sram_23k256_init(void)
 {
 	struct gpio_pin *ss = gpio_chip_to_pin(gpio_sys_chip, CONFIG_23K256_SS);
@@ -118,4 +146,7 @@ void sram_23k256_init(void)
 	spi_add_device(spi_sysbus, &sram_23k256_dev);
 	sram_chip_init(&sram_23k256_chip, &sram_23k256_dev.dev);
 }
+
+/** @} */
+/** @} */
 

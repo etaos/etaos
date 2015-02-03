@@ -47,7 +47,7 @@ static inline struct sram *to_sram_chip(FILE file)
 
 /**
  * @brief Write function pointer.
- * @param ram SRAM chip descriptor.
+ * @param stream File SRAM chip descriptor.
  * @param buf Buffer which has to be written.
  * @param len Length of \p buf.
  * @return Error code or the number of bytes written.
@@ -74,7 +74,7 @@ static int sram_write(FILE stream, const void *buf, size_t len)
 
 /**
  * @brief Read function pointer.
- * @param ram SRAM chip descriptor.
+ * @param stream File SRAM chip descriptor.
  * @param buf Buffer to read data into.
  * @param len Length of \p buf.
  * @return Error code or number bytes read.
@@ -101,8 +101,8 @@ static int sram_read(FILE stream, void *buf, size_t len)
 
 /**
  * @brief Write a single byte to the SRAM chip memory.
- * @param ram SRAM chip descriptor.
  * @param c Byte which has to be written.
+ * @param stream File SRAM chip descriptor.
  * @return Error code or the number of bytes written.
  */
 static int sram_put(int c, FILE stream)
@@ -127,7 +127,7 @@ static int sram_put(int c, FILE stream)
 
 /**
  * @brief Read a single byte from the SRAM chip memory.
- * @param ram SRAM chip descriptor.
+ * @param stream File SRAM chip descriptor.
  * @return Error code or the number of bytes read.
  */
 static int sram_get(FILE stream)

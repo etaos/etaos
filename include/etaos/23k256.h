@@ -16,6 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/23k256.h
+ * @addtogroup spi
+ * @{
+ * @addtogroup 23k256
+ * @{
+ */
+
 #ifndef __23K256_H__
 #define __23K256_H__
 
@@ -26,3 +34,7 @@ extern void sram_23k256_init(void);
 CDECL_END
 
 #endif
+
+/** @} */
+/** @} */
+
