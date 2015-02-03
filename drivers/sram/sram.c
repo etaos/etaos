@@ -43,6 +43,9 @@ static int sram_write(FILE stream, const void *buf, size_t len)
 		return -EINVAL;
 
 	ram = to_sram_chip(stream);
+	if(!ram->write)
+		return -EINVAL;
+
 	mutex_lock(&ram->lock);
 	rc = ram->write(ram, buf, len);
 	ram->wr_idx += len;
@@ -60,6 +63,9 @@ static int sram_read(FILE stream, void *buf, size_t len)
 		return -EINVAL;
 
 	ram = to_sram_chip(stream);
+	if(!ram->read)
+		return -EINVAL;
+
 	mutex_lock(&ram->lock);
 	rc = ram->read(ram, buf, len);
 	ram->rd_idx += len;
@@ -77,6 +83,9 @@ static int sram_put(int c, FILE stream)
 		return -EINVAL;
 
 	ram = to_sram_chip(stream);
+	if(!ram->write_byte)
+		return -EINVAL;
+
 	mutex_lock(&ram->lock);
 	rc = ram->write_byte(ram, c);
 	ram->wr_idx++;
@@ -94,6 +103,9 @@ static int sram_get(FILE stream)
 		return -EINVAL;
 
 	ram = to_sram_chip(stream);
+	if(!ram->read_byte)
+		return -EINVAL;
+
 	mutex_lock(&ram->lock);
 	rc = ram->read_byte(ram);
 	ram->rd_idx++;
