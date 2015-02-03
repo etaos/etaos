@@ -16,6 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file spi/atmega-bus.c
+ * @addtogroup atmega-spi
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/types.h>
@@ -23,8 +29,6 @@
 #include <etaos/spi.h>
 #include <etaos/bitops.h>
 #include <etaos/init.h>
-
-#include <asm/io.h>
 
 #define SPCR MEM_IO8(0x4C)
 #define SPR0 0x1
@@ -48,7 +52,7 @@
 
 static mutex_t master_spi_mutex;
 
-unsigned char spi_clk_div[] = {
+static unsigned char spi_clk_div[] = {
 	4,
 	16,
 	64,
@@ -59,6 +63,18 @@ unsigned char spi_clk_div[] = {
 	64,
 };
 
+/**
+ * @brief Set the speed of the ATmega SPI bus.
+ * @param dev Device requesting the new bitrate.
+ * @param rate New bit rate.
+ *
+ * The bit rate is calculated using the following formula:
+ * \f$x_r = \frac{f_c}{n}\f$. \n
+ * In this formula \n
+ * \f$x_r\f$ is the bitrate; \n
+ * \f$f_c\f$ is the frequency of the CPU; \n
+ * \f$n\f$ is the clock divider (2, 4, 8, 16, 32, 64 or 128).
+ */
 static int atmega_spi_setspeed(struct spidev *dev, uint32_t rate)
 {
 	unsigned char div = 0;
@@ -89,6 +105,12 @@ static int atmega_spi_setspeed(struct spidev *dev, uint32_t rate)
 	return -EOK;
 }
 
+/**
+ * @brief Lead up on the control registers.
+ * @param dev Device driver requesting a control register change.
+ * @param @ctrl Control register to change.
+ * @param data Parameter for \ctrl.
+ */
 static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
 {
 	int rv = -EOK;
@@ -128,6 +150,12 @@ static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
 	return rv;
 }
 
+/**
+ * @brief Start a transmission over the ATmega SPI bus.
+ * @param dev Device in control of the transfer.
+ * @param msg Message to transfer.
+ * @return Amount of bytes transferred.
+ */
 static int atmega_spi_xfer(struct spidev *dev, struct spi_msg *msg)
 {
 	int rv = 0;
@@ -190,6 +218,10 @@ static void __used atmega_spi_init(void)
 	SPCR |= SPE | MSTR;
 	spi_sysbus = &atmega_spi_driver;
 }
+
+/**
+ * @}
+ */
 
 device_init(atmega_spi_init);
 
