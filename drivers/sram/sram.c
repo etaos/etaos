@@ -16,6 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file etaos/sram.h
+ * @addtogroup sram
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/sram.h>
@@ -26,6 +32,11 @@
 #include <etaos/error.h>
 #include <etaos/mutex.h>
 
+/**
+ * @brief Convert a file pointer to a SRAM structure.
+ * @param file FILE pointer to convert.
+ * @return SRAM data structure.
+ */
 static inline struct sram *to_sram_chip(FILE file)
 {
 	struct device *dev;
@@ -34,6 +45,13 @@ static inline struct sram *to_sram_chip(FILE file)
 	return dev->dev_data;
 }
 
+/**
+ * @brief Write function pointer.
+ * @param ram SRAM chip descriptor.
+ * @param buf Buffer which has to be written.
+ * @param len Length of \p buf.
+ * @return Error code or the number of bytes written.
+ */
 static int sram_write(FILE stream, const void *buf, size_t len)
 {
 	int rc;
@@ -54,6 +72,13 @@ static int sram_write(FILE stream, const void *buf, size_t len)
 	return rc;
 }
 
+/**
+ * @brief Read function pointer.
+ * @param ram SRAM chip descriptor.
+ * @param buf Buffer to read data into.
+ * @param len Length of \p buf.
+ * @return Error code or number bytes read.
+ */
 static int sram_read(FILE stream, void *buf, size_t len)
 {
 	int rc;
@@ -74,6 +99,12 @@ static int sram_read(FILE stream, void *buf, size_t len)
 	return rc;
 }
 
+/**
+ * @brief Write a single byte to the SRAM chip memory.
+ * @param ram SRAM chip descriptor.
+ * @param c Byte which has to be written.
+ * @return Error code or the number of bytes written.
+ */
 static int sram_put(int c, FILE stream)
 {
 	int rc;
@@ -94,6 +125,11 @@ static int sram_put(int c, FILE stream)
 	return rc;
 }
 
+/**
+ * @brief Read a single byte from the SRAM chip memory.
+ * @param ram SRAM chip descriptor.
+ * @return Error code or the number of bytes read.
+ */
 static int sram_get(FILE stream)
 {
 	int rc;
@@ -114,6 +150,13 @@ static int sram_get(FILE stream)
 	return rc;
 }
 
+/**
+ * @brief Control the SRAM chip file descriptor.
+ * @param stream FILE pointer.
+ * @param reg Control register.
+ * @param buf Argument for \p reg.
+ * @return An error code.
+ */
 static int sram_ioctl(FILE stream, unsigned long reg, void *buf)
 {
 	int rc;
@@ -159,6 +202,11 @@ static struct dev_file_ops sram_ops = {
 	.ioctl = &sram_ioctl,
 };
 
+/**
+ * @brief Initialise a new SRAM chip data structure.
+ * @param ram SRAM structure which has to be initialised.
+ * @param dev Supporting device structure.
+ */
 void sram_chip_init(struct sram *ram, struct device *dev)
 {
 	ram->rd_idx = 0;
@@ -175,6 +223,8 @@ void sram_chip_init(struct sram *ram, struct device *dev)
 static void __used sram_init(void)
 {
 }
+
+/** @} */
 
 subsys_init(sram_init);
 
