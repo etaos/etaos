@@ -1,0 +1,5 @@
+/**
+ * @defgroup spi-atmega ATmega SPI driver
+ * @ingroup spi
+ * @brief ATmega AVR SPI bus driver.
+ */

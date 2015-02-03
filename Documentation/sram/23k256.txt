@@ -1,0 +1,7 @@
+/**
+ * @defgroup sram-23k256 23K256 SRAM driver
+ * @ingroup sram
+ * @brief SRAM chip by Micro chip.
+ *
+ * This SRAM chip uses SPI to transfer data. The maximum capacity is 256KiB.
+ */

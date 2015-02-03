@@ -1,0 +1,7 @@
+/**
+ * @defgroup sram SRAM drivers
+ * @ingroup dev
+ * @brief SRAM core API.
+ *
+ * The SRAM core defines a device file based API.
+ */

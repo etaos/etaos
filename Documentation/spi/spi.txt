@@ -1,0 +1,5 @@
+/**
+ * @defgroup spi SPI drivers
+ * @ingroup dev
+ * @brief SPI core driver.
+ */
