@@ -18,9 +18,9 @@
 
 /**
  * @file etaos/23k256.h
- * @addtogroup spi
+ * @addtogroup sram
  * @{
- * @addtogroup 23k256
+ * @addtogroup sram-23k256
  * @{
  */
 

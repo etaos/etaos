@@ -79,6 +79,12 @@ int spi_set_mode(struct spidev *dev, spi_ctrl_t mode)
 	return rv;
 }
 
+/**
+ * @brief SPI core backend for SPI transmissions.
+ * @param dev Device in control of the transmission.
+ * @param msg Message which is to be transferred.
+ * @return Error code or the amount of bytes transferred.
+ */
 static int __spi_xfer(struct spidev *dev, struct spi_msg *msg)
 {
 	int rv;
