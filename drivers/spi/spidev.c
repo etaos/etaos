@@ -16,6 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file spi/spidev.c
+ * @addtogroup spi
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/types.h>
@@ -26,8 +32,17 @@
 #include <etaos/tick.h>
 #include <etaos/gpio.h>
 
+/**
+ * @brief SPI system bus
+ */
 struct spi_driver *spi_sysbus;
 
+/**
+ * @brief Change the SPI bus mode.
+ * @param dev Device requesting the mode change.
+ * @param mode New mode to set.
+ * @return Error code.
+ */
 int spi_set_mode(struct spidev *dev, spi_ctrl_t mode)
 {
 	int rv;
@@ -98,6 +113,12 @@ static int __spi_xfer(struct spidev *dev, struct spi_msg *msg)
 	return rv;
 }
 
+/**
+ * @brief Transfer an SPI message.
+ * @param dev Device requesting the transmission.
+ * @param msg Message to transfer.
+ * @return Amount of bytes transferred.
+ */
 int spi_transfer(struct spidev *dev, struct spi_msg *msg)
 {
 	int rv;
@@ -109,6 +130,12 @@ int spi_transfer(struct spidev *dev, struct spi_msg *msg)
 	return rv;
 }
 
+/**
+ * @brief Enable the SPI 2X mode.
+ * @param dev Device requesting the mode.
+ * @return An error code.
+ * @note This will double the bitrate of the SPI bus.
+ */
 int spi_enable_2x(struct spidev *dev)
 {
 	int ret;
@@ -132,6 +159,12 @@ int spi_enable_2x(struct spidev *dev)
 	return ret;
 }
 
+/**
+ * @brief Set the bitrate of the SPI bus.
+ * @param dev Device requesting the bitrate.
+ * @param bps BPS in hertz.
+ * @return Error code.
+ */
 int spi_set_speed(struct spidev *dev, uint32_t bps)
 {
 	int ret;
@@ -149,6 +182,11 @@ int spi_set_speed(struct spidev *dev, uint32_t bps)
 	return ret;
 }
 
+/**
+ * @brief Initialise a new SPI bus.
+ * @param driver Bus to initialise.
+ * @return An error code.
+ */
 int spi_bus_init(struct spi_driver *driver)
 {
 	if(!driver)
@@ -159,6 +197,11 @@ int spi_bus_init(struct spi_driver *driver)
 	return -EOK;
 }
 
+/**
+ * @brief Add a new SPI device to an existing SPI bus.
+ * @param driver SPI bus to add \p dev to.
+ * @param dev SPI device which needs a master bus.
+ */
 void spi_add_device(struct spi_driver *driver, struct spidev *dev)
 {
 	if(!driver || !dev)
@@ -171,6 +214,10 @@ void spi_add_device(struct spi_driver *driver, struct spidev *dev)
 static void __used spi_core_init(void)
 {
 }
+
+/**
+ * @}
+ */
 
 subsys_init(spi_core_init);
 
