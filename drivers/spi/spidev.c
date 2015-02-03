@@ -24,10 +24,11 @@
 #include <etaos/init.h>
 #include <etaos/time.h>
 #include <etaos/tick.h>
+#include <etaos/gpio.h>
 
 struct spi_driver *spi_sysbus;
 
-int spi_dev_set_mode(struct spidev *dev, spi_ctrl_t mode)
+int spi_set_mode(struct spidev *dev, spi_ctrl_t mode)
 {
 	int rv;
 	struct spi_driver *driver;
@@ -70,6 +71,12 @@ static int __spi_xfer(struct spidev *dev, struct spi_msg *msg)
 	tick_t click, ref = sys_tick;
 	struct spi_driver *master = dev->master;
 
+	gpio_pin_request(dev->cs);
+	if(test_bit(SPI_CS_HIGH_FLAG, &dev->flags))
+		gpio_pin_write(dev->cs, 1);
+	else
+		gpio_pin_write(dev->cs, 0);
+
 	for(retries = 0, rv = 0; retries < master->retries; retries++) {
 		rv = master->transfer(dev, msg);
 
@@ -80,6 +87,13 @@ static int __spi_xfer(struct spidev *dev, struct spi_msg *msg)
 		if(time_after(click, ref+master->timeout))
 			break;
 	}
+
+	if(test_bit(SPI_CS_HIGH_FLAG, &dev->flags))
+		gpio_pin_write(dev->cs, 0);
+	else
+		gpio_pin_write(dev->cs, 1);
+
+	gpio_pin_release(dev->cs);
 
 	return rv;
 }

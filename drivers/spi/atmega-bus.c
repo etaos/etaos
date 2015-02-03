@@ -32,13 +32,14 @@
 #define CPHA 0x4
 #define CPOL 0x8
 #define MSTR 0x10
-#define SPE  0x20
-#define SPIE 0x40
+#define DORD 0x20
+#define SPE  0x40
+#define SPIE 0x80
 
 #define SPSR MEM_IO8(0x4D)
 #define SPI2X 0x1
-#define WCOL  0x20
-#define SPIF  0x40
+#define WCOL  0x40
+#define SPIF  0x80
 
 #define SPDR MEM_IO8(0x4E)
 
@@ -139,7 +140,7 @@ static int atmega_spi_xfer(struct spidev *dev, struct spi_msg *msg)
 	mutex_lock(&master_spi_mutex);
 	for(; idx < msg->len; idx++) {
 		SPDR = tx[idx];
-		while(!(SPDR & SPIF));
+		while(!(SPSR & SPIF));
 		rx[idx] = SPDR;
 		rv++;
 	}
@@ -175,8 +176,8 @@ static void __used atmega_spi_init(void)
 	gpio_pin_request(atmega_spi_driver.miso);
 	gpio_pin_request(cs);
 
+	gpio_direction_input(atmega_spi_driver.miso);
 	gpio_direction_output(atmega_spi_driver.clk, 0);
-	gpio_direction_output(atmega_spi_driver.miso, 0);
 	gpio_direction_output(atmega_spi_driver.mosi, 0);
 	gpio_direction_output(cs, 1);
 
@@ -185,6 +186,7 @@ static void __used atmega_spi_init(void)
 	gpio_pin_release(atmega_spi_driver.clk);
 	gpio_pin_release(cs);
 
+	SPCR |= SPR1;
 	SPCR |= SPE | MSTR;
 	spi_sysbus = &atmega_spi_driver;
 }

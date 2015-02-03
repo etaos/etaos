@@ -14,4 +14,19 @@ config 23K256
 	  Say 'y' or 'm' here to build a driver for the 23K256
 	  external SRAM chip. If you are unsure say 'n' here.
 
+config 23K256_SS
+	int "23K256 slave select pin"
+	depends on 23K256
+	help
+	  Enter the GPIO number which is to be used as the slave
+	  select pin by the SPI driver to select the 23K256 SRAM chip
+	  in your hardware configuration.
+
+config 23K256_SPEED
+	int "23K256 bit rate (bps)"
+	depends on 23K256
+	help
+	  Enter the bitrate for the 23K256 SPI transmissions here. This
+	  value should be 20Mhz or less.
+
 endif
