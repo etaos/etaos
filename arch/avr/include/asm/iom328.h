@@ -150,5 +150,12 @@
 
 #define TWAMR MEM_IO8(0xBD)
 
+/* SPI defs */
+#define SS_GPIO		2
+#define SCK_GPIO	5
+#define MOSI_GPIO	3
+#define MISO_GPIO	4
+
+
 #endif /* __IOM328_H_ */
 

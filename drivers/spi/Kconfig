@@ -1,0 +1,16 @@
+menuconfig SPI
+	tristate "SPI drivers"
+	depends on GPIO
+	help
+	  Say 'y' here if you want to build support for SPI bus drivers. If
+	  your chip doesn't have such a bus, say 'N' here. If you are unsure,
+	  say 'm'.
+
+if SPI
+
+config ATMEGA_SPI
+	tristate "ATmega SPI driver"
+	help
+	  Say 'y' or 'm' here to build support for the ATmega SPI driver.
+
+endif
