@@ -30,6 +30,8 @@
 #include <etaos/bitops.h>
 #include <etaos/init.h>
 
+#include <asm/io.h>
+
 #define SPCR MEM_IO8(0x4C)
 #define SPR0 0x1
 #define SPR1 0x2
@@ -81,7 +83,7 @@ static int atmega_spi_setspeed(struct spidev *dev, uint32_t rate)
 	unsigned char spcr;
 
 	for(; div <= 7; div++) {
-		if((F_CPU / spi_clk_div[div]) == rate)
+		if((CONFIG_FCPU / spi_clk_div[div]) == rate)
 			break;
 	}
 
