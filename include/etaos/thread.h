@@ -170,7 +170,6 @@ struct thread {
 
 CDECL
 
-extern void thread_wake_up_from_irq(struct thread *t);
 extern int thread_initialise(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack, unsigned char prio);

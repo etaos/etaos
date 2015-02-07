@@ -229,15 +229,9 @@ extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
 extern void rq_add_thread_no_lock(struct thread *tp);
-#ifdef CONFIG_IRQ_THREAD
-extern void irq_signal_threads(struct rq *rq);
-#else
-#define irq_signal_threads(rq)
-#endif
-
 
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
-
+extern void sched_yield(struct rq *rq);
 extern void sched_init(void);
 
 #if defined(CONFIG_SYS_RR)
@@ -253,22 +247,6 @@ extern struct sched_class fifo_class;
 #ifdef CONFIG_THREAD_QUEUE
 extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
 extern void queue_add_thread(struct thread_queue *qp, struct thread *tp);
-
-/**
- * @brief Get the thread_queue the given thread is on.
- * @param tp Thread to get the thread_queue for.
- * @note You have to be sure that the thread is on one. If its not, a false
- *       thread queue is returned.
- */
-static inline struct thread_queue *thread_to_queue(struct thread *tp)
-{
-	struct thread **tpp = (struct thread**)tp->queue;
-
-	if(tpp)
-		return container_of(tpp, struct thread_queue, qhead);
-	else
-		return NULL;
-}
 #endif
 
 /**

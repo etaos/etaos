@@ -195,18 +195,9 @@ void signal(struct thread *tp)
 void yield(void)
 {
 	struct rq *rq;
-	struct thread *tp;
 
 	rq = sched_get_cpu_rq();
-	tp = rq->sched_class->next_runnable(rq);
-	if(tp != rq->current) {
-		if(prio(tp) <= prio(rq->current)) {
-			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
-		}
-		
-		if(test_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags))
-			schedule();
-	}
+	sched_yield(rq);
 }
 
 /**
