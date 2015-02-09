@@ -134,6 +134,7 @@ static void fifo_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
  */
 static void fifo_add_thread(struct rq *rq, struct thread *tp)
 {
+	rq->num++;
 	fifo_queue_insert(&rq->rr_rq.run_queue, tp);
 }
 
@@ -146,6 +147,7 @@ static void fifo_add_thread(struct rq *rq, struct thread *tp)
  */
 static int fifo_rm_thread(struct rq *rq, struct thread *tp)
 {
+	rq->num--;
 	return fifo_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 

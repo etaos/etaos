@@ -85,12 +85,20 @@ typedef void (*thread_handle_t)(void *arg);
 static void fn(void * param); \
 static void fn(void *param)
 
+struct lottery_ticket {
+	unsigned short num;
+	struct list_head list;
+};
+
 /**
  * @struct rr_entity
  * @brief Round robin entity.
  */
 struct rr_entity {
 	struct thread *next; //!< List entry pointer.
+#ifdef CONIFG_LOTTERY
+	struct list_head tickets;
+#endif
 };
 
 #ifdef CONFIG_THREAD_QUEUE
@@ -152,7 +160,7 @@ struct thread {
 #endif
 
 	void *param; //!< Thread parameter.
-#if defined(CONFIG_RR) || defined(CONFIG_FIFO)
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
 	struct rr_entity se; //!< Scheduling entity.
 #endif
 };

@@ -28,6 +28,13 @@ config FIFO
 	  The queue's are sorted with the time of insertion used
 	  as the sorting key.
 
+config LOTTERY
+	bool "Lottery scheduler"
+	help
+	  Say 'y'here to build the lottery scheduler. The lottery
+	  scheduler depends on random number generation to pick
+	  threads in a 'fair' way.
+
 endmenu
 
 choice
@@ -42,6 +49,11 @@ config SYS_RR
 config SYS_FIFO
 	bool "FIFO scheduler"
 	depends on FIFO
+
+config SYS_LOTTERY
+	bool "Lottery scheduler"
+	depends on LOTTERY
+
 endchoice
 
 config THREAD_QUEUE
@@ -74,7 +86,7 @@ config IPM
 
 config DYN_PRIO
 	bool "Dynamic priorities"
-	depends on RR
+	depends on SYS_RR
 	help
 	  Say 'y' here to enable dynamic priorities. Dynamic
 	  priorities are an extra set of priorites set by

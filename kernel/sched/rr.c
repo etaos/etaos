@@ -133,6 +133,7 @@ static void rr_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
  */
 static void rr_add_thread(struct rq *rq, struct thread *tp)
 {
+	rq->num++;
 	rr_queue_insert(&rq->rr_rq.run_queue, tp);
 }
 
@@ -145,6 +146,7 @@ static void rr_add_thread(struct rq *rq, struct thread *tp)
  */
 static int rr_rm_thread(struct rq *rq, struct thread *tp)
 {
+	rq->num--;
 	return rr_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 

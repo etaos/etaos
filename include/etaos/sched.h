@@ -128,10 +128,12 @@ struct rr_rq {
 struct rq {
 	/** @brief System scheduling class */
 	struct sched_class *sched_class;
-#if defined(CONFIG_RR) || defined(CONFIG_FIFO)
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
 	/** @brief Round robin run queue */
 	struct rr_rq rr_rq;
 #endif
+	/** @brief Number of threads in the run queue */
+	unsigned long num;
 	/**
 	 * @brief Wake queue.
 	 *
@@ -238,6 +240,10 @@ extern void sched_init(void);
 #if defined(CONFIG_SYS_RR)
 extern struct sched_class rr_class;
 #define sys_sched_class rr_class
+
+#elif defined(CONFIG_SYS_LOTTERY)
+extern struct sched_class lottery_class;
+#define sys_sched_class lottery_class
 
 #elif defined(CONFIG_SYS_FIFO)
 
