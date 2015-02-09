@@ -200,7 +200,11 @@ static void rr_update_dyn_prio(struct rq *rq, int num)
 	walker = rq->rr_rq.run_queue;
 
 	while(walker) {
-		walker->dprio += num;
+		if((walker->dprio + num) > walker->prio)
+			walker->dprio = walker->prio;
+		else
+			walker->dprio += num;
+
 		walker = walker->se.next;
 	}
 }
