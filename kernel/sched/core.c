@@ -881,6 +881,9 @@ void sched_init(void)
 {
 	struct rq *rq;
 
+	if(sys_sched_class.init)
+		sys_sched_class.init();
+
 	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
 			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack);
 	rq = sched_get_cpu_rq();

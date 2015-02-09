@@ -192,6 +192,7 @@ static struct thread *fifo_thread_after(struct thread *tp)
  * @brief FIFO scheduling class.
  */
 struct sched_class fifo_class = {
+	.init = NULL,
 	.rm_thread = &fifo_rm_thread,
 	.add_thread = &fifo_add_thread,
 	.next_runnable = &fifo_next_runnable,

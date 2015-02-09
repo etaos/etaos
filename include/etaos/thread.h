@@ -97,7 +97,8 @@ struct lottery_ticket {
 struct rr_entity {
 	struct thread *next; //!< List entry pointer.
 #ifdef CONIFG_LOTTERY
-	struct list_head tickets;
+	unsigned char num;
+	unsigned short *tickets;
 #endif
 };
 

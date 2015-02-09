@@ -54,6 +54,10 @@ struct sched_class {
 	 * @param rq Run queue to get the next runnable task from
 	 */
 	struct thread *(*next_runnable)(struct rq*);
+	/**
+	 * @brief Initialise the scheduling class.
+	 */
+	void (*init)(void);
 	/** 
 	 * @brief Post schedule.
 	 * @param rq RQ which has just received a schedule call.

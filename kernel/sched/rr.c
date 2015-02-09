@@ -214,6 +214,7 @@ static void rr_update_dyn_prio(struct rq *rq, int num)
  * @brief Round robin scheduling class.
  */
 struct sched_class rr_class = {
+	.init = NULL,
 	.rm_thread = &rr_rm_thread,
 	.add_thread = &rr_add_thread,
 	.next_runnable = &rr_next_runnable,
