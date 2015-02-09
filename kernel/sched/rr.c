@@ -190,14 +190,14 @@ static struct thread *rr_thread_after(struct thread *tp)
  * @brief Update the dynamic prio of all threads in the run queue.
  * @param rq Run queue which has to be updated.
  */
-static void rr_update_dyn_prio(struct rq *rq)
+static void rr_update_dyn_prio(struct rq *rq, int num)
 {
 	struct thread *walker;
 
 	walker = rq->rr_rq.run_queue;
 
 	while(walker) {
-		walker->dprio += 1;
+		walker->dprio += num;
 		walker = walker->se.next;
 	}
 }

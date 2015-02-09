@@ -66,8 +66,9 @@ struct sched_class {
 	/** 
 	 * @brief update the dynamic priority of all threads on the given rq.
 	 * @param rq Run queue to update.
+	 * @param num Numeral value that is added to struct thread::dprio.
 	 */
-	void (*dyn_prio_update)(struct rq*);
+	void (*dyn_prio_update)(struct rq* rq, int num);
 #endif
 	/** 
 	 * @brief Add a new thread to the run queue.

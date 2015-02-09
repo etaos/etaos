@@ -834,7 +834,7 @@ resched:
 #ifdef CONFIG_DYN_PRIO
 	if(num > 0) {
 		raw_spin_lock_irq(&rq->lock);
-		rq->sched_class->dyn_prio_update(rq);
+		rq->sched_class->dyn_prio_update(rq, num);
 		raw_spin_unlock_irq(&rq->lock);
 	}
 #endif
