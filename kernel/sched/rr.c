@@ -189,6 +189,7 @@ static struct thread *rr_thread_after(struct thread *tp)
 /**
  * @brief Update the dynamic prio of all threads in the run queue.
  * @param rq Run queue which has to be updated.
+ * @param num Numeral value that is added to struct thread::dprio.
  */
 static void rr_update_dyn_prio(struct rq *rq, int num)
 {
