@@ -774,6 +774,7 @@ static void sched_do_signal_threads(struct rq *rq)
  * 	   - threads which have used up their time slice;
  * 	   - the kill queue of the run queue;
  * 	   - irq threads which have to be woken up.
+ * @see schedule sched_yield
  *
  * struct rq::lock will be locked (and unlocked).
  */
