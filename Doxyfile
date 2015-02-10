@@ -38,7 +38,7 @@ PROJECT_NAME           = ETA/OS
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 3.1.0
+PROJECT_NUMBER         = 3.2.0
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -760,7 +760,11 @@ INPUT                  = . \
                          Documentation/i2c/atmega.txt \
                          Documentation/i2c/i2c.txt \
                          Documentation/usart/atmega.txt \
-                         Documentation/usart/usart.txt
+                         Documentation/usart/usart.txt \
+                         Documentation/spi/atmega.txt \
+                         Documentation/spi/spi.txt \
+                         Documentation/sram/23k256.txt \
+                         Documentation/sram/sram.txt
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

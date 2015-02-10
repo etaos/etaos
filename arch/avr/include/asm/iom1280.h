@@ -197,5 +197,11 @@
 #define TWSR_VAL (TWSR & 0xF8)
 #endif
 
+/* SPI pins */
+#define SS_GPIO		 8
+#define SCK_GPIO	 9
+#define MOSI_GPIO	10
+#define MISO_GPIO	11
+
 #endif /* __IO1280_H__ */
 
