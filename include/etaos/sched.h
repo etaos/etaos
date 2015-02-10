@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Sched header
- *  Copyright (C) 2014, 2015  Michel Megens
+ *  Copyright (C) 2014, 2015  Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,6 +54,16 @@ struct sched_class {
 	 * @param rq Run queue to get the next runnable task from
 	 */
 	struct thread *(*next_runnable)(struct rq*);
+	/**
+	 * @brief Initialise the scheduling class.
+	 */
+	void (*init)(void);
+	/**
+	 * @brief Kill a given thread.
+	 * @param tp Thread which is going to be killed.
+	 * @note Do not free up the memory yet. Leave this to the scheduler.
+	 */
+	void (*kill)(struct thread *tp);
 	/** 
 	 * @brief Post schedule.
 	 * @param rq RQ which has just received a schedule call.
@@ -66,8 +76,9 @@ struct sched_class {
 	/** 
 	 * @brief update the dynamic priority of all threads on the given rq.
 	 * @param rq Run queue to update.
+	 * @param num Numeral value that is added to struct thread::dprio.
 	 */
-	void (*dyn_prio_update)(struct rq*);
+	void (*dyn_prio_update)(struct rq* rq, int num);
 #endif
 	/** 
 	 * @brief Add a new thread to the run queue.
@@ -127,10 +138,12 @@ struct rr_rq {
 struct rq {
 	/** @brief System scheduling class */
 	struct sched_class *sched_class;
-#if defined(CONFIG_RR) || defined(CONFIG_FIFO)
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
 	/** @brief Round robin run queue */
 	struct rr_rq rr_rq;
 #endif
+	/** @brief Number of threads in the run queue */
+	unsigned long num;
 	/**
 	 * @brief Wake queue.
 	 *
@@ -229,20 +242,18 @@ extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
 extern void rq_add_thread_no_lock(struct thread *tp);
-#ifdef CONFIG_IRQ_THREAD
-extern void irq_signal_threads(struct rq *rq);
-#else
-#define irq_signal_threads(rq)
-#endif
-
 
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
-
+extern void sched_yield(struct rq *rq);
 extern void sched_init(void);
 
 #if defined(CONFIG_SYS_RR)
 extern struct sched_class rr_class;
 #define sys_sched_class rr_class
+
+#elif defined(CONFIG_SYS_LOTTERY)
+extern struct sched_class lottery_class;
+#define sys_sched_class lottery_class
 
 #elif defined(CONFIG_SYS_FIFO)
 
@@ -253,22 +264,6 @@ extern struct sched_class fifo_class;
 #ifdef CONFIG_THREAD_QUEUE
 extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
 extern void queue_add_thread(struct thread_queue *qp, struct thread *tp);
-
-/**
- * @brief Get the thread_queue the given thread is on.
- * @param tp Thread to get the thread_queue for.
- * @note You have to be sure that the thread is on one. If its not, a false
- *       thread queue is returned.
- */
-static inline struct thread_queue *thread_to_queue(struct thread *tp)
-{
-	struct thread **tpp = (struct thread**)tp->queue;
-
-	if(tpp)
-		return container_of(tpp, struct thread_queue, qhead);
-	else
-		return NULL;
-}
 #endif
 
 /**

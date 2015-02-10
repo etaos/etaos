@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Scheduling core
- *  Copyright (C) 2014, 2015  Michel Megens
+ *  Copyright (C) 2014, 2015  Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -66,6 +66,9 @@ static void raw_thread_init(struct thread *tp, const char *name,
 #endif
 #ifdef CONFIG_DYN_PRIO
 	tp->dprio = 0;
+#endif
+#ifdef CONFIG_SYS_LOTTERY
+	list_head_init(&tp->se.tickets);
 #endif
 
 	sched_create_stack_frame(tp, stack, stack_size, handle);
@@ -137,13 +140,19 @@ int thread_initialise(struct thread *tp, const char *name,
 void kill(void)
 {
 	struct thread *tp;
+	struct sched_class *class;
 
 	tp = current_thread();
+	class = tp->rq->sched_class;
 
 	set_bit(THREAD_EXIT_FLAG, &tp->flags);
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	thread_add_to_kill_q(tp);
+	
+	if(class->kill)
+		class->kill(tp);
+
 	schedule();
 }
 
@@ -195,18 +204,9 @@ void signal(struct thread *tp)
 void yield(void)
 {
 	struct rq *rq;
-	struct thread *tp;
 
 	rq = sched_get_cpu_rq();
-	tp = rq->sched_class->next_runnable(rq);
-	if(tp != rq->current) {
-		if(prio(tp) <= prio(rq->current)) {
-			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
-		}
-		
-		if(test_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags))
-			schedule();
-	}
+	sched_yield(rq);
 }
 
 /**

@@ -30,29 +30,6 @@
 #include <etaos/sched.h>
 #include <etaos/thread.h>
 
-#ifdef CONFIG_IRQ_THREAD
-static DEFINE_THREAD_QUEUE(irq_thread_queue);
-static void irq_thread_wait();
-
-/**
- * @brief Threaded IRQ handle.
- * @param data IRQ data.
- * @note This function is a thread handle.
- */
-void irq_handle_fn(void *data)
-{
-	struct irq_data *irq = data;
-
-	while(true) {
-		irq_thread_wait();
-		if(test_bit(THREAD_EXIT_FLAG, &current_thread()->flags))
-			kill();
-
-		irq->handler(irq, irq->private_data);
-	}
-}
-#endif
-
 /**
  * @brief Handle a hardware IRQ.
  * @param data IRQ which has to be handled.
@@ -107,56 +84,6 @@ void irq_handle(int irq)
 
 	irq_handle_hard_irq(data);
 }
-
-#ifdef CONFIG_IRQ_THREAD
-/**
- * @brief Put an IRQ thread in a waiting state.
- * @note The thread wont wake up until it is signaled and woken up by
- *       irq_signal_threads.
- * @see irq_signal_threads schedule
- */
-static void irq_thread_wait(void)
-{
-	struct thread *tp;
-
-	tp = current_thread();
-	queue_add_thread(&irq_thread_queue, tp);
-	set_bit(THREAD_WAITING_FLAG, &tp->flags);
-	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
-	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
-	schedule();
-}
-
-/**
- * @brief Wake up all signaled IRQ threads.
- * @param rq Run queue to add threads to when they wake up.
- * @warning Applications shouldn't call this function.
- */
-void irq_signal_threads(struct rq *rq)
-{
-	struct thread *walker;
-	struct thread_queue *qp = &irq_thread_queue;
-	unsigned long flags;
-
-	irq_save_and_disable(&flags);
-	walker = qp->qhead;
-	while(walker && walker != SIGNALED) {
-		if(walker->ec) {
-			walker->ec--;
-			queue_remove_thread(qp, walker);
-			rq_add_thread_no_lock(walker);
-			clear_bit(THREAD_WAITING_FLAG, &walker->flags);
-			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
-		}
-		walker = qp->sched_class->thread_after(walker);
-	}
-
-	if(!qp->qhead)
-		qp->qhead = SIGNALED;
-
-	irq_restore(&flags);
-}
-#endif
 
 /** @} */
 

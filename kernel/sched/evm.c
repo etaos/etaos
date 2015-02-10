@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Event driven mutexes
- *  Copyright (C) 2014, 2015  Michel Megens
+ *  Copyright (C) 2014, 2015  Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -80,7 +80,8 @@ static void evm_timeout(struct timer *timer, void *arg)
 	if(walker != SIGNALED) {
 		while(walker) {
 			if(walker->timer == timer) {
-				raw_rq_remove_wake_thread(sched_get_cpu_rq(), walker);
+				raw_rq_remove_wake_thread(sched_get_cpu_rq(), 
+							  walker);
 				queue_remove_thread(qp, walker);
 				if(!qp->qhead)
 					qp->qhead = SIGNALED;

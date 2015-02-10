@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Thread header
- *  Copyright (C) 2014, 2015  Michel Megens
+ *  Copyright (C) 2014, 2015  Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -85,12 +85,20 @@ typedef void (*thread_handle_t)(void *arg);
 static void fn(void * param); \
 static void fn(void *param)
 
+#ifdef CONFIG_LOTTERY
+struct lottery_ticket {
+	struct list_head list;
+	unsigned short ticket;
+};
+#endif
+
 /**
  * @struct rr_entity
  * @brief Round robin entity.
  */
 struct rr_entity {
 	struct thread *next; //!< List entry pointer.
+	struct list_head tickets;
 };
 
 #ifdef CONFIG_THREAD_QUEUE
@@ -152,7 +160,7 @@ struct thread {
 #endif
 
 	void *param; //!< Thread parameter.
-#if defined(CONFIG_RR) || defined(CONFIG_FIFO)
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
 	struct rr_entity se; //!< Scheduling entity.
 #endif
 };
@@ -170,7 +178,6 @@ struct thread {
 
 CDECL
 
-extern void thread_wake_up_from_irq(struct thread *t);
 extern int thread_initialise(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack, unsigned char prio);

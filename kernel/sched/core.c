@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Scheduling core
- *  Copyright (C) 2014, 2015   Michel Megens
+ *  Copyright (C) 2014, 2015   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,6 +17,14 @@
  */
 
 /**
+ * @file kernel/sched/core.c Scheduling core
+ *
+ * The scheduling core is the backend of the threading API. It provides
+ * architecture independent code (algorithms, backend functions, etc..) to
+ * support the threading API in dividing CPU time as fair as possible.
+ */
+
+/**
  * @addtogroup sched
  */
 /* @{ */
@@ -30,6 +38,7 @@
 #include <etaos/sched.h>
 #include <etaos/preempt.h>
 #include <etaos/irq.h>
+#include <etaos/irq_handle.h>
 #include <etaos/bitops.h>
 #include <etaos/time.h>
 #include <etaos/spinlock.h>
@@ -40,12 +49,66 @@
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp);
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
 
-void thread_wake_up_from_irq(struct thread *thread)
+#ifdef CONFIG_IRQ_THREAD
+DEFINE_THREAD_QUEUE(irq_thread_queue);
+
+/**
+ * @brief Put an IRQ thread in a waiting state.
+ * @note The thread wont wake up until it is signaled and woken up by
+ *       irq_signal_threads.
+ * @see irq_signal_threads schedule
+ */
+static void irq_thread_wait(void)
 {
+	struct thread *tp;
+
+	tp = current_thread();
+	queue_add_thread(&irq_thread_queue, tp);
+	set_bit(THREAD_WAITING_FLAG, &tp->flags);
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	schedule();
+}
+
+/**
+ * @brief Threaded IRQ handle.
+ * @param data IRQ data.
+ * @note This function is a thread handle.
+ *
+ * Threaded IRQ's will be handled in this thread. Calls 
+ * struct irq_data::handler.
+ */
+void irq_handle_fn(void *data)
+{
+	struct irq_data *irq = data;
+
+	while(true) {
+		irq_thread_wait();
+		if(test_bit(THREAD_EXIT_FLAG, &current_thread()->flags))
+			kill();
+
+		irq->handler(irq, irq->private_data);
+	}
+}
+#endif
+
+/**
+ * @brief Get the thread_queue the given thread is on.
+ * @param tp Thread to get the thread_queue for.
+ * @note You have to be sure that the thread is on one. If its not, a false
+ *       thread queue is returned.
+ */
+static inline struct thread_queue *thread_to_queue(struct thread *tp)
+{
+	struct thread **tpp = (struct thread**)tp->queue;
+
+	if(tpp)
+		return container_of(tpp, struct thread_queue, qhead);
+	else
+		return NULL;
 }
 
 #ifdef CONFIG_THREAD_QUEUE
-
 /**
  * @brief Initialise a thread queue during run time.
  * @param qp Thread queue which has to be initialised.
@@ -136,10 +199,12 @@ static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
 {
 	struct thread *carriage;
 
+	/* get the queue head */
 	carriage = *tpp;
 	if(carriage == SIGNALED)
 		return -EINVAL;
 
+	/* loop through all threads in the queue */
 	while(carriage) {
 		if(carriage == tp) {
 			*tpp = tp->rq_next;
@@ -189,6 +254,8 @@ void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
  * @brief Remove a thread from a rq.
  * @param rq RQ to remove from.
  * @param tp Thread to remove.
+ *
+ * struct rq::lock will be locked (and unlocked).
  */
 void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 {
@@ -201,6 +268,8 @@ void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
  * @brief Remove a thread from the kill queue.
  * @param rq RQ to remove from.
  * @param tp Thread to remove.
+ *
+ * struct rq::lock will be locked (and unlocked).
  */
 void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 {
@@ -270,6 +339,8 @@ void raw_thread_add_to_kill_q(struct thread *tp)
 /**
  * @brief Add a wake thread to the current RQ.
  * @param tp Thread to add.
+ *
+ * struct rq::lock will be locked (and unlocked).
  */
 void thread_add_to_wake_q(struct thread *tp)
 {
@@ -285,6 +356,8 @@ void thread_add_to_wake_q(struct thread *tp)
 /**
  * @brief Add a kill thread to the current RQ.
  * @param tp Thread to add.
+ *
+ * struct rq::lock will be locked (and unlocked).
  */
 void thread_add_to_kill_q(struct thread *tp)
 {
@@ -338,6 +411,8 @@ void rq_add_thread_no_lock(struct thread *tp)
  * @brief Add a thread to a run queue.
  * @param rq Run queue to add \p tp to.
  * @param tp Thread to add.
+ *
+ * struct rq::lock will be locked (and unlocked).
  */
 int rq_add_thread(struct rq *rq, struct thread *tp)
 {
@@ -413,6 +488,8 @@ static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 /**
  * @brief Remove a thread from a run queue.
  * @param tp Thread to remove.
+ *
+ * struct rq::lock will be locked (and unlocked).
  */
 int rq_remove_thread(struct thread *tp)
 {
@@ -572,6 +649,10 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
  * @brief Signal a thread on a wake queue.
  * @param rq Run queue of the thread.
  * @param tp Thread to signal.
+ *
+ * The thread \p tp has received an EVENT trigger. The queue which \p tp is on
+ * will be notified and the the thread with the highest priority will be woken
+ * up first.
  */
 static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 {
@@ -611,40 +692,60 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
  */
 #define current(_rq) ((_rq)->current)
 
+#ifdef CONFIG_IRQ_THREAD
 /**
- * @brief Reschedule the current run queue.
- * @return True or false based on whether there has been a context switch
- *         or not.
- * @retval true if there has been a context switch.
- * @retval false if there has not been a context switch.
- * @note This function also updates:
- * 	   - threads signaled from an IRQ;
- * 	   - timers;
- * 	   - threads which have used up their time slice;
- * 	   - the kill queue of the run queue;
- * 	   - irq threads which have to be woken up.
+ * @brief Signal threads that function as an IRQ.
+ * @param rq Current run queue.
+ *
+ * IRQ's can be configured to be handled in threaded context instead of IRQ
+ * context. This function is responsible for waking up the correct threads
+ * when one of these IRQ's has been triggered by external hardware.
  */
-static bool __hot rq_schedule(void)
+static void irq_signal_threads(struct rq *rq)
 {
-	struct rq *rq;
-	unsigned int diff;
-	bool did_switch;
-	struct thread *tp, *prev;
-#ifdef CONFIG_EVENT_MUTEX
-	struct thread *carriage, *volatile*tpp;
-	unsigned char events;
+	struct thread *walker;
+	struct thread_queue *qp = irq_get_thread_queue();
+	unsigned long flags;
+
+	irq_save_and_disable(&flags);
+	walker = qp->qhead;
+	while(walker && walker != SIGNALED) {
+		if(walker->ec) {
+			walker->ec--;
+			queue_remove_thread(qp, walker);
+			rq_add_thread_no_lock(walker);
+			clear_bit(THREAD_WAITING_FLAG, &walker->flags);
+			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
+		}
+		walker = qp->sched_class->thread_after(walker);
+	}
+
+	if(!qp->qhead)
+		qp->qhead = SIGNALED;
+
+	irq_restore(&flags);
+}
+#else
+#define irq_signal_threads(__rq)
 #endif
 
-	rq = sched_get_cpu_rq();
-	prev = current(rq);
-	did_switch = false;
-	
-resched:
-	preempt_disable();
-	raw_spin_lock_irq(&rq->lock);
-	irq_signal_threads(rq);
-
 #ifdef CONFIG_EVENT_MUTEX
+/**
+ * @brief Signal threads that are waiting for an event.
+ * @param rq A pointer to the current of 'this' CPU.
+ *
+ * This function wakes up all threads that have received an EVENT trigger. Only
+ * functions that are put into a waiting state by the EVM subsystem are woken
+ * up by this function. Functions put to sleep by either sleep or wait are not
+ * affected.
+ */
+static void sched_do_signal_threads(struct rq *rq)
+{
+	struct thread *carriage, 
+		      *tp,
+		      *volatile*tpp;
+	unsigned char events;
+
 	carriage = rq->wake_queue;
 	while(carriage) {
 		events = carriage->ec;
@@ -658,12 +759,44 @@ resched:
 		}
 		carriage = carriage->rq_next;
 	}
+
+	return;
+}
+#else
+#define sched_do_signal_threads(__rq)
 #endif
 
-#ifdef CONFIG_TIMER
+/**
+ * @brief Reschedule the current run queue.
+ * @note This function also updates:
+ * 	   - threads signaled from an IRQ;
+ * 	   - timers;
+ * 	   - threads which have used up their time slice;
+ * 	   - the kill queue of the run queue;
+ * 	   - irq threads which have to be woken up.
+ *
+ * struct rq::lock will be locked (and unlocked).
+ */
+static void __hot rq_schedule(void)
+{
+	struct rq *rq;
+	unsigned int diff;
+	struct thread *tp, *prev;
+	int num = 0;
+
+	rq = sched_get_cpu_rq();
+	prev = current(rq);
+	
+resched:
+	preempt_disable();
+	raw_spin_lock_irq(&rq->lock);
+	irq_signal_threads(rq);
+	sched_do_signal_threads(rq);
+
 	diff = tm_update_source(rq->source);
 	if(diff)
 		tm_process_clock(rq->source, diff);
+
 #ifdef CONFIG_PREEMPT
 	if(diff < prev->slice) {
 		prev->slice -= diff;
@@ -671,7 +804,6 @@ resched:
 		prev->slice = CONFIG_TIME_SLICE;
 		set_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags);
 	}
-#endif
 #endif
 
 	tp = sched_get_next_runnable(rq);
@@ -685,10 +817,10 @@ resched:
 		rq->switch_count++;
 		dyn_prio_reset(tp);
 		rq_switch_context(rq, prev, tp);
-		did_switch = true;
 		rq = sched_get_cpu_rq();
 		prev = current(rq);
 		rq_update(rq);
+		num++;
 	} else {
 		raw_spin_unlock_irq(&rq->lock);
 	}
@@ -699,30 +831,29 @@ resched:
 	}
 
 	rq_destroy_kill_q(rq);
-	return did_switch;
+#ifdef CONFIG_DYN_PRIO
+	if(num > 0) {
+		raw_spin_lock_irq(&rq->lock);
+		rq->sched_class->dyn_prio_update(rq, num);
+		raw_spin_unlock_irq(&rq->lock);
+	}
+#endif
+	return;
 }
 
 /**
  * @brief Reschedule the current run queue.
+ * @see yield
+ * @see sleep
+ * @see wait
+ * @see signal
  *
- * It also updates the dynamic priorities.
+ * Run the scheduler to allow other threads to access the CPU. Most likely
+ * you don't want to call this function directly.
  */
 void __hot schedule(void)
 {
-#ifdef CONFIG_DYN_PRIO
-	bool need_prio_update;
-	struct rq *rq;
-	
-	need_prio_update = rq_schedule();
-	rq = sched_get_cpu_rq();
-	if(need_prio_update && rq->sched_class->dyn_prio_update) {
-		raw_spin_lock_irq(&rq->lock);
-		rq->sched_class->dyn_prio_update(rq);
-		raw_spin_unlock_irq(&rq->lock);
-	}
-#else
 	rq_schedule();
-#endif
 }
 
 static struct thread idle_thread, main_thread;
@@ -743,10 +874,15 @@ THREAD(idle_thread_func, arg)
 /**
  * @brief Initialise the scheduler.
  * @note This function doesn't return.
+ *
+ * The arch init initialises the scheduler using this function during boot.
  */
 void sched_init(void)
 {
 	struct rq *rq;
+
+	if(sys_sched_class.init)
+		sys_sched_class.init();
 
 	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
 			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack);
@@ -758,12 +894,24 @@ void sched_init(void)
 }
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Get a pointer to the preemption counter of the current thread.
+ * @return A pointer to the preemption counter of the current thread.
+ *
+ * Returns struct thread::preemt_cnt.
+ */
 int *preempt_counter_ptr(void)
 {
 	struct thread *tp = current_thread();
 	return &tp->preemt_cnt;
 }
 
+/**
+ * @brief Substract \p num from the preemption counter of the current thread.
+ * @param num Amount to substract from the preemption counter.
+ *
+ * Substracts \p num from struct thread::preemt_cnt.
+ */
 void __preempt_add(int num)
 {
 	volatile int *preemt_ptr = preempt_counter_ptr();
@@ -771,6 +919,12 @@ void __preempt_add(int num)
 	*preemt_ptr += num;
 }
 
+/**
+ * @brief Add \p num to the preemption counter of the current thread.
+ * @param num Amount to add to the preemption counter.
+ *
+ * Will add \p num to struct thread::preemt_cnt.
+ */
 void __preempt_sub(int num)
 {
 	volatile int *preemt_ptr = preempt_counter_ptr();
@@ -778,6 +932,31 @@ void __preempt_sub(int num)
 	*preemt_ptr -= num;
 }
 #endif
+
+/**
+ * @brief API interface for `yield()'.
+ * @param rq Pointer to the active run queue.
+ *
+ * Yield the current thread to allow other threads access to the CPU.
+ */
+void sched_yield(struct rq *rq)
+{
+	struct thread *tp, *curr;
+	struct sched_class *class;
+
+	class = rq->sched_class;
+	tp = class->next_runnable(rq);
+	curr = current(rq);
+
+	if(tp != curr) {
+		if(prio(tp) <= prio(curr)) {
+			set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+			rq_schedule();
+		}
+	}
+
+	return;
+}
 
 /**
  * @brief Check if a reschedule is needed.

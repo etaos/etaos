@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Scheduling core
- *  Copyright (C) 2014, 2015   Michel Megens
+ *  Copyright (C) 2014, 2015   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ static struct rq avr_rq = {
 	.kill_queue = NULL,
 	.current = NULL,
 	.switch_count = 0,
+	.num = 0,
 	.lock = SPIN_LOCK_INIT(avr_rq.lock),
 
 };
