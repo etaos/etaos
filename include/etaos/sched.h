@@ -61,6 +61,7 @@ struct sched_class {
 	/**
 	 * @brief Kill a given thread.
 	 * @param tp Thread which is going to be killed.
+	 * @note Do not free up the memory yet. Leave this to the scheduler.
 	 */
 	void (*kill)(struct thread *tp);
 	/** 

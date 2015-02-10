@@ -33,6 +33,11 @@
 
 static struct lottery_ticket *lottery_take_ticket(void);
 
+/**
+ * @brief Insert a new thread into a queue.
+ * @param tpp Root queue pointer.
+ * @param tp Thread to insert.
+ */
 static void lottery_insert_thread(struct thread *volatile*tpp, 
 		struct thread *tp)
 {
@@ -65,6 +70,13 @@ static void lottery_insert_thread(struct thread *volatile*tpp,
 #endif
 }
 
+/**
+ * @brief Remove a thread from a queue.
+ * @param tpp Root queue pointer.
+ * @param tp Thread to remove from.
+ * @retval -EOK on success.
+ * @return -EINVAL on error (no thread was removed).
+ */
 static int lottery_rm_thread(struct thread *volatile*tpp, struct thread *tp)
 {
 	struct thread *thread;
@@ -104,6 +116,11 @@ struct lottery_pool_head {
 	unsigned long num;
 };
 
+/**
+ * @brief Add a new thread to a lottery run queue.
+ * @param rq Run queue to add \p tp to.
+ * @param tp Thread which has to be added to the given run queue.
+ */
 static void lottery_add_thread(struct rq *rq, struct thread *tp)
 {
 	struct lottery_ticket *ticket;
@@ -132,6 +149,11 @@ static void lottery_add_thread(struct rq *rq, struct thread *tp)
 	lottery_insert_thread(&rq->rr_rq.run_queue, tp);
 }
 
+/**
+ * @brief Remove a thread from the lottery run queue.
+ * @param rq Run queue to remove from.
+ * @param tp Thread which is to be removed.
+ */
 static int lottery_remove_thread(struct rq *rq, struct thread *tp)
 {
 	rq->num--;
@@ -143,12 +165,22 @@ static struct lottery_pool_head lottery_tickets = {
 	.num = 0,
 };
 
+/**
+ * @brief Return a lottery ticket to the allocator.
+ * @param ticket Ticket to return.
+ */
 static void lottery_return_ticket(struct lottery_ticket *ticket)
 {
 	list_del(&ticket->list);
 	list_add(&ticket->list, &lottery_tickets.tickets);
 }
 
+/**
+ * @brief Free all memory allocated by the lottery scheduler.
+ * @param tp Thread which is about to be killed.
+ * @note This function does not free the actual thread. It merely free's up
+ *       allocated lottery tickets (they're returned to the ticket allocator).
+ */
 static void lottery_kill_thread(struct thread *tp)
 {
 	struct list_head *carriage, *tmp;
@@ -181,6 +213,13 @@ static inline bool lottery_single_thread_available(struct rq *rq)
 	return true;
 }
 
+/**
+ * @brief Get the next runnable thread from the lottery scheduler.
+ * @param rq Run queue to pick a thread from.
+ *
+ * A new thread is selected for execution using a pseudo random number
+ * generator.
+ */
 static struct thread *lottery_next_runnable(struct rq *rq)
 {
 	unsigned long num;
@@ -214,6 +253,10 @@ try_again:
 #define LOTTERY_POOL_SIZE 20
 #define LOTTERY_RESIZE_SIZE 5
 
+/**
+ * @brief Generate new lottery tickets.
+ * @param num Amount of tickets to generate.
+ */
 static int lottery_generate_tickets(int num)
 {
 	struct lottery_ticket *ticket;
@@ -232,7 +275,10 @@ static int lottery_generate_tickets(int num)
 	return -EOK;
 }
 
-
+/**
+ * @brief Allocate a lottery ticket.
+ * @return The allocated lottery ticket.
+ */
 static struct lottery_ticket *lottery_take_ticket(void)
 {
 	struct list_head *ticket_entry;
@@ -246,6 +292,9 @@ static struct lottery_ticket *lottery_take_ticket(void)
 	return list_entry(ticket_entry, struct lottery_ticket, list);
 }
 
+/**
+ * @brief Initialise the lottery scheduler
+ */
 static void lottery_init(void)
 {
 	struct lottery_ticket *ticket;
@@ -280,3 +329,4 @@ struct sched_class lottery_class = {
 };
 
 /** @} */
+
