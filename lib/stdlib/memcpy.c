@@ -17,6 +17,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/stdlib.h>
@@ -26,10 +31,11 @@ typedef long word;      /* "word" used for optimal copy speed */
 #define wsize   sizeof(word)
 #define wmask   (wsize - 1)
 
-/*
- * Copy a block of memory, handling overlap.
- * This is the routine that actually implements
- * (the portable versions of) bcopy, memcpy, and memmove.
+/**
+ * @brief Copy a memory region to another region.
+ * @param dst0 Destination region.
+ * @param src0 Source region.
+ * @param length Number of bytes to copy.
  */
 void *memcpy(void *dst0, const void *src0, size_t length)
 {
@@ -90,4 +96,6 @@ void *memcpy(void *dst0, const void *src0, size_t length)
 done:
 	return dst0;
 }
+
+/** @} */
 
