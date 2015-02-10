@@ -20,6 +20,11 @@
 #define __MATH_H__
 
 /**
+ * @addtogroup math
+ * @{
+ */
+
+/**
  * @brief Rounds __x to the nearest integer.
  * @param __x Floating point number to round.
  */
@@ -91,6 +96,8 @@ extern double log10(double __x);
  * @param __x Number to compute the exponential value for.
  */
 extern double exp(double __x);
+
+/** @} */
 
 #endif
 
