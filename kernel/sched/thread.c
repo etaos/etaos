@@ -67,6 +67,9 @@ static void raw_thread_init(struct thread *tp, const char *name,
 #ifdef CONFIG_DYN_PRIO
 	tp->dprio = 0;
 #endif
+#ifdef CONFIG_SYS_LOTTERY
+	list_head_init(&tp->se.tickets);
+#endif
 
 	sched_create_stack_frame(tp, stack, stack_size, handle);
 
@@ -137,13 +140,19 @@ int thread_initialise(struct thread *tp, const char *name,
 void kill(void)
 {
 	struct thread *tp;
+	struct sched_class *class;
 
 	tp = current_thread();
+	class = tp->rq->sched_class;
 
 	set_bit(THREAD_EXIT_FLAG, &tp->flags);
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	thread_add_to_kill_q(tp);
+	
+	if(class->kill)
+		class->kill(tp);
+
 	schedule();
 }
 

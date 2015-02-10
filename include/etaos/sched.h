@@ -58,6 +58,11 @@ struct sched_class {
 	 * @brief Initialise the scheduling class.
 	 */
 	void (*init)(void);
+	/**
+	 * @brief Kill a given thread.
+	 * @param tp Thread which is going to be killed.
+	 */
+	void (*kill)(struct thread *tp);
 	/** 
 	 * @brief Post schedule.
 	 * @param rq RQ which has just received a schedule call.

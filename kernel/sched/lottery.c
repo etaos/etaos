@@ -23,11 +23,15 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
+#include <etaos/math.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/sched.h>
 #include <etaos/thread.h>
 #include <etaos/mem.h>
+#include <etaos/list.h>
+
+static struct lottery_ticket *lottery_take_ticket(void);
 
 static void lottery_insert_thread(struct thread *volatile*tpp, 
 		struct thread *tp)
@@ -46,12 +50,11 @@ static void lottery_insert_thread(struct thread *volatile*tpp,
 		tp->ec++;
 #endif
 	} else if(thread) {
-		while(thread) {
+		while(thread && prio(thread) <= prio(tp)) {
 			tpp = &thread->se.next;
 			thread = thread->se.next;
 		}
 	}
-
 	tp->se.next = thread;
 	*tpp = tp;
 #ifdef CONFIG_EVENT_MUTEX
@@ -96,8 +99,35 @@ static int lottery_rm_thread(struct thread *volatile*tpp, struct thread *tp)
 	return efifo;
 }
 
+struct lottery_pool_head {
+	struct list_head tickets;
+	unsigned long num;
+};
+
 static void lottery_add_thread(struct rq *rq, struct thread *tp)
 {
+	struct lottery_ticket *ticket;
+	double tickets;
+	unsigned int idx, _tickets;
+
+	/* check if the thread has tickets assigned yet */
+	if(list_empty(&tp->se.tickets)) {
+		if(tp->prio < 250) {
+			tickets = -0.04;
+			tickets *= tp->prio;
+			tickets += 10;
+		} else {
+			tickets = 1;
+		}
+
+		_tickets = (unsigned int)round(tickets);
+
+		for(idx = 0; idx < _tickets; idx++) {
+			ticket = lottery_take_ticket();
+			list_add(&ticket->list, &tp->se.tickets);
+		}
+	}
+
 	rq->num++;
 	lottery_insert_thread(&rq->rr_rq.run_queue, tp);
 }
@@ -108,6 +138,28 @@ static int lottery_remove_thread(struct rq *rq, struct thread *tp)
 	return lottery_rm_thread(&rq->rr_rq.run_queue, tp);
 }
 
+static struct lottery_pool_head lottery_tickets = {
+	.tickets = STATIC_INIT_LIST_HEAD(lottery_tickets.tickets),
+	.num = 0,
+};
+
+static void lottery_return_ticket(struct lottery_ticket *ticket)
+{
+	list_del(&ticket->list);
+	list_add(&ticket->list, &lottery_tickets.tickets);
+}
+
+static void lottery_kill_thread(struct thread *tp)
+{
+	struct list_head *carriage, *tmp;
+	struct lottery_ticket *ticket;
+
+	list_for_each_safe(carriage, tmp, &tp->se.tickets) {
+		ticket = list_entry(carriage, struct lottery_ticket, list);
+		lottery_return_ticket(ticket);
+	}
+}
+
 static struct thread *lottery_thread_after(struct thread *tp)
 {
 	if(tp)
@@ -116,66 +168,108 @@ static struct thread *lottery_thread_after(struct thread *tp)
 		return NULL;
 }
 
-static struct thread *lottery_next_runnable(struct rq *rq)
+static inline bool lottery_single_thread_available(struct rq *rq)
 {
-	return NULL;
+	struct thread *tp;
+
+	tp = rq->rr_rq.run_queue;
+	if(tp) {
+		if(tp->se.next)
+			return false;
+	}
+
+	return true;
 }
 
-struct lottery_ticket_pool {
+static struct thread *lottery_next_runnable(struct rq *rq)
+{
 	unsigned long num;
-	long *tickets;
-};
+	struct thread *runnable;
+	struct list_head *carriage;
+	struct lottery_ticket *_ticket;
 
-static struct lottery_ticket_pool lottery_pool = {
-	.num = 0,
-	.tickets = NULL,
-};
+	if(lottery_single_thread_available(rq))
+		return rq->rr_rq.run_queue;
+
+try_again:
+	num = random_m(lottery_tickets.num);
+
+	for(runnable = rq->rr_rq.run_queue; runnable; 
+			runnable = runnable->se.next) {
+		list_for_each(carriage, &runnable->se.tickets) {
+			_ticket = list_entry(carriage, struct lottery_ticket,
+					list);
+			if(_ticket->ticket == num) {
+				return runnable;
+			}
+		}
+	}
+
+	if(rq->num > 0)
+		goto try_again;
+
+	return NULL;
+}
 
 #define LOTTERY_POOL_SIZE 20
 #define LOTTERY_RESIZE_SIZE 5
 
-static void lottery_realloc_pool(int resize)
+static int lottery_generate_tickets(int num)
 {
+	struct lottery_ticket *ticket;
+	int idx = 0;
+
+	for(; idx < num; idx++) {
+		ticket = kzalloc(sizeof(*ticket));
+		if(!ticket)
+			return -ENOMEM;
+
+		ticket->ticket = lottery_tickets.num;
+		lottery_tickets.num++;
+		list_add(&ticket->list, &lottery_tickets.tickets);
+	}
+
+	return -EOK;
 }
 
-static unsigned short lottery_take_ticket(void)
+
+static struct lottery_ticket *lottery_take_ticket(void)
 {
-	unsigned short val = -1;
-	unsigned long idx;
+	struct list_head *ticket_entry;
 
-	for(idx = 0; idx < lottery_pool.num; idx++) {
-		if(lottery_pool.tickets[idx] < 0)
-			continue;
-		val = lottery_pool.tickets[idx] & 0xFFFF;
-		lottery_pool.tickets[idx] = -1;
+	if(list_empty(&lottery_tickets.tickets)) {
+		lottery_generate_tickets(LOTTERY_RESIZE_SIZE);
 	}
 
-	if(val == -1) {
-		lottery_realloc_pool(LOTTERY_RESIZE_SIZE);
-		val = lottery_pool.tickets[idx] & 0xFFFF;
-		lottery_pool.tickets[idx] = -1;
-	}
-
-	return val;
+	ticket_entry = lottery_tickets.tickets.next;
+	list_del(ticket_entry);
+	return list_entry(ticket_entry, struct lottery_ticket, list);
 }
 
 static void lottery_init(void)
 {
-	char i;
+	struct lottery_ticket *ticket;
+	int idx = 0;
 
-	lottery_pool.num = LOTTERY_POOL_SIZE;
-	lottery_pool.tickets = kzalloc(sizeof(long)*LOTTERY_POOL_SIZE);
+	for(; idx < LOTTERY_POOL_SIZE; idx++) {
+		ticket = kzalloc(sizeof(*ticket));
+		if(!ticket)
+			return;
 
-	for(i = 0; i < LOTTERY_POOL_SIZE; i++) {
-		lottery_pool.tickets[i] = i;
+		ticket->ticket = idx;
+		list_add(&ticket->list, &lottery_tickets.tickets);
 	}
+
+	lottery_tickets.num = LOTTERY_POOL_SIZE;
+	return;
 }
 
 /**
- * @brief FIFO scheduling class.
+ * @brief Lottery scheduling class.
  */
 struct sched_class lottery_class = {
 	.init = &lottery_init,
+	.kill = &lottery_kill_thread,
 	.rm_thread = &lottery_remove_thread,
 	.add_thread = &lottery_add_thread,
 	.next_runnable = &lottery_next_runnable,

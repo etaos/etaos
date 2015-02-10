@@ -85,10 +85,12 @@ typedef void (*thread_handle_t)(void *arg);
 static void fn(void * param); \
 static void fn(void *param)
 
+#ifdef CONFIG_LOTTERY
 struct lottery_ticket {
-	unsigned short num;
 	struct list_head list;
+	unsigned short ticket;
 };
+#endif
 
 /**
  * @struct rr_entity
@@ -96,10 +98,7 @@ struct lottery_ticket {
  */
 struct rr_entity {
 	struct thread *next; //!< List entry pointer.
-#ifdef CONIFG_LOTTERY
-	unsigned char num;
-	unsigned short *tickets;
-#endif
+	struct list_head tickets;
 };
 
 #ifdef CONFIG_THREAD_QUEUE

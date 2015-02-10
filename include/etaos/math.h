@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - ETA/OS stdlib header
- *  Copyright (C) 2014, 2015   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - Math functions
+ *  Copyright (C) 2015  Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __STDLIB_H__
-#define __STDLIB_H__
+#ifndef __MATH_H__
+#define __MATH_H__
 
-extern void srand(uint32_t seed);
-extern uint32_t random_m(uint32_t max);
-extern uint32_t random(void);
-extern uint32_t random_r(uint32_t *sptr, uint32_t max);
+extern double round(double __x);
 
-extern void *memcpy(void *dst, const void *src, size_t length);
-
-#endif /* __STDLIB_H__ */
+#endif
