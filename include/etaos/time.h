@@ -98,6 +98,11 @@ struct timer {
  */
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
+/**
+ * @def cs_last_update
+ * @brief Get the system tick of the last moment \p __cs was updated.
+ * @param __cs Clocksource to get the last update timestamp from.
+ */
 #define cs_last_update(__cs) (__cs)->tc_update
 
 CDECL
