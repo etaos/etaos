@@ -1,0 +1,10 @@
+/**
+  @page contrib Contributing to ETA/OS
+  @tableofcontents
+
+  @section cs Coding style
+  @section patches Patches
+  @subsection cre-patch Creating patches
+  @subsection snt-patch Sending patches
+*/
+
