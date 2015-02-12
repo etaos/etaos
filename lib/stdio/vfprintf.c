@@ -21,6 +21,7 @@
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/types.h>
+#include <etaos/preempt.h>
 
 /**
  * @addtogroup libc
@@ -147,6 +148,7 @@ int vfprintf(FILE stream, const char *fmt, va_list ap)
 	size_t i;
 	uint32_t uval;
 
+	preempt_disable();
 	for(i = 0; fmt[i] != '\0'; i++) {
 		if(fmt[i] != '%') {
 			putc(fmt[i], stream);
@@ -204,6 +206,7 @@ int vfprintf(FILE stream, const char *fmt, va_list ap)
 			}
 		}
 	}
+	preempt_enable();
 
 	return stream->length;
 }
