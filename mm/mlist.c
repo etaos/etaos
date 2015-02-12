@@ -81,7 +81,7 @@ size_t mm_heap_available(void)
 	struct heap_node *c;
 	size_t total;
 	
-	spin_lock(&mlock);
+	raw_spin_lock(&mlock);
 	c = mm_head;
 	total = 0;
 	
@@ -90,7 +90,7 @@ size_t mm_heap_available(void)
 		c = c->next;
 	}
 
-	spin_unlock(&mlock);
+	raw_spin_unlock(&mlock);
 
 #ifdef CONFIG_MMDEBUG
 	printf("Mem avail: %u\n", total);
