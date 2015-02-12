@@ -978,7 +978,7 @@ bool preempt_should_resched(void)
 
 	rq = tp->rq;
 	diff = tm_get_tick(rq->source);
-	diff -= rq->source->tc_update;
+	diff -= cs_last_update(rq->source);
 
 	if(diff > tp->slice) {
 		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
