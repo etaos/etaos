@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - FIFO sched class
- *  Copyright (C) 2014, 2015  Michel Megens
+ *  Copyright (C) 2014, 2015  Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -134,6 +134,7 @@ static void fifo_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
  */
 static void fifo_add_thread(struct rq *rq, struct thread *tp)
 {
+	rq->num++;
 	fifo_queue_insert(&rq->rr_rq.run_queue, tp);
 }
 
@@ -146,6 +147,7 @@ static void fifo_add_thread(struct rq *rq, struct thread *tp)
  */
 static int fifo_rm_thread(struct rq *rq, struct thread *tp)
 {
+	rq->num--;
 	return fifo_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 
@@ -190,6 +192,7 @@ static struct thread *fifo_thread_after(struct thread *tp)
  * @brief FIFO scheduling class.
  */
 struct sched_class fifo_class = {
+	.init = NULL,
 	.rm_thread = &fifo_rm_thread,
 	.add_thread = &fifo_add_thread,
 	.next_runnable = &fifo_next_runnable,

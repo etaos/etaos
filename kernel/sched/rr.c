@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Round robin sched class
- *  Copyright (C) 2014, 2015  Michel Megens
+ *  Copyright (C) 2014, 2015  Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -133,6 +133,7 @@ static void rr_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
  */
 static void rr_add_thread(struct rq *rq, struct thread *tp)
 {
+	rq->num++;
 	rr_queue_insert(&rq->rr_rq.run_queue, tp);
 }
 
@@ -145,6 +146,7 @@ static void rr_add_thread(struct rq *rq, struct thread *tp)
  */
 static int rr_rm_thread(struct rq *rq, struct thread *tp)
 {
+	rq->num--;
 	return rr_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 
@@ -189,15 +191,20 @@ static struct thread *rr_thread_after(struct thread *tp)
 /**
  * @brief Update the dynamic prio of all threads in the run queue.
  * @param rq Run queue which has to be updated.
+ * @param num Numeral value that is added to struct thread::dprio.
  */
-static void rr_update_dyn_prio(struct rq *rq)
+static void rr_update_dyn_prio(struct rq *rq, int num)
 {
 	struct thread *walker;
 
 	walker = rq->rr_rq.run_queue;
 
 	while(walker) {
-		walker->dprio += 1;
+		if((walker->dprio + num) > walker->prio)
+			walker->dprio = walker->prio;
+		else
+			walker->dprio += num;
+
 		walker = walker->se.next;
 	}
 }
@@ -207,6 +214,7 @@ static void rr_update_dyn_prio(struct rq *rq)
  * @brief Round robin scheduling class.
  */
 struct sched_class rr_class = {
+	.init = NULL,
 	.rm_thread = &rr_rm_thread,
 	.add_thread = &rr_add_thread,
 	.next_runnable = &rr_next_runnable,
