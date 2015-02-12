@@ -31,7 +31,9 @@ LDFLAGS_etaos += --gc-sections --whole-archive
 softfloat-$(CONFIG_LIBFLT) = -lflt
 
 ifneq ($(NOLIBGCC),1)
+ifneq ($(MCU),)
 LIB_GCC = $(dir $(shell $(CC) $(KBUILD_CFLAGS) --print-libgcc-file-name))
+endif
 ETAOS_EXTRA_LIBS += -L$(LIB_GCC) --no-whole-archive \
 		    --start-group -lgcc $(softfloat-m) --end-group
 export ETAOS_EXTRA_LIBS

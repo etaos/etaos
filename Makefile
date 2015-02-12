@@ -9,6 +9,12 @@ EXTRAVERSION =
 NAME = Fiery Desert Rose
 
 MAKEFLAGS += -rR --no-print-directory
+
+boards := $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*_defconfig)
+boards := $(sort $(notdir $(boards)))
+board-dirs := $(dir $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*/*_defconfig))
+board-dirs := $(sort $(notdir $(board-dirs:/=)))
+
 # DO NOT make these files show up anywhere. For your own safety.
 export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
 			  -name CVS -o -name .pc -o -name .hg -o -name .git \) \
@@ -65,7 +71,7 @@ ifeq ($(MAKECMDGOALS),prepare)
 	NOLIBGCC := 1
 endif
 
-ifneq ($(filter config menuconfig xconfig gconfig nconfig oldconfig \
+ifneq ($(filter $(boards) config menuconfig xconfig gconfig nconfig oldconfig \
 	silentoldconfig, $(MAKECMDGOALS)),)
 	NOLIBGCC := 1
 endif
@@ -160,6 +166,7 @@ DEPMOD		= /sbin/depmod
 PERL		= perl
 CHECK		= sparse
 
+KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
 export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
 export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC CXX
 export CPP AR NM STRIP OBJCOPY OBJDUMP
@@ -168,6 +175,9 @@ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS KBUILD_CHECKSRC
 export LDFLAGS
 export LDFLAGS_etaos
 
+PHONY += version
+version:
+	@echo $(KERNELVERSION)
 
 PHONY += headers_install
 # header install
@@ -275,6 +285,7 @@ quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
 quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
       cmd_rmfiles = rm -f $(rm-files)
 
+
 help:
 	@echo 'Cleaning targets:'
 	@echo '  clean            - Remove most generated build files but keep the config and'
@@ -290,16 +301,24 @@ help:
 	@echo '* modules          - Build all modules'
 	@echo '* modules_install  - Install modules to INSTALL_MOD_PATH/etaos (default: /etaos)'
 	@echo '  version          - Output the ETA/OS version'
+	@echo '  help             - Print this help text'
 	@echo ''
 	@echo 'Architecture specific targets ($(SRCARCH)):'
 	@echo ''
 	@$(if $(archhelp),$(archhelp), \
 		echo '  No architecture specific help defined for $(SRCARCH)')
 	@echo ''
-	@echo 'Use CROSS_COMPILE to configure for cross compiling (if not'
-	@echo 'done so using kconfig.'
-	@echo 'Execute `make\' or `make all\' to build all targets marked with'
-	@echo '[*]'
+	@$(if $(boards), \
+		$(foreach b, $(boards), \
+		printf "  %-24s - Build for %s\\n" $(b) $(subst _defconfig,,$(b));) \
+		echo '')
+	@$(if $(board-dirs), \
+		$(foreach b, $(board-dirs), \
+		printf "  %-16s - Show %s-specific targets\\n" help-$(b) $(b);) \
+		printf "  %-16s - Show all of the above\\n" help-boards; \
+		echo '')
+	@echo 'Use CROSS_COMPILE to configure for cross compiling (if not done so using kconfig).'
+	@echo 'Execute "make" or "make all" to build all targets marked with [*].'
 
 
 
