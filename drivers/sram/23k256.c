@@ -32,6 +32,8 @@
 #include <etaos/mem.h>
 #include <etaos/init.h>
 
+#include <etaos/sram/23k256.h>
+
 #define WRSR 0x1
 #define RDSR 0x5
 

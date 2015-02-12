@@ -17,7 +17,8 @@
 #include <etaos/gpio.h>
 #include <etaos/platform.h>
 #include <etaos/ipm.h>
-#include <etaos/23k256.h>
+
+#include <etaos/sram/23k256.h>
 
 static void *test_stack;
 static uint8_t test_stack2[CONFIG_STACK_SIZE];
