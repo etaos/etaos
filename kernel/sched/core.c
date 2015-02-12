@@ -827,9 +827,8 @@ resched:
 	}
 
 	preempt_enable_no_resched();
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags)) {
+	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
 		goto resched;
-	}
 
 	rq_destroy_kill_q(rq);
 #ifdef CONFIG_DYN_PRIO
