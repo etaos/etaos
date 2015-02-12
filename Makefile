@@ -275,6 +275,34 @@ quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
 quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
       cmd_rmfiles = rm -f $(rm-files)
 
+help:
+	@echo 'Cleaning targets:'
+	@echo '  clean            - Remove most generated build files but keep the config and'
+	@echo '                     enough to rebuild ETA/OS.'
+	@echo '  mrproper         - Remove all generated files + config files.'
+	@echo ''
+	@echo 'Configuration targets:'
+	@$(MAKE) -f $(srctree)/scripts/kconfig/Makefile help
+	@echo ''
+	@echo 'Other generic targets:'
+	@echo '  all              - Build all targets marked with [*]'
+	@echo '* etaos-img        - Build the bare ETA/OS kernel.'
+	@echo '* modules          - Build all modules'
+	@echo '* modules_install  - Install modules to INSTALL_MOD_PATH/etaos (default: /etaos)'
+	@echo '  version          - Output the ETA/OS version'
+	@echo ''
+	@echo 'Architecture specific targets ($(SRCARCH)):'
+	@echo ''
+	@$(if $(archhelp),$(archhelp), \
+		echo '  No architecture specific help defined for $(SRCARCH)')
+	@echo ''
+	@echo 'Use CROSS_COMPILE to configure for cross compiling (if not'
+	@echo 'done so using kconfig.'
+	@echo 'Execute `make\' or `make all\' to build all targets marked with'
+	@echo '[*]'
+
+
+
 ifeq ($(KBUILD_EXTMOD),)
 # Shorthand for $(Q)$(MAKE) -f scripts/Makefile.clean obj=dir
 # Usage:
@@ -325,8 +353,6 @@ endif
 
 PHONY += FORCE
 FORCE:
-
-
 
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
