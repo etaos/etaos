@@ -267,17 +267,26 @@ all: etaos modules
 # mrproper - Delete all generated files, including .config
 #
 
+quiet_cmd_mrproper_files = CLEAN   $(mrproper-rmfiles)
+      cmd_mrproper_files = rm -f $(mrproper-rmfiles)
 quiet_cmd_mrproper_dirs = CLEAN   $(mrproper-rmdirs)
       cmd_mrproper_dirs = rm -rf $(mrproper-rmdirs)
-mrproper-dirs      := $(addprefix _mrproper_,scripts)
-mrproper-rmdirs += include/config include/generated
 
-PHONY += $(mrproper-dirs) mrproper
+mrproper-dirs      := $(addprefix _mrproper_,scripts)
+mrproper-rmdirs += include/config include/generated Documentation/html
+mrproper-files   := $(addprefix _mrproper_,.config)
+mrproper-rmfiles := .config .config.old
+
+PHONY += $(mrproper-dirs) $(mrproper-rmfiles) mrproper
+
 $(mrproper-dirs):
 	$(call cmd,mrproper_dirs)
 	$(Q)$(MAKE) $(clean)=$(patsubst _mrproper_%,%,$@)
 
-mrproper: clean $(mrproper-dirs)
+$(mrproper-files):
+	$(call cmd,mrproper_files)
+
+mrproper: clean $(mrproper-dirs) $(mrproper-files)
 
 quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
       cmd_rmdirs = rm -rf $(rm-dirs)
