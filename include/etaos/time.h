@@ -103,7 +103,7 @@ struct timer {
  * @brief Get the system tick of the last moment \p __cs was updated.
  * @param __cs Clocksource to get the last update timestamp from.
  */
-#define cs_last_update(__cs) (__cs)->tc_update
+#define cs_last_update(__cs) __cs->tc_update
 
 CDECL
 /**
