@@ -29,7 +29,7 @@ int ee_stress_write_byte(uint8_t addr, uint8_t byte)
 	}
 
 	/* needs a 10ms delay before the next write can occur */
-	delay(1);
+	delay(10);
 	return rc;
 }
 
