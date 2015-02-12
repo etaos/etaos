@@ -16,9 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/mem.h>
 
+/**
+ * @brief Allocate memory for an array.
+ * @param num Number elements in the array.
+ * @param size Size of a single element.
+ * @return A pointer to the allocated space, or a NULL pointer if there is
+ *         not a sufficient consecutive memory region.
+ */
 void *calloc(size_t num, size_t size)
 {
 	void *rv;
@@ -27,3 +39,6 @@ void *calloc(size_t num, size_t size)
 	rv = kzalloc(size);
 	return rv;
 }
+
+/** @} */
+
