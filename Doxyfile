@@ -744,27 +744,28 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = . \
-                         Documentation/fs.txt \
-                         Documentation/irq.txt \
-                         Documentation/libc.txt \
-                         Documentation/mem.txt \
-                         Documentation/sched.txt \
-                         Documentation/timer.txt \
-                         Documentation/device-core.txt \
-                         Documentation/kernel.txt \
                          Documentation/arch/avr.txt \
-                         Documentation/eeprom/24c02.txt \
-                         Documentation/eeprom/eeprom.txt \
-                         Documentation/gpio/atmega.txt \
-                         Documentation/gpio/gpio.txt \
-                         Documentation/i2c/atmega.txt \
-                         Documentation/i2c/i2c.txt \
-                         Documentation/usart/atmega.txt \
-                         Documentation/usart/usart.txt \
-                         Documentation/spi/atmega.txt \
-                         Documentation/spi/spi.txt \
-                         Documentation/sram/23k256.txt \
-                         Documentation/sram/sram.txt \
+                         Documentation/fs/fs.txt \
+                         Documentation/mm/mem.txt \
+                         Documentation/kernel/irq.txt \
+                         Documentation/kernel/libc.txt \
+                         Documentation/kernel/sched.txt \
+                         Documentation/kernel/timer.txt \
+                         Documentation/kernel/kernel.txt \
+                         Documentation/drivers/eeprom/24c02.txt \
+                         Documentation/drivers/device-core.txt \
+                         Documentation/drivers/eeprom/eeprom.txt \
+                         Documentation/drivers/gpio/atmega.txt \
+                         Documentation/drivers/gpio/gpio.txt \
+                         Documentation/drivers/i2c/atmega.txt \
+                         Documentation/drivers/i2c/i2c.txt \
+                         Documentation/drivers/usart/atmega.txt \
+                         Documentation/drivers/usart/usart.txt \
+                         Documentation/drivers/spi/atmega.txt \
+                         Documentation/drivers/spi/spi.txt \
+                         Documentation/drivers/sram/23k256.txt \
+                         Documentation/drivers/sram/sram.txt \
+                         Documentation/generic/contributing.txt \
                          Documentation/generic/copying.txt
 
 # This tag can be used to specify the character encoding of the source files
