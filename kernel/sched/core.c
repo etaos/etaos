@@ -967,6 +967,8 @@ void sched_yield(struct rq *rq)
  * @note The difference between should_resched and preempt_should_resched is
  * is that should_resched only checks if THREAD_NEED_RESCHED_FLAG is set,
  * preempt_should_resched also checks if the timeslice has expired.
+ * @retval true if the system should reschedule.
+ * @retval false if the system doesn't need to reschedule.
  */
 bool preempt_should_resched(void)
 {
