@@ -120,6 +120,7 @@ static inline void preempt_disable(void)
 
 #else /* !CONFIG_PREEMPT */
 
+#define preempt_should_resched()
 #define __preempt_add(_i)
 #define __preempt_sub(_i)
 #define preempt_counter_ptr()

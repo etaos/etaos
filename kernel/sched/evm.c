@@ -32,6 +32,7 @@
 #include <etaos/bitops.h>
 #include <etaos/time.h>
 #include <etaos/spinlock.h>
+#include <etaos/preempt.h>
 
 /**
  * @brief Signal the queue head of a thread_queue.
@@ -58,6 +59,7 @@ static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 
 	if(rq->current != tp) {
 		rq_add_thread(rq, tp);
+		preempt_should_resched();
 		if(prio(tp) <= prio(rq->current))
 			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
 	} else {
@@ -202,3 +204,4 @@ void evm_signal_from_irq(struct thread_queue *qp)
 }
 
 /* @} */
+
