@@ -958,6 +958,32 @@ void sched_yield(struct rq *rq)
 	return;
 }
 
+#ifdef CONFIG_PREEMPT
+/**
+ * @brief Check if the current thread should be rescheduled.
+ * @note The difference between should_resched and preempt_should_resched is
+ * is that should_resched only checks if THREAD_NEED_RESCHED_FLAG is set,
+ * preempt_should_resched also checks if the timeslice has expired.
+ */
+bool preempt_should_resched(void)
+{
+	struct rq *rq;
+	unsigned int diff;
+	struct thread *tp = current_thread();
+
+	rq = tp->rq;
+	diff = tm_get_tick(rq->source);
+	diff -= rq->source->tc_update;
+
+	if(diff > tp->slice) {
+		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+		return true;
+	}
+
+	return false;
+}
+#endif
+
 /**
  * @brief Check if a reschedule is needed.
  * @return True or false based on whether a resched is needed or not.

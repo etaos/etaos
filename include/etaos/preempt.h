@@ -50,6 +50,7 @@ extern void __preempt_sub(int num);
  */
 extern int *preempt_counter_ptr(void);
 extern bool should_resched(void);
+extern bool preempt_should_resched(void);
 
 /**
  * @def preempt_count_inc
@@ -75,7 +76,7 @@ extern bool should_resched(void);
  */
 static inline int preempt_dec_and_test(void)
 {
-	return !--*preempt_counter_ptr() && should_resched();
+	return !--*preempt_counter_ptr() && preempt_should_resched();
 }
 
 /**

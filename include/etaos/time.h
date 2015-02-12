@@ -98,6 +98,8 @@ struct timer {
  */
 #define TIMER_ONESHOT_MASK (1<<TIMER_ONESHOT_FLAG)
 
+#define cs_last_update(__cs) (__cs)->tc_update
+
 CDECL
 /**
  * @brief Get the tick count from a clock source.
