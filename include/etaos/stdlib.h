@@ -25,5 +25,6 @@ extern uint32_t random(void);
 extern uint32_t random_r(uint32_t *sptr, uint32_t max);
 
 extern void *memcpy(void *dst, const void *src, size_t length);
+extern int   memcmp(const void *r1, const void *r2, size_t nbytes);
 
 #endif /* __STDLIB_H__ */
