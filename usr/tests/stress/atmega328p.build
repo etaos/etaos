@@ -1,4 +1,0 @@
-MCU=atmega328p
-PROGRAMMER=arduino
-BAUD=115200
-PORT=/dev/ttyACM0
