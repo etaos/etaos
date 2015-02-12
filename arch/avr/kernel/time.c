@@ -91,6 +91,7 @@ static void __used avr_timer_init(void)
 		: "0" (__count) \
 	);
 
+#ifdef CONFIG_DELAY_US
 void arch_delay_us(double __us)
 {
 	double __tmp;
@@ -115,6 +116,7 @@ void arch_delay_us(double __us)
 
 	delay_loop(__ticks);
 }
+#endif
 
 subsys_init(avr_timer_init);
 

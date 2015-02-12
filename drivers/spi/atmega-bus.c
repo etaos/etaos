@@ -18,7 +18,7 @@
 
 /**
  * @file spi/atmega-bus.c
- * @addtogroup atmega-spi
+ * @addtogroup spi-atmega
  * @{
  */
 

@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC random number generation
- *  Copyright (C) 2015   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - kfree
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,31 +23,15 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
-#include <etaos/error.h>
+#include <etaos/mem.h>
 
 /**
- * @brief Compare two memory regions.
- * @param r1 Pointer to region 1.
- * @param r2 Pointer to region 2.
- * @param nbytes Number of bytes to compare.
- * @retval Zero if the two regions are equal for \p nbytes number of bytes.
- * @retval The difference between the first two differing bytes.
+ * @brief Free an allocated memory region.
+ * @param ptr Memory region to free.
  */
-int memcmp(const void *r1, const void *r2, size_t nbytes)
+void kfree(void *ptr)
 {
-	const unsigned char *p1, *p2;
-
-	if(nbytes) {
-		p1 = r1;
-		p2 = r2;
-
-		do {
-			if(*p1++ != *p2++)
-				return (*--p1 - *--p2);
-		} while(--nbytes);
-	}
-
-	return -EOK;
+	mm_kfree(ptr);
 }
 
 /** @} */

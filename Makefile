@@ -2,11 +2,11 @@
 # ETA/OS root Makefile
 #
 
-VERSION = 3
-PATCHLEVEL = 2
-SUBLEVEL = 0
+VERSION = 4
+PATCHLEVEL = 0
+SUBLEVEL = 1
 EXTRAVERSION =
-NAME = Blazing Flower Power
+NAME = Fiery Desert Rose
 
 MAKEFLAGS += -rR --no-print-directory
 # DO NOT make these files show up anywhere. For your own safety.

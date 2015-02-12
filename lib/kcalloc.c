@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC random number generation
- *  Copyright (C) 2015   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - calloc
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,32 +22,22 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/stdlib.h>
-#include <etaos/error.h>
+#include <etaos/mem.h>
 
 /**
- * @brief Compare two memory regions.
- * @param r1 Pointer to region 1.
- * @param r2 Pointer to region 2.
- * @param nbytes Number of bytes to compare.
- * @retval Zero if the two regions are equal for \p nbytes number of bytes.
- * @retval The difference between the first two differing bytes.
+ * @brief Allocate memory for an array.
+ * @param num Number elements in the array.
+ * @param size Size of a single element.
+ * @return A pointer to the allocated space, or a NULL pointer if there is
+ *         not a sufficient consecutive memory region.
  */
-int memcmp(const void *r1, const void *r2, size_t nbytes)
+void *calloc(size_t num, size_t size)
 {
-	const unsigned char *p1, *p2;
+	void *rv;
 
-	if(nbytes) {
-		p1 = r1;
-		p2 = r2;
-
-		do {
-			if(*p1++ != *p2++)
-				return (*--p1 - *--p2);
-		} while(--nbytes);
-	}
-
-	return -EOK;
+	size = size * num;
+	rv = kzalloc(size);
+	return rv;
 }
 
 /** @} */

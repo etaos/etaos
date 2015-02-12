@@ -82,6 +82,22 @@
  */
 
 /**
+ * @defgroup lottery Lottery scheduler
+ * @ingroup sched
+ * @brief Probabilistic lottery scheduling.
+ *
+ * The lottery scheduling algorithm is a probabilistic scheduling algorithm.
+ * Threads are assigned one or more lottery tickets, and the scheduler will
+ * draw a random ticket to select a new thread for execution. The distribution
+ * of tickets does not need to be uniform; granting a process more tickets
+ * provides it a relative higher chance of execution. A user based priority is
+ * transformed into a ticket number using the following function: \n
+ * 
+ * \f$f(x) = \frac{1}{25}x+10\f$ \n
+ * where \f$x\f$ is the priority assigned by a user.
+ */
+
+/**
  * @defgroup evm Event management
  * @ingroup kernel
  * @brief ETA/OS thread synchronisation.

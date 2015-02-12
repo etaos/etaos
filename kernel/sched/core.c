@@ -774,6 +774,7 @@ static void sched_do_signal_threads(struct rq *rq)
  * 	   - threads which have used up their time slice;
  * 	   - the kill queue of the run queue;
  * 	   - irq threads which have to be woken up.
+ * @see schedule sched_yield
  *
  * struct rq::lock will be locked (and unlocked).
  */
@@ -826,9 +827,8 @@ resched:
 	}
 
 	preempt_enable_no_resched();
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags)) {
+	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
 		goto resched;
-	}
 
 	rq_destroy_kill_q(rq);
 #ifdef CONFIG_DYN_PRIO

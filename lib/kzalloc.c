@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC random number generation
- *  Copyright (C) 2015   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - Zero alloc
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,32 +23,43 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
-#include <etaos/error.h>
+#include <etaos/mem.h>
 
+#if defined(CONFIG_STRING) || defined(CONFIG_STRING_MODULE)
+#include <etaos/string.h>
 /**
- * @brief Compare two memory regions.
- * @param r1 Pointer to region 1.
- * @param r2 Pointer to region 2.
- * @param nbytes Number of bytes to compare.
- * @retval Zero if the two regions are equal for \p nbytes number of bytes.
- * @retval The difference between the first two differing bytes.
+ * @brief Allocate a memory regeion.
+ * @param size Size of the region.
+ *
+ * The content of the allocated region will be set to 0.
  */
-int memcmp(const void *r1, const void *r2, size_t nbytes)
+void *kzalloc(size_t size)
 {
-	const unsigned char *p1, *p2;
+	void *data;
 
-	if(nbytes) {
-		p1 = r1;
-		p2 = r2;
+	data = mm_alloc(size);
+	if(data)
+		memset(data, 0, size);
 
-		do {
-			if(*p1++ != *p2++)
-				return (*--p1 - *--p2);
-		} while(--nbytes);
-	}
-
-	return -EOK;
+	return data;
 }
+#else
+void *kzalloc(size_t size)
+{
+	void *data;
+	volatile unsigned char *ptr;
+
+	data = mm_alloc(size);
+	if(data) {
+		ptr = data;
+		do {
+			*ptr++ = 0;
+		} while(--size);
+	}
+	
+	return data;
+}
+#endif
 
 /** @} */
 
