@@ -11,6 +11,11 @@
  * In this context a thread is a sequence of executing software that can be
  * considered to be logically independent from other software that is running 
  * on the same CPU.
+ *
+ * The thread management API contains all functions which are used to
+ * manipulate the state of the 'current' thread. The current thread is the
+ * context of the thread calling the functions. Notable functions include
+ * but not exclude yield(), sleep(), wait() and signal().
  */
 
 /**
