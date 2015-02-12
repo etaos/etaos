@@ -948,7 +948,10 @@ void sched_yield(struct rq *rq)
 	tp = class->next_runnable(rq);
 	curr = current(rq);
 
-	if(tp != curr) {
+	if(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)) {
+		rq_schedule();
+		return;
+	} else if(tp != curr) {
 		if(prio(tp) <= prio(curr)) {
 			set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
 			rq_schedule();

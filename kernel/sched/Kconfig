@@ -102,6 +102,16 @@ config PREEMPT
 	  the scheduler to preempt the currently running task at
 	  any given moment.
 
+config TIME_SLICE
+	int "Time slice"
+	default 10
+	depends on PREEMPT
+	help
+	  Configure the time slice of threads. The time slice defines
+	  a period of time which threads have to execute a piece of
+	  code. After that time has expired, the system will give another
+	  thread CPU time.
+
 config SCHED_DBG
 	bool "Scheduling DBG"
 	help

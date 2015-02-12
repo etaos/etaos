@@ -35,10 +35,6 @@
 #include <etaos/thread.h>
 #include <etaos/bitops.h>
 
-#ifndef CONFIG_TIME_SLICE
-#define CONFIG_TIME_SLICE 5
-#endif
-
 struct rq;
 struct thread_queue;
 /**
