@@ -71,58 +71,11 @@ extern void mm_heap_add_block(void *start, size_t size);
 extern size_t mm_heap_available(void);
 extern void mm_init(void *start, size_t size);
 
-#if defined(CONFIG_STRING) || defined(CONFIG_STRING_MODULE)
-#include <etaos/string.h>
-/**
- * @brief Allocate a memory regeion.
- * @param size Size of the region.
- *
- * The content of the allocated region will be set to 0.
- */
-static inline void *kzalloc(size_t size)
-{
-	void *data;
+extern void kfree(void *);
+extern void *kzalloc(size_t);
+extern void *kmalloc(size_t);
+extern void *kcalloc(size_t, size_t);
 
-	data = mm_alloc(size);
-	if(data)
-		memset(data, 0, size);
-
-	return data;
-}
-#else
-static inline void *kzalloc(size_t size)
-{
-	void *data;
-	volatile unsigned char *ptr;
-
-	data = mm_alloc(size);
-	if(data) {
-		ptr = data;
-		do {
-			*ptr++ = 0;
-		} while(--size);
-	}
-	
-	return data;
-}
-#endif
-
-/**
- * @brief Allocate a new memory region.
- * @param size Size of the memory region to allocate
- */
-static inline void *kmalloc(size_t size)
-{
-	return mm_alloc(size);
-}
-/**
- * @brief Free an allocated memory region.
- * @param ptr Memory region to free.
- */
-static inline void kfree(void *ptr)
-{
-	mm_kfree(ptr);
-}
 CDECL_END
 
 /** @} */
