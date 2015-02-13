@@ -28,8 +28,17 @@
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
 #include <etaos/init.h>
+#include <etaos/tick.h>
+#include <etaos/thread.h>
+#include <etaos/evm.h>
 
 #include <etaos/eeprom/24c02.h>
+
+#ifdef CONFIG_EVENT_MUTEX
+static DEFINE_THREAD_QUEUE(eeprom_sync);
+#else
+static tick_t last_rw_op = 0;
+#endif
 
 #define BASE_SLA_24C02 0xA0
 #define SCL_FRQ_24C02 100000UL
@@ -64,7 +73,17 @@ int eeprom_24c02_write_byte(unsigned char addr, unsigned char data)
 	int rc;
 	unsigned char tx[] = { addr, data };
 
+#ifdef CONFIG_EVENT_MUTEX
+	evm_wait_event_queue(&eeprom_sync, EVM_WAIT_INFINITE);
+#else
+	while(time_before(sys_tick, last_rw_op+10));
+#endif
 	rc = i2c_master_send(ee_chip.priv, (void*)tx, 2);
+#ifdef CONFIG_EVENT_MUTEX
+	synchronize(&eeprom_sync, 10);
+#else
+	last_rw_op = sys_tick;
+#endif
 
 	return (rc == 2) ? -EOK : rc;
 }
@@ -94,7 +113,17 @@ int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 	msgs[MSG_RX].buff = &rx;
 	set_bit(I2C_RD_FLAG, &msgs[MSG_RX].flags);
 
+#ifdef CONFIG_EVENT_MUTEX
+	evm_wait_event_queue(&eeprom_sync, EVM_WAIT_INFINITE);
+#else
+	while(time_before(sys_tick, last_rw_op+10));
+#endif
 	rc = i2c_bus_xfer(client->bus, msgs, 2);
+#ifdef CONFIG_EVENT_MUTEX
+	synchronize(&eeprom_sync, 10);
+#else
+	last_rw_op = sys_tick;
+#endif
 	*storage = rx;
 	kfree(msgs);
 

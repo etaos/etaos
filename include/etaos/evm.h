@@ -36,6 +36,12 @@ extern void evm_signal_event_queue(struct thread_queue *qp);
 extern int evm_wait_event_queue(struct thread_queue *qp, unsigned ms);
 extern void evm_signal_from_irq(struct thread_queue *qp);
 extern int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms);
+
+static inline void synchronize(struct thread_queue *qp, unsigned ms)
+{
+	sleep(ms);
+	evm_signal_event_queue(qp);
+}
 CDECL_END
 /**
  * @brief Put the thread in in an infinite wait for an event.
