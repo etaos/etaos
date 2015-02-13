@@ -77,7 +77,7 @@ void dev_sync_unlock(struct device *dev, unsigned ms)
 	sleep(ms);
 	evm_signal_event_queue(&syn->qp);
 #else
-	sync->last_rw_op = sys_tick;
+	syn->last_rw_op = sys_tick;
 #endif
 }
 
