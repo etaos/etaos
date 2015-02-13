@@ -29,7 +29,6 @@ int sram_stress_write_byte(uint16_t addr, uint8_t byte)
 	}
 
 	/* needs a 10ms delay before the next write can occur */
-	delay(1);
 	return rc;
 }
 
