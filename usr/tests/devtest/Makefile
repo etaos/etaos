@@ -1,4 +1,4 @@
-ETAOS=/home/michel/workspace/etaos
+ETAOS=$(shell pwd)/../../..
 SIMULAVR=/usr/bin/simulavr
 AVRDUDE=/usr/bin/avrdude
 OBJCOPY=/usr/bin/avr-objcopy
