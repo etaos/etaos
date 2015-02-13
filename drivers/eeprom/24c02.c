@@ -28,11 +28,13 @@
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
 #include <etaos/init.h>
+#include <etaos/device.h>
 
 #include <etaos/eeprom/24c02.h>
 
 #define BASE_SLA_24C02 0xA0
 #define SCL_FRQ_24C02 100000UL
+#define EE_SYNC 10
 
 static int __eeprom_24c02_read_byte(struct eeprom *ee)
 {
@@ -62,9 +64,12 @@ static struct eeprom ee_chip = {
 int eeprom_24c02_write_byte(unsigned char addr, unsigned char data)
 {
 	int rc;
+	struct i2c_client *client = ee_chip.priv;
 	unsigned char tx[] = { addr, data };
 
+	dev_sync_lock(&client->dev, EE_SYNC);
 	rc = i2c_master_send(ee_chip.priv, (void*)tx, 2);
+	dev_sync_unlock(&client->dev, EE_SYNC);
 
 	return (rc == 2) ? -EOK : rc;
 }
@@ -94,7 +99,10 @@ int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 	msgs[MSG_RX].buff = &rx;
 	set_bit(I2C_RD_FLAG, &msgs[MSG_RX].flags);
 
+	dev_sync_lock(&client->dev, EE_SYNC);
 	rc = i2c_bus_xfer(client->bus, msgs, 2);
+	dev_sync_unlock(&client->dev, EE_SYNC);
+
 	*storage = rx;
 	kfree(msgs);
 

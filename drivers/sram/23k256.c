@@ -31,6 +31,7 @@
 #include <etaos/sram.h>
 #include <etaos/mem.h>
 #include <etaos/init.h>
+#include <etaos/device.h>
 
 #include <etaos/sram/23k256.h>
 
@@ -41,6 +42,8 @@
 #define WRDA 0x2
 
 #define HOLD 0x1
+
+#define SRAM_SYNC 1
 
 #define SPI_BYTE_MODE HOLD
 #define SPI_PAGE_MODE HOLD | 0x80
@@ -103,7 +106,9 @@ static int __sram_put(struct sram *ram, int c)
 
 	sram_set_mode(SPI_BYTE_MODE);
 	msg = spi_alloc_msg(write_seq, write_seq, 4);
+	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
 	rv = spi_transfer(&sram_23k256_dev, msg);
+	dev_sync_unlock(&sram_23k256_dev.dev, SRAM_SYNC);
 	spi_free_msg(msg);
 
 	return rv;
@@ -122,7 +127,9 @@ static int __sram_get(struct sram *ram)
 	};
 	struct spi_msg *msg = spi_alloc_msg(read_seq, read_seq, 4);
 
+	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
 	spi_transfer(&sram_23k256_dev, msg);
+	dev_sync_unlock(&sram_23k256_dev.dev, SRAM_SYNC);
 	spi_free_msg(msg);
 
 	return read_seq[3];
