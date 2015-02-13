@@ -27,6 +27,8 @@
 #include <etaos/error.h>
 #include <etaos/mem.h>
 #include <etaos/vfs.h>
+#include <etaos/evm.h>
+#include <etaos/tick.h>
 
 /**
  * @addtogroup dev-core
@@ -53,6 +55,30 @@ static void dev_release(struct device *dev)
 
 	list_del(&dev->devs);
 	kfree(dev);
+}
+
+void dev_sync_lock(struct device *dev, unsigned ms)
+{
+	sync_t *syn = &dev->sync_lock;
+
+#ifdef CONFIG_EVENT_MUTEX
+	evm_wait_event_queue(&syn->qp, EVM_WAIT_INFINITE);
+#else
+	while(time_before(sys_tick, syn->last_rw_op+ms))
+		yield();
+#endif
+}
+
+void dev_sync_unlock(struct device *dev, unsigned ms)
+{
+	sync_t *syn = &dev->sync_lock;
+
+#ifdef CONFIG_EVENT_MUTEX
+	sleep(ms);
+	evm_signal_event_queue(&syn->qp);
+#else
+	sync->last_rw_op = sys_tick;
+#endif
 }
 
 static inline int dev_name_is_unique(struct device *dev)
@@ -92,6 +118,15 @@ struct device *device_create(const char *name, void *data,
 	return dev;
 }
 
+static inline void sync_lock_init(sync_t *lock)
+{
+#ifdef CONFIG_EVENT_MUTEX
+	thread_queue_init(&lock->qp);
+#else
+	lock->last_rw_op = 0UL;
+#endif
+}
+
 /**
  * @brief Initialise a device structure.
  * @param dev Device structure to initialise.
@@ -113,6 +148,7 @@ int device_initialize(struct device *dev, struct dev_file_ops *fops)
 
 	dev->release = &dev_release;
 	mutex_init(&dev->dev_lock);
+	sync_lock_init(&dev->sync_lock);
 
 	dev->file.next = NULL;
 	dev->file.name = dev->name;

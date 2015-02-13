@@ -41,6 +41,14 @@ struct platform_device {
 	void *io_base;
 };
 
+typedef struct sync_lock {
+#ifdef CONFIG_EVENT_MUTEX
+	struct thread_queue qp;
+#else
+	tick_t last_rw_op;
+#endif
+} sync_t;
+
 /**
  * @brief Device driver descriptor.
  */
@@ -57,6 +65,8 @@ struct device {
 	struct platform_device *pdev;
 	/** @brief Private data pointer */
 	void *dev_data;
+
+	sync_t sync_lock;
 
 	/**
 	 * @brief Device free/unregister
@@ -88,6 +98,8 @@ struct dev_file_ops {
 };
 
 CDECL
+extern void dev_sync_unlock(struct device *dev, unsigned ms);
+extern void dev_sync_lock(struct device *dev, unsigned ms);
 extern struct device *device_create(const char *name, void *data,
 		struct dev_file_ops *fops);
 extern int device_initialize(struct device *dev, struct dev_file_ops *fops);
