@@ -57,6 +57,16 @@ static void dev_release(struct device *dev)
 	kfree(dev);
 }
 
+/**
+ * @brief Lock a device with synchronization.
+ * @param dev Device to lock.
+ * @param ms Miliseconds of synchronization required.
+ *
+ * Some devices need a certain amount of miliseconds to process information
+ * internally after an operation. Code surrounded by dev_sync_lock() and
+ * dev_sync_unlock() cannot be accessed for \p ms miliseconds after
+ * dev_sync_unlock() has been called.
+ */
 void dev_sync_lock(struct device *dev, unsigned ms)
 {
 	sync_t *syn = &dev->sync_lock;
@@ -69,6 +79,17 @@ void dev_sync_lock(struct device *dev, unsigned ms)
 #endif
 }
 
+/**
+ * @brief Unlock a dev locked with dev_sync_lock.
+ * @param dev Device to unlock.
+ * @param ms Miliseconds of synchronization required.
+ * @note Synchronization time starts with this function call.
+ *
+ * Some devices need a certain amount of miliseconds to process information
+ * internally after an operation. Code surrounded by dev_sync_lock() and
+ * dev_sync_unlock() cannot be accessed for \p ms miliseconds after
+ * dev_sync_unlock() has been called.
+ */
 void dev_sync_unlock(struct device *dev, unsigned ms)
 {
 	sync_t *syn = &dev->sync_lock;

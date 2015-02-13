@@ -29,6 +29,7 @@
 #include <etaos/types.h>
 #include <etaos/stdio.h>
 #include <etaos/mutex.h>
+#include <etaos/thread.h>
 
 /**
  * @brief Platform device structure.
@@ -37,15 +38,18 @@
  * to a single platform.
  */
 struct platform_device {
-	const char *name;
-	void *io_base;
+	const char *name; //!< Platform device name.
+	void *io_base; //!< Platform device I/O base.
 };
 
+/**
+ * @brief Synchronization lock type.
+ */
 typedef struct sync_lock {
 #ifdef CONFIG_EVENT_MUTEX
-	struct thread_queue qp;
+	struct thread_queue qp; //!< Waiting queue.
 #else
-	tick_t last_rw_op;
+	tick_t last_rw_op; //!< Last operation time stamp.
 #endif
 } sync_t;
 
