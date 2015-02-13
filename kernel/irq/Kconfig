@@ -8,7 +8,7 @@ menuconfig IRQ_SUPPORT
 if IRQ_SUPPORT
 config IRQ_THREAD
 	bool "Threaded IRQ support"
-	depends on SCHED && THREAD_QUEUE
+	depends on SCHED && THREAD_QUEUE && EVENT_MUTEX
 	help
 	  Say 'y' here if you want to have the ability to
 	  handle threads out of IRQ context. Triggered IRQ's will
