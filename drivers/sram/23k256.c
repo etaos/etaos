@@ -122,8 +122,8 @@ static int __sram_put(struct sram *ram, int c)
 static int __sram_get(struct sram *ram)
 {
 	uint8_t read_seq[] = {
-		RDDA, (uint8_t)((ram->wr_idx >> 8) & 0xFF),
-		(uint8_t)(ram->wr_idx & 0xFF), 0xFF /* dummy byte */
+		RDDA, (uint8_t)((ram->rd_idx >> 8) & 0xFF),
+		(uint8_t)(ram->rd_idx & 0xFF), 0xFF /* dummy byte */
 	};
 	struct spi_msg *msg = spi_alloc_msg(read_seq, read_seq, 4);
 
