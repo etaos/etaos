@@ -101,7 +101,6 @@ void dev_sync_lock(struct device *dev, unsigned ms)
 /**
  * @brief Unlock a dev locked with dev_sync_lock.
  * @param dev Device to unlock.
- * @param ms Miliseconds of synchronization required.
  *
  * Some devices need a certain amount of miliseconds to process information
  * internally after an operation. Code surrounded by dev_sync_lock() and
