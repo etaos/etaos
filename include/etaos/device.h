@@ -46,7 +46,7 @@ struct platform_device {
  * @brief Synchronization lock type.
  */
 typedef struct sync_lock {
-	mutex_t lock;
+	mutex_t lock; //!< Device synchronization lock.
 	tick_t last_rw_op; //!< Last operation time stamp.
 } sync_t;
 
