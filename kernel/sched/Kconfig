@@ -15,12 +15,14 @@ menu "Scheduling algorithms"
 
 config RR
 	bool "Round robin scheduler"
+	select RR_SHARED
 	help
 	  Say 'y' here to use the round robin algorithm to
 	  schedule different threads.
 
 config FIFO
 	bool "FIFO scheduler"
+	select RR_SHARED
 	help
 	  Say 'y' here to use the FIFO scheduling algorithm to
 	  schedule threads. The FIFO scheduler does not take
@@ -30,12 +32,19 @@ config FIFO
 
 config LOTTERY
 	bool "Lottery scheduler"
+	select RR_SHARED
 	help
 	  Say 'y'here to build the lottery scheduler. The lottery
 	  scheduler depends on random number generation to pick
 	  threads in a 'fair' way.
 
 endmenu
+
+config RR_SHARED
+	bool
+	help
+	  Build the shared round robin helpers. These are automatically build
+	  for all RR based algorithms.
 
 choice
 	prompt "Default algorithm"
