@@ -31,6 +31,8 @@
 #include <etaos/mem.h>
 #include <etaos/list.h>
 
+#include "rr_shared.h"
+
 static struct lottery_ticket *lottery_take_ticket(void);
 
 /**
@@ -146,7 +148,7 @@ static void lottery_add_thread(struct rq *rq, struct thread *tp)
 	}
 
 	rq->num++;
-	lottery_insert_thread(&rq->rr_rq.run_queue, tp);
+	rr_shared_queue_insert(&rq->rr_rq.run_queue, tp);
 }
 
 /**
@@ -157,7 +159,7 @@ static void lottery_add_thread(struct rq *rq, struct thread *tp)
 static int lottery_remove_thread(struct rq *rq, struct thread *tp)
 {
 	rq->num--;
-	return lottery_rm_thread(&rq->rr_rq.run_queue, tp);
+	return rr_shared_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 
 static struct lottery_pool_head lottery_tickets = {

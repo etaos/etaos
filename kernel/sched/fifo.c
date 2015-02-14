@@ -22,6 +22,8 @@
 #include <etaos/sched.h>
 #include <etaos/thread.h>
 
+#include "rr_shared.h"
+
 /**
  * @addtogroup fifo
  * @{
@@ -64,47 +66,6 @@ static void fifo_queue_insert(struct thread *volatile*tpp, struct thread *tp)
 #endif
 }
 
-/**
- * @brief Remove a thread from a queue.
- * @param tpp Root queue pointer.
- * @param tp Thread to remove from.
- * @retval -EOK on success.
- * @return -EINVAL on error (no thread was removed).
- */
-static int fifo_queue_remove(struct thread *volatile*tpp, struct thread *tp)
-{
-	struct thread *thread;
-	int efifo = -EINVAL;
-
-	thread = *tpp;
-
-	if(thread == SIGNALED)
-		return efifo;
-
-	while(thread) {
-		if(thread == tp) {
-			efifo = 0;
-			*tpp = tp->se.next;
-#ifdef CONFIG_EVENT_MUTEX
-			if(tp->ec) {
-				if(tp->se.next)
-					tp->se.next->ec = tp->ec;
-				tp->ec = 0;
-			}
-#endif
-
-			tp->se.next = NULL;
-			tp->queue = NULL;
-			break;
-		}
-
-		tpp = &thread->se.next;
-		thread = thread->se.next;
-	}
-
-	return efifo;
-}
-
 #ifdef CONFIG_THREAD_QUEUE
 /**
  * @brief Add a new thread to a queue.
@@ -123,7 +84,7 @@ static void fifo_thread_queue_add(struct thread_queue *qp, struct thread *tp)
  */
 static void fifo_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
 {
-	fifo_queue_remove(&qp->qhead, tp);
+	rr_shared_queue_remove(&qp->qhead, tp);
 }
 #endif
 
@@ -148,7 +109,7 @@ static void fifo_add_thread(struct rq *rq, struct thread *tp)
 static int fifo_rm_thread(struct rq *rq, struct thread *tp)
 {
 	rq->num--;
-	return fifo_queue_remove(&rq->rr_rq.run_queue, tp);
+	return rr_shared_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 
 /**

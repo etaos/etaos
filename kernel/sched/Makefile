@@ -1,8 +1,8 @@
-obj-$(CONFIG_SCHED)		+= sched-core.o
-obj-$(CONFIG_RR)		+= rr.o
-obj-$(CONFIG_FIFO)		+= fifo.o
-obj-$(CONFIG_LOTTERY)		+= lottery.o
+obj-$(CONFIG_SCHED)		+= core.o algo.o thread.o
+obj-$(CONFIG_IPM)		+= ipm.o
 obj-$(CONFIG_EVENT_MUTEX)	+= evm.o
 
-sched-core-y := core.o thread.o
-sched-core-$(CONFIG_IPM) += ipm.o
+algo-$(CONFIG_RR)		+= rr.o
+algo-$(CONFIG_RR_SHARED)	+= rr-shared.o
+algo-$(CONFIG_FIFO)		+= fifo.o
+algo-$(CONFIG_LOTTERY)		+= lottery.o

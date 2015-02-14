@@ -27,82 +27,7 @@
 #include <etaos/sched.h>
 #include <etaos/thread.h>
 
-/**
- * @brief Insert a new thread into a queue.
- * @param tpp Root queue pointer.
- * @param tp Thread to insert.
- */
-static void rr_queue_insert(struct thread *volatile*tpp, struct thread *tp)
-{
-	struct thread *thread;
-#ifdef CONFIG_EVENT_MUTEX
-	tp->ec = 0;
-#endif
-	tp->queue = tpp;
-	
-	thread = *tpp;
-
-	if(thread == SIGNALED) {
-		thread = NULL;
-#ifdef CONFIG_EVENT_MUTEX
-		tp->ec++;
-#endif
-	} else if(thread) {
-		while(thread && prio(thread) <= prio(tp)) {
-			tpp = &thread->se.next;
-			thread = thread->se.next;
-		}
-	}
-	tp->se.next = thread;
-	*tpp = tp;
-#ifdef CONFIG_EVENT_MUTEX
-	if(tp->se.next && tp->se.next->ec) {
-		tp->ec += tp->se.next->ec;
-		tp->se.next->ec = 0;
-	}
-#endif
-}
-
-/**
- * @brief Remove a thread from a queue.
- * @param tpp Root queue pointer.
- * @param tp Thread to remove from.
- * @retval -EOK on success.
- * @return -EINVAL on error (no thread was removed).
- */
-static int rr_queue_remove(struct thread *volatile*tpp, struct thread *tp)
-{
-	struct thread *thread;
-	int err = -EINVAL;
-
-	thread = *tpp;
-
-	if(thread == SIGNALED)
-		return err;
-
-	while(thread) {
-		if(thread == tp) {
-			err = 0;
-			*tpp = tp->se.next;
-#ifdef CONFIG_EVENT_MUTEX
-			if(tp->ec) {
-				if(tp->se.next)
-					tp->se.next->ec = tp->ec;
-				tp->ec = 0;
-			}
-#endif
-
-			tp->se.next = NULL;
-			tp->queue = NULL;
-			break;
-		}
-
-		tpp = &thread->se.next;
-		thread = thread->se.next;
-	}
-
-	return err;
-}
+#include "rr_shared.h"
 
 #ifdef CONFIG_THREAD_QUEUE
 /**
@@ -112,7 +37,7 @@ static int rr_queue_remove(struct thread *volatile*tpp, struct thread *tp)
  */
 static void rr_thread_queue_add(struct thread_queue *qp, struct thread *tp)
 {
-	rr_queue_insert(&qp->qhead, tp);
+	rr_shared_queue_insert(&qp->qhead, tp);
 }
 
 /**
@@ -122,7 +47,7 @@ static void rr_thread_queue_add(struct thread_queue *qp, struct thread *tp)
  */
 static void rr_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
 {
-	rr_queue_remove(&qp->qhead, tp);
+	rr_shared_queue_remove(&qp->qhead, tp);
 }
 #endif
 
@@ -134,7 +59,7 @@ static void rr_thread_queue_remove(struct thread_queue *qp, struct thread *tp)
 static void rr_add_thread(struct rq *rq, struct thread *tp)
 {
 	rq->num++;
-	rr_queue_insert(&rq->rr_rq.run_queue, tp);
+	rr_shared_queue_insert(&rq->rr_rq.run_queue, tp);
 }
 
 /**
@@ -147,7 +72,7 @@ static void rr_add_thread(struct rq *rq, struct thread *tp)
 static int rr_rm_thread(struct rq *rq, struct thread *tp)
 {
 	rq->num--;
-	return rr_queue_remove(&rq->rr_rq.run_queue, tp);
+	return rr_shared_queue_remove(&rq->rr_rq.run_queue, tp);
 }
 
 /**
