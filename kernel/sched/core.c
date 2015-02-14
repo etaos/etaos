@@ -92,6 +92,7 @@ void irq_handle_fn(void *data)
 }
 #endif
 
+#ifdef CONFIG_THREAD_QUEUE
 /**
  * @brief Get the thread_queue the given thread is on.
  * @param tp Thread to get the thread_queue for.
@@ -108,7 +109,28 @@ static inline struct thread_queue *thread_to_queue(struct thread *tp)
 		return NULL;
 }
 
-#ifdef CONFIG_THREAD_QUEUE
+static void queue_wait_tmo(struct timer *timer, void *arg)
+{
+	struct thread *tp = arg;
+	struct thread_queue *qp = thread_to_queue(tp);
+
+	queue_remove_thread(qp, tp);
+	if(qp->qhead == NULL)
+		qp->qhead = SIGNALED;
+
+	rq_add_thread_no_lock(tp);
+}
+
+void thread_queue_wait(struct thread_queue *qp, unsigned int ms)
+{
+	struct thread *current = current_thread();
+
+	current->timer = tm_create_timer(current->rq->source, ms,
+			&queue_wait_tmo, current, TIMER_ONESHOT_MASK);
+	queue_add_thread(qp, current);
+	schedule();
+}
+
 /**
  * @brief Initialise a thread queue during run time.
  * @param qp Thread queue which has to be initialised.

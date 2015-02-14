@@ -254,12 +254,13 @@ extern struct sched_class lottery_class;
 #elif defined(CONFIG_SYS_FIFO)
 
 extern struct sched_class fifo_class;
-#define sys_sched_class fifo_class;
+#define sys_sched_class fifo_class
 #endif
 
 #ifdef CONFIG_THREAD_QUEUE
 extern void queue_remove_thread(struct thread_queue *qp, struct thread *tp);
 extern void queue_add_thread(struct thread_queue *qp, struct thread *tp);
+extern void thread_queue_wait(struct thread_queue *qp, unsigned int ms);
 #endif
 
 /**

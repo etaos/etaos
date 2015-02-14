@@ -29,6 +29,8 @@
 #include <etaos/vfs.h>
 #include <etaos/evm.h>
 #include <etaos/tick.h>
+#include <etaos/thread.h>
+#include <etaos/sched.h>
 
 /**
  * @addtogroup dev-core
@@ -39,6 +41,10 @@ static struct list_head dev_root = STATIC_INIT_LIST_HEAD(dev_root);
 
 static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops);
 static struct device *dev_allocate(const char *name, struct dev_file_ops *fops);
+
+#ifdef CONFIG_THREAD_QUEUE
+static DEFINE_THREAD_QUEUE(sync_queue);
+#endif
 
 /**
  * @brief Initialise the device core.
@@ -70,12 +76,25 @@ static void dev_release(struct device *dev)
 void dev_sync_lock(struct device *dev, unsigned ms)
 {
 	sync_t *syn = &dev->sync_lock;
+#ifdef CONFIG_THREAD_QUEUE
+	unsigned int time;
+#endif
 
-#ifdef CONFIG_EVENT_MUTEX
-	evm_wait_event_queue(&syn->qp, EVM_WAIT_INFINITE);
+	mutex_lock(&syn->lock);
+
+	if(syn->last_rw_op == NEVER)
+		return;
+#ifdef CONFIG_THREAD_QUEUE
+	if(time_before(sys_tick, syn->last_rw_op+ms)) {
+		time = (syn->last_rw_op+ms) - sys_tick;
+		thread_queue_wait(&sync_queue, time);
+	}
 #else
-	while(time_before(sys_tick, syn->last_rw_op+ms))
+	while(time_before(sys_tick, syn->last_rw_op+ms)) {
+#ifdef CONFIG_SCHED
 		yield();
+#endif
+	}
 #endif
 }
 
@@ -83,23 +102,18 @@ void dev_sync_lock(struct device *dev, unsigned ms)
  * @brief Unlock a dev locked with dev_sync_lock.
  * @param dev Device to unlock.
  * @param ms Miliseconds of synchronization required.
- * @note Synchronization time starts with this function call.
  *
  * Some devices need a certain amount of miliseconds to process information
  * internally after an operation. Code surrounded by dev_sync_lock() and
  * dev_sync_unlock() cannot be accessed for \p ms miliseconds after
  * dev_sync_unlock() has been called.
  */
-void dev_sync_unlock(struct device *dev, unsigned ms)
+void dev_sync_unlock(struct device *dev)
 {
 	sync_t *syn = &dev->sync_lock;
 
-#ifdef CONFIG_EVENT_MUTEX
-	sleep(ms);
-	evm_signal_event_queue(&syn->qp);
-#else
 	syn->last_rw_op = sys_tick;
-#endif
+	mutex_unlock(&syn->lock);
 }
 
 static inline int dev_name_is_unique(struct device *dev)
@@ -141,11 +155,8 @@ struct device *device_create(const char *name, void *data,
 
 static inline void sync_lock_init(sync_t *lock)
 {
-#ifdef CONFIG_EVENT_MUTEX
-	thread_queue_init(&lock->qp);
-#else
-	lock->last_rw_op = 0UL;
-#endif
+	mutex_init(&lock->lock);
+	lock->last_rw_op = NEVER;
 }
 
 /**

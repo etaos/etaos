@@ -192,6 +192,7 @@ static void lottery_kill_thread(struct thread *tp)
 	}
 }
 
+#ifdef CONFIG_EVENT_MUTEX
 static struct thread *lottery_thread_after(struct thread *tp)
 {
 	if(tp)
@@ -199,6 +200,7 @@ static struct thread *lottery_thread_after(struct thread *tp)
 	else
 		return NULL;
 }
+#endif
 
 static inline bool lottery_single_thread_available(struct rq *rq)
 {

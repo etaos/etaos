@@ -46,11 +46,8 @@ struct platform_device {
  * @brief Synchronization lock type.
  */
 typedef struct sync_lock {
-#ifdef CONFIG_EVENT_MUTEX
-	struct thread_queue qp; //!< Waiting queue.
-#else
+	mutex_t lock;
 	tick_t last_rw_op; //!< Last operation time stamp.
-#endif
 } sync_t;
 
 /**
@@ -102,7 +99,7 @@ struct dev_file_ops {
 };
 
 CDECL
-extern void dev_sync_unlock(struct device *dev, unsigned ms);
+extern void dev_sync_unlock(struct device *dev);
 extern void dev_sync_lock(struct device *dev, unsigned ms);
 extern struct device *device_create(const char *name, void *data,
 		struct dev_file_ops *fops);

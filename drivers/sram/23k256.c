@@ -108,7 +108,7 @@ static int __sram_put(struct sram *ram, int c)
 	msg = spi_alloc_msg(write_seq, write_seq, 4);
 	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
 	rv = spi_transfer(&sram_23k256_dev, msg);
-	dev_sync_unlock(&sram_23k256_dev.dev, SRAM_SYNC);
+	dev_sync_unlock(&sram_23k256_dev.dev);
 	spi_free_msg(msg);
 
 	return rv;
@@ -129,7 +129,7 @@ static int __sram_get(struct sram *ram)
 
 	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
 	spi_transfer(&sram_23k256_dev, msg);
-	dev_sync_unlock(&sram_23k256_dev.dev, SRAM_SYNC);
+	dev_sync_unlock(&sram_23k256_dev.dev);
 	spi_free_msg(msg);
 
 	return read_seq[3];

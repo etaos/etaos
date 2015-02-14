@@ -105,6 +105,8 @@ struct timer {
  */
 #define cs_last_update(__cs) __cs->tc_update
 
+#define NEVER -1
+
 CDECL
 /**
  * @brief Get the tick count from a clock source.

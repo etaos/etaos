@@ -69,7 +69,7 @@ int eeprom_24c02_write_byte(unsigned char addr, unsigned char data)
 
 	dev_sync_lock(&client->dev, EE_SYNC);
 	rc = i2c_master_send(ee_chip.priv, (void*)tx, 2);
-	dev_sync_unlock(&client->dev, EE_SYNC);
+	dev_sync_unlock(&client->dev);
 
 	return (rc == 2) ? -EOK : rc;
 }
@@ -101,7 +101,7 @@ int eeprom_24c02_read_byte(unsigned char addr, unsigned char *storage)
 
 	dev_sync_lock(&client->dev, EE_SYNC);
 	rc = i2c_bus_xfer(client->bus, msgs, 2);
-	dev_sync_unlock(&client->dev, EE_SYNC);
+	dev_sync_unlock(&client->dev);
 
 	*storage = rx;
 	kfree(msgs);
