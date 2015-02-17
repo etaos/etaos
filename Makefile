@@ -15,6 +15,8 @@ export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
 			  -name CVS -o -name .pc -o -name .hg -o -name .git \) \
 			  -prune -o
 
+_all: all
+
 # To put more focus on warnings, be less verbose as default
 # Use 'make V=1' to see the full commands
 SRCARCH 	:= $(ARCH)
