@@ -25,9 +25,9 @@
 CDECL
 
 extern void vfs_init(void);
-extern void vfs_add(FILE file);
-extern int vfs_delete(FILE f);
-extern FILE vfs_find(const char *name);
+extern void vfs_add(struct vfile * file);
+extern int vfs_delete(struct vfile * f);
+extern struct vfile * vfs_find(const char *name);
 
 CDECL_END
 

@@ -34,10 +34,10 @@
 
 /**
  * @brief Convert a file pointer to a SRAM structure.
- * @param file FILE pointer to convert.
+ * @param file struct vfile * pointer to convert.
  * @return SRAM data structure.
  */
-static inline struct sram *to_sram_chip(FILE file)
+static inline struct sram *to_sram_chip(struct vfile * file)
 {
 	struct device *dev;
 
@@ -52,7 +52,7 @@ static inline struct sram *to_sram_chip(FILE file)
  * @param len Length of \p buf.
  * @return Error code or the number of bytes written.
  */
-static int sram_write(FILE stream, const void *buf, size_t len)
+static int sram_write(struct vfile * stream, const void *buf, size_t len)
 {
 	int rc;
 	struct sram *ram;
@@ -79,7 +79,7 @@ static int sram_write(FILE stream, const void *buf, size_t len)
  * @param len Length of \p buf.
  * @return Error code or number bytes read.
  */
-static int sram_read(FILE stream, void *buf, size_t len)
+static int sram_read(struct vfile * stream, void *buf, size_t len)
 {
 	int rc;
 	struct sram *ram;
@@ -105,7 +105,7 @@ static int sram_read(FILE stream, void *buf, size_t len)
  * @param stream File SRAM chip descriptor.
  * @return Error code or the number of bytes written.
  */
-static int sram_put(int c, FILE stream)
+static int sram_put(int c, struct vfile * stream)
 {
 	int rc;
 	struct sram *ram;
@@ -130,7 +130,7 @@ static int sram_put(int c, FILE stream)
  * @param stream File SRAM chip descriptor.
  * @return Error code or the number of bytes read.
  */
-static int sram_get(FILE stream)
+static int sram_get(struct vfile * stream)
 {
 	int rc;
 	struct sram *ram;
@@ -152,12 +152,12 @@ static int sram_get(FILE stream)
 
 /**
  * @brief Control the SRAM chip file descriptor.
- * @param stream FILE pointer.
+ * @param stream struct vfile * pointer.
  * @param reg Control register.
  * @param buf Argument for \p reg.
  * @return An error code.
  */
-static int sram_ioctl(FILE stream, unsigned long reg, void *buf)
+static int sram_ioctl(struct vfile * stream, unsigned long reg, void *buf)
 {
 	int rc;
 	unsigned long idx;

@@ -26,7 +26,7 @@
  * @brief Write a single byte from a file.
  * @param stream Stream to write from.
  */
-int getc(FILE stream)
+int getc(struct vfile * stream)
 {
 	return fgetc(stream);
 }

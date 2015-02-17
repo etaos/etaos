@@ -32,7 +32,7 @@
  * @param c Character to write.
  * @param stream Stream to write \p c to.
  */
-int fputc(int c, FILE stream)
+int fputc(int c, struct vfile * stream)
 {
 	int rc = -1;
 

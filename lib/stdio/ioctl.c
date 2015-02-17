@@ -30,7 +30,7 @@
  * @note Make sure that buf is long enough. See the documentation of the
  *       specific device driver for information on the length of the buffer.
  */
-int ioctl(FILE stream, unsigned long reg, void *buf)
+int ioctl(struct vfile * stream, unsigned long reg, void *buf)
 {
 	int rc;
 

@@ -15,7 +15,7 @@ int sram_stress_write_byte(uint16_t addr, uint8_t byte)
 {
 	int fd, rc;
 	unsigned long _addr = addr;
-	FILE stream; 
+	struct vfile * stream; 
 
 	fd = open("23K256", _FDEV_SETUP_RW);
 
@@ -36,7 +36,7 @@ int sram_stress_read_byte(uint16_t addr, uint8_t *store)
 {
 	int rc, fd;
 	unsigned long _addr = addr;
-	FILE stream;
+	struct vfile * stream;
 
 	fd = open("23K256", _FDEV_SETUP_RW);
 
