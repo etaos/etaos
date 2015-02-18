@@ -655,15 +655,10 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 		}
 	}
 
-	if(prev != new) {
-		class->rm_thread(rq, new); /* remove the new 
-					      thread from the rq */
-		raw_spin_unlock_irq(&rq->lock);
-		cpu_reschedule(rq, prev, new);
-	} else {
-		raw_spin_unlock_irq(&rq->lock);
-	}
-
+	/* prev != new (this condition is ensured by rq_schedule) */
+	class->rm_thread(rq, new);
+	raw_spin_unlock_irq(&rq->lock);
+	cpu_reschedule(rq, prev, new);
 }
 
 #ifdef CONFIG_EVENT_MUTEX
