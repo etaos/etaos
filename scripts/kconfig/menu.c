@@ -559,8 +559,8 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
 		if (location == NULL && accessible)
 			location = menu;
 	}
+	jump = xmalloc(sizeof(struct jump_key));
 	if (head && location) {
-		jump = xmalloc(sizeof(struct jump_key));
 
 		if (menu_is_visible(prop->menu)) {
 			/*
