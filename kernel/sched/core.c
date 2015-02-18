@@ -821,11 +821,11 @@ resched:
 		tm_process_clock(rq->source, diff);
 
 #ifdef CONFIG_PREEMPT
-	if(diff < prev->slice) {
-		prev->slice -= diff;
-	} else if(diff >= prev->slice) {
+	if(diff >= prev->slice) {
 		prev->slice = CONFIG_TIME_SLICE;
 		set_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags);
+	} else {
+		prev->slice -= diff;
 	}
 #endif
 
