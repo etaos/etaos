@@ -655,10 +655,10 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 		}
 	}
 
-	/* prev != new (this condition is ensured by rq_schedule) */
+	/* prev != new (this condition is ensured by cpu_schedule) */
 	class->rm_thread(rq, new);
 	raw_spin_unlock_irq(&rq->lock);
-	cpu_reschedule(rq, prev, new);
+	cpu_switch_context(rq, prev, new);
 }
 
 #ifdef CONFIG_EVENT_MUTEX
@@ -795,14 +795,14 @@ static void sched_do_signal_threads(struct rq *rq)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot rq_schedule(void)
+static void __hot cpu_schedule(int cpu)
 {
 	struct rq *rq;
 	unsigned int diff;
 	struct thread *tp, *prev;
 	int num = 0;
 
-	rq = sched_get_cpu_rq();
+	rq = sched_cpu_to_rq(cpu);
 	prev = current(rq);
 	
 resched:
@@ -870,7 +870,10 @@ resched:
  */
 void __hot schedule(void)
 {
-	rq_schedule();
+	int cpu;
+
+	cpu = cpu_get_id();
+	cpu_schedule(cpu);
 }
 
 static struct thread idle_thread, main_thread;
@@ -907,7 +910,7 @@ void sched_init(void)
 	idle_thread.rq = rq;
 	rq->current = &idle_thread;
 
-	cpu_reschedule(rq, NULL, &idle_thread);
+	cpu_switch_context(rq, NULL, &idle_thread);
 }
 
 #ifdef CONFIG_PREEMPT
@@ -960,18 +963,20 @@ void sched_yield(struct rq *rq)
 {
 	struct thread *tp, *curr;
 	struct sched_class *class;
+	int cpu;
 
 	class = rq->sched_class;
 	tp = class->next_runnable(rq);
 	curr = current(rq);
+	cpu = cpu_get_id();
 
 	if(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)) {
-		rq_schedule();
+		cpu_schedule(cpu);
 		return;
 	} else if(tp != curr) {
 		if(prio(tp) <= prio(curr)) {
 			set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
-			rq_schedule();
+			cpu_schedule(cpu);
 		}
 	}
 
