@@ -629,6 +629,7 @@ static void rq_destroy_kill_q(struct rq *rq)
  * @param __t Thread to reset the dynamic priority for.
  */
 #define dyn_prio_reset(__t) (__t)->dprio = 0;
+#define dyn_prio_update(__rq, __c) (__c)->dyn_prio_update(__rq, 1)
 #else
 #define dyn_prio_reset(__t)
 #endif
@@ -798,9 +799,8 @@ static void sched_do_signal_threads(struct rq *rq)
 static void __hot cpu_schedule(int cpu)
 {
 	struct rq *rq;
-	unsigned int diff;
 	struct thread *tp, *prev;
-	int num = 0;
+	unsigned int diff = 0;
 
 	rq = sched_cpu_to_rq(cpu);
 	prev = current(rq);
@@ -833,12 +833,17 @@ resched:
 			tp != prev) {
 		rq->current = tp;
 		rq->switch_count++;
+#ifdef CONFIG_DYN_PRIO
+		dyn_prio_update(rq, rq->sched_class);
+#endif
 		dyn_prio_reset(tp);
 		rq_switch_context(rq, prev, tp);
-		rq = sched_get_cpu_rq();
+		
+		/* we might be on a different run queue now */
+		cpu = cpu_get_id();
+		rq = sched_cpu_to_rq(cpu);
 		prev = current(rq);
 		rq_update(rq);
-		num++;
 	} else {
 		raw_spin_unlock_irq(&rq->lock);
 	}
@@ -848,13 +853,6 @@ resched:
 		goto resched;
 
 	rq_destroy_kill_q(rq);
-#ifdef CONFIG_DYN_PRIO
-	if(num > 0) {
-		raw_spin_lock_irq(&rq->lock);
-		rq->sched_class->dyn_prio_update(rq, num);
-		raw_spin_unlock_irq(&rq->lock);
-	}
-#endif
 	return;
 }
 
