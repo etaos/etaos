@@ -16,6 +16,7 @@ menu "Scheduling algorithms"
 config RR
 	bool "Round robin scheduler"
 	select RR_SHARED
+	select RR_ENTITY
 	help
 	  Say 'y' here to use the round robin algorithm to
 	  schedule different threads.
@@ -23,6 +24,7 @@ config RR
 config FIFO
 	bool "FIFO scheduler"
 	select RR_SHARED
+	select RR_ENTITY
 	help
 	  Say 'y' here to use the FIFO scheduling algorithm to
 	  schedule threads. The FIFO scheduler does not take
@@ -33,6 +35,7 @@ config FIFO
 config LOTTERY
 	bool "Lottery scheduler"
 	select RR_SHARED
+	select RR_ENTITY
 	help
 	  Say 'y'here to build the lottery scheduler. The lottery
 	  scheduler depends on random number generation to pick
@@ -45,6 +48,9 @@ config RR_SHARED
 	help
 	  Build the shared round robin helpers. These are automatically build
 	  for all RR based algorithms.
+
+config RR_ENTITY
+	bool
 
 choice
 	prompt "Default algorithm"

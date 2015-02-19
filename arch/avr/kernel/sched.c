@@ -26,7 +26,9 @@
 #include <asm/sched.h>
 #include <asm/io.h>
 
-static struct rq avr_rq = {
+static DEFINE_RQ(avr_rq, &sys_sched_class);
+
+/*static struct rq avr_rq = {
 	.sched_class = &sys_sched_class,
 #if defined(CONFIG_RR) || defined(CONFIG_FIFO)
 	.rr_rq = { .run_queue = NULL, },
@@ -38,7 +40,7 @@ static struct rq avr_rq = {
 	.num = 0,
 	.lock = SPIN_LOCK_INIT(avr_rq.lock),
 
-};
+}; */
 
 /**
  * @brief Initialise the AVR scheduling core.

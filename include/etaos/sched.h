@@ -114,6 +114,17 @@ struct sched_class {
 #endif
 };
 
+#ifdef CONFIG_RR_ENTITY
+#define __DEFINE_RQ .rr_rq = { .run_queue = NULL }
+#endif
+
+#define DEFINE_RQ(__name,__class)			\
+	struct rq __name = {				\
+		.sched_class = __class,			\
+		.lock = SPIN_LOCK_INIT(__name.lock),	\
+		__DEFINE_RQ,				\
+	}
+
 /**
  * @struct rr_rq
  * @brief Round robin run queue.
