@@ -39,19 +39,19 @@ int sysctl(sys_ctl_t ctl, ...)
 	va_start(va, ctl);
 	switch(ctl) {
 	case SYS_SET_STDOUT:
-		stream = (FILE) va_arg(va, size_t);
+		stream = (struct vfile *) va_arg(va, size_t);
 		stdout = stream;
 		err = -EOK;
 		break;
 
 	case SYS_SET_STDERR:
-		stream = (FILE) va_arg(va, size_t);
+		stream = (struct vfile *) va_arg(va, size_t);
 		stderr = stream;
 		err = -EOK;
 		break;
 
 	case SYS_SET_STDIN:
-		stream = (FILE) va_arg(va, size_t);
+		stream = (struct vfile *) va_arg(va, size_t);
 		stdin = stream;
 		err = -EOK;
 		break;

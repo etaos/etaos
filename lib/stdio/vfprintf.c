@@ -32,7 +32,7 @@
 #define FLT_DIGITS 2
 
 static int convert_to_num(uint64_t num, uint8_t base, bool sign, 
-							  bool caps, FILE stream)
+							  bool caps, struct vfile * stream)
 {
 	char buff[BUFF];
 	char *cp;
@@ -74,7 +74,7 @@ static int convert_to_num(uint64_t num, uint8_t base, bool sign,
 	return 0;
 }
 
-static void print_flt(double num, FILE output)
+static void print_flt(double num, struct vfile * output)
 {
 	size_t int_part;
 	double remainder;
@@ -111,7 +111,7 @@ static void print_flt(double num, FILE output)
 }
 
 static const char *vfprintf_long_int(va_list ap, const char *fmt, 
-		size_t fmt_i, FILE stream)
+		size_t fmt_i, struct vfile * stream)
 {
 	switch(fmt[fmt_i]) {
 		case 'l':
@@ -143,7 +143,7 @@ static const char *vfprintf_long_int(va_list ap, const char *fmt,
  * @param fmt Format string.
  * @param ap VA list to complete the format string.
  */
-int vfprintf(FILE stream, const char *fmt, va_list ap)
+int vfprintf(struct vfile * stream, const char *fmt, va_list ap)
 {
 	size_t i;
 	uint32_t uval;

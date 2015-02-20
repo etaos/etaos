@@ -15,13 +15,13 @@ static struct platform_device exit_dev = {
 	.io_base = NULL,
 };
 
-static int exit_dev_write(struct file* file, const void *data, size_t len);
+static int exit_dev_write(struct vfile* file, const void *data, size_t len);
 
 static struct dev_file_ops exit_dev_fops = {
 	.write = &exit_dev_write,
 };
 
-static int exit_dev_write(struct file* file, const void *data, size_t len)
+static int exit_dev_write(struct vfile* file, const void *data, size_t len)
 {
 	return 0;
 }

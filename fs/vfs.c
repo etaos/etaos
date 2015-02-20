@@ -28,8 +28,8 @@
 #include <etaos/vfs.h>
 #include <etaos/init.h>
 
-FILE __iob[MAX_OPEN];
-static struct file *vfshead;
+struct vfile * __iob[MAX_OPEN];
+static struct vfile *vfshead;
 
 /**
  * @brief Add a file to the file descriptor array.
@@ -37,7 +37,7 @@ static struct file *vfshead;
  * @return Assigned file descriptor.
  * @retval -1 on error.
  */
-int iob_add(FILE stream)
+int iob_add(struct vfile * stream)
 {
 	int rc;
 		
@@ -85,7 +85,7 @@ void vfs_init(void)
  * @brief Add a file to the virtual file system.
  * @param newfile File to add.
  */
-void vfs_add(FILE newfile)
+void vfs_add(struct vfile * newfile)
 {
 	newfile->next = vfshead;
 	vfshead = newfile;
@@ -97,9 +97,9 @@ void vfs_add(FILE newfile)
  * @retval 0 success.
  * @retval -1 on error.
  */
-int vfs_delete(FILE file)
+int vfs_delete(struct vfile * file)
 {
-	struct file **fpp;
+	struct vfile **fpp;
 
 	fpp = &file;
 	for(; *fpp; fpp = &(*fpp)->next) {
@@ -118,9 +118,9 @@ int vfs_delete(FILE file)
  * @return The file pointer.
  * @retval NULL on error (i.e. file not found).
  */
-FILE vfs_find(const char *name)
+struct vfile * vfs_find(const char *name)
 {
-	FILE walker;
+	struct vfile * walker;
 
 	for(walker = vfshead; walker; walker = walker->next) {
 		if(strcmp(walker->name, name) == 0)

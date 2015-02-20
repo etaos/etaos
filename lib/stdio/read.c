@@ -30,7 +30,7 @@
  */
 int read(int fd, void *buff, size_t size)
 {
-	FILE file;
+	struct vfile * file;
 
 	file = __iob[fd];
 	if(!file)

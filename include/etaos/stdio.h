@@ -58,7 +58,7 @@
 
 #define EOF 1
 
-struct file;
+struct vfile;
 /**
  * \brief Define a file stream.
  * \param defname Variable name of the stream.
@@ -75,7 +75,7 @@ struct file;
  * This defines an initialized file stream structure.
  */
 #define FDEV_SETUP_STREAM(defname, r, w, p, g, f, n, fl, d) \
-	struct file defname = {	\
+	struct vfile defname = {	\
 	.write = r,		\
 	.read = w,		\
 	.put = p,		\
@@ -94,32 +94,32 @@ struct file;
  * @ingroup vfs
  * @brief File definition
  */
-typedef struct file {
+struct vfile {
 	const char *name; //!< File name.
-	struct file *next; //!< Next file.
+	struct vfile *next; //!< Next file.
 
 	unsigned long flags; //!< File flags.
 	int fd; //!< Assigned file descriptor.
 
-	int (*open)(struct file*); //!< Open a file.
-	int (*close)(struct file*); //!< File close.
-	int (*read)(struct file*, void*, size_t); //!< Read from a file.
-	int (*write)(struct file*, const void*, size_t); //!< Write to a file.
-	int (*flush)(struct file*); //!< Flush the file.
-	int (*put)(int c, struct file*); //!< Write 1 byte to a file.
-	int (*get)(struct file*); //!< Read 1 byte from a file.
-	int (*ioctl)(struct file*, unsigned long reg, void *buf);
+	int (*open)(struct vfile*); //!< Open a file.
+	int (*close)(struct vfile*); //!< File close.
+	int (*read)(struct vfile*, void*, size_t); //!< Read from a file.
+	int (*write)(struct vfile*, const void*, size_t); //!< Write to a file.
+	int (*flush)(struct vfile*); //!< Flush the file.
+	int (*put)(int c, struct vfile*); //!< Write 1 byte to a file.
+	int (*get)(struct vfile*); //!< Read 1 byte from a file.
+	int (*ioctl)(struct vfile*, unsigned long reg, void *buf);
 
 	void *data; //!< Private file data.
 	volatile unsigned char *buff; //!< File buffer.
 	size_t length; //!< Length of buff.
 	size_t index; //!< Index in buff.
 
-} *FILE;
+};
 
 CDECL
 
-extern FILE __iob[];
+extern struct vfile * __iob[];
 
 #define stdin 	__iob[0]
 #define stdout 	__iob[1]
@@ -127,20 +127,20 @@ extern FILE __iob[];
 
 #define filep(__idx) __iob[__idx]
 
-extern int putc(int c, FILE stream);
-extern int fputc(int c, FILE stream);
-extern int fputs(char *c, FILE stream);
-extern int fprintf(FILE stream, const char*, ...);
+extern int putc(int c, struct vfile * stream);
+extern int fputc(int c, struct vfile * stream);
+extern int fputs(char *c, struct vfile * stream);
+extern int fprintf(struct vfile * stream, const char*, ...);
 extern int printf(const char *, ...);
-extern int vfprintf(FILE stream, const char *fmt, va_list va);
-extern int iob_add(FILE iob);
+extern int vfprintf(struct vfile * stream, const char *fmt, va_list va);
+extern int iob_add(struct vfile * iob);
 extern int iob_remove(int fd);
 extern void close(int fd);
 extern int open(const char *name, unsigned long flags);
 extern int write(int fd, const void *buff, size_t size);
-extern int ioctl(FILE stream, unsigned long reg, void *buf);
-extern int getc(FILE stream);
-extern int fgetc(FILE stream);
+extern int ioctl(struct vfile * stream, unsigned long reg, void *buf);
+extern int getc(struct vfile * stream);
+extern int fgetc(struct vfile * stream);
 
 CDECL_END
 

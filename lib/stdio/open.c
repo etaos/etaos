@@ -29,7 +29,7 @@
  */
 int open(const char *name, unsigned long flags)
 {
-	FILE file;
+	struct vfile * file;
 
 	file = vfs_find(name);
 	if(file) {

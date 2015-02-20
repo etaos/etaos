@@ -32,7 +32,7 @@
  * @param stream Stream to write to.
  * @note Uses fputc internally
  */
-int fputs(char *s, FILE stream)
+int fputs(char *s, struct vfile * stream)
 {
 	for (; *s; s++) {
 		fputc(*s, stream);

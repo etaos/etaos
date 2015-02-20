@@ -24,7 +24,7 @@
 #include <etaos/error.h>
 #include <etaos/init.h>
 
-static inline struct usart *to_usart_dev(FILE file)
+static inline struct usart *to_usart_dev(struct vfile * file)
 {
 	struct device *dev;
 
@@ -33,7 +33,7 @@ static inline struct usart *to_usart_dev(FILE file)
 	return dev->dev_data;
 }
 
-static int usart_write(FILE file, const void *buff, size_t len)
+static int usart_write(struct vfile * file, const void *buff, size_t len)
 {
 	struct usart *usart;
 
@@ -41,7 +41,7 @@ static int usart_write(FILE file, const void *buff, size_t len)
 	return usart->write(usart, buff, len);
 }
 
-static int usart_read(FILE file, void *buff, size_t len)
+static int usart_read(struct vfile * file, void *buff, size_t len)
 {
 	struct usart *usart;
 
@@ -49,7 +49,7 @@ static int usart_read(FILE file, void *buff, size_t len)
 	return usart->read(usart, buff, len);
 }
 
-static int usart_putc(int c, FILE stream)
+static int usart_putc(int c, struct vfile * stream)
 {
 	struct usart *usart;
 
@@ -57,7 +57,7 @@ static int usart_putc(int c, FILE stream)
 	return usart->putc(usart, c);
 }
 
-static int usart_getc(FILE stream)
+static int usart_getc(struct vfile * stream)
 {
 	struct usart *usart;
 
@@ -75,7 +75,7 @@ static struct dev_file_ops usart_fops = {
 
 void setup_usart_streams(struct usart *usart)
 {
-	FILE usart_stream;
+	struct vfile * usart_stream;
 
 	usart_stream = dev_to_file(&usart->dev);
 	sysctl(SYS_SET_STDOUT, usart_stream);

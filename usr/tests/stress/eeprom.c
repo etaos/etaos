@@ -15,7 +15,7 @@ int ee_stress_write_byte(uint8_t addr, uint8_t byte)
 {
 	int fd, rc;
 	unsigned long _addr = addr;
-	FILE stream; 
+	struct vfile * stream; 
 
 	fd = open("24C02", _FDEV_SETUP_RW);
 
@@ -36,7 +36,7 @@ int ee_stress_read_byte(uint8_t addr, uint8_t *store)
 {
 	int rc, fd;
 	unsigned long _addr = addr;
-	FILE stream;
+	struct vfile * stream;
 
 	fd = open("24C02", _FDEV_SETUP_RW);
 
