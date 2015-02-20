@@ -38,6 +38,11 @@ static struct irq_chip avr_irq_chip = {
 	.resume = NULL,
 };
 
+int cpu_get_id(void)
+{
+	return 0;
+}
+
 /**
  * @brief Get the AVR IRQ chip.
  * @return ATmega AVR IRQ chip.

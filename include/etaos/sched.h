@@ -114,6 +114,17 @@ struct sched_class {
 #endif
 };
 
+#ifdef CONFIG_RR_ENTITY
+#define __DEFINE_RQ .rr_rq = { .run_queue = NULL }
+#endif
+
+#define DEFINE_RQ(__name,__class)			\
+	struct rq __name = {				\
+		.sched_class = __class,			\
+		.lock = SPIN_LOCK_INIT(__name.lock),	\
+		__DEFINE_RQ,				\
+	}
+
 /**
  * @struct rr_rq
  * @brief Round robin run queue.
@@ -175,6 +186,18 @@ CDECL
 extern unsigned char prio(struct thread *tp);
 extern void schedule(void);
 extern bool should_resched(void);
+
+/**
+ * @ingroup archAPI
+ * @brief Get the ID of the current CPU.
+ */
+extern int cpu_get_id(void);
+/**
+ * @ingroup archAPI
+ * @brief Get the RQ of the given cpu.
+ * @param cpu CPU to get the run queue from.
+ */
+extern struct rq *sched_cpu_to_rq(int cpu);
 /**
  * @ingroup archAPI
  * @brief Get the run queue of the current CPU.
@@ -201,9 +224,9 @@ extern struct rq *sched_select_rq(void);
  *
  * Do a context switch to the new given thread.
  */
-extern void cpu_reschedule(struct rq *rq, 
-		struct thread *prev, 
-		struct thread *next);
+extern void cpu_switch_context(struct rq *rq, 
+				struct thread *prev, 
+				struct thread *next);
 /**
  * @ingroup archAPI
  * @brief Setup the stack from of a thread.

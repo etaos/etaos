@@ -26,7 +26,9 @@
 #include <asm/sched.h>
 #include <asm/io.h>
 
-static struct rq avr_rq = {
+static DEFINE_RQ(avr_rq, &sys_sched_class);
+
+/*static struct rq avr_rq = {
 	.sched_class = &sys_sched_class,
 #if defined(CONFIG_RR) || defined(CONFIG_FIFO)
 	.rr_rq = { .run_queue = NULL, },
@@ -38,7 +40,7 @@ static struct rq avr_rq = {
 	.num = 0,
 	.lock = SPIN_LOCK_INIT(avr_rq.lock),
 
-};
+}; */
 
 /**
  * @brief Initialise the AVR scheduling core.
@@ -49,6 +51,11 @@ static struct rq avr_rq = {
 void avr_init_sched(void)
 {
 	avr_rq.source = avr_get_sys_clk();
+}
+
+struct rq *sched_cpu_to_rq(int cpu)
+{
+	return &avr_rq;
 }
 
 struct rq *sched_get_cpu_rq(void)
@@ -105,7 +112,7 @@ void avr_save_stack(stack_t *sp, struct thread *current)
 	return;
 }
 
-void cpu_reschedule(struct rq *rq, struct thread *prev, struct thread *next)
+void cpu_switch_context(struct rq *rq, struct thread *prev, struct thread *next)
 {
 	irq_enter_critical();
 	avr_switch_context(next->sp, prev);

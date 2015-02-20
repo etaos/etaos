@@ -152,9 +152,8 @@ struct thread {
 #ifdef CONFIG_DYN_PRIO
 	unsigned char dprio; //!< Dynamic thread priority.
 #endif
-#ifdef CONFIG_TIMER	
 	struct timer *timer; //!< Event timer.
-#endif
+
 #ifdef CONFIG_EVENT_MUTEX
 	unsigned char ec; //!< Event counter.
 #endif

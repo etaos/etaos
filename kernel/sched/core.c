@@ -629,6 +629,7 @@ static void rq_destroy_kill_q(struct rq *rq)
  * @param __t Thread to reset the dynamic priority for.
  */
 #define dyn_prio_reset(__t) (__t)->dprio = 0;
+#define dyn_prio_update(__rq, __c) (__c)->dyn_prio_update(__rq, 1)
 #else
 #define dyn_prio_reset(__t)
 #endif
@@ -655,15 +656,10 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 		}
 	}
 
-	if(prev != new) {
-		class->rm_thread(rq, new); /* remove the new 
-					      thread from the rq */
-		raw_spin_unlock_irq(&rq->lock);
-		cpu_reschedule(rq, prev, new);
-	} else {
-		raw_spin_unlock_irq(&rq->lock);
-	}
-
+	/* prev != new (this condition is ensured by cpu_schedule) */
+	class->rm_thread(rq, new);
+	raw_spin_unlock_irq(&rq->lock);
+	cpu_switch_context(rq, prev, new);
 }
 
 #ifdef CONFIG_EVENT_MUTEX
@@ -800,14 +796,13 @@ static void sched_do_signal_threads(struct rq *rq)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot rq_schedule(void)
+static void __hot cpu_schedule(int cpu)
 {
 	struct rq *rq;
-	unsigned int diff;
 	struct thread *tp, *prev;
-	int num = 0;
+	unsigned int diff = 0;
 
-	rq = sched_get_cpu_rq();
+	rq = sched_cpu_to_rq(cpu);
 	prev = current(rq);
 	
 resched:
@@ -821,11 +816,11 @@ resched:
 		tm_process_clock(rq->source, diff);
 
 #ifdef CONFIG_PREEMPT
-	if(diff < prev->slice) {
-		prev->slice -= diff;
-	} else if(diff >= prev->slice) {
+	if(diff >= prev->slice) {
 		prev->slice = CONFIG_TIME_SLICE;
 		set_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags);
+	} else {
+		prev->slice -= diff;
 	}
 #endif
 
@@ -838,12 +833,17 @@ resched:
 			tp != prev) {
 		rq->current = tp;
 		rq->switch_count++;
+#ifdef CONFIG_DYN_PRIO
+		dyn_prio_update(rq, rq->sched_class);
+#endif
 		dyn_prio_reset(tp);
 		rq_switch_context(rq, prev, tp);
-		rq = sched_get_cpu_rq();
+		
+		/* we might be on a different run queue now */
+		cpu = cpu_get_id();
+		rq = sched_cpu_to_rq(cpu);
 		prev = current(rq);
 		rq_update(rq);
-		num++;
 	} else {
 		raw_spin_unlock_irq(&rq->lock);
 	}
@@ -853,13 +853,6 @@ resched:
 		goto resched;
 
 	rq_destroy_kill_q(rq);
-#ifdef CONFIG_DYN_PRIO
-	if(num > 0) {
-		raw_spin_lock_irq(&rq->lock);
-		rq->sched_class->dyn_prio_update(rq, num);
-		raw_spin_unlock_irq(&rq->lock);
-	}
-#endif
 	return;
 }
 
@@ -875,7 +868,10 @@ resched:
  */
 void __hot schedule(void)
 {
-	rq_schedule();
+	int cpu;
+
+	cpu = cpu_get_id();
+	cpu_schedule(cpu);
 }
 
 static struct thread idle_thread, main_thread;
@@ -912,7 +908,7 @@ void sched_init(void)
 	idle_thread.rq = rq;
 	rq->current = &idle_thread;
 
-	cpu_reschedule(rq, NULL, &idle_thread);
+	cpu_switch_context(rq, NULL, &idle_thread);
 }
 
 #ifdef CONFIG_PREEMPT
@@ -965,18 +961,20 @@ void sched_yield(struct rq *rq)
 {
 	struct thread *tp, *curr;
 	struct sched_class *class;
+	int cpu;
 
 	class = rq->sched_class;
 	tp = class->next_runnable(rq);
 	curr = current(rq);
+	cpu = cpu_get_id();
 
 	if(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)) {
-		rq_schedule();
+		cpu_schedule(cpu);
 		return;
 	} else if(tp != curr) {
 		if(prio(tp) <= prio(curr)) {
 			set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
-			rq_schedule();
+			cpu_schedule(cpu);
 		}
 	}
 
