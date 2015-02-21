@@ -53,3 +53,45 @@ int sram_stress_read_byte(uint16_t addr, uint8_t *store)
 
 	return rc;
 }
+
+int sram_stress_read(uint16_t addr, void *buff, size_t len)
+{
+	int rc, fd;
+	FILE stream;
+	unsigned long _addr = addr;
+
+	fd = open("23K256", _FDEV_SETUP_RW);
+
+	if(fd >= 0) {
+		stream = filep(fd);
+		ioctl(stream, SRAM_RESET_RD_IDX, &_addr);
+		rc = read(fd, buff, len);
+		close(fd);
+	} else {
+		rc = -1;
+	}
+
+	return rc;
+}
+
+int sram_stress_write(uint16_t addr, const void *buff, size_t len)
+{
+	int fd, rc;
+	unsigned long _addr = addr;
+	FILE stream;
+
+	fd = open("23K256", _FDEV_SETUP_RW);
+
+	if(fd >= 0) {
+		stream = filep(fd);
+		ioctl(stream, SRAM_RESET_WR_IDX, &_addr);
+		rc = write(fd, buff, len);
+		close(fd);
+	} else {
+		rc = -1;
+	}
+
+	/* needs a 10ms delay before the next write can occur */
+	return rc;
+}
+

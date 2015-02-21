@@ -141,6 +141,7 @@ extern int write(int fd, const void *buff, size_t size);
 extern int ioctl(FILE stream, unsigned long reg, void *buf);
 extern int getc(FILE stream);
 extern int fgetc(FILE stream);
+extern int read(int fd, void *buff, size_t size);
 
 CDECL_END
 
