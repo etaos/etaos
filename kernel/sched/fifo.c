@@ -108,8 +108,11 @@ static void fifo_add_thread(struct rq *rq, struct thread *tp)
  */
 static int fifo_rm_thread(struct rq *rq, struct thread *tp)
 {
-	rq->num--;
-	return rr_shared_queue_remove(&rq->rr_rq.run_queue, tp);
+	int rc;
+
+	if((rc = rr_shared_queue_remove(&rq->rr_rq.run_queue, tp)) == 0)
+		rq->num--;
+	return rc;
 }
 
 /**
