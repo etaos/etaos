@@ -101,6 +101,7 @@ struct dev_file_ops {
 CDECL
 extern void dev_sync_unlock(struct device *dev);
 extern void dev_sync_lock(struct device *dev, unsigned ms);
+extern void dev_sync_wait(struct device *dev, unsigned ms);
 extern struct device *device_create(const char *name, void *data,
 		struct dev_file_ops *fops);
 extern int device_initialize(struct device *dev, struct dev_file_ops *fops);

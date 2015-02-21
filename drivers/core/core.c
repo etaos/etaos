@@ -99,6 +99,37 @@ void dev_sync_lock(struct device *dev, unsigned ms)
 }
 
 /**
+ * @brief Wait for an operation to complete.
+ * @param dev Device to put on hold.
+ * @param ms Miliseconds to wait.
+ *
+ * Put a device on hold for a given amount of miliseconds, without unlocking
+ * the sync lock.
+ */
+void dev_sync_wait(struct device *dev, unsigned ms)
+{
+	sync_t *syn = &dev->sync_lock;
+#ifdef CONFIG_THREAD_QUEUE
+	unsigned int time;
+#endif
+
+	syn->last_rw_op = sys_tick;
+
+#ifdef CONFIG_THREAD_QUEUE
+	if(time_before(sys_tick, syn->last_rw_op+ms)) {
+		time = (syn->last_rw_op+ms) - sys_tick;
+		thread_queue_wait(&sync_queue, time);
+	}
+#else
+	while(time_before(sys_tick, syn->last_rw_op+ms)) {
+#ifdef CONFIG_SCHED
+		yield();
+#endif
+	}
+#endif
+}
+
+/**
  * @brief Unlock a dev locked with dev_sync_lock.
  * @param dev Device to unlock.
  *
