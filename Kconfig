@@ -1,4 +1,4 @@
-mainmenu "Eta/OS $ARCH Kernel Configuration"
+mainmenu "ETA/OS $ARCH Kernel Configuration"
 
 config SRCARCH
 	string
