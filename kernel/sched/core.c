@@ -629,6 +629,12 @@ static void rq_destroy_kill_q(struct rq *rq)
  * @param __t Thread to reset the dynamic priority for.
  */
 #define dyn_prio_reset(__t) (__t)->dprio = 0;
+/**
+ * @def dyn_prio_update
+ * @brief Update the dynamic priorities of a run queue with 1.
+ * @param __rq Run queue to update.
+ * @param __c Scheduling class of \p __rq.
+ */
 #define dyn_prio_update(__rq, __c) (__c)->dyn_prio_update(__rq, 1)
 #endif
 
@@ -784,6 +790,7 @@ static void sched_do_signal_threads(struct rq *rq)
 
 /**
  * @brief Reschedule the current run queue.
+ * @param cpu ID of the CPU which should be rescheduled.
  * @note This function also updates:
  * 	   - threads signaled from an IRQ;
  * 	   - timers;
