@@ -54,3 +54,44 @@ int ee_stress_read_byte(uint8_t addr, uint8_t *store)
 	return rc;
 }
 
+int ee_stress_read(uint8_t addr, void *buff, size_t len)
+{
+	int rc, fd;
+	unsigned long _addr = addr;
+	struct vfile *stream;
+
+	fd = open("24C02", _FDEV_SETUP_RW);
+
+	if(fd >= 0) {
+		stream = filep(fd);
+		ioctl(stream, EEPROM_RESET_RD_IDX, &_addr);
+		rc = read(fd, buff, len);
+		close(fd);
+	} else {
+		rc = -1;
+	}
+
+	return rc;
+}
+
+int ee_stress_write(uint8_t addr, const void *buff, size_t len)
+{
+	int fd, rc = -EOK;
+	unsigned long _addr = addr;
+	struct vfile *stream;
+
+	fd = open("24C02", _FDEV_SETUP_RW);
+
+	if(fd >= 0) {
+		stream = filep(fd);
+		ioctl(stream, EEPROM_RESET_WR_IDX, &_addr);
+		write(fd, buff, len);
+		close(fd);
+	} else {
+		rc = -1;
+	}
+
+	/* needs a 10ms delay before the next write can occur */
+	return rc;
+}
+

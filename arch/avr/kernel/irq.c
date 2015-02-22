@@ -66,6 +66,12 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 #endif
 }
 
+SIGNAL(SPI_STC_VECTOR)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+	chip->chip_handle(SPI_STC_VECTOR_NUM);
+}
+
 SIGNAL(TWI_STC_VECTOR)
 {
 	struct irq_chip *chip = arch_get_irq_chip();

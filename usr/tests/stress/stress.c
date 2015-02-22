@@ -25,28 +25,37 @@ static uint8_t test_stack2[CONFIG_STACK_SIZE];
 
 static struct ipm_queue ipm_q;
 static uint8_t ee_value = 0x0;
-static const char *ee_output = "[%u][%s]: %u\n";
+static const char ee_output[] = "[%u][%s]: %u\n";
+
+static const char sram_test[] = "sram test";
+static const char ee_test[]   = "ee test";
 
 #define EE_ADDR 0x20
+#define EE_ADDR2 0x40
 
 extern int ee_stress_read_byte(uint8_t addr, uint8_t *rb);
 extern int ee_stress_write_byte(uint8_t addr, uint8_t byte);
+extern int ee_stress_write(uint8_t addr, const void *buff, size_t len);
+extern int ee_stress_read(uint8_t addr, void *buff, size_t len);
 
 extern int sram_stress_read_byte(uint16_t addr, uint8_t *store);
 extern int sram_stress_write_byte(uint16_t addr, uint8_t byte);
+extern int sram_stress_read(uint16_t addr, void *buff, size_t len);
+extern int sram_stress_write(uint16_t addr, const void *buff, size_t len);
 
 THREAD(test_th_handle2, arg)
 {
 	unsigned char sram_readback;
 	unsigned long rand;
 
-	sram_23k256_init();
 	sram_stress_write_byte(0x100, 0x78);
-	
+	sram_stress_write(0x200, sram_test, strlen(sram_test)+1);
+
 	while(true) {
 		sram_stress_read_byte(0x100, &sram_readback);
 		rand = random_m(100);
-		printf("[2][tst2]: SRAM: %u :: RAND: %u\n", sram_readback, rand);
+		printf("[2][tst2]: SRAM: %u :: RAND: %u\n",
+				sram_readback, rand);
 		sleep(1000);
 	}
 }
@@ -56,6 +65,8 @@ THREAD(test_th_handle, arg)
 	int fd;
 	struct ipm msg;
 	uint8_t readback;
+	char sram_string[sizeof(sram_test)];
+	char ee_string[sizeof(ee_test)];
 
 	thread_create("tst2", &test_th_handle2, NULL, CONFIG_STACK_SIZE, 
 			test_stack2, 150);
@@ -69,6 +80,10 @@ THREAD(test_th_handle, arg)
 
 		fd = open("atm-usart", _FDEV_SETUP_RW);
 		write(fd, msg.data, msg.len);
+
+		sram_stress_read(0x200, sram_string, sizeof(sram_string));
+		ee_stress_read(EE_ADDR2, ee_string, sizeof(ee_string));
+		printf("[1]SRAM::EEPROM %s::%s\n", sram_string, ee_string);
 		close(fd);
 	}
 }
@@ -79,8 +94,10 @@ int main(void)
 	bool value = true;
 	uint8_t readback = 0;
 
+	sram_23k256_init();
 	ipm_queue_init(&ipm_q, 2);
 	ee_stress_write_byte(EE_ADDR, 0xAC);
+	ee_stress_write(EE_ADDR2, ee_test, strlen(ee_test)+1);
 
 	test_stack = kzalloc(CONFIG_STACK_SIZE);
 	thread_create("tst", &test_th_handle, NULL,

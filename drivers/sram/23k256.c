@@ -25,6 +25,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/stdlib.h>
 #include <etaos/types.h>
 #include <etaos/spi.h>
 #include <etaos/gpio.h>
@@ -47,10 +48,12 @@
 
 #define SPI_BYTE_MODE HOLD
 #define SPI_PAGE_MODE HOLD | 0x80
-#define SPI_BUF_MODE  HOLD | 0x40
+#define SPI_SEQ_MODE  HOLD | 0x40
 
 static int __sram_put(struct sram *ram, int c);
 static int __sram_get(struct sram *ram);
+static int __sram_write(struct sram *ram, const void *_buff, size_t len);
+static int __sram_read(struct sram *sram, void *_buff, size_t len);
 
 static struct spidev sram_23k256_dev = {
 	.flags = 0UL,
@@ -64,8 +67,8 @@ static struct sram sram_23k256_chip = {
 
 	.write_byte = &__sram_put,
 	.read_byte = &__sram_get,
-	.write = NULL,
-	.read = NULL,
+	.write = &__sram_write,
+	.read = &__sram_read,
 };
 
 /**
@@ -114,6 +117,33 @@ static int __sram_put(struct sram *ram, int c)
 	return rv;
 }
 
+static int __sram_write(struct sram *ram, const void *_buff, size_t len)
+{
+	struct spi_msg *msg;
+	uint8_t *buff;
+	int rv = -EINVAL;
+
+	buff = kzalloc(len+3);
+	if(!buff)
+		return -ENOMEM;
+
+	memcpy(&buff[3], _buff, len);
+	buff[0] = WRDA;
+	buff[1] = (uint8_t)((ram->wr_idx >> 8) & 0xFF);
+	buff[2] = (uint8_t)(ram->wr_idx & 0xFF);
+	msg = spi_alloc_msg(buff, buff, len+3);
+
+	sram_set_mode(SPI_SEQ_MODE);
+	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
+	rv = spi_transfer(&sram_23k256_dev, msg);
+	dev_sync_unlock(&sram_23k256_dev.dev);
+	spi_free_msg(msg);
+
+	kfree(buff);
+
+	return rv;
+}
+
 /**
  * @brief Read a single byte from a 23K256 chip.
  * @param ram SRAM chip descriptor.
@@ -133,6 +163,33 @@ static int __sram_get(struct sram *ram)
 	spi_free_msg(msg);
 
 	return read_seq[3];
+}
+
+static int __sram_read(struct sram *sram, void *_buff, size_t len)
+{
+	struct spi_msg *msg;
+	uint8_t *buff;
+	int rv = -EINVAL;
+
+	buff = kzalloc(len+3);
+	if(!buff)
+		return -EINVAL;
+
+	buff[0] = RDDA;
+	buff[1] = (uint8_t)((sram->rd_idx >> 8) & 0xFF);
+	buff[2] = (uint8_t)(sram->rd_idx & 0xFF);
+	msg = spi_alloc_msg(buff, buff, len+3);
+
+	sram_set_mode(SPI_SEQ_MODE);
+	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
+	rv = spi_transfer(&sram_23k256_dev, msg);
+	dev_sync_unlock(&sram_23k256_dev.dev);
+	spi_free_msg(msg);
+
+	memcpy(_buff, &buff[3], len);
+	kfree(buff);
+
+	return rv;
 }
 
 /**
