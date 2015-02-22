@@ -62,6 +62,11 @@ void arch_irq_enable();
 CDECL_END
 
 /**
+ * @brief Get the CPU IRQ chip.
+ */
+#define irq_get_chip() arch_get_irq_chip()
+
+/**
  * @brief Enable interrupts
  */
 #define irq_disable() arch_irq_disable()

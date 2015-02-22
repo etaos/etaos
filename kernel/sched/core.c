@@ -32,6 +32,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/init.h>
+#include <etaos/list.h>
 #include <etaos/error.h>
 #include <etaos/mem.h>
 #include <etaos/thread.h>
@@ -60,10 +61,8 @@ DEFINE_THREAD_QUEUE(irq_thread_queue);
  */
 static void irq_thread_wait(void)
 {
-	struct thread *tp;
-
-	tp = current_thread();
-	queue_add_thread(&irq_thread_queue, tp);
+	struct thread *tp = current_thread();
+	
 	set_bit(THREAD_WAITING_FLAG, &tp->flags);
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
@@ -87,7 +86,8 @@ void irq_handle_fn(void *data)
 		if(test_bit(THREAD_EXIT_FLAG, &current_thread()->flags))
 			kill();
 
-		irq->handler(irq, irq->private_data);
+		if(irq->handler(irq, irq->private_data) == IRQ_HANDLED)
+			clear_bit(IRQ_THREADED_TRIGGERED_FLAG, &irq->flags);
 	}
 }
 #endif
@@ -725,27 +725,28 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
  */
 static void irq_signal_threads(struct rq *rq)
 {
-	struct thread *walker;
-	struct thread_queue *qp = irq_get_thread_queue();
-	unsigned long flags;
+	struct list_head *icarriage;
+	struct irq_chip *chip = irq_get_chip();
+	struct irq_data *idata;
+	struct irq_thread_data *tdata;
+	struct thread *tp;
 
-	irq_save_and_disable(&flags);
-	walker = qp->qhead;
-	while(walker && walker != SIGNALED) {
-		if(walker->ec) {
-			walker->ec--;
-			queue_remove_thread(qp, walker);
-			rq_add_thread_no_lock(walker);
-			clear_bit(THREAD_WAITING_FLAG, &walker->flags);
+	list_for_each(icarriage, &chip->irqs) {
+		idata = list_entry(icarriage, struct irq_data, irq_list);
+		if(!test_bit(IRQ_THREADED_FLAG, &idata->flags) ||
+				!test_bit(IRQ_ENABLE_FLAG, &idata->flags))
+			continue;
+
+		tdata = container_of(idata, struct irq_thread_data, idata);
+		tp = tdata->owner;
+		if(tp->ec) {
+			clear_bit(THREAD_WAITING_FLAG, &tp->flags);
+			rq_add_thread_no_lock(tp);
 			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
 		}
-		walker = qp->sched_class->thread_after(walker);
 	}
 
-	if(!qp->qhead)
-		qp->qhead = SIGNALED;
-
-	irq_restore(&flags);
+	return;
 }
 #else
 #define irq_signal_threads(__rq)

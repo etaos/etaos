@@ -56,14 +56,16 @@ unsigned long test_sys_tick = 0;
 
 SIGNAL(TIMER0_OVERFLOW_VECTOR)
 {
-#ifdef CONFIG_IRQ_DEBUG
-	test_sys_tick++;
-#endif
-#if 1
 	struct irq_chip *chip = arch_get_irq_chip();
 
-	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
+#ifdef CONFIG_IRQ_DEBUG
+	test_sys_tick++;
+
+	if((test_sys_tick % 5000) == 0)
+		chip->chip_handle(EXT_IRQ0_NUM);
 #endif
+
+	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
 }
 
 SIGNAL(TWI_STC_VECTOR)

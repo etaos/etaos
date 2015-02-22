@@ -32,10 +32,12 @@
 
 #define _VECTORS_SIZE (57*4)
 
-#define TIMER0_OVERFLOW_VECTOR_NUM 23
-#define SPI_STC_VECTOR_NUM	   24
-#define TWI_STC_VECTOR_NUM	   39
+#define EXT_IRQ0_NUM			 1
+#define TIMER0_OVERFLOW_VECTOR_NUM	23
+#define SPI_STC_VECTOR_NUM		24
+#define TWI_STC_VECTOR_NUM		39
 
+#define EXT_IRQ0_VECTOR irq_vector(1)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(23)
 #define SPI_STC_VECTOR irq_vector(24)
 #define TWI_STC_VECTOR irq_vector(39)
