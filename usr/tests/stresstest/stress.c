@@ -30,8 +30,11 @@ static const char ee_output[] = "[%u][%s]: %u\n";
 static const char sram_test[] = "sram test";
 static const char ee_test[]   = "ee test";
 
-#define EE_ADDR 0x20
-#define EE_ADDR2 0x40
+#define EE_BYTE_ADDR 0x20
+#define EE_STRING_ADDR 0x40
+
+#define SRAM_BYTE_ADDR 0x100
+#define SRAM_STRING_ADDR 0x200
 
 extern int ee_stress_read_byte(uint8_t addr, uint8_t *rb);
 extern int ee_stress_write_byte(uint8_t addr, uint8_t byte);
@@ -48,11 +51,11 @@ THREAD(test_th_handle2, arg)
 	unsigned char sram_readback;
 	unsigned long rand;
 
-	sram_stress_write_byte(0x100, 0x78);
-	sram_stress_write(0x200, sram_test, strlen(sram_test)+1);
+	sram_stress_write_byte(SRAM_BYTE_ADDR, 0x78);
+	sram_stress_write(SRAM_STRING_ADDR, sram_test, strlen(sram_test)+1);
 
 	while(true) {
-		sram_stress_read_byte(0x100, &sram_readback);
+		sram_stress_read_byte(SRAM_BYTE_ADDR, &sram_readback);
 		rand = random_m(100);
 		printf("[2][tst2]: SRAM: %u :: RAND: %u\n",
 				sram_readback, rand);
@@ -72,7 +75,7 @@ THREAD(test_th_handle, arg)
 			test_stack2, 150);
 
 	while(true) {
-		ee_stress_read_byte(EE_ADDR, &readback);
+		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
 		printf(ee_output, 1, "tst1", readback);
 
 		ipm_get_msg(&ipm_q, &msg);
@@ -81,8 +84,9 @@ THREAD(test_th_handle, arg)
 		fd = open("atm-usart", _FDEV_SETUP_RW);
 		write(fd, msg.data, msg.len);
 
-		sram_stress_read(0x200, sram_string, sizeof(sram_string));
-		ee_stress_read(EE_ADDR2, ee_string, sizeof(ee_string));
+		sram_stress_read(SRAM_STRING_ADDR, sram_string, 
+				sizeof(sram_string));
+		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
 		printf("[1]SRAM::EEPROM %s::%s\n", sram_string, ee_string);
 		close(fd);
 	}
@@ -96,8 +100,8 @@ int main(void)
 
 	sram_23k256_init();
 	ipm_queue_init(&ipm_q, 2);
-	ee_stress_write_byte(EE_ADDR, 0xAC);
-	ee_stress_write(EE_ADDR2, ee_test, strlen(ee_test)+1);
+	ee_stress_write_byte(EE_BYTE_ADDR, 0xAC);
+	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);
 
 	test_stack = kzalloc(CONFIG_STACK_SIZE);
 	thread_create("tst", &test_th_handle, NULL,
@@ -115,9 +119,9 @@ int main(void)
 		pgpio_pin_release(13);
 		value = !value;
 
-		ee_stress_read_byte(EE_ADDR, &readback);
+		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
 		ee_value += 1;
-		ee_stress_write_byte(EE_ADDR, ee_value);
+		ee_stress_write_byte(EE_BYTE_ADDR, ee_value);
 		printf(ee_output, 0, "main", readback);
 		printf("[0][main]: Memory available: %u\n", 
 				mm_heap_available());
