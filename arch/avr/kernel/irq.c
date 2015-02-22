@@ -49,6 +49,14 @@ void arch_irq_restore_flags(unsigned long *flags)
 	return;
 }
 
+void cpu_request_irq(struct irq_data *data)
+{
+	switch(data->irq) {
+	default:
+		break;
+	}
+}
+
 #ifdef CONFIG_IRQ_DEBUG
 extern unsigned long test_sys_tick;
 unsigned long test_sys_tick = 0;
