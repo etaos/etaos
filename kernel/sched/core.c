@@ -630,8 +630,6 @@ static void rq_destroy_kill_q(struct rq *rq)
  */
 #define dyn_prio_reset(__t) (__t)->dprio = 0;
 #define dyn_prio_update(__rq, __c) (__c)->dyn_prio_update(__rq, 1)
-#else
-#define dyn_prio_reset(__t)
 #endif
 
 /**
@@ -835,8 +833,8 @@ resched:
 		rq->switch_count++;
 #ifdef CONFIG_DYN_PRIO
 		dyn_prio_update(rq, rq->sched_class);
-#endif
 		dyn_prio_reset(tp);
+#endif
 		rq_switch_context(rq, prev, tp);
 		
 		/* we might be on a different run queue now */
