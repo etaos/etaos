@@ -52,7 +52,11 @@
 #define SPI_TMO 500
 #define SPI_RETRIES 3
 
-static mutex_t master_spi_mutex;
+static mutex_t master_xfer_mutex;
+static uint8_t *master_rx_buff;
+static uint8_t *master_tx_buff;
+static size_t   master_index;
+static size_t   master_length;
 
 static unsigned char spi_clk_div[] = {
 	4,
@@ -64,6 +68,21 @@ static unsigned char spi_clk_div[] = {
 	32,
 	64,
 };
+
+static irqreturn_t atmega_spi_stc_irq(struct irq_data *irq, void *data)
+{
+	if(master_rx_buff)
+		master_rx_buff[master_index - 1] = SPDR;
+
+	if(master_index < master_length) {
+		SPDR = master_tx_buff[master_index];
+		master_index += 1;
+	} else {
+		mutex_unlock_from_irq(&master_xfer_mutex);
+	}
+
+	return IRQ_HANDLED;
+}
 
 /**
  * @brief Set the speed of the ATmega SPI bus.
@@ -117,7 +136,6 @@ static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
 {
 	int rv = -EOK;
 
-	mutex_lock(&master_spi_mutex);
 	switch(ctrl) {
 	case SPI_MODE0:
 		SPCR &= ~(CPHA | CPOL);
@@ -147,7 +165,6 @@ static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
 		rv = -EINVAL;
 		break;
 	}
-	mutex_unlock(&master_spi_mutex);
 
 	return rv;
 }
@@ -160,23 +177,18 @@ static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
  */
 static int atmega_spi_xfer(struct spidev *dev, struct spi_msg *msg)
 {
-	int rv = 0;
-	size_t idx = 0;
-	unsigned char *rx, *tx;
+	master_rx_buff = msg->rx;
+	master_tx_buff = msg->tx;
+	master_length = msg->len;
 
-	rx = msg->rx;
-	tx = msg->tx;
+	/* Set the index to 1, since the first byte is sent here to
+	   initialise the transfer. */
+	master_index = 1;
 
-	mutex_lock(&master_spi_mutex);
-	for(; idx < msg->len; idx++) {
-		SPDR = tx[idx];
-		while(!(SPSR & SPIF));
-		rx[idx] = SPDR;
-		rv++;
-	}
-	mutex_unlock(&master_spi_mutex);
+	SPDR = master_tx_buff[0];
+	mutex_wait(&master_xfer_mutex);
 
-	return rv;
+	return msg->len;
 }
 
 static struct spi_driver atmega_spi_driver = {
@@ -193,7 +205,15 @@ static void __used atmega_spi_init(void)
 	struct gpio_pin *cs;
 
 	/* software initialisation */
-	mutex_init(&master_spi_mutex);
+	mutex_init(&master_xfer_mutex);
+	master_rx_buff = NULL;
+	master_tx_buff = NULL;
+	master_index = 0;
+	master_length = 0;
+
+	irq_request(SPI_STC_VECTOR_NUM, &atmega_spi_stc_irq, IRQ_FALLING_MASK,
+			NULL);
+
 	atmega_spi_driver.clk = gpio_chip_to_pin(chip, SCK_GPIO);
 	atmega_spi_driver.mosi = gpio_chip_to_pin(chip, MOSI_GPIO);
 	atmega_spi_driver.miso = gpio_chip_to_pin(chip, MISO_GPIO);
@@ -217,7 +237,7 @@ static void __used atmega_spi_init(void)
 	gpio_pin_release(cs);
 
 	SPCR |= SPR1;
-	SPCR |= SPE | MSTR;
+	SPCR |= SPE | MSTR | SPIE;
 	spi_sysbus = &atmega_spi_driver;
 }
 
