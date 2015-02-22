@@ -26,6 +26,8 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 
+struct irq_data;
+
 CDECL
 
 extern void irq_save_and_disable(unsigned long *flags);
@@ -34,32 +36,39 @@ extern void irq_restore(unsigned long *flags);
 /* arch functions */
 /**
  * @ingroup archAPI
+ * @brief Setup the hardware registers for the IRQ.
+ * @param data IRQ data structure.
+ */
+extern void cpu_request_irq(struct irq_data *data);
+/**
+ * @ingroup archAPI
  * @brief Restore the IRQ flags.
  * @param flags IRQ flags which have to be restored.
- * @pure
  */
 extern void arch_irq_restore_flags(unsigned long *flags);
 /**
  * @ingroup archAPI
  * @brief Get the IRQ flags.
  * @return IRQ flags.
- * @pure
  */
 extern unsigned long arch_irq_get_flags();
 /**
  * @ingroup archAPI
  * @brief Disable the global interrupts.
- * @pure
  */
 extern void arch_irq_disable();
 /**
  * @ingroup archAPI
  * @brief Enable the global interrupts.
- * @pure
  */
 void arch_irq_enable();
 
 CDECL_END
+
+/**
+ * @brief Get the CPU IRQ chip.
+ */
+#define irq_get_chip() arch_get_irq_chip()
 
 /**
  * @brief Enable interrupts

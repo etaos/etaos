@@ -20,12 +20,7 @@
 #define __IRQ_HANDLE_HEADER__
 
 #ifdef CONFIG_IRQ_THREAD
-struct thread_queue;
-extern struct thread_queue irq_thread_queue;
-static inline struct thread_queue *irq_get_thread_queue(void)
-{
-	return &irq_thread_queue;
-}
+extern void irq_handle(int irq);
 #endif
 
 #endif

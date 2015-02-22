@@ -101,6 +101,7 @@ static int irq_request_threaded_irq(struct irq_thread_data *data)
 
 	data->owner = thread_create("ithread", &irq_handle_fn, &data->idata,
 			CONFIG_STACK_SIZE, stack, IRQ_THREAD_PRIO);
+
 	if(!data->owner)
 		return -ENOMEM;
 
@@ -151,6 +152,7 @@ int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 	data->chip = arch_get_irq_chip();
 	err = irq_chip_add_irq(data->chip, data);
 	irq_store_data(irq, data);
+	cpu_request_irq(data);
 
 	set_bit(IRQ_ENABLE_FLAG, &data->flags);
 	return err;
