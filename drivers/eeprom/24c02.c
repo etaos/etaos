@@ -22,6 +22,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/stdlib.h>
 #include <etaos/types.h>
 #include <etaos/i2c.h>
 #include <etaos/eeprom.h>
@@ -35,6 +36,7 @@
 #define BASE_SLA_24C02 0xA0
 #define SCL_FRQ_24C02 100000UL
 #define EE_SYNC 10
+#define PAGE_SIZE 8
 
 static int __eeprom_24c02_read_byte(struct eeprom *ee)
 {
@@ -49,10 +51,80 @@ static int __eeprom_24c02_write_byte(struct eeprom *ee, int c)
 	return eeprom_24c02_write_byte(ee->wr_idx, (unsigned char)c);
 }
 
+static int __ee_24c02_write(struct eeprom *ee, const void *_buff, size_t len)
+{
+	int8_t *buff;
+	uint8_t eeprom_index = 0;
+	int full_pages, left_over, idx = 0;
+	struct i2c_client *client = ee->priv;
+
+	if(len >= PAGE_SIZE)
+		full_pages = (len / PAGE_SIZE);
+	else
+		full_pages = 0;
+
+	left_over = len % PAGE_SIZE;
+	buff = kmalloc(PAGE_SIZE+1);
+	if(!buff)
+		return -ENOMEM;
+
+	dev_sync_lock(&client->dev, EE_SYNC);
+	for(; full_pages; full_pages--, idx++) {
+		buff[0] = ee->wr_idx + eeprom_index;
+		memcpy(&buff[1], _buff + (PAGE_SIZE*idx), PAGE_SIZE);
+		i2c_master_send(client, buff, PAGE_SIZE+1);
+		eeprom_index += PAGE_SIZE;
+		dev_sync_wait(&client->dev, EE_SYNC);
+	}
+
+	if(left_over) {
+		buff[0] = ee->wr_idx + eeprom_index;
+		memcpy(&buff[1], _buff + (PAGE_SIZE*idx), left_over);
+		i2c_master_send(client, buff, left_over);
+	}
+	dev_sync_unlock(&client->dev);
+
+	kfree(buff);
+	return -EOK;
+}
+
+#define MSG_TX 0
+#define MSG_RX 1
+static int __ee_24c02_read(struct eeprom *ee, void *_buff, size_t len)
+{
+	struct i2c_client *client = ee->priv;
+	struct i2c_msg *msgs;
+	uint8_t addr;
+	int rc;
+
+	msgs = kzalloc(sizeof(*msgs)*2);
+	if(!msgs)
+		return -ENOMEM;
+
+	addr = ee->rd_idx;
+	msgs[MSG_TX].dest_addr = client->addr;
+	msgs[MSG_TX].len = 1;
+	msgs[MSG_TX].buff = &addr;
+
+	msgs[MSG_RX].dest_addr = client->addr;
+	msgs[MSG_RX].len = len;
+	msgs[MSG_RX].buff = _buff;
+	set_bit(I2C_RD_FLAG, &msgs[MSG_RX].flags);
+
+	dev_sync_lock(&client->dev, EE_SYNC);
+	rc = i2c_bus_xfer(client->bus, msgs, 2);
+	dev_sync_unlock(&client->dev);
+	
+	kfree(msgs);
+	return (rc == 2) ? -EOK : rc;
+}
+
 static struct eeprom ee_chip = {
 	.name = "24C02",
 	.write_byte = &__eeprom_24c02_write_byte,
 	.read_byte = &__eeprom_24c02_read_byte,
+	.write = &__ee_24c02_write,
+	.read = &__ee_24c02_read,
 };
 
 /**
@@ -74,8 +146,6 @@ int eeprom_24c02_write_byte(unsigned char addr, unsigned char data)
 	return (rc == 2) ? -EOK : rc;
 }
 
-#define MSG_TX 0
-#define MSG_RX 1
 /**
  * @brief Read a byte from a 24C02 EEPROM chip.
  * @param addr EEPROM address to read from.
