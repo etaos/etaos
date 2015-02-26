@@ -629,13 +629,19 @@ static void rq_destroy_kill_q(struct rq *rq)
  * @param __t Thread to reset the dynamic priority for.
  */
 #define dyn_prio_reset(__t) (__t)->dprio = 0;
+
 /**
- * @def dyn_prio_update
  * @brief Update the dynamic priorities of a run queue with 1.
  * @param __rq Run queue to update.
- * @param __c Scheduling class of \p __rq.
  */
-#define dyn_prio_update(__rq, __c) (__c)->dyn_prio_update(__rq, 1)
+static inline void dyn_prio_update(struct rq *rq)
+{
+	struct sched_class *class;
+
+	class = rq ? rq->sched_class : NULL;
+	if(class)
+		class->dyn_prio_update(rq, 1);
+}
 #endif
 
 /**
@@ -749,7 +755,9 @@ static void irq_signal_threads(struct rq *rq)
 	return;
 }
 #else
-#define irq_signal_threads(__rq)
+static inline void irq_signal_threads(struct rq *rq)
+{
+}
 #endif
 
 #ifdef CONFIG_EVENT_MUTEX
@@ -786,7 +794,9 @@ static void sched_do_signal_threads(struct rq *rq)
 	return;
 }
 #else
-#define sched_do_signal_threads(__rq)
+static inline void sched_do_signal_threads(struct rq *rq)
+{
+}
 #endif
 
 #ifdef CONFIG_PREEMPT
@@ -852,7 +862,7 @@ resched:
 		rq->current = tp;
 		rq->switch_count++;
 #ifdef CONFIG_DYN_PRIO
-		dyn_prio_update(rq, rq->sched_class);
+		dyn_prio_update(rq);
 		dyn_prio_reset(tp);
 #endif
 		preempt_reset_slice(prev);
