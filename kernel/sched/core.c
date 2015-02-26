@@ -789,6 +789,18 @@ static void sched_do_signal_threads(struct rq *rq)
 #define sched_do_signal_threads(__rq)
 #endif
 
+#ifdef CONFIG_PREEMPT
+static inline void preempt_reset_slice(struct thread *tp)
+{
+	if(tp)
+		tp->slice = CONFIG_TIME_SLICE;
+}
+#else
+static inline void preempt_reset_slice(struct thread *tp)
+{
+}
+#endif
+
 /**
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
@@ -843,8 +855,9 @@ resched:
 		dyn_prio_update(rq, rq->sched_class);
 		dyn_prio_reset(tp);
 #endif
+		preempt_reset_slice(prev);
 		rq_switch_context(rq, prev, tp);
-		
+
 		/* we might be on a different run queue now */
 		cpu = cpu_get_id();
 		rq = sched_cpu_to_rq(cpu);
