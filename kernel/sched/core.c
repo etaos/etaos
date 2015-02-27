@@ -865,7 +865,7 @@ resched:
 		dyn_prio_update(rq);
 		dyn_prio_reset(tp);
 #endif
-		preempt_reset_slice(prev);
+		preempt_reset_slice(tp);
 		rq_switch_context(rq, prev, tp);
 
 		/* we might be on a different run queue now */
