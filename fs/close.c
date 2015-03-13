@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - LibC close
+ *  ETA/OS - VFS close
  *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 #include <etaos/vfs.h>
 
 /**
- * @ingroup libc
+ * @ingroup vfs
  * @brief Close a file.
  * @param fd File descriptor to close.
  */
@@ -29,3 +29,4 @@ void close(int fd)
 {
 	iob_remove(fd);
 }
+

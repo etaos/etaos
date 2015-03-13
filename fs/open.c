@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - STDIO open
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - VFS open
+ *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/stdio.h>
 #include <etaos/error.h>
+#include <etaos/stdio.h>
 #include <etaos/vfs.h>
 
 /**
- * @ingroup libc
+ * @ingroup vfs
  * @brief Open a file on the virtual file system.
  * @param name File name to look for.
  * @param flags File flags.
@@ -40,3 +40,4 @@ int open(const char *name, unsigned long flags)
 
 	return -EINVAL;
 }
+
