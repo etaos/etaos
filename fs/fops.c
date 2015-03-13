@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC write
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - Generic file operations
+ *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,16 +19,29 @@
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/stdio.h>
-#include <etaos/bitops.h>
 #include <etaos/vfs.h>
 
-int write(int fd, const void *buff, size_t len)
+ssize_t vfs_setoffset(struct vfile *file, ssize_t offset, ssize_t max)
 {
-	struct vfile * file;
-
-	file = __iob[fd];
-	if(!file)
+	if(offset > max)
+		return -EINVAL;
+	if(offset < 0 && (file->index + offset) < 0)
 		return -EINVAL;
 
-	return vfs_write(file, buff, len);
+	if(offset != file->index)
+		file->index += offset;
+
+	return offset;
 }
+
+size_t vfs_setindex(struct vfile *file, size_t index, size_t max)
+{
+	if(index > max)
+		return -EINVAL;
+	
+	if(index != file->index)
+		file->index  = index;
+
+	return index;
+}
+

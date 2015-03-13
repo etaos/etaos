@@ -29,6 +29,12 @@ extern void vfs_add(struct vfile * file);
 extern int vfs_delete(struct vfile * f);
 extern struct vfile * vfs_find(const char *name);
 
+extern int vfs_read(struct vfile *file, void *buff, size_t size);
+extern int vfs_write(struct vfile *file, const void *buff, size_t size);
+
+extern ssize_t vfs_setoffset(struct vfile *file, ssize_t offset, ssize_t max);
+extern size_t vfs_setindex(struct vfile *file, size_t index, size_t max);
+
 CDECL_END
 
 #endif

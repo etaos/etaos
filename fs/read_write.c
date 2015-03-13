@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC write
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - VFS read/write operations
+ *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,15 +20,34 @@
 #include <etaos/error.h>
 #include <etaos/stdio.h>
 #include <etaos/bitops.h>
-#include <etaos/vfs.h>
 
-int write(int fd, const void *buff, size_t len)
+/**
+ * @ingroup vfs
+ * @brief Write to a file.
+ * @param file File to write to.
+ * @param buff Buffer to write into.
+ * @param size Size of \p buff.
+ */
+int vfs_write(struct vfile *file, const void *buff, size_t size)
 {
-	struct vfile * file;
-
-	file = __iob[fd];
-	if(!file)
+	if(test_bit(STREAM_WRITE_FLAG, &file->flags) && file->write)
+		return file->write(file, buff, size);
+	else
 		return -EINVAL;
-
-	return vfs_write(file, buff, len);
 }
+
+/**
+ * @ingroup vfs
+ * @brief Read from a file.
+ * @param file File to read from.
+ * @param buff Buffer to store data into.
+ * @param size Size of \p buff.
+ */
+int vfs_read(struct vfile *file, void *buff, size_t size)
+{
+	if(test_bit(STREAM_READ_FLAG, &file->flags) && file->read)
+		return file->read(file, buff, size);
+	else
+		return -EINVAL;
+}
+
