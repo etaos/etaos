@@ -1,6 +1,8 @@
 # Let clean descend into subdirs
 subdir-	+= basic kconfig
 
+subdir-y += crurom
+
 always		:= $(hostprogs-y) $(hostprogs-m)
 
 # The following hostprogs-y programs are only build on demand
