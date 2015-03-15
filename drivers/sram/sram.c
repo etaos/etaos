@@ -164,9 +164,6 @@ static struct dev_file_ops sram_ops = {
  */
 void sram_chip_init(struct sram *ram, struct device *dev)
 {
-	ram->rd_idx = 0;
-	ram->wr_idx = 0;
-
 	mutex_init(&ram->lock);
 	if(dev) {
 		dev->name = ram->name;

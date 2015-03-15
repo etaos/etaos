@@ -42,13 +42,13 @@ static int __eeprom_24c02_read_byte(struct eeprom *ee)
 {
 	unsigned char store;
 
-	eeprom_24c02_read_byte(ee->rd_idx, &store);
+	eeprom_24c02_read_byte(ee->file->index, &store);
 	return store;
 }
 
 static int __eeprom_24c02_write_byte(struct eeprom *ee, int c)
 {
-	return eeprom_24c02_write_byte(ee->wr_idx, (unsigned char)c);
+	return eeprom_24c02_write_byte(ee->file->index, (unsigned char)c);
 }
 
 static int __ee_24c02_write(struct eeprom *ee, const void *_buff, size_t len)
@@ -70,7 +70,7 @@ static int __ee_24c02_write(struct eeprom *ee, const void *_buff, size_t len)
 
 	dev_sync_lock(&client->dev, EE_SYNC);
 	for(; full_pages; full_pages--, idx++) {
-		buff[0] = ee->wr_idx + eeprom_index;
+		buff[0] = ee->file->index + eeprom_index;
 		memcpy(&buff[1], _buff + (PAGE_SIZE*idx), PAGE_SIZE);
 		i2c_master_send(client, buff, PAGE_SIZE+1);
 		eeprom_index += PAGE_SIZE;
@@ -78,7 +78,7 @@ static int __ee_24c02_write(struct eeprom *ee, const void *_buff, size_t len)
 	}
 
 	if(left_over) {
-		buff[0] = ee->wr_idx + eeprom_index;
+		buff[0] = ee->file->index + eeprom_index;
 		memcpy(&buff[1], _buff + (PAGE_SIZE*idx), left_over);
 		i2c_master_send(client, buff, left_over);
 	}
@@ -101,7 +101,7 @@ static int __ee_24c02_read(struct eeprom *ee, void *_buff, size_t len)
 	if(!msgs)
 		return -ENOMEM;
 
-	addr = ee->rd_idx;
+	addr = ee->file->index;
 	msgs[MSG_TX].dest_addr = client->addr;
 	msgs[MSG_TX].len = 1;
 	msgs[MSG_TX].buff = &addr;
