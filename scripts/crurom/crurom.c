@@ -49,6 +49,11 @@ static int rootlen = 0;
 static char outname[256];
 static FILE *fpout;
 
+/**
+ * @brief Generate a ROMFS entry for a single file.
+ * @param name Filename to generate a ROMFS entry for.
+ * @return Error code.
+ */
 static int dofile(char *name)
 {
 	int rc = -EXIT_SUCCESS;
@@ -126,6 +131,13 @@ static int dofile(char *name)
 	return rc;
 }
 
+/**
+ * @brief Generate ROMFS data for an entire directory.
+ * @param dirpath Path to the directory.
+ *
+ * This function will generate ROMFS entries for all files in the given
+ * directory, and subdirectory's if the `-r' flag is set.
+ */
 static int dodir(char *dirpath)
 {
 	int rc = -EXIT_SUCCESS;
