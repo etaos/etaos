@@ -93,6 +93,16 @@ static inline void raw_spin_unlock_irq(spinlock_t *lock)
 	arch_spin_unlock(lock);
 }
 
+static inline int spin_try_lock(spinlock_t *lock)
+{
+	if(lock->lock) {
+		return 1;
+	} else {
+		spin_lock(lock);
+		return 0;
+	}
+}
+
 CDECL_END
 
 #define spin_lock_irqsave(__l, __f) _spin_lock_irqsave(__l, &__f)

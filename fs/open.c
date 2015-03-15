@@ -33,6 +33,8 @@ int open(const char *name, unsigned long flags)
 
 	file = vfs_find(name);
 	if(file) {
+		if(spin_try_lock(&file->lock))
+			return -EAGAIN;
 		file->flags = flags;
 		iob_add(file);
 		return file->fd;

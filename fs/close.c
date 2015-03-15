@@ -27,6 +27,12 @@
  */
 void close(int fd)
 {
-	iob_remove(fd);
+	struct vfile *file;
+
+	file = __iob[fd];
+	if(file) {
+		spin_unlock(&file->lock);
+		iob_remove(fd);
+	}
 }
 
