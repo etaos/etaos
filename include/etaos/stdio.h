@@ -21,6 +21,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/spinlock.h>
 
 /**
  * \def MAX_OPEN
@@ -97,6 +98,7 @@ struct vfile;
 struct vfile {
 	const char *name; //!< File name.
 	struct vfile *next; //!< Next file.
+	spinlock_t lock;
 
 	unsigned long flags; //!< File flags.
 	int fd; //!< Assigned file descriptor.
