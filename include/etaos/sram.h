@@ -34,6 +34,7 @@
  */
 struct sram {
 	const char *name; //!< Chip name.
+	struct vfile *file;
 	
 	unsigned long rd_idx, //!< Read index.
 		      wr_idx; //!< Write index.

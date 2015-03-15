@@ -66,7 +66,7 @@ static int sram_write(struct vfile * stream, const void *buf, size_t len)
 
 	mutex_lock(&ram->lock);
 	rc = ram->write(ram, buf, len);
-	ram->wr_idx += len;
+	stream->index += len;
 	mutex_unlock(&ram->lock);
 
 	return rc;
@@ -93,7 +93,7 @@ static int sram_read(struct vfile * stream, void *buf, size_t len)
 
 	mutex_lock(&ram->lock);
 	rc = ram->read(ram, buf, len);
-	ram->rd_idx += len;
+	stream->index += len;
 	mutex_unlock(&ram->lock);
 
 	return rc;
@@ -119,7 +119,7 @@ static int sram_put(int c, struct vfile * stream)
 
 	mutex_lock(&ram->lock);
 	rc = ram->write_byte(ram, c);
-	ram->wr_idx++;
+	stream->index += 1;
 	mutex_unlock(&ram->lock);
 
 	return rc;
@@ -144,51 +144,7 @@ static int sram_get(struct vfile * stream)
 
 	mutex_lock(&ram->lock);
 	rc = ram->read_byte(ram);
-	ram->rd_idx++;
-	mutex_unlock(&ram->lock);
-
-	return rc;
-}
-
-/**
- * @brief Control the SRAM chip file descriptor.
- * @param stream struct vfile * pointer.
- * @param reg Control register.
- * @param buf Argument for \p reg.
- * @return An error code.
- */
-static int sram_ioctl(struct vfile * stream, unsigned long reg, void *buf)
-{
-	int rc;
-	unsigned long idx;
-	struct sram *ram;
-
-	if(!stream)
-		return -EINVAL;
-
-	ram = to_sram_chip(stream);
-
-	if(!buf)
-		idx = 0;
-	else
-		idx = *((unsigned long*)buf);
-
-	mutex_lock(&ram->lock);
-	switch(reg) {
-	case SRAM_RESET_WR_IDX:
-		ram->wr_idx = idx;
-		rc = -EOK;
-		break;
-
-	case SRAM_RESET_RD_IDX:
-		ram->rd_idx = idx;
-		rc = -EOK;
-		break;
-
-	default:
-		rc = -EINVAL;
-		break;
-	}
+	stream->index += 1;
 	mutex_unlock(&ram->lock);
 
 	return rc;
@@ -199,7 +155,6 @@ static struct dev_file_ops sram_ops = {
 	.read = &sram_read,
 	.put = &sram_put,
 	.get = &sram_get,
-	.ioctl = &sram_ioctl,
 };
 
 /**
@@ -217,6 +172,7 @@ void sram_chip_init(struct sram *ram, struct device *dev)
 		dev->name = ram->name;
 		device_initialize(dev, &sram_ops);
 		dev->dev_data = ram;
+		ram->file = &dev->file;
 	}
 }
 
