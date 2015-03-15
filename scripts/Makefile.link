@@ -43,8 +43,8 @@ include scripts/Makefile.lib
 
 app-target := $(obj)/$(APP_TARGET)
 
-quiet_cmd_link_app = LD      $@                                                 
-cmd_link_app = $(LD) $(LDFLAGS_etaos) -o $@ $(etaos-head) $(etaos-img) $(obj-y) -L$(ETAOS_LIB_DIR) $(ETAOS_LIBS) $(ETAOS_EXTRA_LIBS)
+quiet_cmd_link_app = LD      $@
+cmd_link_app = $(LD) $(LDFLAGS_etaos) -o $@ $(etaos-head) $(etaos-img) $(obj-y) $(crurom-obj) -L$(ETAOS_LIB_DIR) $(ETAOS_LIBS) $(ETAOS_EXTRA_LIBS)
 
 __build: $(app-target)
 	@:

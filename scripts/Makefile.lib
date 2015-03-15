@@ -42,8 +42,12 @@ subdir-m	+= $(__subdir-m)
 obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
 obj-m		:= $(filter-out %/, $(obj-m))
 
-crurom-y	:= $(patsubst %/,%,$(filter %/, $(crurom-y)))
-crurom-obj	:= romfs.o
+ifneq ($(crurom-obj),)
+crurom-obj := $(addprefix $(obj)/, $(crurom-obj))
+endif
+ifneq ($(crurom-y),)
+crurom-y   := $(addprefix $(obj)/, $(crurom-y))
+endif
 
 # Subdirectories we need to descend into
 

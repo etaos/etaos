@@ -10,6 +10,8 @@ __build:
 # Init all relevant variables used in kbuild files so
 # 1) they have correct type
 # 2) they do not inherit any value from the environment
+crurom-y :=
+crurom-obj :=
 obj-y :=
 obj-m :=
 lib-y :=
@@ -228,12 +230,22 @@ endef
 quiet_cmd_link_single-m = CC [M]  $@
 cmd_link_single-m = $(CC) $(c_flags) -c -o $@ $<
 
+quiet_cmd_gen_romfs = CRUROM  $(crurom-obj:.o=.c)
+      cmd_gen_romfs = $(CRUROM) $(CRUROMFLAGS) -o $(@:.o=.c) $(crurom-y)
+
+quiet_cmd_cc_crurom_o_c = CC      $@
+      cmd_cc_crurom_o_c = $(CC) $(c_flags) -c -o $@ $(@:.o=.c)
+
+$(crurom-obj):
+	$(call cmd,gen_romfs)
+	$(call cmd,cc_crurom_o_c)
+
 # Built-in and composite module parts
 $(obj)/%.o: $(src)/%.c FORCE
 	$(call cmd,force_checksrc)
 	$(call if_changed_rule,cc_o_c)
 
-# Single-part modules are special since we need to mark them in $(MODVERDIR)
+# Single-part modules are special since we need to mark them in $(MODVERDIR
 
 quiet_cmd_ar_single-m = AR [M]  $(@:.o=.a)
 cmd_ar_single-m = $(AR) rcs $(addprefix $(obj)/lib, $(notdir $(@:.o=.a))) \
@@ -300,6 +312,7 @@ $(obj)/%.lds: $(src)/%.lds.S FORCE
 # To build objects in subdirs, we need to descend into the directories
 $(sort $(subdir-obj-y)): $(subdir-ym) ;
 
+
 #
 # Rule to compile a set of .o files into one .o file
 #
@@ -311,7 +324,7 @@ cmd_link_o_target = $(if $(strip $(obj-y)),\
 		      $(cmd_secanalysis),\
 		      rm -f $@; $(AR) rcs$(KBUILD_ARFLAGS) $@)
 
-$(builtin-target): $(obj-y) FORCE
+$(builtin-target): $(obj-y) $(crurom-obj) FORCE
 	$(call if_changed,link_o_target)
 
 targets += $(builtin-target)
