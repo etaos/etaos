@@ -34,14 +34,33 @@ ssize_t vfs_setoffset(struct vfile *file, ssize_t offset, ssize_t max)
 	return offset;
 }
 
-size_t vfs_setindex(struct vfile *file, size_t index, size_t max)
+static size_t vfs_setindex(struct vfile *file, size_t index, size_t max)
 {
-	if(index > max)
+	if(index > max && !max)
 		return -EINVAL;
 	
 	if(index != file->index)
 		file->index  = index;
 
 	return index;
+}
+
+size_t lseek(struct vfile *file, size_t offset, int whence)
+{
+	switch(whence) {
+	case SEEK_END:
+		offset += file->length;
+		break;
+	
+	case SEEK_CUR:
+		if(!offset)
+			return file->index;
+
+		return vfs_setindex(file, file->index + offset, 0);
+	default:
+		break;
+	}
+
+	return vfs_setindex(file, offset, 0);
 }
 
