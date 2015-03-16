@@ -88,13 +88,15 @@ THREAD(test_th_handle, arg)
 
 		fd = open("atm-usart", _FDEV_SETUP_RW);
 		write(fd, msg.data, msg.len);
+		close(fd);
 
 		sram_stress_read(SRAM_STRING_ADDR, sram_string, 
 				sizeof(sram_string));
 		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
 		printf("[1][%s]: SRAM::EEPROM %s::%s\n", current_thread_name(),
 				sram_string, ee_string);
-		close(fd);
+
+		sleep(500);
 	}
 }
 

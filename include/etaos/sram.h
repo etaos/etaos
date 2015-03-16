@@ -34,10 +34,8 @@
  */
 struct sram {
 	const char *name; //!< Chip name.
+	struct vfile *file; //!< SRAM device file.
 	
-	unsigned long rd_idx, //!< Read index.
-		      wr_idx; //!< Write index.
-	mutex_t lock; //!< Chip lock.
 	void *priv; //!< Private data.
 
 	/**
@@ -73,14 +71,6 @@ struct sram {
 	 */
 	int (*write_byte)(struct sram *ram, int c);
 };
-
-/**
- * @brief SRAM IOCTL options.
- */
-typedef enum {
-	SRAM_RESET_WR_IDX, //!< Reset the write index.
-	SRAM_RESET_RD_IDX, //!< Reset the read index.
-} sram_ioctl_t;
 
 CDECL
 extern void sram_chip_init(struct sram *ram, struct device *dev);

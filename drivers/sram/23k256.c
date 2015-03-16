@@ -44,7 +44,7 @@
 
 #define HOLD 0x1
 
-#define SRAM_SYNC 1
+#define SRAM_SYNC 5
 
 #define SPI_BYTE_MODE HOLD
 #define SPI_PAGE_MODE HOLD | 0x80
@@ -61,8 +61,6 @@ static struct spidev sram_23k256_dev = {
 
 static struct sram sram_23k256_chip = {
 	.name = "23K256",
-	.rd_idx = 0,
-	.wr_idx = 0,
 	.priv = &sram_23k256_dev,
 
 	.write_byte = &__sram_put,
@@ -103,8 +101,8 @@ static int __sram_put(struct sram *ram, int c)
 	struct spi_msg *msg;
 	unsigned char byte = c;
 	uint8_t write_seq[] = {
-		WRDA, (uint8_t)((ram->wr_idx >> 8) & 0xFF),
-		(uint8_t)(ram->wr_idx & 0xFF), byte
+		WRDA, (uint8_t)((ram->file->index >> 8) & 0xFF),
+		(uint8_t)(ram->file->index & 0xFF), byte
 	};
 
 	sram_set_mode(SPI_BYTE_MODE);
@@ -129,8 +127,8 @@ static int __sram_write(struct sram *ram, const void *_buff, size_t len)
 
 	memcpy(&buff[3], _buff, len);
 	buff[0] = WRDA;
-	buff[1] = (uint8_t)((ram->wr_idx >> 8) & 0xFF);
-	buff[2] = (uint8_t)(ram->wr_idx & 0xFF);
+	buff[1] = (uint8_t)((ram->file->index >> 8) & 0xFF);
+	buff[2] = (uint8_t)(ram->file->index & 0xFF);
 	msg = spi_alloc_msg(buff, buff, len+3);
 
 	sram_set_mode(SPI_SEQ_MODE);
@@ -152,8 +150,8 @@ static int __sram_write(struct sram *ram, const void *_buff, size_t len)
 static int __sram_get(struct sram *ram)
 {
 	uint8_t read_seq[] = {
-		RDDA, (uint8_t)((ram->rd_idx >> 8) & 0xFF),
-		(uint8_t)(ram->rd_idx & 0xFF), 0xFF /* dummy byte */
+		RDDA, (uint8_t)((ram->file->index >> 8) & 0xFF),
+		(uint8_t)(ram->file->index & 0xFF), 0xFF /* dummy byte */
 	};
 	struct spi_msg *msg = spi_alloc_msg(read_seq, read_seq, 4);
 
@@ -176,8 +174,8 @@ static int __sram_read(struct sram *sram, void *_buff, size_t len)
 		return -EINVAL;
 
 	buff[0] = RDDA;
-	buff[1] = (uint8_t)((sram->rd_idx >> 8) & 0xFF);
-	buff[2] = (uint8_t)(sram->rd_idx & 0xFF);
+	buff[1] = (uint8_t)((sram->file->index >> 8) & 0xFF);
+	buff[2] = (uint8_t)(sram->file->index & 0xFF);
 	msg = spi_alloc_msg(buff, buff, len+3);
 
 	sram_set_mode(SPI_SEQ_MODE);
@@ -202,7 +200,6 @@ void sram_23k256_init(void)
 	struct gpio_pin *ss = gpio_chip_to_pin(gpio_sys_chip, CONFIG_23K256_SS);
 
 	list_head_init(&sram_23k256_dev.list);
-	mutex_init(&sram_23k256_chip.lock);
 
 	sram_23k256_dev.cs = ss;
 	gpio_pin_request(ss);

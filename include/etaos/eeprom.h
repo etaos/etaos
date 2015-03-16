@@ -29,6 +29,7 @@
 #define __EEPROM__
 
 #include <etaos/kernel.h>
+#include <etaos/stdio.h>
 #include <etaos/device.h>
 #include <etaos/mutex.h>
 
@@ -37,11 +38,8 @@
  */
 struct eeprom {
 	const char *name; //!< EEPROM chip name.
+	struct vfile *file; //!< EEPROM device file.
 
-	unsigned long rd_idx; //!< Chip address read index.
-	unsigned long wr_idx; //!< Chip address write index.
-
-	mutex_t lock; //!< Chip lock.
 	void *priv; //!< Private data, usually set to the i2c_client.
 
 	/**
@@ -77,14 +75,6 @@ struct eeprom {
 	 */
 	int (*write_byte)(struct eeprom *ee, int c);
 };
-
-/**
- * @brief EEPROM ioctl register enumerator.
- */
-typedef enum {
-	EEPROM_RESET_WR_IDX, //!< IOCTL write index reset.
-	EEPROM_RESET_RD_IDX, //!< IOCTL read index reset.
-} eeprom_ioctl_t;
 
 CDECL
 extern void eeprom_chip_init(struct eeprom *ee, struct device *dev);

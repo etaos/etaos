@@ -58,10 +58,8 @@ static int eeprom_write(struct vfile * stream, const void *buf, size_t len)
 	if(!ee->write)
 		return -EINVAL;
 
-	mutex_lock(&ee->lock);
 	rc = ee->write(ee, buf, len);
-	ee->wr_idx += len;
-	mutex_unlock(&ee->lock);
+	stream->index += len;
 
 	return rc;
 }
@@ -85,10 +83,8 @@ static int eeprom_read(struct vfile * stream, void *buf, size_t len)
 	if(!ee->read)
 		return -EINVAL;
 
-	mutex_lock(&ee->lock);
 	rc = ee->read(ee, buf, len);
-	ee->rd_idx += len;
-	mutex_unlock(&ee->lock);
+	stream->index += len;
 
 	return rc;
 }
@@ -112,10 +108,8 @@ static int eeprom_put(int c, struct vfile * stream)
 	if(!ee->write_byte)
 		return -EINVAL;
 
-	mutex_lock(&ee->lock);
 	rc = ee->write_byte(ee, c);
-	ee->wr_idx++;
-	mutex_unlock(&ee->lock);
+	stream->index++;
 
 	return rc;
 }
@@ -138,57 +132,26 @@ static int eeprom_get(struct vfile * stream)
 	if(!ee->read_byte)
 		return -EINVAL;
 
-	mutex_lock(&ee->lock);
 	rc = ee->read_byte(ee);
-	ee->rd_idx++;
-	mutex_unlock(&ee->lock);
+	stream->index++;
 
 	return rc;
 }
 
-/**
- * @brief EEPROM core IOCTL.
- * @param stream File stream.
- * @param reg Control register.
- * @param buf Optional argument for reg.
- * 
- * Available control options are found in eeprom_ioctl_t.
- */
-static int eeprom_ioctl(struct vfile * stream, unsigned long reg, void *buf)
+static int eeprom_open(struct vfile *file)
 {
-	int rc;
-	unsigned long idx;
-	struct eeprom *ee;
+	struct device *dev = container_of(file, struct device, file);
 
-	if(!stream)
-		return -EINVAL;
+	dev_lock(dev);
+	return -EOK;
+}
 
-	ee = to_eeprom_chip(stream);
+static int eeprom_close(struct vfile *file)
+{
+	struct device *dev = container_of(file, struct device, file);
 
-	if(!buf)
-		idx = 0;
-	else
-		idx = *((unsigned long*)buf);
-
-	mutex_lock(&ee->lock);
-	switch(reg) {
-	case EEPROM_RESET_WR_IDX:
-		ee->wr_idx = idx;
-		rc = -EOK;
-		break;
-		
-	case EEPROM_RESET_RD_IDX:
-		ee->rd_idx = idx;
-		rc = -EOK;
-		break;
-
-	default:
-		rc = -EINVAL;
-		break;
-	}
-	mutex_unlock(&ee->lock);
-
-	return rc;
+	dev_unlock(dev);
+	return -EOK;
 }
 
 static struct dev_file_ops eeprom_ops = {
@@ -196,7 +159,8 @@ static struct dev_file_ops eeprom_ops = {
 	.read = &eeprom_read,
 	.put = &eeprom_put,
 	.get = &eeprom_get,
-	.ioctl = &eeprom_ioctl,
+	.open = &eeprom_open,
+	.close = &eeprom_close,
 };
 
 /**
@@ -207,13 +171,10 @@ static struct dev_file_ops eeprom_ops = {
  */
 void eeprom_chip_init(struct eeprom *ee, struct device *dev)
 {
-	ee->wr_idx = 0;
-	ee->rd_idx = 0;
-	mutex_init(&ee->lock);
-
 	if(dev) {
 		dev->name = ee->name;
 		device_initialize(dev, &eeprom_ops);
+		ee->file = &dev->file;
 		dev->dev_data = ee;
 	}
 }

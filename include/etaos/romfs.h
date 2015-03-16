@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC close
- *  Copyright (C) 2012   Michel Megens
+ *  ETA/OS - ROMFS header
+ *  Copyright (C)  2015   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,16 +16,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <etaos/kernel.h>
-#include <etaos/stdio.h>
-#include <etaos/vfs.h>
+#ifndef __ROMFS_H__
+#define __ROMFS_H__
 
-/**
- * @ingroup libc
- * @brief Close a file.
- * @param fd File descriptor to close.
- */
-void close(int fd)
-{
-	iob_remove(fd);
-}
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+
+#include <asm/pgm.h>
+
+struct romfs {
+	struct romfs *next;
+	const char *name;
+	size_t length;
+	const char *data;
+};
+
+#endif

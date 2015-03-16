@@ -3,7 +3,6 @@ libc-files-$(CONFIG_STDLIB) += kmalloc.o kzalloc.o kfree.o kcalloc.o
 
 libc-files-$(CONFIG_STDIO) += stdio/putc.o stdio/printf.o stdio/vfprintf.o
 libc-files-$(CONFIG_STDIO) += stdio/fputs.o stdio/fputc.o stdio/fprintf.o
-libc-files-$(CONFIG_STDIO) += stdio/open.o stdio/close.o
 libc-files-$(CONFIG_STDIO) += stdio/read.o stdio/write.o
 libc-files-$(CONFIG_STDIO) += stdio/ioctl.o stdio/getc.o stdio/fgetc.o
 

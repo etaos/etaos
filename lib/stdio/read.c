@@ -20,15 +20,9 @@
 #include <etaos/error.h>
 #include <etaos/stdio.h>
 #include <etaos/bitops.h>
+#include <etaos/vfs.h>
 
-/**
- * @ingroup libc
- * @brief Read from a file.
- * @param fd File descriptor to read from.
- * @param buff Buffer to store data into.
- * @param size Size of \p buff.
- */
-int read(int fd, void *buff, size_t size)
+int read(int fd, void *buff, size_t len)
 {
 	struct vfile * file;
 
@@ -36,9 +30,5 @@ int read(int fd, void *buff, size_t size)
 	if(!file)
 		return -EINVAL;
 
-	if(test_bit(STREAM_READ_FLAG, &file->flags) && file->read)
-		return file->read(file, buff, size);
-	else
-		return -EINVAL;
+	return vfs_read(file, buff, len);
 }
-

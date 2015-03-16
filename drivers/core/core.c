@@ -21,6 +21,7 @@
 #include <etaos/stdio.h>
 #include <etaos/string.h>
 #include <etaos/mutex.h>
+#include <etaos/spinlock.h>
 #include <etaos/device.h>
 #include <etaos/list.h>
 #include <etaos/device.h>
@@ -214,7 +215,10 @@ int device_initialize(struct device *dev, struct dev_file_ops *fops)
 
 	dev->file.next = NULL;
 	dev->file.name = dev->name;
+	dev->file.index = 0;
+	dev->file.length = 0;
 	vfs_add(&dev->file);
+	spinlock_init(&dev->file.lock);
 	dev_set_fops(dev, fops);
 
 	list_add(&dev->devs, &dev_root);

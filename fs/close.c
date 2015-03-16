@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC write
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - VFS close
+ *  Copyright (C) 2012   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,18 +17,24 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/error.h>
 #include <etaos/stdio.h>
-#include <etaos/bitops.h>
 #include <etaos/vfs.h>
 
-int write(int fd, const void *buff, size_t len)
+/**
+ * @ingroup vfs
+ * @brief Close a file.
+ * @param fd File descriptor to close.
+ */
+void close(int fd)
 {
-	struct vfile * file;
+	struct vfile *file;
 
 	file = __iob[fd];
-	if(!file)
-		return -EINVAL;
+	if(file) {
+		if(file->close)
+			file->close(file);
 
-	return vfs_write(file, buff, len);
+		iob_remove(fd);
+	}
 }
+
