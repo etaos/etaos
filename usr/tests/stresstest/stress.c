@@ -55,9 +55,10 @@ THREAD(test_th_handle2, arg)
 {
 	unsigned char sram_readback;
 	unsigned long rand;
+	float sram_entry = 3.1415F;
 
 	sram_stress_write_byte(SRAM_BYTE_ADDR, 0x78);
-	sram_stress_write(SRAM_STRING_ADDR, sram_test, strlen(sram_test)+1);
+	sram_stress_write(SRAM_STRING_ADDR, &sram_entry, sizeof(sram_entry));
 
 	while(true) {
 		sram_stress_read_byte(SRAM_BYTE_ADDR, &sram_readback);
@@ -73,7 +74,7 @@ THREAD(test_th_handle, arg)
 	int fd;
 	struct ipm msg;
 	uint8_t readback;
-	char sram_string[sizeof(sram_test)];
+	float sram_data;
 	char ee_string[sizeof(ee_test)];
 
 	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE, 
@@ -90,11 +91,11 @@ THREAD(test_th_handle, arg)
 		write(fd, msg.data, msg.len);
 		close(fd);
 
-		sram_stress_read(SRAM_STRING_ADDR, sram_string, 
-				sizeof(sram_string));
+		sram_stress_read(SRAM_STRING_ADDR, &sram_data, 
+				sizeof(sram_data));
 		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
-		printf("[1][%s]: SRAM::EEPROM %s::%s\n", current_thread_name(),
-				sram_string, ee_string);
+		printf("[1][%s]: SRAM::EEPROM %f::%s\n", current_thread_name(),
+				sram_data, ee_string);
 
 		sleep(500);
 	}

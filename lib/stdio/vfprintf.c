@@ -29,7 +29,7 @@
  */
 
 #define BUFF 16
-#define FLT_DIGITS 2
+#define FLT_DIGITS 6
 
 static int convert_to_num(uint64_t num, uint8_t base, bool sign, 
 							  bool caps, struct vfile * stream)
