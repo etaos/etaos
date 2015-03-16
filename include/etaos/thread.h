@@ -132,8 +132,9 @@ struct rq;
  * All information available for a thread is stored in this structure.
  */
 struct thread {
-	const char *name; //!< Name of the thread.
-	unsigned long flags; //!< Thread flags
+	struct thread *volatile*queue; //!< Queue root pointer.
+	struct thread *rq_next; //!< Wake/Kill list entry.
+
 #ifdef CONFIG_PREEMPT
 	unsigned int slice; //!< Time slice.
 	int preemt_cnt; //!< Preempt enable counter.
@@ -141,9 +142,7 @@ struct thread {
 
 	bool on_rq; //!< Run queue enable.
 	struct rq *rq; //!< Run queue pointer.
-
-	struct thread *volatile*queue; //!< Queue root pointer.
-	struct thread *rq_next; //!< Wake/Kill list entry.
+	unsigned long flags; //!< Thread flags
 
 	void    *stack; //!< Root stack pointer.
 	stack_t *sp; //!< Run time stack pointer.
@@ -162,6 +161,7 @@ struct thread {
 #if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
 	struct rr_entity se; //!< Scheduling entity.
 #endif
+	char name[9]; //!< Name of the thread.
 };
 
 /**

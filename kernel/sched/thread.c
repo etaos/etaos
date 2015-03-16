@@ -22,6 +22,7 @@
 /*@{*/
 
 #include <etaos/kernel.h>
+#include <etaos/stdlib.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/thread.h>
@@ -47,7 +48,8 @@ static void raw_thread_init(struct thread *tp, const char *name,
 		void *stack, unsigned char prio)
 {
 	memset(tp, 0, sizeof(*tp));
-	tp->name = name;
+	memcpy(tp->name, name, strlen(name) + 1);
+
 	tp->param = arg;
 	tp->prio = prio;
 	tp->flags = 0;

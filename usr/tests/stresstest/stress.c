@@ -87,7 +87,8 @@ THREAD(test_th_handle, arg)
 		sram_stress_read(SRAM_STRING_ADDR, sram_string, 
 				sizeof(sram_string));
 		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
-		printf("[1]SRAM::EEPROM %s::%s\n", sram_string, ee_string);
+		printf("[1][%s]: SRAM::EEPROM %s::%s\n", current_thread()->name,
+				sram_string, ee_string);
 		close(fd);
 	}
 }
