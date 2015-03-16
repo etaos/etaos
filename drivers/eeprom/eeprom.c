@@ -58,10 +58,8 @@ static int eeprom_write(struct vfile * stream, const void *buf, size_t len)
 	if(!ee->write)
 		return -EINVAL;
 
-	mutex_lock(&ee->lock);
 	rc = ee->write(ee, buf, len);
 	stream->index += len;
-	mutex_unlock(&ee->lock);
 
 	return rc;
 }
@@ -85,10 +83,8 @@ static int eeprom_read(struct vfile * stream, void *buf, size_t len)
 	if(!ee->read)
 		return -EINVAL;
 
-	mutex_lock(&ee->lock);
 	rc = ee->read(ee, buf, len);
 	stream->index += len;
-	mutex_unlock(&ee->lock);
 
 	return rc;
 }
@@ -112,10 +108,8 @@ static int eeprom_put(int c, struct vfile * stream)
 	if(!ee->write_byte)
 		return -EINVAL;
 
-	mutex_lock(&ee->lock);
 	rc = ee->write_byte(ee, c);
 	stream->index++;
-	mutex_unlock(&ee->lock);
 
 	return rc;
 }
@@ -138,12 +132,26 @@ static int eeprom_get(struct vfile * stream)
 	if(!ee->read_byte)
 		return -EINVAL;
 
-	mutex_lock(&ee->lock);
 	rc = ee->read_byte(ee);
 	stream->index++;
-	mutex_unlock(&ee->lock);
 
 	return rc;
+}
+
+static int eeprom_open(struct vfile *file)
+{
+	struct device *dev = container_of(file, struct device, file);
+
+	dev_lock(dev);
+	return -EOK;
+}
+
+static int eeprom_close(struct vfile *file)
+{
+	struct device *dev = container_of(file, struct device, file);
+
+	dev_unlock(dev);
+	return -EOK;
 }
 
 static struct dev_file_ops eeprom_ops = {
@@ -151,6 +159,8 @@ static struct dev_file_ops eeprom_ops = {
 	.read = &eeprom_read,
 	.put = &eeprom_put,
 	.get = &eeprom_get,
+	.open = &eeprom_open,
+	.close = &eeprom_close,
 };
 
 /**
@@ -161,8 +171,6 @@ static struct dev_file_ops eeprom_ops = {
  */
 void eeprom_chip_init(struct eeprom *ee, struct device *dev)
 {
-	mutex_init(&ee->lock);
-
 	if(dev) {
 		dev->name = ee->name;
 		device_initialize(dev, &eeprom_ops);

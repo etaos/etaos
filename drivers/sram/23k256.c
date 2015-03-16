@@ -44,7 +44,7 @@
 
 #define HOLD 0x1
 
-#define SRAM_SYNC 1
+#define SRAM_SYNC 5
 
 #define SPI_BYTE_MODE HOLD
 #define SPI_PAGE_MODE HOLD | 0x80
@@ -200,7 +200,6 @@ void sram_23k256_init(void)
 	struct gpio_pin *ss = gpio_chip_to_pin(gpio_sys_chip, CONFIG_23K256_SS);
 
 	list_head_init(&sram_23k256_dev.list);
-	mutex_init(&sram_23k256_chip.lock);
 
 	sram_23k256_dev.cs = ss;
 	gpio_pin_request(ss);

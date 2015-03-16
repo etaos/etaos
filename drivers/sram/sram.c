@@ -64,10 +64,8 @@ static int sram_write(struct vfile * stream, const void *buf, size_t len)
 	if(!ram->write)
 		return -EINVAL;
 
-	mutex_lock(&ram->lock);
 	rc = ram->write(ram, buf, len);
 	stream->index += len;
-	mutex_unlock(&ram->lock);
 
 	return rc;
 }
@@ -91,10 +89,8 @@ static int sram_read(struct vfile * stream, void *buf, size_t len)
 	if(!ram->read)
 		return -EINVAL;
 
-	mutex_lock(&ram->lock);
 	rc = ram->read(ram, buf, len);
 	stream->index += len;
-	mutex_unlock(&ram->lock);
 
 	return rc;
 }
@@ -117,10 +113,8 @@ static int sram_put(int c, struct vfile * stream)
 	if(!ram->write_byte)
 		return -EINVAL;
 
-	mutex_lock(&ram->lock);
 	rc = ram->write_byte(ram, c);
 	stream->index += 1;
-	mutex_unlock(&ram->lock);
 
 	return rc;
 }
@@ -142,12 +136,26 @@ static int sram_get(struct vfile * stream)
 	if(!ram->read_byte)
 		return -EINVAL;
 
-	mutex_lock(&ram->lock);
 	rc = ram->read_byte(ram);
 	stream->index += 1;
-	mutex_unlock(&ram->lock);
 
 	return rc;
+}
+
+static int sram_open(struct vfile *file)
+{
+	struct device *dev = container_of(file, struct device, file);
+
+	dev_lock(dev);
+	return -EOK;
+}
+
+static int sram_close(struct vfile *file)
+{
+	struct device *dev = container_of(file, struct device, file);
+
+	dev_unlock(dev);
+	return -EOK;
 }
 
 static struct dev_file_ops sram_ops = {
@@ -155,6 +163,8 @@ static struct dev_file_ops sram_ops = {
 	.read = &sram_read,
 	.put = &sram_put,
 	.get = &sram_get,
+	.open = &sram_open,
+	.close = &sram_close,
 };
 
 /**
@@ -164,7 +174,6 @@ static struct dev_file_ops sram_ops = {
  */
 void sram_chip_init(struct sram *ram, struct device *dev)
 {
-	mutex_init(&ram->lock);
 	if(dev) {
 		dev->name = ram->name;
 		device_initialize(dev, &sram_ops);

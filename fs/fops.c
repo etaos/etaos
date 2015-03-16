@@ -36,7 +36,7 @@ ssize_t vfs_setoffset(struct vfile *file, ssize_t offset, ssize_t max)
 
 static size_t vfs_setindex(struct vfile *file, size_t index, size_t max)
 {
-	if(index > max && !max)
+	if(index > max && max)
 		return -EINVAL;
 	
 	if(index != file->index)

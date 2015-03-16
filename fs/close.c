@@ -31,7 +31,9 @@ void close(int fd)
 
 	file = __iob[fd];
 	if(file) {
-		spin_unlock(&file->lock);
+		if(file->close)
+			file->close(file);
+
 		iob_remove(fd);
 	}
 }
