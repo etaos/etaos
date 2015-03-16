@@ -25,7 +25,7 @@ static uint8_t test_stack2[CONFIG_STACK_SIZE];
 
 static struct ipm_queue ipm_q;
 static uint8_t ee_value = 0x0;
-static const char ee_output[] = "[%u][%s]: %u\n";
+static const char ee_output[] = "[%u][%s]: ee-byte read: %u\n";
 
 static const char sram_test[] = "sram test";
 static const char ee_test[]   = "ee test";
@@ -46,6 +46,11 @@ extern int sram_stress_write_byte(uint16_t addr, uint8_t byte);
 extern int sram_stress_read(uint16_t addr, void *buff, size_t len);
 extern int sram_stress_write(uint16_t addr, const void *buff, size_t len);
 
+static char *current_thread_name(void)
+{
+	return current_thread()->name;
+}
+
 THREAD(test_th_handle2, arg)
 {
 	unsigned char sram_readback;
@@ -57,8 +62,8 @@ THREAD(test_th_handle2, arg)
 	while(true) {
 		sram_stress_read_byte(SRAM_BYTE_ADDR, &sram_readback);
 		rand = random_m(100);
-		printf("[2][tst2]: SRAM: %u :: RAND: %u\n",
-				sram_readback, rand);
+		printf("[2][%s]: SRAM: %u :: RAND: %u\n", 
+				current_thread_name(), sram_readback, rand);
 		sleep(1000);
 	}
 }
@@ -71,12 +76,12 @@ THREAD(test_th_handle, arg)
 	char sram_string[sizeof(sram_test)];
 	char ee_string[sizeof(ee_test)];
 
-	thread_create("tst2", &test_th_handle2, NULL, CONFIG_STACK_SIZE, 
+	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE, 
 			test_stack2, 150);
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
-		printf(ee_output, 1, "tst1", readback);
+		printf(ee_output, 1, current_thread_name(), readback);
 
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
@@ -87,7 +92,8 @@ THREAD(test_th_handle, arg)
 		sram_stress_read(SRAM_STRING_ADDR, sram_string, 
 				sizeof(sram_string));
 		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
-		printf("[1]SRAM::EEPROM %s::%s\n", sram_string, ee_string);
+		printf("[1][%s]: SRAM::EEPROM %s::%s\n", current_thread_name(),
+				sram_string, ee_string);
 		close(fd);
 	}
 }
@@ -104,7 +110,7 @@ int main(void)
 	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);
 
 	test_stack = kzalloc(CONFIG_STACK_SIZE);
-	thread_create("tst", &test_th_handle, NULL,
+	thread_create("test-1", &test_th_handle, NULL,
 			CONFIG_STACK_SIZE, test_stack, 150);
 
 	pgpio_pin_request(13);
@@ -122,8 +128,10 @@ int main(void)
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
 		ee_value += 1;
 		ee_stress_write_byte(EE_BYTE_ADDR, ee_value);
-		printf(ee_output, 0, "main", readback);
-		printf("[0][main]: Memory available: %u\n", 
+		printf("[%u][%s]:   ee-byte read: %u\n", 0, 
+				current_thread_name(), readback);
+		printf("[0][%s]:   Memory available: %u\n", 
+				current_thread_name(),
 				mm_heap_available());
 
 		sleep(500);
