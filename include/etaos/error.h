@@ -26,5 +26,6 @@
 #define EINVAL		 4
 #define EAGAIN		 5
 #define EBADF            6
+#define EEXIST           7
 
 #endif

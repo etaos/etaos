@@ -186,7 +186,7 @@ static inline void *memcpy_P(void *_dest, const void *_src, size_t size)
 {
 	size_t idx;
 	char *dest = _dest;
-	const char *src = src;
+	const char *src = _src;
 
 	for(idx = 0; idx < size; idx++)
 		dest[idx] = pgm_read_byte(src+idx);
