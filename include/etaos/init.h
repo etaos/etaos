@@ -46,6 +46,10 @@
 #define DEV_INIT_CALL
 #endif
 
+#ifndef CHIP_INIT_CALL
+#define CHIP_INIT_CALL
+#endif
+
 CDECL
 #ifdef CONFIG_SCHED
 extern void main_thread_func(void *arg);
@@ -87,5 +91,15 @@ CDECL_END
 		DEV_INIT_CALL(ss_init_fn); \
 	}
 
-#endif /* __INIT_H__ */
+/**
+ * @ingroup kern-init
+ * @brief Automated device init.
+ * @param ss_init_fn Init functions.
+ */
+#define chip_init(ss_init_fn) \
+	static __used CHIP_ATTRIB void __ ## ss_init_fn(void) \
+	{ \
+		CHIP_INIT_CALL(ss_init_fn); \
+	}
 
+#endif /* __INIT_H__ */

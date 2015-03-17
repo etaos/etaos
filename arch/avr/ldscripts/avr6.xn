@@ -131,6 +131,8 @@ SECTIONS
     KEEP (*(.modinit))
     *(.devinit1)
     KEEP (*(.devinit1))
+    *(.chipinit)
+    KEEP (*(.chipinit))
 
     *(.devinit2)
     KEEP (*(.devinit2))
