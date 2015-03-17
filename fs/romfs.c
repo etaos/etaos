@@ -26,6 +26,16 @@
 #include <etaos/romfs.h>
 #include <etaos/stdio.h>
 
+/**
+ * @brief Open a ROMFS file.
+ * @param file File which has to be opened.
+ * @return Error code.
+ * @retval -EXIST
+ * @retval -EOK
+ *
+ * This file copies all data belonging to this file into data memory for
+ * quick access by read and getc.
+ */
 static int romfs_open(struct vfile *file)
 {
         char *buff;
@@ -44,6 +54,12 @@ static int romfs_open(struct vfile *file)
         return -EOK;
 }
 
+/**
+ * @brief Close a ROMFS file.
+ * @param file File to close.
+ * @return Error code.
+ * @retval -EOK
+ */
 static int romfs_close(struct vfile *file)
 {
         int uses;
@@ -60,6 +76,13 @@ static int romfs_close(struct vfile *file)
         return -EOK;
 }
 
+/**
+ * @brief Read \p len amount of bytes from a ROMFS file.
+ * @param file File to read from.
+ * @param buff Buffer to store the read data in.
+ * @param len Amount of bytes to read.
+ * @return The amount of bytes read.
+ */
 static int romfs_read(struct vfile *file, void *buff, size_t len)
 {
         size_t readable;
@@ -75,6 +98,11 @@ static int romfs_read(struct vfile *file, void *buff, size_t len)
         return (int)readable;
 }
 
+/**
+ * @brief Read a single character from a ROMFS file.
+ * @param file File to read from.
+ * @return The character read from the file buffer.
+ */
 static int romfs_getc(struct vfile *file)
 {
         int c;
@@ -87,6 +115,11 @@ static int romfs_getc(struct vfile *file)
         return c;
 }
 
+/**
+ * @brief Initialise a new file based on a ROMFS entry.
+ * @param file File which has to be initialised.
+ * @param entry ROMFS entry to use as a base for a file.
+ */
 static void romfs_setup_file(struct vfile *file, struct romfs *entry)
 {
         file->name = entry->name;
