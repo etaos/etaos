@@ -62,18 +62,18 @@ static int romfs_open(struct vfile *file)
  */
 static int romfs_close(struct vfile *file)
 {
-        int uses;
+	int uses;
 
-        atomic_dec(&file->uses);
-        uses = atomic_get(&file->uses);
+	atomic_dec(&file->uses);
+	uses = atomic_get(&file->uses);
 
-        if(!uses) {
-                kfree(file->data);
-                file->data = NULL;
-                file->index = 0;
-        }
+	if(!uses) {
+		kfree(file->data);
+		file->data = NULL;
+		file->index = 0;
+	}
 
-        return -EOK;
+	return -EOK;
 }
 
 /**
@@ -85,17 +85,17 @@ static int romfs_close(struct vfile *file)
  */
 static int romfs_read(struct vfile *file, void *buff, size_t len)
 {
-        size_t readable;
+	size_t readable;
 
-        if(len > (file->length - file->index))
-                readable = file->length - file->index;
-        else
-                readable = len;
+	if(len > (file->length - file->index))
+		readable = file->length - file->index;
+	else
+		readable = len;
 
-        memcpy(buff, file->data, readable);
-        file->index += readable;
+	memcpy(buff, file->data, readable);
+	file->index += readable;
 
-        return (int)readable;
+	return (int)readable;
 }
 
 /**
@@ -105,14 +105,14 @@ static int romfs_read(struct vfile *file, void *buff, size_t len)
  */
 static int romfs_getc(struct vfile *file)
 {
-        int c;
-        char *data;
+	int c;
+	char *data;
 
-        data = file->data;
-        c = data[file->index];
-        file->index++;
+	data = file->data;
+	c = data[file->index];
+	file->index++;
 
-        return c;
+	return c;
 }
 
 /**
@@ -122,31 +122,32 @@ static int romfs_getc(struct vfile *file)
  */
 static void romfs_setup_file(struct vfile *file, struct romfs *entry)
 {
-        file->name = entry->name;
-        file->length = entry->length - 1; /* do not include EOF */
-        file->fs_data = entry;
-        spinlock_init(&file->lock);
-        atomic_init(&file->uses);
+	file->name = entry->name;
+	file->length = entry->length - 1; /* do not include EOF */
+	file->fs_data = entry;
+	spinlock_init(&file->lock);
+	atomic_init(&file->uses);
 
-        file->read = &romfs_read;
-        file->get = &romfs_getc;
-        file->open = &romfs_open;
-        file->close = &romfs_close;
+	file->read = &romfs_read;
+	file->get = &romfs_getc;
+	file->open = &romfs_open;
+	file->close = &romfs_close;
 }
 
 static void __used romfs_rollout(void)
 {
-        struct romfs *entry;
-        struct vfile *file;
+	struct romfs *entry;
+	struct vfile *file;
 
-        for(entry = romEntryList; entry; entry = entry->next) {
-                file = kzalloc(sizeof(*file));
-                if(!file)
-                        return;
+	for(entry = romEntryList; entry; entry = entry->next) {
+		file = kzalloc(sizeof(*file));
+		if(!file)
+			return;
 
-                romfs_setup_file(file, entry);
-                vfs_add(file);
-        }
+		romfs_setup_file(file, entry);
+		vfs_add(file);
+	}
 }
 
 module_init(romfs_rollout);
+
