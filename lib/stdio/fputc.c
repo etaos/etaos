@@ -19,6 +19,7 @@
 /** @file fputc.c */
 
 #include <etaos/kernel.h>
+#include <etaos/error.h>
 #include <etaos/stdio.h>
 #include <etaos/bitops.h>
 

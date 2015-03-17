@@ -87,12 +87,15 @@ static int romfs_read(struct vfile *file, void *buff, size_t len)
 {
 	size_t readable;
 
+	if(file->index >= file->length)
+		return -EOF;
+
 	if(len > (file->length - file->index))
 		readable = file->length - file->index;
 	else
 		readable = len;
 
-	memcpy(buff, file->data, readable);
+	memcpy(buff, file->data + file->index, readable);
 	file->index += readable;
 
 	return (int)readable;
@@ -107,6 +110,9 @@ static int romfs_getc(struct vfile *file)
 {
 	int c;
 	char *data;
+
+	if(file->index >= file->length)
+		return -EOF;
 
 	data = file->data;
 	c = data[file->index];

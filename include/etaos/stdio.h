@@ -62,8 +62,6 @@
 #define _FDEV_SETUP_RW    (__SRD|__SWR)	/**< fdev_setup_stream() with read/write intent */
 #define _FDEV_SETUP_RWB   __SRWB /**< Read/write from buffers */
 
-#define EOF 1
-
 struct vfile;
 /**
  * \brief Define a file stream.
