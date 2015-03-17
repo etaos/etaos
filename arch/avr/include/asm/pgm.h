@@ -182,5 +182,16 @@
 
 typedef char __attribute__((__progmem__)) prog_char;
 
-#endif
+static inline void *memcpy_P(void *_dest, const void *_src, size_t size)
+{
+	size_t idx;
+	char *dest = _dest;
+	const char *src = src;
 
+	for(idx = 0; idx < size; idx++)
+		dest[idx] = pgm_read_byte(src+idx);
+
+	return (void*)dest;
+}
+
+#endif

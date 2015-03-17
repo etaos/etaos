@@ -19,6 +19,9 @@
 #ifndef __STDLIB_H__
 #define __STDLIB_H__
 
+#include <etaos/types.h>
+#include <asm/io.h>
+
 extern void srand(uint32_t seed);
 extern uint32_t random_m(uint32_t max);
 extern uint32_t random(void);
@@ -26,5 +29,11 @@ extern uint32_t random_r(uint32_t *sptr, uint32_t max);
 
 extern void *memcpy(void *dst, const void *src, size_t length);
 extern int   memcmp(const void *r1, const void *r2, size_t nbytes);
+
+#ifdef __HARVARD__
+extern void *memcpy_P(void *dst, const void *src, size_t length);
+#else
+#define memcpy_P(x,y,z) memcpy(x,y,z)
+#endif
 
 #endif /* __STDLIB_H__ */
