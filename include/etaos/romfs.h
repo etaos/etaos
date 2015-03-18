@@ -24,11 +24,14 @@
 
 #include <asm/pgm.h>
 
+/**
+ * @brief Micro ROM filesystem entry.
+ */
 struct romfs {
-	struct romfs *next;
-	const char *name;
-	size_t length;
-	const char *data;
+	struct romfs *next; //!< Next pointer.
+	const char *name;   //!< File name of the entry.
+	size_t length;      //!< Length of the \p data.
+	const char *data;   //!< Data saved by the entry.
 };
 
 extern struct romfs *romEntryList;

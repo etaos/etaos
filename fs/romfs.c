@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup romfs
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
 #include <etaos/init.h>
@@ -156,4 +161,6 @@ static void __used romfs_rollout(void)
 }
 
 module_init(romfs_rollout);
+
+/** @} */
 
