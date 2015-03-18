@@ -63,7 +63,7 @@ THREAD(test_th_handle2, arg)
 	while(true) {
 		sram_stress_read_byte(SRAM_BYTE_ADDR, &sram_readback);
 		rand = random_m(100);
-		printf("[2][%s]: SRAM: %u :: RAND: %u\n", 
+		printf("[2][%s]: SRAM: %u :: RAND: %u\n",
 				current_thread_name(), sram_readback, rand);
 		sleep(1000);
 	}
@@ -77,7 +77,7 @@ THREAD(test_th_handle, arg)
 	float sram_data;
 	char ee_string[sizeof(ee_test)];
 
-	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE, 
+	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,
 			test_stack2, 150);
 
 	while(true) {
@@ -91,7 +91,7 @@ THREAD(test_th_handle, arg)
 		write(fd, msg.data, msg.len);
 		close(fd);
 
-		sram_stress_read(SRAM_STRING_ADDR, &sram_data, 
+		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
 				sizeof(sram_data));
 		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
 		printf("[1][%s]: SRAM::EEPROM %f::%s\n", current_thread_name(),
@@ -107,7 +107,6 @@ int main(void)
 	bool value = true;
 	uint8_t readback = 0;
 
-	sram_23k256_init();
 	ipm_queue_init(&ipm_q, 2);
 	ee_stress_write_byte(EE_BYTE_ADDR, 0xAC);
 	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);
@@ -131,9 +130,9 @@ int main(void)
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
 		ee_value += 1;
 		ee_stress_write_byte(EE_BYTE_ADDR, ee_value);
-		printf("[%u][%s]:   ee-byte read: %u\n", 0, 
+		printf("[%u][%s]:   ee-byte read: %u\n", 0,
 				current_thread_name(), readback);
-		printf("[0][%s]:   Memory available: %u\n", 
+		printf("[0][%s]:   Memory available: %u\n",
 				current_thread_name(),
 				mm_heap_available());
 
@@ -141,4 +140,3 @@ int main(void)
 	}
 	return 0;
 }
-

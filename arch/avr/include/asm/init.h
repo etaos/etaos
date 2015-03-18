@@ -31,6 +31,8 @@ CDECL_END
 	__attribute__((naked))
 #define DEV_ATTRIB __attribute__((section (".devinit1"))) \
 	__attribute__((naked))
+#define CHIP_ATTRIB __attribute__((section (".chipinit"))) \
+	__attribute__((naked))
 
 #define DEV_INIT_CONTENT(init_fn) \
 	__asm__ __volatile__("call "  #init_fn ::: )
@@ -38,6 +40,7 @@ CDECL_END
 #define SUBSYS_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
 #define MOD_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
 #define DEV_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
+#define CHIP_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
 
 #ifdef CONFIG_SCHED
 #define sys_init() \
@@ -49,4 +52,3 @@ CDECL_END
 
 #endif /* __ASSEMBLER__ */
 #endif /* __AVR_INIT_H__ */
-

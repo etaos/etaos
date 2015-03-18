@@ -210,6 +210,7 @@ void sram_23k256_init(void)
 	sram_chip_init(&sram_23k256_chip, &sram_23k256_dev.dev);
 }
 
-/** @} */
-/** @} */
+chip_init(sram_23k256_init);
 
+/** @} */
+/** @} */
