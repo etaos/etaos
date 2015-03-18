@@ -180,7 +180,16 @@
 #define pgm_read_byte(address_short)    pgm_read_byte_near(address_short)
 #define pgm_read_word(address_short)    pgm_read_word_near(address_short)
 
+#ifdef __DOXYGEN__
+/**
+ * @ingroup atmega
+ * @brief Program memory character.
+ * @deprecated The use of GNU attributes in typedefs is deprecated.
+ */
+typedef char prog_char;
+#else
 typedef char __attribute__((__progmem__)) prog_char;
+#endif
 
 /**
  * @ingroup atmega

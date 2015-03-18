@@ -2008,7 +2008,8 @@ PREDEFINED             = CONFIG_TIMER \
                          CONFIG_PREEMPT \
                          CONFIG_IRQ \
                          CDECL \
-                         CDECL_END
+                         CDECL_END \
+                         __DOXYGEN__
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
