@@ -182,6 +182,14 @@
 
 typedef char __attribute__((__progmem__)) prog_char;
 
+/**
+ * @ingroup atmega
+ * @brief Copy memory from program memroy in data memory.
+ * @param _dest Destination addess (data space address).
+ * @param _src Source address (program space address).
+ * @param size Number bytes to copy.
+ * @return Destination address pointer.
+ */
 static inline void *memcpy_P(void *_dest, const void *_src, size_t size)
 {
 	size_t idx;
