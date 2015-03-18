@@ -632,7 +632,7 @@ static void rq_destroy_kill_q(struct rq *rq)
 
 /**
  * @brief Update the dynamic priorities of a run queue with 1.
- * @param __rq Run queue to update.
+ * @param rq Run queue to update.
  */
 static inline void dyn_prio_update(struct rq *rq)
 {
