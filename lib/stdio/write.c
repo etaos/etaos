@@ -22,6 +22,13 @@
 #include <etaos/bitops.h>
 #include <etaos/vfs.h>
 
+/**
+ * @ingroup libc
+ * @brief Write to a file.
+ * @param fd File to write to.
+ * @param buff Buffer to write into.
+ * @param len Size of \p buff.
+ */
 int write(int fd, const void *buff, size_t len)
 {
 	struct vfile * file;

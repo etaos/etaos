@@ -16,16 +16,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file include/etaos/vfs.h VFS header
+ */
+
 #ifndef __VFS_H__
 #define __VFS_H__
 
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 
+/**
+ * @ingroup vfs
+ * @brief Seek operations type.
+ */
 typedef enum {
-	SEEK_SET,
-	SEEK_CUR,
-	SEEK_END,
+	SEEK_SET, //!< Set the index to the input.
+	SEEK_CUR, //!< Set the index to the current index + input.
+	SEEK_END, //!< Set the index to the file end + input.
 } lseek_t;
 
 CDECL
