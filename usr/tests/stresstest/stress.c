@@ -18,6 +18,7 @@
 #include <etaos/vfs.h>
 #include <etaos/platform.h>
 #include <etaos/ipm.h>
+#include <asm/pgm.h>
 
 #include <etaos/sram/23k256.h>
 
@@ -26,7 +27,6 @@ static uint8_t test_stack2[CONFIG_STACK_SIZE];
 
 static struct ipm_queue ipm_q;
 static uint8_t ee_value = 0x0;
-static const char ee_output[] = "[%u][%s]: ee-byte read: %u\n";
 
 static const char sram_test[] = "sram test";
 static const char ee_test[]   = "ee test";
@@ -68,7 +68,7 @@ THREAD(test_th_handle2, arg)
 	while(true) {
 		sram_stress_read_byte(SRAM_BYTE_ADDR, &sram_readback);
 		rand = random_m(100);
-		printf("[2][%s]: SRAM: %u :: RAND: %u\n",
+		printf_P(PSTR("[2][%s]: SRAM: %u :: RAND: %u\n"),
 				current_thread_name(), sram_readback, rand);
 
 		fd = open("test.txt", O_RDONLY);
@@ -83,7 +83,8 @@ THREAD(test_th_handle2, arg)
 		romdata[flen] = '\0';
 		close(fd);
 
-		printf("[2][%s]: ROMFS: %s\n", current_thread_name(), romdata);
+		printf_P(PSTR("[2][%s]: ROMFS: %s\n"), 
+				current_thread_name(), romdata);
 
 		kfree(romdata);
 		sleep(1000);
@@ -103,7 +104,8 @@ THREAD(test_th_handle, arg)
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
-		printf(ee_output, 1, current_thread_name(), readback);
+		printf_P(PSTR("[%u][%s]: ee-byte read: %u\n"), 1, 
+				current_thread_name(), readback);
 
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
@@ -115,7 +117,8 @@ THREAD(test_th_handle, arg)
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
 				sizeof(sram_data));
 		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
-		printf("[1][%s]: SRAM::EEPROM %f::%s\n", current_thread_name(),
+		printf_P(PSTR("[1][%s]: SRAM::EEPROM %f::%s\n"), 
+				current_thread_name(),
 				sram_data, ee_string);
 
 		sleep(500);
@@ -151,9 +154,9 @@ int main(void)
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
 		ee_value += 1;
 		ee_stress_write_byte(EE_BYTE_ADDR, ee_value);
-		printf("[%u][%s]:   ee-byte read: %u\n", 0,
+		printf_P(PSTR("[%u][%s]:   ee-byte read: %u\n"), 0,
 				current_thread_name(), readback);
-		printf("[0][%s]:   Memory available: %u\n",
+		printf_P(PSTR("[0][%s]:   Memory available: %u\n"),
 				current_thread_name(),
 				mm_heap_available());
 

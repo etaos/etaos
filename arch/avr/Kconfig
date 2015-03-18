@@ -84,6 +84,7 @@ config ATMEGA328
 	select ARCH_TNC
 	select ARCH_TNS
 	select ARCH_SET_BIT
+	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega328p
 	  AVR core.
@@ -94,6 +95,7 @@ config ATMEGA1280
 	select ARCH_TNC
 	select ARCH_TNS
 	select ARCH_SET_BIT
+	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega1280
 	  AVR core.
@@ -104,6 +106,7 @@ config ATMEGA2560
 	select ARCH_TNC
 	select ARCH_TNS
 	select ARCH_SET_BIT
+	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega2560
 	  AVR core.

@@ -45,6 +45,8 @@ extern int   memcmp(const void *r1, const void *r2, size_t nbytes);
  * memcpy implementation.
  */
 #define memcpy_P(x,y,z) memcpy(x,y,z)
+#define strlen_P(c) strlen(c)
+#define PSTR(s) (s)
 #endif
 
 #endif /* __STDLIB_H__ */

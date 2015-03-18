@@ -211,4 +211,12 @@ static inline void *memcpy_P(void *_dest, const void *_src, size_t size)
 	return (void*)dest;
 }
 
+static inline size_t strlen_P(const char *s)
+{
+	const char *c;
+
+	for(c = s; pgm_read_byte(c); ++c);
+	return (size_t)(c - s);
+}
+
 #endif

@@ -10,6 +10,8 @@ libc-files-$(CONFIG_STRING) += string/strlen.o string/strchr.o
 libc-files-$(CONFIG_STRING) += string/strcmp.o string/strnlen.o 
 libc-files-$(CONFIG_STRING) += string/memset.o
 
+libc-files-$(CONFIG_HARVARD) += stdio/printf_p.o stdio/vfprintf_p.o
+
 obj-$(CONFIG_LIBC) += c.o
 
 c-y += $(libc-files-y) $(libc-files-m)

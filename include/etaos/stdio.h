@@ -151,6 +151,13 @@ extern int getc(struct vfile *stream);
 extern int fgetc(struct vfile *stream);
 extern size_t ftell(struct vfile *file);
 
+#ifdef CONFIG_HARVARD
+extern int printf_P(const char *fmt, ...);
+extern int vfprintf_P(struct vfile * stream, const char *fmt, va_list ap);
+#else
+#define printf_P(fmt, args...) printf(fmt, args)
+#endif
+
 CDECL_END
 
 #endif
