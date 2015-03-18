@@ -50,4 +50,3 @@ int vfs_read(struct vfile *file, void *buff, size_t size)
 	else
 		return -EINVAL;
 }
-

@@ -31,4 +31,6 @@ struct romfs {
 	const char *data;
 };
 
+extern struct romfs *romEntryList;
+
 #endif

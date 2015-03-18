@@ -22,6 +22,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/spinlock.h>
+#include <etaos/atomic.h>
 
 /**
  * \def MAX_OPEN
@@ -43,6 +44,10 @@
 #define __SMALLOC 0x80 //!< handle is malloc()ed
 /* @} */
 
+#define O_RDONLY __SRD
+#define O_WRONLY __SWR
+#define O_RDWR   (__SRD | SWR)
+
 #define STREAM_READ_FLAG 	0
 #define STREAM_WRITE_FLAG 	1
 #define STREAM_RW_BUFFER_FLAG 	2
@@ -57,8 +62,6 @@
 #define _FDEV_SETUP_RW    (__SRD|__SWR)	/**< fdev_setup_stream() with read/write intent */
 #define _FDEV_SETUP_RWB   __SRWB /**< Read/write from buffers */
 
-#define EOF 1
-
 struct vfile;
 /**
  * \brief Define a file stream.
@@ -72,7 +75,7 @@ struct vfile;
  * \param fl Flags byte.
  * \param d Data pointer.
  * \warning The file name (<b>n</b>) MUST be unique.
- * 
+ *
  * This defines an initialized file stream structure.
  */
 #define FDEV_SETUP_STREAM(defname, r, w, p, g, f, n, fl, d) \
@@ -102,6 +105,7 @@ struct vfile {
 
 	unsigned long flags; //!< File flags.
 	int fd; //!< Assigned file descriptor.
+	atomic_t uses; //!< Amount of times the file is open.
 
 	int (*open)(struct vfile*); //!< Open a file.
 	int (*close)(struct vfile*); //!< File close.
@@ -112,6 +116,7 @@ struct vfile {
 	int (*get)(struct vfile*); //!< Read 1 byte from a file.
 	int (*ioctl)(struct vfile*, unsigned long reg, void *buf);
 
+	void *fs_data; //!< File system info.
 	void *data; //!< Private file data.
 	volatile unsigned char *buff; //!< File buffer.
 	size_t length; //!< Length of buff.
@@ -144,8 +149,8 @@ extern int read(int fd, void *buff, size_t size);
 extern int ioctl(struct vfile *stream, unsigned long reg, void *buf);
 extern int getc(struct vfile *stream);
 extern int fgetc(struct vfile *stream);
+extern size_t ftell(struct vfile *file);
 
 CDECL_END
 
 #endif
-

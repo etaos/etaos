@@ -15,6 +15,7 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 #include <etaos/gpio.h>
+#include <etaos/vfs.h>
 #include <etaos/platform.h>
 #include <etaos/ipm.h>
 
@@ -55,6 +56,10 @@ THREAD(test_th_handle2, arg)
 {
 	unsigned char sram_readback;
 	unsigned long rand;
+	int fd;
+	struct vfile *file;
+	size_t flen;
+	char *romdata;
 	float sram_entry = 3.1415F;
 
 	sram_stress_write_byte(SRAM_BYTE_ADDR, 0x78);
@@ -65,6 +70,22 @@ THREAD(test_th_handle2, arg)
 		rand = random_m(100);
 		printf("[2][%s]: SRAM: %u :: RAND: %u\n",
 				current_thread_name(), sram_readback, rand);
+
+		fd = open("test.txt", O_RDONLY);
+		file = filep(fd);
+
+		lseek(file, 0, SEEK_END);
+		flen = ftell(file);
+		lseek(file, 0, SEEK_SET);
+
+		romdata = kzalloc(flen + 1);
+		read(fd, romdata, flen);
+		romdata[flen] = '\0';
+		close(fd);
+
+		printf("[2][%s]: ROMFS: %s\n", current_thread_name(), romdata);
+
+		kfree(romdata);
 		sleep(1000);
 	}
 }

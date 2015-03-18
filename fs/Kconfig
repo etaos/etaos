@@ -8,4 +8,15 @@ config VFS
 	  used by the standard C library for the STDIO
 	  functions. If you are unsure say 'm' or 'y'
 	  here.
+
+if VFS
+
+config ROMFS
+	tristate "Micro ROM filesystem"
+	help
+	  Say 'y' or 'm' here to build a small read-only
+	  filesystem. This filesystem is stored in program
+	  memory. If you are unsure, say 'n' here.
+
+endif
 endmenu

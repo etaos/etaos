@@ -25,5 +25,8 @@
 #define ENOTINITIALISED  3
 #define EINVAL		 4
 #define EAGAIN		 5
+#define EBADF            6
+#define EEXIST           7
+#define EOF		 8
 
 #endif

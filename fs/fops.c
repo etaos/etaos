@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Generic file operations
- *  Copyright (C) 2012   Michel Megens
+ *  Copyright (C) 2015   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,11 +38,16 @@ static size_t vfs_setindex(struct vfile *file, size_t index, size_t max)
 {
 	if(index > max && max)
 		return -EINVAL;
-	
+
 	if(index != file->index)
 		file->index  = index;
 
 	return index;
+}
+
+size_t ftell(struct vfile *file)
+{
+	return file->index;
 }
 
 size_t lseek(struct vfile *file, size_t offset, int whence)
@@ -51,7 +56,7 @@ size_t lseek(struct vfile *file, size_t offset, int whence)
 	case SEEK_END:
 		offset += file->length;
 		break;
-	
+
 	case SEEK_CUR:
 		if(!offset)
 			return file->index;
@@ -63,4 +68,3 @@ size_t lseek(struct vfile *file, size_t offset, int whence)
 
 	return vfs_setindex(file, offset, 0);
 }
-

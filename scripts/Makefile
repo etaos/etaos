@@ -1,7 +1,7 @@
 # Let clean descend into subdirs
 subdir-	+= basic kconfig
 
-subdir-y += crurom
+subdir-$(CONFIG_ROMFS) += crurom
 
 always		:= $(hostprogs-y) $(hostprogs-m)
 

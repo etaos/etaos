@@ -180,7 +180,35 @@
 #define pgm_read_byte(address_short)    pgm_read_byte_near(address_short)
 #define pgm_read_word(address_short)    pgm_read_word_near(address_short)
 
+#ifdef __DOXYGEN__
+/**
+ * @ingroup atmega
+ * @brief Program memory character.
+ * @deprecated The use of GNU attributes in typedefs is deprecated.
+ */
+typedef char prog_char;
+#else
 typedef char __attribute__((__progmem__)) prog_char;
-
 #endif
 
+/**
+ * @ingroup atmega
+ * @brief Copy memory from program memroy in data memory.
+ * @param _dest Destination addess (data space address).
+ * @param _src Source address (program space address).
+ * @param size Number bytes to copy.
+ * @return Destination address pointer.
+ */
+static inline void *memcpy_P(void *_dest, const void *_src, size_t size)
+{
+	size_t idx;
+	char *dest = _dest;
+	const char *src = _src;
+
+	for(idx = 0; idx < size; idx++)
+		dest[idx] = pgm_read_byte(src+idx);
+
+	return (void*)dest;
+}
+
+#endif

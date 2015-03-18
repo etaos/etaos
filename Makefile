@@ -227,7 +227,7 @@ etaos: prepare $(etaos-img)
 app: $(etaos-target)
 prepare: cremodverdir
 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
-	$(Q)$(MAKE) $(build)=scripts/crurom
+	$(Q)$(MAKE) $(build)=scripts
 
 cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
                   $(if $(KBUILD_MODULES),; rm -f $(MODVERDIR)/*)
