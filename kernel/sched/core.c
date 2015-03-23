@@ -828,7 +828,7 @@ static void __hot cpu_schedule(int cpu)
 {
 	struct rq *rq;
 	struct thread *tp, *prev;
-	unsigned int diff = 0;
+	tick_t diff = 0;
 
 	rq = sched_cpu_to_rq(cpu);
 	prev = current(rq);
