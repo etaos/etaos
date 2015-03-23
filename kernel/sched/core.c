@@ -626,7 +626,7 @@ static void rq_destroy_kill_q(struct rq *rq)
 #ifdef CONFIG_DYN_PRIO
 /**
  * @brief Reset the dynamic priority.
- * @param __t Thread to reset the dynamic priority for.
+ * @param tp Thread to reset the dynamic priority for.
  */
 static inline void dyn_prio_reset(struct thread *tp)
 {
