@@ -32,6 +32,7 @@
 #include <etaos/tick.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/atomic.h>
 
 /**
  * @addtogroup dev-core
@@ -217,6 +218,7 @@ int device_initialize(struct device *dev, struct dev_file_ops *fops)
 	dev->file.name = dev->name;
 	dev->file.index = 0;
 	dev->file.length = 0;
+	atomic_init(&dev->file.uses);
 	vfs_add(&dev->file);
 	spinlock_init(&dev->file.lock);
 	dev_set_fops(dev, fops);
