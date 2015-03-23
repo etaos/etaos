@@ -822,6 +822,27 @@ static inline void preempt_reset_slice(struct thread *tp)
 }
 #endif
 
+/**
+ * @brief Reschedule policy.
+ * @param curr Current thread.
+ * @param next Thread which is supposed to be running after \p curr.
+ * @return an integer indicating whether to reschedule or not.
+ * @retval 1 if __schedule should reschedule.
+ * @retval 0 if __schedule should not reschedule.
+ *
+ * The decision to reschedule is made as following:
+ *
+ * Check the PREEMPT_NEED_RESCHED_FLAG flag. If this flag is set and \p next
+ * is the idle thread a reschedule will only occur if THREAD_NEED_RESCHED_FLAG
+ * is set (PREEMPT_NEED_RESCHED_FLAG is discarded). If \p next is \b not the
+ * idle thread, the return value will be:
+ * \f$ x \lor y \f$ \n
+ * where \p x is the value of PREEMPT_NEED_RESCHED_FLAG; \n
+ * \p y is the value of THREAD_NEED_RESCHED_FLAG. \n
+ * \n
+ * When preemption is not enabled the value of THREAD_NEED_RESCHED_FLAG is
+ * returned.
+ */
 static int __schedule_need_resched(struct thread *curr, struct thread *next)
 {
 #ifdef CONFIG_PREEMPT
@@ -847,6 +868,19 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 #endif
 }
 
+/**
+ * @brief Reschedule the current run queue.
+ * @param cpu ID of the CPU which should be rescheduled.
+ * @note This function also updates:
+ * 	   - threads signaled from an IRQ;
+ * 	   - timers;
+ * 	   - threads which have used up their time slice;
+ * 	   - the kill queue of the run queue;
+ * 	   - irq threads which have to be woken up.
+ * @see __schedule_need_resched
+ *
+ * struct rq::lock will be locked (and unlocked).
+ */
 static void __hot __schedule(int cpu)
 {
 	struct rq *rq;
@@ -877,6 +911,11 @@ static void __hot __schedule(int cpu)
 
 	next = sched_get_next_runnable(rq);
 
+	/*
+	 * Only reschedule if we have to. The decision is based on the
+	 * THREAD_NEED_RESCHED_FLAG and the PREEMPT_NEED_RESCHED_FLAG. Also,
+	 * if prev == next a reschedule is redundant.
+	 */
 	if(__schedule_need_resched(prev, next) && prev != next) {
 		rq->current = next;
 		rq->switch_count++;
