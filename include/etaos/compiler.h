@@ -31,4 +31,12 @@
 #define __hot
 #endif
 
+#ifndef likely
+#define likely(x)
+#endif
+
+#ifndef unlikely
+#define unlikely(x)
+#endif
+
 #endif
