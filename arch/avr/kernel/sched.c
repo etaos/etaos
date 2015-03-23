@@ -53,7 +53,7 @@ void avr_init_sched(void)
 	avr_rq.source = avr_get_sys_clk();
 }
 
-struct rq *sched_cpu_to_rq(int cpu)
+struct rq *cpu_to_rq(int cpu)
 {
 	return &avr_rq;
 }

@@ -30,6 +30,7 @@
 /* @{ */
 
 #include <etaos/kernel.h>
+#include <etaos/compiler.h>
 #include <etaos/types.h>
 #include <etaos/init.h>
 #include <etaos/list.h>
@@ -49,6 +50,7 @@
 
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp);
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
+static bool thread_is_idle(struct thread *tp);
 
 #ifdef CONFIG_IRQ_THREAD
 DEFINE_THREAD_QUEUE(irq_thread_queue);
@@ -624,11 +626,13 @@ static void rq_destroy_kill_q(struct rq *rq)
 
 #ifdef CONFIG_DYN_PRIO
 /**
- * @def dyn_prio_reset
  * @brief Reset the dynamic priority.
- * @param __t Thread to reset the dynamic priority for.
+ * @param tp Thread to reset the dynamic priority for.
  */
-#define dyn_prio_reset(__t) (__t)->dprio = 0;
+static inline void dyn_prio_reset(struct thread *tp)
+{
+	tp->dprio = 0;
+}
 
 /**
  * @brief Update the dynamic priorities of a run queue with 1.
@@ -639,8 +643,16 @@ static inline void dyn_prio_update(struct rq *rq)
 	struct sched_class *class;
 
 	class = rq ? rq->sched_class : NULL;
-	if(class)
+	if(likely(class))
 		class->dyn_prio_update(rq, 1);
+}
+#else
+static inline void dyn_prio_reset(struct thread *tp)
+{
+}
+
+static inline void dyn_prio_update(struct rq *rq)
+{
 }
 #endif
 
@@ -666,7 +678,7 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 		}
 	}
 
-	/* prev != new (this condition is ensured by cpu_schedule) */
+	/* prev != new (this condition is ensured by __schedule) */
 	class->rm_thread(rq, new);
 	raw_spin_unlock_irq(&rq->lock);
 	cpu_switch_context(rq, prev, new);
@@ -701,7 +713,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		tm_stop_timer(tp->timer);
 	}
 
-	if(rq->current != tp) {
+	if(unlikely(rq->current != tp)) {
 		raw_rq_add_thread(rq, tp);
 		if(prio(tp) <= prio(rq->current))
 			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
@@ -739,8 +751,8 @@ static void irq_signal_threads(struct rq *rq)
 
 	list_for_each(icarriage, &chip->irqs) {
 		idata = list_entry(icarriage, struct irq_data, irq_list);
-		if(!test_bit(IRQ_THREADED_FLAG, &idata->flags) ||
-				!test_bit(IRQ_ENABLE_FLAG, &idata->flags))
+		if(likely(!test_bit(IRQ_THREADED_FLAG, &idata->flags) ||
+				!test_bit(IRQ_ENABLE_FLAG, &idata->flags)))
 			continue;
 
 		tdata = container_of(idata, struct irq_thread_data, idata);
@@ -770,7 +782,7 @@ static inline void irq_signal_threads(struct rq *rq)
  * up by this function. Functions put to sleep by either sleep or wait are not
  * affected.
  */
-static void sched_do_signal_threads(struct rq *rq)
+static void rq_signal_threads(struct rq *rq)
 {
 	struct thread *carriage, 
 		      *tp,
@@ -812,6 +824,52 @@ static inline void preempt_reset_slice(struct thread *tp)
 #endif
 
 /**
+ * @brief Reschedule policy.
+ * @param curr Current thread.
+ * @param next Thread which is supposed to be running after \p curr.
+ * @return an integer indicating whether to reschedule or not.
+ * @retval 1 if __schedule should reschedule.
+ * @retval 0 if __schedule should not reschedule.
+ *
+ * The decision to reschedule is made as following:
+ *
+ * Check the PREEMPT_NEED_RESCHED_FLAG flag. If this flag is set and \p next
+ * is the idle thread a reschedule will only occur if THREAD_NEED_RESCHED_FLAG
+ * is set (PREEMPT_NEED_RESCHED_FLAG is discarded). If \p next is \b not the
+ * idle thread, the return value will be:
+ * \f$ x \lor y \f$ \n
+ * where \p x is the value of PREEMPT_NEED_RESCHED_FLAG; \n
+ * \p y is the value of THREAD_NEED_RESCHED_FLAG. \n
+ * \n
+ * When preemption is not enabled the value of THREAD_NEED_RESCHED_FLAG is
+ * returned.
+ */
+static int __schedule_need_resched(struct thread *curr, struct thread *next)
+{
+#ifdef CONFIG_PREEMPT
+	if(test_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags)) {
+		if(thread_is_idle(next)) {
+			clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
+			preempt_reset_slice(curr);
+			return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, 
+					&curr->flags);
+		} else {
+			return (test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG,
+					&curr->flags) ||
+				test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
+						&curr->flags));
+		}
+	} else {
+		return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, 
+				&curr->flags);
+	}
+	
+#else
+	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+#endif
+}
+
+/**
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
  * @note This function also updates:
@@ -820,68 +878,62 @@ static inline void preempt_reset_slice(struct thread *tp)
  * 	   - threads which have used up their time slice;
  * 	   - the kill queue of the run queue;
  * 	   - irq threads which have to be woken up.
- * @see schedule sched_yield
+ * @see __schedule_need_resched
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot cpu_schedule(int cpu)
+static void __hot __schedule(int cpu)
 {
 	struct rq *rq;
-	struct thread *tp, *prev;
-	unsigned int diff = 0;
+	struct thread *next,
+		      *prev;
+	unsigned int tdelta;
 
-	rq = sched_cpu_to_rq(cpu);
-	prev = current(rq);
-	
-resched:
 	preempt_disable();
+	rq = cpu_to_rq(cpu);
+	prev = rq->current;
 	raw_spin_lock_irq(&rq->lock);
-	irq_signal_threads(rq);
-	sched_do_signal_threads(rq);
 
-	diff = tm_update_source(rq->source);
-	if(diff)
-		tm_process_clock(rq->source, diff);
+	irq_signal_threads(rq);
+	rq_signal_threads(rq);
+
+	tdelta = tm_update_source(rq->source);
+	if(tdelta)
+		tm_process_clock(rq->source, tdelta);
 
 #ifdef CONFIG_PREEMPT
-	if(diff >= prev->slice) {
+	if(prev->slice <= tdelta) {
 		prev->slice = CONFIG_TIME_SLICE;
-		set_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags);
+		set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
 	} else {
-		prev->slice -= diff;
+		prev->slice -= tdelta;
 	}
 #endif
 
-	tp = sched_get_next_runnable(rq);
+	next = sched_get_next_runnable(rq);
 
-	/* Only have to reschedule if the THREAD_NEED_RESCHED_FLAG
-	   is set on the current thread, and iff the next runnable
-	   isn't the same thread as the one currently running. */
-	if(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags) && 
-			tp != prev) {
-		rq->current = tp;
+	/*
+	 * Only reschedule if we have to. The decision is based on the
+	 * THREAD_NEED_RESCHED_FLAG and the PREEMPT_NEED_RESCHED_FLAG. Also,
+	 * if prev == next a reschedule is redundant.
+	 */
+	if(likely(__schedule_need_resched(prev, next) && prev != next)) {
+		rq->current = next;
 		rq->switch_count++;
-#ifdef CONFIG_DYN_PRIO
-		dyn_prio_update(rq);
-		dyn_prio_reset(tp);
-#endif
-		preempt_reset_slice(tp);
-		rq_switch_context(rq, prev, tp);
 
-		/* we might be on a different run queue now */
-		cpu = cpu_get_id();
-		rq = sched_cpu_to_rq(cpu);
-		prev = current(rq);
+		dyn_prio_update(rq);
+		dyn_prio_reset(next);
+
+		preempt_reset_slice(next);
+		rq_switch_context(rq, prev, next);
 		rq_update(rq);
+
 	} else {
 		raw_spin_unlock_irq(&rq->lock);
 	}
 
-	preempt_enable_no_resched();
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &prev->flags))
-		goto resched;
-
 	rq_destroy_kill_q(rq);
+	preempt_enable_no_resched();
 	return;
 }
 
@@ -898,9 +950,13 @@ resched:
 void __hot schedule(void)
 {
 	int cpu;
+	struct thread *curr;
 
-	cpu = cpu_get_id();
-	cpu_schedule(cpu);
+	do {
+		cpu = cpu_get_id();
+		__schedule(cpu);
+		curr = current_thread();
+	} while(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags));
 }
 
 static struct thread idle_thread, main_thread;
@@ -941,6 +997,14 @@ void sched_init(void)
 }
 
 #ifdef CONFIG_PREEMPT
+static bool thread_is_idle(struct thread *tp)
+{
+	if(!tp)
+		return false;
+	
+	return (tp == &idle_thread);
+}
+
 /**
  * @brief Get a pointer to the preemption counter of the current thread.
  * @return A pointer to the preemption counter of the current thread.
@@ -998,12 +1062,12 @@ void sched_yield(struct rq *rq)
 	cpu = cpu_get_id();
 
 	if(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)) {
-		cpu_schedule(cpu);
+		__schedule(cpu);
 		return;
 	} else if(tp != curr) {
 		if(prio(tp) <= prio(curr)) {
 			set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
-			cpu_schedule(cpu);
+			__schedule(cpu);
 		}
 	}
 
@@ -1029,8 +1093,8 @@ bool preempt_should_resched(void)
 	diff = tm_get_tick(rq->source);
 	diff -= cs_last_update(rq->source);
 
-	if(diff > tp->slice) {
-		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	if(diff >= tp->slice) {
+		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
 		return true;
 	}
 
