@@ -45,7 +45,7 @@ void *operator new[](size_t num)
  */
 void operator delete(void *ptr)
 {
-	if(!ptr)
+	if(ptr)
 		kfree(ptr);
 }
 
