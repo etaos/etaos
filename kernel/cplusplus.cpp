@@ -30,6 +30,11 @@ void *operator new(size_t num)
 	return kmalloc(num);
 }
 
+void *operator new[](size_t num)
+{
+	return kmalloc(num);
+}
+
 /**
  * @brief Free the memory of an allocated object.
  * @param ptr Memory region to free.
@@ -37,6 +42,12 @@ void *operator new(size_t num)
 void operator delete(void *ptr)
 {
 	if(!ptr)
+		kfree(ptr);
+}
+
+void operator delete[](void *ptr)
+{
+	if(ptr)
 		kfree(ptr);
 }
 
