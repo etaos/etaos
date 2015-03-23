@@ -887,7 +887,7 @@ static void __hot __schedule(int cpu)
 	struct rq *rq;
 	struct thread *next,
 		      *prev;
-	unsigned int tdelta;
+	tick_t tdelta = 0;
 
 	preempt_disable();
 	rq = cpu_to_rq(cpu);

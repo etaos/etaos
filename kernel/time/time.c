@@ -99,9 +99,9 @@ static void tm_start_timer(struct timer *timer)
  * @param cs Clocksource to calculate the clockskew of.
  * @return The clockskew of \p cs.
  */
-static unsigned int cs_get_diff(struct clocksource *cs)
+static tick_t cs_get_diff(struct clocksource *cs)
 {
-	unsigned int update;
+	tick_t update;
 
 	update = tm_get_tick(cs);
 	update -= cs->tc_update;
