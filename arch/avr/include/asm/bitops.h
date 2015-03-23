@@ -76,6 +76,12 @@ static inline void set_bit(unsigned nr, volatile void *addr)
 			);
 }
 
+/**
+ * @brief Return the value of bit \p nr.
+ * @param nr Bit number to test.
+ * @param addr Register that contains \p nr.
+ * @return The value of bit \p nr.
+ */
 static inline int test_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((unsigned char *)addr) + 
