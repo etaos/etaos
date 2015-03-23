@@ -31,12 +31,31 @@ void *operator new(size_t num)
 }
 
 /**
+ * @brief Allocate an array of memory.
+ * @param num Number of bytes to allocate.
+ */
+void *operator new[](size_t num)
+{
+	return kmalloc(num);
+}
+
+/**
  * @brief Free the memory of an allocated object.
  * @param ptr Memory region to free.
  */
 void operator delete(void *ptr)
 {
-	if(!ptr)
+	if(ptr)
+		kfree(ptr);
+}
+
+/**
+ * @brief Free an array of memory.
+ * @param ptr Memory region to free.
+ */
+void operator delete[](void *ptr)
+{
+	if(ptr)
 		kfree(ptr);
 }
 
