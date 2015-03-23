@@ -31,7 +31,10 @@
 #define raw_spin_unlock(__l) arch_spin_unlock(__l)
 
 CDECL
-
+/**
+ * @brief Lock the given spinlock.
+ * @param lock Spin lock which has to be locked.
+ */
 static inline void spin_lock(spinlock_t *lock)
 {
 #ifdef CONFIG_PREEMPT
@@ -40,6 +43,10 @@ static inline void spin_lock(spinlock_t *lock)
 	raw_spin_lock(lock);
 }
 
+/**
+ * @brief Unlock a given spin lock.
+ * @param lock Lock which has to be unlocked.
+ */
 static inline void spin_unlock(spinlock_t *lock)
 {
 	raw_spin_unlock(lock);
@@ -81,18 +88,35 @@ static inline void _raw_spin_unlock_irqrestore(spinlock_t *lock,
 	raw_spin_unlock(lock);
 }
 
+/**
+ * @brief Lock a spin lock without touching the preemption settings.
+ * @param lock Spin lock that has to be locked.
+ * @note The local interrupts will also be disabled.
+ */
 static inline void raw_spin_lock_irq(spinlock_t *lock)
 {
 	local_irq_disable();
 	arch_spin_lock(lock);
 }
 
+/**
+ * @brief Unlock a spin lock without touching the preemption settings.
+ * @param lock Spin lock that has to be unlocked.
+ * @note The local interrupts will also be enabled.
+ */
 static inline void raw_spin_unlock_irq(spinlock_t *lock)
 {
 	local_irq_enable();
 	arch_spin_unlock(lock);
 }
 
+/**
+ * @brief Attempt to aquire a spin lock.
+ * @param lock Lock to attempt.
+ * @note If the lock cannot be aquired nothing will be done.
+ * @retval 1 If the lock cannot be aquired.
+ * @retval 0 If the lock has been aquired.
+ */
 static inline int spin_try_lock(spinlock_t *lock)
 {
 	if(lock->lock) {
@@ -105,7 +129,20 @@ static inline int spin_try_lock(spinlock_t *lock)
 
 CDECL_END
 
+/**
+ * @brief Lock a spinlock and disable the interrupts.
+ * @param __l Lock to aquire.
+ * @param __f Flags to save the interrupt settings in.
+ */
 #define spin_lock_irqsave(__l, __f) _spin_lock_irqsave(__l, &__f)
+/**
+ * @brief Release a spin lock.
+ * @param __l Lock to release.
+ * @param __f Interrupt flags.
+ *
+ * The interrupt flags saved by spin_lock_irqsave are restored by this
+ * function, using the second argument.
+ */
 #define spin_unlock_irqrestore(__l, __f) _spin_unlock_irqrestore(__l, &__f)
 #define raw_spin_lock_irqsave(__l, __f) _raw_spin_lock_irqsave(__l, &__f)
 #define raw_spin_unlock_irqrestore(__l, __f) \
