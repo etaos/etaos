@@ -197,7 +197,7 @@ extern int cpu_get_id(void);
  * @brief Get the RQ of the given cpu.
  * @param cpu CPU to get the run queue from.
  */
-extern struct rq *sched_cpu_to_rq(int cpu);
+extern struct rq *cpu_to_rq(int cpu);
 /**
  * @ingroup archAPI
  * @brief Get the run queue of the current CPU.
