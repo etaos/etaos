@@ -149,7 +149,7 @@ static inline void tm_source_inc(struct clocksource *cs)
 	irq_restore(&flags);
 }
 
-extern unsigned int tm_update_source(struct clocksource *source);
+extern tick_t tm_update_source(struct clocksource *source);
 extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
 		unsigned long flags);

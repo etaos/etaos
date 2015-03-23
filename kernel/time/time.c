@@ -186,9 +186,9 @@ int tm_stop_timer(struct timer *timer)
  * @note You should call tm_process_clock as soon as possible after calling
  *       this function to keep timers up to date.
  */
-unsigned int tm_update_source(struct clocksource *source)
+tick_t tm_update_source(struct clocksource *source)
 {
-	unsigned int diff;
+	tick_t diff;
 
 	diff = cs_get_diff(source);
 	source->tc_update = tm_get_tick(source);
