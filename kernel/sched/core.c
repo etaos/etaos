@@ -30,6 +30,7 @@
 /* @{ */
 
 #include <etaos/kernel.h>
+#include <etaos/compiler.h>
 #include <etaos/types.h>
 #include <etaos/init.h>
 #include <etaos/list.h>
@@ -642,7 +643,7 @@ static inline void dyn_prio_update(struct rq *rq)
 	struct sched_class *class;
 
 	class = rq ? rq->sched_class : NULL;
-	if(class)
+	if(likely(class))
 		class->dyn_prio_update(rq, 1);
 }
 #else
@@ -712,7 +713,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		tm_stop_timer(tp->timer);
 	}
 
-	if(rq->current != tp) {
+	if(unlikely(rq->current != tp)) {
 		raw_rq_add_thread(rq, tp);
 		if(prio(tp) <= prio(rq->current))
 			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
@@ -750,8 +751,8 @@ static void irq_signal_threads(struct rq *rq)
 
 	list_for_each(icarriage, &chip->irqs) {
 		idata = list_entry(icarriage, struct irq_data, irq_list);
-		if(!test_bit(IRQ_THREADED_FLAG, &idata->flags) ||
-				!test_bit(IRQ_ENABLE_FLAG, &idata->flags))
+		if(likely(!test_bit(IRQ_THREADED_FLAG, &idata->flags) ||
+				!test_bit(IRQ_ENABLE_FLAG, &idata->flags)))
 			continue;
 
 		tdata = container_of(idata, struct irq_thread_data, idata);
@@ -916,7 +917,7 @@ static void __hot __schedule(int cpu)
 	 * THREAD_NEED_RESCHED_FLAG and the PREEMPT_NEED_RESCHED_FLAG. Also,
 	 * if prev == next a reschedule is redundant.
 	 */
-	if(__schedule_need_resched(prev, next) && prev != next) {
+	if(likely(__schedule_need_resched(prev, next) && prev != next)) {
 		rq->current = next;
 		rq->switch_count++;
 
