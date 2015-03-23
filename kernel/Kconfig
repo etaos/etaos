@@ -13,6 +13,9 @@ config ARCH_SET_BIT
 config ARCH_CLEAR_BIT
 	bool
 
+config ARCH_TEST_BIT
+	bool
+
 config HARVARD
 	bool
 

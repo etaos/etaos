@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - AVR bitops
+ *  ETA/OS - AVR bitops
  *  Copyright (C) 2014, 2015   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -74,6 +74,24 @@ static inline void set_bit(unsigned nr, volatile void *addr)
 			: "z" (p), "r" (msk)
 			: "memory"
 			);
+}
+
+static inline int test_bit(unsigned nr, volatile void *addr)
+{
+	volatile unsigned char *p = ((unsigned char *)addr) + 
+		(nr / BITS_PER_BYTE);
+	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
+	volatile unsigned char tmp;
+
+	__asm__ __volatile__(
+			"ld %0, %a1"	"\n\t"
+			"and %0, %2"	"\n\t"
+			: "=&r" (tmp)
+			: "z" (p), "d" (msk)
+			: "memory"
+			);
+
+	return tmp != 0;
 }
 
 /**

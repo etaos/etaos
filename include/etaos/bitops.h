@@ -36,7 +36,7 @@ CDECL
  * @param flags Address of the flags register.
  * @return The value of the tested bit.
  */
-static inline bool test_bit(unsigned bit, volatile unsigned long *flags)
+static inline int test_bit(unsigned bit, volatile unsigned long *flags)
 {
 	return 1UL & (flags[bit / BITS_PER_LONG] >> (bit % BITS_PER_LONG));
 }
