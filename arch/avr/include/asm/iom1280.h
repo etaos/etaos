@@ -50,6 +50,8 @@
 #define AVR_STACK_HI_ADDR 0x3E
 #define AVR_STATUS_ADDR 0x3F
 
+#define AVR_INTERRUPT_FLAG 7
+
 #define AVR_HAVE_RAMPD 1
 #define AVR_RAMPD_ADDR 0x3C
 

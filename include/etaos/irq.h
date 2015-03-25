@@ -62,6 +62,23 @@ extern void arch_irq_disable();
  * @brief Enable the global interrupts.
  */
 extern void arch_irq_enable();
+
+/**
+ * @ingroup archAPI
+ * @brief Check if the interrupts are enabled.
+ * @param flags Flags argument.
+ *
+ * The \p flags argument will tell which interrupts are enabled.
+ */
+extern void raw_irq_enabled_flags(unsigned long *flags);
+
+static inline bool irqs_disabled()
+{
+	unsigned long flags;
+
+	raw_irq_enabled_flags(&flags);
+	return flags == 0UL;
+}
 CDECL_END
 
 /**

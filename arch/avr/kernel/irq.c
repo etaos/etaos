@@ -49,6 +49,19 @@ void arch_irq_restore_flags(unsigned long *flags)
 	return;
 }
 
+void raw_irq_enabled_flags(unsigned long *flags)
+{
+	unsigned char status;
+
+	__asm__ __volatile__(
+			"in %0, %1"	"\n\t"
+			: "=&r" (status)
+			: "M" (AVR_STATUS_ADDR)
+			: "memory"
+			);
+	*flags = (status & (1UL << AVR_INTERRUPT_FLAG)) != 0;
+}
+
 void cpu_request_irq(struct irq_data *data)
 {
 	switch(data->irq) {
