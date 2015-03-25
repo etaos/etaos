@@ -61,8 +61,7 @@ extern void arch_irq_disable();
  * @ingroup archAPI
  * @brief Enable the global interrupts.
  */
-void arch_irq_enable();
-
+extern void arch_irq_enable();
 CDECL_END
 
 /**

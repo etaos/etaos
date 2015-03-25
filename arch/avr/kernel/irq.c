@@ -62,7 +62,7 @@ extern unsigned long test_sys_tick;
 unsigned long test_sys_tick = 0;
 #endif
 
-SIGNAL(TIMER0_OVERFLOW_VECTOR)
+void avr_handle_timer(void)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 
