@@ -126,15 +126,14 @@ static void rr_update_dyn_prio(struct rq *rq, int num)
 {
 	struct thread *walker;
 
-	walker = rq->rr_rq.run_queue;
+	for(walker = rq->rr_rq.run_queue; walker; walker = walker->se.next) {
+		if(test_bit(THREAD_IDLE_FLAG, &walker->flags))
+			continue;
 
-	while(walker) {
 		if((walker->dprio + num) > walker->prio)
 			walker->dprio = walker->prio;
 		else
 			walker->dprio += num;
-
-		walker = walker->se.next;
 	}
 }
 #endif

@@ -84,6 +84,7 @@ void sched_init_idle(struct thread *tp, const char *name,
 		void *stack)
 {
 	raw_thread_init(tp, name, handle, arg, stack_size, stack, 255);
+	set_bit(THREAD_IDLE_FLAG, &tp->flags);
 }
 
 /**
@@ -130,8 +131,10 @@ int thread_initialise(struct thread *tp, const char *name,
 
 	raw_thread_init(tp, name, handle, arg, stack_size, stack, prio);
 	rq = sched_select_rq();
-	
+
+	preempt_disable();
 	rq_add_thread(rq, tp);
+	preempt_enable();
 	return -EOK;
 }
 
@@ -207,8 +210,10 @@ void yield(void)
 {
 	struct rq *rq;
 
+	preempt_disable();
 	rq = sched_get_cpu_rq();
 	sched_yield(rq);
+	preempt_enable();
 }
 
 /**
@@ -241,7 +246,6 @@ void sleep(unsigned ms)
 	struct thread *tp = current_thread();
 
 	sched_setup_sleep_thread(tp, ms);
-	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	schedule();
 }
 

@@ -60,6 +60,7 @@ static inline void mutex_wait(mutex_t *mutex)
 
 static inline void mutex_lock(mutex_t *mutex)
 {
+	preempt_disable();
 	evm_wait_event_queue(&mutex->qp, EVM_WAIT_INFINITE);
 	mutex->owner = current_thread();
 }
@@ -68,6 +69,7 @@ static inline void mutex_unlock(mutex_t *mutex)
 {
 	mutex->owner = NULL;
 	evm_signal_event_queue(&mutex->qp);
+	preempt_enable();
 }
 
 static inline void mutex_unlock_from_irq(mutex_t *mutex)

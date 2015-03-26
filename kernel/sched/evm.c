@@ -44,6 +44,7 @@ static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 	struct thread *tp;
 	unsigned long flags;
 
+	preempt_disable();
 	irq_save_and_disable(&flags);
 	tp = qp->qhead;
 
@@ -59,7 +60,6 @@ static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 
 	if(rq->current != tp) {
 		rq_add_thread(rq, tp);
-		preempt_should_resched();
 		if(prio(tp) <= prio(rq->current))
 			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
 	} else {
@@ -68,6 +68,7 @@ static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 		tp->rq = rq;
 	}
 	irq_restore(&flags);
+	preempt_enable_no_resched();
 }
 
 static void evm_timeout(struct timer *timer, void *arg)
@@ -113,6 +114,7 @@ void evm_signal_event_queue(struct thread_queue *qp)
 
 	tp = qp->qhead;
 
+	preempt_disable();
 	if(!tp) {
 		raw_spin_lock_irq(&qp->lock);
 		qp->qhead = SIGNALED;
@@ -121,8 +123,7 @@ void evm_signal_event_queue(struct thread_queue *qp)
 		rq = sched_get_cpu_rq();
 		raw_evm_signal_event_queue(rq, qp);
 	}
-
-	yield();
+	preempt_enable_no_resched();
 }
 
 /**
@@ -134,12 +135,18 @@ void evm_signal_event_queue(struct thread_queue *qp)
  */
 int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms)
 {
+	int rv;
+
+	preempt_disable();
 	raw_spin_unlock_irq(&qp->lock);
 	if(qp->qhead == SIGNALED)
 		qp->qhead = NULL;
 	raw_spin_unlock_irq(&qp->lock);
 
-	return evm_wait_event_queue(qp, ms);
+	preempt_enable_no_resched();
+	rv = evm_wait_event_queue(qp, ms);
+
+	return rv;
 }
 
 /**
@@ -156,11 +163,12 @@ int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
 	unsigned long flags;
 	struct clocksource *cs;
 
+	preempt_disable();
 	raw_spin_lock_irqsave(&qp->lock, flags);
 	if(qp->qhead == SIGNALED) {
 		qp->qhead = NULL;
 		raw_spin_unlock_irqrestore(&qp->lock, flags);
-		yield();
+		preempt_enable_no_resched();
 		return -EOK;
 	} else {
 		raw_spin_unlock_irqrestore(&qp->lock, flags);
@@ -177,6 +185,7 @@ int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
 
 	thread_add_to_wake_q(tp);
 	queue_add_thread(qp, tp);
+	preempt_enable_no_resched();
 	schedule();
 
 	tp = current_thread();

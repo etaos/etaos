@@ -38,7 +38,6 @@
  * @brief USART descriptor.
  */
 struct usart {
-	spinlock_t bus_lock; //!< USART bus lock.
 	int timeout; //!< Transmission timeout.
 
 	struct device dev; //!< Backend USART device.

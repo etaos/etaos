@@ -32,10 +32,13 @@
 int read(int fd, void *buff, size_t len)
 {
 	struct vfile * file;
+	int rv;
 
 	file = __iob[fd];
 	if(!file)
-		return -EINVAL;
+		return -EBADF;
 
-	return vfs_read(file, buff, len);
+	rv = vfs_read(file, buff, len);
+	
+	return rv;
 }

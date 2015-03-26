@@ -118,7 +118,12 @@ static inline void preempt_disable(void)
 	preempt_count_inc;
 }
 
-#define preemptible() (*preempt_counter_ptr() == 0 && !irqs_disabled())
+static inline int preempt_count(void)
+{
+	return *preempt_counter_ptr();
+}
+
+#define preemptible() ((preempt_count() == 0) && !irqs_disabled())
 
 #else /* !CONFIG_PREEMPT */
 

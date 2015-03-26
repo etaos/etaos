@@ -574,12 +574,15 @@ void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 {
 	struct rq *rq;
 
+	preempt_disable();
 	rq = tp->rq;
 	set_bit(THREAD_SLEEPING_FLAG, &tp->flags);
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 
 	tp->timer = tm_create_timer(rq->source, ms, &sched_sleep_timeout,
 			tp, TIMER_ONESHOT_MASK);
+	preempt_enable_no_resched();
 }
 
 /**
@@ -922,9 +925,11 @@ static void __hot __schedule(int cpu)
 		rq->switch_count++;
 
 		dyn_prio_update(rq);
+		dyn_prio_reset(prev);
 		dyn_prio_reset(next);
 
 		preempt_reset_slice(next);
+		preempt_reset_slice(prev);
 		rq_switch_context(rq, prev, next);
 		rq_update(rq);
 
@@ -935,6 +940,14 @@ static void __hot __schedule(int cpu)
 	rq_destroy_kill_q(rq);
 	preempt_enable_no_resched();
 	return;
+}
+
+static inline bool need_resched()
+{
+	struct thread *curr = current_thread();
+
+	return (test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags) ||
+		test_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags));
 }
 
 /**
@@ -950,14 +963,33 @@ static void __hot __schedule(int cpu)
 void __hot schedule(void)
 {
 	int cpu;
-	struct thread *curr;
 
 	do {
 		cpu = cpu_get_id();
 		__schedule(cpu);
-		curr = current_thread();
-	} while(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags));
+	} while(need_resched());
 }
+
+#ifdef CONFIG_PREEMPT
+void __hot preempt_schedule(void)
+{
+	int cpu;
+
+	/* we don't want to preempt the current process if either
+	 * a) the interrupts are disabled or
+	 * b) the preemption counter != 0
+	 */
+	if(likely(!preemptible()))
+		return;
+
+	do {
+		cpu = cpu_get_id();
+		__schedule(cpu);
+	} while(need_resched());
+
+	return;
+}
+#endif
 
 static struct thread idle_thread, main_thread;
 static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE];
@@ -966,6 +998,7 @@ THREAD(idle_thread_func, arg)
 {
 	struct thread *tp = arg;
 
+	irq_enable();
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack_ptr, 120);
 	while(true) {

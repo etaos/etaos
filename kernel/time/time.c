@@ -73,7 +73,7 @@ static void tm_start_timer(struct timer *timer)
 
 	cs = timer->source;
 
-	raw_spin_lock(&cs->lock);
+	_raw_spin_lock(&cs->lock);
 	for(_timer = cs->thead; _timer; _timer = _timer->next) {
 		if(timer->tleft < _timer->tleft) {
 			_timer->tleft -= timer->tleft;
@@ -91,7 +91,7 @@ static void tm_start_timer(struct timer *timer)
 		timer->prev->next = timer;
 	else
 		cs->thead = timer;
-	raw_spin_unlock(&cs->lock);
+	_raw_spin_unlock(&cs->lock);
 }
 
 /**
@@ -134,10 +134,12 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 	else
 		timer->ticks = timer->tleft;
 
+	_raw_spin_lock(&cs->lock);
 	timer->tleft += cs_get_diff(cs);
 	timer->source = cs;
 	timer->handle = handle;
 	timer->priv_data = arg;
+	_raw_spin_unlock(&cs->lock);
 
 	tm_start_timer(timer);
 	return timer;

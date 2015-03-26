@@ -57,7 +57,6 @@ void avr_init(void)
 #endif
 
 	dev_init();
-	irq_enable();
 	sys_init();
 
 	while(1);
