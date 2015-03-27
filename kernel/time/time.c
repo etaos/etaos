@@ -73,7 +73,6 @@ static void tm_start_timer(struct timer *timer)
 
 	cs = timer->source;
 
-	_raw_spin_lock(&cs->lock);
 	for(_timer = cs->thead; _timer; _timer = _timer->next) {
 		if(timer->tleft < _timer->tleft) {
 			_timer->tleft -= timer->tleft;
@@ -91,7 +90,6 @@ static void tm_start_timer(struct timer *timer)
 		timer->prev->next = timer;
 	else
 		cs->thead = timer;
-	_raw_spin_unlock(&cs->lock);
 }
 
 /**
@@ -127,6 +125,7 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 	if((timer = kzalloc(sizeof(*timer))) == NULL)
 		return NULL;
 
+	_raw_spin_lock(&cs->lock);
 	timer->tleft = (cs->freq / 1000UL) * ms;
 
 	if(test_bit(TIMER_ONESHOT_FLAG, &flags))
@@ -134,14 +133,13 @@ struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
 	else
 		timer->ticks = timer->tleft;
 
-	_raw_spin_lock(&cs->lock);
 	timer->tleft += cs_get_diff(cs);
 	timer->source = cs;
 	timer->handle = handle;
 	timer->priv_data = arg;
-	_raw_spin_unlock(&cs->lock);
 
 	tm_start_timer(timer);
+	_raw_spin_unlock(&cs->lock);
 	return timer;
 }	
 
@@ -164,7 +162,7 @@ int tm_stop_timer(struct timer *timer)
 	cs = timer->source;
 
 	if(timer->tleft) {
-		raw_spin_lock(&cs->lock);
+		_raw_spin_lock(&cs->lock);
 		if(timer->prev)
 			timer->prev->next = timer->next;
 		else
@@ -173,9 +171,10 @@ int tm_stop_timer(struct timer *timer)
 			timer->next->prev = timer->prev;
 			timer->next->tleft += timer->tleft;
 		}
-		raw_spin_unlock(&cs->lock);
+
 		timer->tleft = 0;
 		tm_start_timer(timer);
+		_raw_spin_unlock(&cs->lock);
 	}
 
 	return 0;
@@ -234,11 +233,8 @@ void tm_process_clock(struct clocksource *cs, unsigned int diff)
 				cs->thead->prev = NULL;
 			if((timer->tleft = timer->ticks) == 0)
 				kfree(timer);
-			else {
-				raw_spin_unlock(&cs->lock);
+			else
 				tm_start_timer(timer);
-				raw_spin_lock(&cs->lock);
-			}
 		}
 	}
 	raw_spin_unlock(&cs->lock);
