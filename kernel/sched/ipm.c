@@ -26,7 +26,7 @@
 #include <etaos/types.h>
 #include <etaos/ipm.h>
 #include <etaos/mem.h>
-#include <etaos/evm.h>
+#include <etaos/event.h>
 
 static inline bool ipm_queue_is_full(struct ipm_queue *iq)
 {
@@ -79,7 +79,7 @@ void ipm_post_msg(struct ipm_queue *iq, const void *buff, size_t len)
 	msg->data = buff;
 	msg->len = len;
 
-	evm_signal_event_queue(&iq->qp);
+	event_notify(&iq->qp);
 }
 
 /**
@@ -91,7 +91,7 @@ void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 {
 	unsigned long flags;
 
-	evm_wait_event_queue(&iq->qp, EVM_WAIT_INFINITE);
+	raw_event_wait(&iq->qp, EVM_WAIT_INFINITE);
 
 	spin_lock_irqsave(&iq->lock, flags);
 	if(iq->wr_idx == iq->rd_idx)
@@ -102,7 +102,7 @@ void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 
 	if(iq->rd_idx != iq->wr_idx) {
 		spin_unlock_irqrestore(&iq->lock, flags);
-		evm_signal_event_queue(&iq->qp);
+		event_notify(&iq->qp);
 		spin_lock_irqsave(&iq->lock, flags);
 	}
 
