@@ -828,6 +828,30 @@ static inline void preempt_reset_slice(struct thread *tp)
 }
 #endif
 
+static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
+{
+	struct thread *next = rq->current;
+
+	/*
+	 * Update the dynamic priorities of all threads that still
+	 * reside on the run queue.
+	 */
+	dyn_prio_update(rq);
+
+	/*
+	 * Reset the priorities of the thread that just lost the CPU and
+	 * the thread that is about to receive CPU time.
+	 */
+	dyn_prio_reset(prev);
+	dyn_prio_reset(next);
+
+	/*
+	 * Reset the time slices of the entering and leaving threads.
+	 */
+	preempt_reset_slice(next);
+	preempt_reset_slice(prev);
+}
+
 /**
  * @brief Reschedule policy.
  * @param curr Current thread.
@@ -926,12 +950,7 @@ static void __hot __schedule(int cpu)
 		rq->current = next;
 		rq->switch_count++;
 
-		dyn_prio_update(rq);
-		dyn_prio_reset(prev);
-		dyn_prio_reset(next);
-
-		preempt_reset_slice(next);
-		preempt_reset_slice(prev);
+		__schedule_prepare(rq, prev);
 		rq_switch_context(rq, prev, next);
 		rq_update(rq);
 
