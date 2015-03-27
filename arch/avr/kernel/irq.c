@@ -89,6 +89,7 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
 
+#ifdef CONFIG_PREEMPT
 	__asm__ __volatile__(
 			"sei"	"\n\t"
 			:
@@ -102,6 +103,7 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 			:
 			: "memory"
 			);
+#endif
 }
 
 SIGNAL(SPI_STC_VECTOR)

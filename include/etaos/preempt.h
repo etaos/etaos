@@ -32,6 +32,7 @@ struct thread;
 CDECL
 
 extern void schedule(void);
+extern bool preempt_should_resched(void);
 
 #ifdef CONFIG_PREEMPT
 /**
@@ -50,7 +51,6 @@ extern void __preempt_sub(int num);
  */
 extern int *preempt_counter_ptr(void);
 extern bool should_resched(void);
-extern bool preempt_should_resched(void);
 
 /**
  * @def preempt_count_inc
@@ -128,7 +128,6 @@ static inline int preempt_count(void)
 #else /* !CONFIG_PREEMPT */
 
 #define preemptible() 0
-#define preempt_should_resched()
 #define __preempt_add(_i)
 #define __preempt_sub(_i)
 #define preempt_counter_ptr()

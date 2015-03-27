@@ -50,7 +50,9 @@
 
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp);
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
+#ifdef CONFIG_PREEMPT
 static bool thread_is_idle(struct thread *tp);
+#endif
 
 #ifdef CONFIG_IRQ_THREAD
 DEFINE_THREAD_QUEUE(irq_thread_queue);
@@ -1124,6 +1126,11 @@ bool preempt_should_resched(void)
 		return true;
 	}
 
+	return false;
+}
+#else
+bool preempt_should_resched(void)
+{
 	return false;
 }
 #endif
