@@ -38,6 +38,7 @@
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/cpu.h>
 #include <etaos/preempt.h>
 #include <etaos/irq.h>
 #include <etaos/irq_handle.h>
@@ -918,7 +919,7 @@ static void __hot __schedule(int cpu)
 		      *prev;
 	tick_t tdelta = 0;
 
-	preempt_disable();
+	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
 	prev = rq->current;
 	raw_spin_lock_irq(&rq->lock);
@@ -959,7 +960,7 @@ static void __hot __schedule(int cpu)
 	}
 
 	rq_destroy_kill_q(rq);
-	preempt_enable_no_resched();
+	cpu_notify(SCHED_EXIT);
 	return;
 }
 
