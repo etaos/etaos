@@ -210,10 +210,8 @@ void yield(void)
 {
 	struct rq *rq;
 
-	preempt_disable();
 	rq = sched_get_cpu_rq();
 	sched_yield(rq);
-	preempt_enable();
 }
 
 /**

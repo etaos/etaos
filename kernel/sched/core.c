@@ -1086,24 +1086,16 @@ void __preempt_sub(int num)
  */
 void sched_yield(struct rq *rq)
 {
-	struct thread *tp, *curr;
-	struct sched_class *class;
-	int cpu;
+	struct thread *next,
+		      *curr;
 
-	class = rq->sched_class;
-	tp = class->next_runnable(rq);
+	preempt_disable();
+	next = sched_get_next_runnable(rq);
 	curr = current(rq);
-	cpu = cpu_get_id();
 
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)) {
-		__schedule(cpu);
-		return;
-	} else if(tp != curr) {
-		if(prio(tp) <= prio(curr)) {
-			set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
-			__schedule(cpu);
-		}
-	}
+	if(preempt_should_resched() || prio(next) <= prio(curr))
+		set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+	preempt_enable_no_resched();
 
 	return;
 }

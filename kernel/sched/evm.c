@@ -44,7 +44,6 @@ static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 	struct thread *tp;
 	unsigned long flags;
 
-	preempt_disable();
 	irq_save_and_disable(&flags);
 	tp = qp->qhead;
 
@@ -68,7 +67,6 @@ static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 		tp->rq = rq;
 	}
 	irq_restore(&flags);
-	preempt_enable_no_resched();
 }
 
 static void evm_timeout(struct timer *timer, void *arg)
@@ -124,6 +122,8 @@ void evm_signal_event_queue(struct thread_queue *qp)
 		raw_evm_signal_event_queue(rq, qp);
 	}
 	preempt_enable_no_resched();
+
+	yield();
 }
 
 /**
@@ -169,6 +169,7 @@ int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
 		qp->qhead = NULL;
 		raw_spin_unlock_irqrestore(&qp->lock, flags);
 		preempt_enable_no_resched();
+		yield();
 		return -EOK;
 	} else {
 		raw_spin_unlock_irqrestore(&qp->lock, flags);
