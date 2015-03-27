@@ -27,6 +27,7 @@
 #include <etaos/thread.h>
 #include <etaos/sched.h>
 #include <etaos/preempt.h>
+#include <etaos/cpu.h>
 #include <etaos/event.h>
 #include <etaos/irq.h>
 #include <etaos/bitops.h>
@@ -108,6 +109,13 @@ void event_notify(struct thread_queue *qp)
 {
 	struct rq *rq;
 	struct thread *tp;
+	unsigned long flags;
+
+	cpu_get_state(&flags);
+	if(test_bit(CPU_IRQ_EXEC_FLAG, &flags)) {
+		event_notify_irq(qp);
+		return;
+	}
 
 	tp = qp->qhead;
 
