@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Mutexes
- *  Copyright (C) 2014   Michel Megens
+ *  Copyright (C) 2014, 2015   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,8 +36,7 @@ typedef struct mutex {
 } mutex_t;
 
 #ifdef CONFIG_MUTEX_EVENT_QUEUE
-#include <etaos/thread.h>
-#include <etaos/evm.h>
+
 #define STATIC_MUTEX_INIT { \
 		.qp = INIT_THREAD_QUEUE, \
 		.owner = NULL, \
@@ -46,36 +45,15 @@ typedef struct mutex {
 
 CDECL
 
+extern void mutex_wait(mutex_t *mutex);
+extern void mutex_lock(mutex_t *mutex);
+extern void mutex_unlock(mutex_t *mutex);
+extern void mutex_unlock_irq(mutex_t *mutex);
+
 static inline void mutex_init(mutex_t *mutex)
 {
 	thread_queue_init(&mutex->qp);
 	mutex->owner = NULL;
-}
-
-static inline void mutex_wait(mutex_t *mutex)
-{
-	mutex->owner = NULL;
-	evm_wait_next_event_queue(&mutex->qp, EVM_WAIT_INFINITE);
-}
-
-static inline void mutex_lock(mutex_t *mutex)
-{
-	preempt_disable();
-	evm_wait_event_queue(&mutex->qp, EVM_WAIT_INFINITE);
-	mutex->owner = current_thread();
-}
-
-static inline void mutex_unlock(mutex_t *mutex)
-{
-	mutex->owner = NULL;
-	evm_signal_event_queue(&mutex->qp);
-	preempt_enable();
-}
-
-static inline void mutex_unlock_from_irq(mutex_t *mutex)
-{
-	mutex->owner = NULL;
-	evm_signal_from_irq(&mutex->qp);
 }
 
 CDECL_END
@@ -99,16 +77,19 @@ static inline void mutex_wait(mutex_t *mutex)
 	arch_mutex_wait(mutex);
 }
 
-static inline void mutex_unlock_from_irq(mutex_t *mutex)
+static inline void mutex_unlock_irq(mutex_t *mutex)
 {
 	mutex->lock = 0;
 	barrier();
 }
 CDECL_END
 
+
 #define mutex_lock(__l) arch_mutex_lock(__l)
 #define mutex_unlock(__l) arch_mutex_unlock(__l)
 #endif
+
+#define mutex_unlock_from_irq(__m) mutex_unlock_irq(__m)
 
 #endif
 
