@@ -1001,6 +1001,7 @@ THREAD(idle_thread_func, arg)
 	irq_enable();
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack_ptr, 120);
+	preempt_disable();
 	while(true) {
 		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 		schedule();

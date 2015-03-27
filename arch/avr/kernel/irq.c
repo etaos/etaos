@@ -75,7 +75,8 @@ extern unsigned long test_sys_tick;
 unsigned long test_sys_tick = 0;
 #endif
 
-void avr_handle_timer(void)
+extern void preempt_schedule(void);
+SIGNAL(TIMER0_OVERFLOW_VECTOR)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 
@@ -87,6 +88,20 @@ void avr_handle_timer(void)
 #endif
 
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
+
+	__asm__ __volatile__(
+			"sei"	"\n\t"
+			:
+			:
+			: "memory"
+			);
+	preempt_schedule();
+	__asm__ __volatile__(
+			"cli"	"\n\t"
+			:
+			:
+			: "memory"
+			);
 }
 
 SIGNAL(SPI_STC_VECTOR)
