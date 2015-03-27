@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - Event driven mutexes
- *  Copyright (C) 2014, 2015  Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - Event management
+ *  Copyright (C) 2015   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,19 +27,18 @@
 #include <etaos/thread.h>
 #include <etaos/sched.h>
 #include <etaos/preempt.h>
-#include <etaos/evm.h>
+#include <etaos/event.h>
 #include <etaos/irq.h>
 #include <etaos/bitops.h>
 #include <etaos/time.h>
 #include <etaos/spinlock.h>
-#include <etaos/preempt.h>
 
 /**
  * @brief Signal the queue head of a thread_queue.
  * @param rq Run queue to place a woken up thread on.
  * @param qp Thread queue which has to be signaled.
  */
-static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
+static void __raw_event_notify(struct rq *rq, struct thread_queue *qp)
 {
 	struct thread *tp;
 	unsigned long flags;
@@ -69,7 +68,7 @@ static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 	irq_restore(&flags);
 }
 
-static void evm_timeout(struct timer *timer, void *arg)
+static void event_tmo(struct timer *timer, void *arg)
 {
 	struct thread *walker, *curr;
 	struct thread_queue *qp;
@@ -105,7 +104,7 @@ static void evm_timeout(struct timer *timer, void *arg)
  * @param qp thread_queue to signal.
  * @warning NEVER call this from an ISR.
  */
-void evm_signal_event_queue(struct thread_queue *qp)
+void event_notify(struct thread_queue *qp)
 {
 	struct rq *rq;
 	struct thread *tp;
@@ -119,7 +118,7 @@ void evm_signal_event_queue(struct thread_queue *qp)
 		raw_spin_unlock_irq(&qp->lock);
 	} else if(tp != SIGNALED) {
 		rq = sched_get_cpu_rq();
-		raw_evm_signal_event_queue(rq, qp);
+		__raw_event_notify(rq, qp);
 	}
 	preempt_enable_no_resched();
 
@@ -133,7 +132,7 @@ void evm_signal_event_queue(struct thread_queue *qp)
  * @note Set ms to 0 to wait infinitly.
  * @see EVM_WAIT_INFINITE
  */
-int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms)
+int event_wait(struct thread_queue *qp, unsigned ms)
 {
 	int rv;
 
@@ -144,7 +143,7 @@ int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms)
 	raw_spin_unlock_irq(&qp->lock);
 
 	preempt_enable_no_resched();
-	rv = evm_wait_event_queue(qp, ms);
+	rv = raw_event_wait(qp, ms);
 
 	return rv;
 }
@@ -157,7 +156,7 @@ int evm_wait_next_event_queue(struct thread_queue *qp, unsigned ms)
  * Give up the CPU untill an event is posted to this queue, or a timeout based
  * on \p ms occurs.
  */
-int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
+int raw_event_wait(struct thread_queue *qp, unsigned ms)
 {
 	struct thread *tp;
 	unsigned long flags;
@@ -179,7 +178,7 @@ int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
 	cs = tp->rq->source;
 
 	if(ms)
-		tp->timer = tm_create_timer(cs, ms, &evm_timeout,
+		tp->timer = tm_create_timer(cs, ms, &event_tmo,
 				(void*)&qp->qhead, TIMER_ONESHOT_MASK);
 	else
 		tp->timer = NULL;
@@ -202,7 +201,7 @@ int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
  * @brief Signal an event from an IRQ.
  * @param qp Queue to signel.
  */
-void evm_signal_from_irq(struct thread_queue *qp)
+void event_notify_irq(struct thread_queue *qp)
 {
 	struct thread *tp;
 
