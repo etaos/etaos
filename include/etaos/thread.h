@@ -174,6 +174,7 @@ struct thread {
 #define THREAD_EXIT_FLAG 	 3 //!< Thread waiting to be killed.
 #define THREAD_NEED_RESCHED_FLAG 4 //!< Thread need a resched.
 #define PREEMPT_NEED_RESCHED_FLAG 5 //!< Thread has used its full time slice.
+#define THREAD_IDLE_FLAG	 6 //!< Thread is the idle thread.
 /** @} */
 
 CDECL

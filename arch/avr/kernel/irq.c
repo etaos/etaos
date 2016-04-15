@@ -49,6 +49,19 @@ void arch_irq_restore_flags(unsigned long *flags)
 	return;
 }
 
+void raw_irq_enabled_flags(unsigned long *flags)
+{
+	unsigned char status;
+
+	__asm__ __volatile__(
+			"in %0, %1"	"\n\t"
+			: "=&r" (status)
+			: "M" (AVR_STATUS_ADDR)
+			: "memory"
+			);
+	*flags = (status & (1UL << AVR_INTERRUPT_FLAG)) != 0;
+}
+
 void cpu_request_irq(struct irq_data *data)
 {
 	switch(data->irq) {
@@ -62,6 +75,7 @@ extern unsigned long test_sys_tick;
 unsigned long test_sys_tick = 0;
 #endif
 
+extern void preempt_schedule(void);
 SIGNAL(TIMER0_OVERFLOW_VECTOR)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
@@ -74,6 +88,22 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 #endif
 
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
+
+#ifdef CONFIG_PREEMPT
+	__asm__ __volatile__(
+			"sei"	"\n\t"
+			:
+			:
+			: "memory"
+			);
+	preempt_schedule();
+	__asm__ __volatile__(
+			"cli"	"\n\t"
+			:
+			:
+			: "memory"
+			);
+#endif
 }
 
 SIGNAL(SPI_STC_VECTOR)

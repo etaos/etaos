@@ -54,12 +54,12 @@ static char *current_thread_name(void)
 
 THREAD(test_th_handle2, arg)
 {
-	unsigned char sram_readback;
+	unsigned char sram_readback = 0;
 	unsigned long rand;
 	int fd;
 	struct vfile *file;
 	size_t flen;
-	char *romdata;
+	char *romdata = NULL;
 	float sram_entry = 3.1415F;
 
 	sram_stress_write_byte(SRAM_BYTE_ADDR, 0x78);
@@ -72,21 +72,23 @@ THREAD(test_th_handle2, arg)
 				current_thread_name(), sram_readback, rand);
 
 		fd = open("test.txt", O_RDONLY);
-		file = filep(fd);
+		if(fd >= 0) {
+			file = filep(fd);
 
-		lseek(file, 0, SEEK_END);
-		flen = ftell(file);
-		lseek(file, 0, SEEK_SET);
+			lseek(file, 0, SEEK_END);
+			flen = ftell(file);
+			lseek(file, 0, SEEK_SET);
 
-		romdata = kzalloc(flen + 1);
-		read(fd, romdata, flen);
-		romdata[flen] = '\0';
-		close(fd);
+			romdata = kzalloc(flen + 1);
+			read(fd, romdata, flen);
+			romdata[flen] = '\0';
+			close(fd);
+		}
 
 		printf_P(PSTR("[2][%s]: ROMFS: %s\n"), 
 				current_thread_name(), romdata);
-
 		kfree(romdata);
+
 		sleep(1000);
 	}
 }
@@ -95,12 +97,9 @@ THREAD(test_th_handle, arg)
 {
 	int fd;
 	struct ipm msg;
-	uint8_t readback;
+	uint8_t readback = 0;
 	float sram_data;
 	char ee_string[sizeof(ee_test)];
-
-	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,
-			test_stack2, 150);
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
@@ -111,8 +110,10 @@ THREAD(test_th_handle, arg)
 		ipm_reset_queue(&ipm_q);
 
 		fd = open("atm-usart", _FDEV_SETUP_RW);
-		write(fd, msg.data, msg.len);
-		close(fd);
+		if(fd >= 0) {
+			write(fd, msg.data, msg.len);
+			close(fd);
+		}
 
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
 				sizeof(sram_data));
@@ -131,6 +132,8 @@ int main(void)
 	bool value = true;
 	uint8_t readback = 0;
 
+	printf("Application started\n");
+
 	ipm_queue_init(&ipm_q, 2);
 	ee_stress_write_byte(EE_BYTE_ADDR, 0xAC);
 	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);
@@ -138,6 +141,8 @@ int main(void)
 	test_stack = kzalloc(CONFIG_STACK_SIZE);
 	thread_create("test-1", &test_th_handle, NULL,
 			CONFIG_STACK_SIZE, test_stack, 150);
+	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,
+			test_stack2, 120);
 
 	pgpio_pin_request(13);
 	pgpio_direction_output(13, false);

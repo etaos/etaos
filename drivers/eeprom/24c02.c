@@ -74,7 +74,6 @@ static int __ee_24c02_write(struct eeprom *ee, const void *_buff, size_t len)
 		memcpy(&buff[1], _buff + (PAGE_SIZE*idx), PAGE_SIZE);
 		i2c_master_send(client, buff, PAGE_SIZE+1);
 		eeprom_index += PAGE_SIZE;
-		dev_sync_wait(&client->dev, EE_SYNC);
 	}
 
 	if(left_over) {

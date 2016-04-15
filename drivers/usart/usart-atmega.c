@@ -38,11 +38,9 @@ static int atmega_usart_putc(struct usart *usart, int c)
 	if(c == '\n')
 		atmega_usart_putc(usart, '\r');
 
-	spin_lock(&usart->bus_lock);
 	while(( UCSR0A & BIT(UDRE0) ) == 0);
 	UCSR0A |= BIT(TXCn);
 	UDR0 = c;
-	spin_unlock(&usart->bus_lock);
 
 	return c;
 }
@@ -51,10 +49,8 @@ static int atmega_usart_getc(struct usart *usart)
 {
 	int c;
 
-	spin_lock(&usart->bus_lock);
 	while(!(UCSR0A & BIT(RXC0)));
 	c = UDR0;
-	spin_unlock(&usart->bus_lock);
 	return c;
 }
 
@@ -116,7 +112,6 @@ static __used void atmega_usart_init(void)
 	UCSR0C = BIT(UCSZ01) | BIT(UCSZ00);
 	UCSR0B = BIT(TXEN0) | BIT(RXEN0);
 
-	spinlock_init(&(atmega_usart.bus_lock));
 	usart_initialise(&atmega_usart);
 #ifdef CONFIG_STDIO_USART
 	setup_usart_streams(&atmega_usart);

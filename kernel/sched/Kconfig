@@ -112,6 +112,7 @@ config DYN_PRIO
 
 config PREEMPT
 	bool "CPU preemption"
+	depends on SYS_RR
 	help
 	  Say 'y' here to enable preemption. Preemption allows
 	  the scheduler to preempt the currently running task at

@@ -38,6 +38,7 @@
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/cpu.h>
 #include <etaos/preempt.h>
 #include <etaos/irq.h>
 #include <etaos/irq_handle.h>
@@ -50,7 +51,9 @@
 
 static void raw_rq_add_thread(struct rq *rq, struct thread *tp);
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
+#ifdef CONFIG_PREEMPT
 static bool thread_is_idle(struct thread *tp);
+#endif
 
 #ifdef CONFIG_IRQ_THREAD
 DEFINE_THREAD_QUEUE(irq_thread_queue);
@@ -574,12 +577,15 @@ void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 {
 	struct rq *rq;
 
+	preempt_disable();
 	rq = tp->rq;
 	set_bit(THREAD_SLEEPING_FLAG, &tp->flags);
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 
 	tp->timer = timer_create_timer(rq->source, ms, &sched_sleep_timeout,
 			tp, TIMER_ONESHOT_MASK);
+	preempt_enable_no_resched();
 }
 
 /**
@@ -823,6 +829,30 @@ static inline void preempt_reset_slice(struct thread *tp)
 }
 #endif
 
+static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
+{
+	struct thread *next = rq->current;
+
+	/*
+	 * Update the dynamic priorities of all threads that still
+	 * reside on the run queue.
+	 */
+	dyn_prio_update(rq);
+
+	/*
+	 * Reset the priorities of the thread that just lost the CPU and
+	 * the thread that is about to receive CPU time.
+	 */
+	dyn_prio_reset(prev);
+	dyn_prio_reset(next);
+
+	/*
+	 * Reset the time slices of the entering and leaving threads.
+	 */
+	preempt_reset_slice(next);
+	preempt_reset_slice(prev);
+}
+
 /**
  * @brief Reschedule policy.
  * @param curr Current thread.
@@ -889,7 +919,7 @@ static void __hot __schedule(int cpu)
 		      *prev;
 	tick_t tdelta = 0;
 
-	preempt_disable();
+	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
 	prev = rq->current;
 	raw_spin_lock_irq(&rq->lock);
@@ -921,10 +951,7 @@ static void __hot __schedule(int cpu)
 		rq->current = next;
 		rq->switch_count++;
 
-		dyn_prio_update(rq);
-		dyn_prio_reset(next);
-
-		preempt_reset_slice(next);
+		__schedule_prepare(rq, prev);
 		rq_switch_context(rq, prev, next);
 		rq_update(rq);
 
@@ -933,8 +960,16 @@ static void __hot __schedule(int cpu)
 	}
 
 	rq_destroy_kill_q(rq);
-	preempt_enable_no_resched();
+	cpu_notify(SCHED_EXIT);
 	return;
+}
+
+static inline bool need_resched()
+{
+	struct thread *curr = current_thread();
+
+	return (test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags) ||
+		test_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags));
 }
 
 /**
@@ -950,14 +985,33 @@ static void __hot __schedule(int cpu)
 void __hot schedule(void)
 {
 	int cpu;
-	struct thread *curr;
 
 	do {
 		cpu = cpu_get_id();
 		__schedule(cpu);
-		curr = current_thread();
-	} while(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags));
+	} while(need_resched());
 }
+
+#ifdef CONFIG_PREEMPT
+void __hot preempt_schedule(void)
+{
+	int cpu;
+
+	/* we don't want to preempt the current process if either
+	 * a) the interrupts are disabled or
+	 * b) the preemption counter != 0
+	 */
+	if(likely(!preemptible()))
+		return;
+
+	do {
+		cpu = cpu_get_id();
+		__schedule(cpu);
+	} while(need_resched());
+
+	return;
+}
+#endif
 
 static struct thread idle_thread, main_thread;
 static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE];
@@ -966,8 +1020,10 @@ THREAD(idle_thread_func, arg)
 {
 	struct thread *tp = arg;
 
+	irq_enable();
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack_ptr, 120);
+	preempt_disable();
 	while(true) {
 		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 		schedule();
@@ -1052,24 +1108,16 @@ void __preempt_sub(int num)
  */
 void sched_yield(struct rq *rq)
 {
-	struct thread *tp, *curr;
-	struct sched_class *class;
-	int cpu;
+	struct thread *next,
+		      *curr;
 
-	class = rq->sched_class;
-	tp = class->next_runnable(rq);
+	preempt_disable();
+	next = sched_get_next_runnable(rq);
 	curr = current(rq);
-	cpu = cpu_get_id();
 
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)) {
-		__schedule(cpu);
-		return;
-	} else if(tp != curr) {
-		if(prio(tp) <= prio(curr)) {
-			set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
-			__schedule(cpu);
-		}
-	}
+	if(preempt_should_resched() || prio(next) <= prio(curr))
+		set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+	preempt_enable_no_resched();
 
 	return;
 }
@@ -1098,6 +1146,11 @@ bool preempt_should_resched(void)
 		return true;
 	}
 
+	return false;
+}
+#else
+bool preempt_should_resched(void)
+{
 	return false;
 }
 #endif

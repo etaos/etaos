@@ -29,6 +29,7 @@
 #include <etaos/bitops.h>
 #include <etaos/sched.h>
 #include <etaos/thread.h>
+#include <etaos/cpu.h>
 
 /**
  * @brief Handle a hardware IRQ.
@@ -75,6 +76,7 @@ void irq_handle(int irq)
 {
 	struct irq_data *data;
 
+	cpu_notify(IRQ_ENTER);
 	data = irq_to_data(irq);
 	if(!data)
 		return;
@@ -83,6 +85,7 @@ void irq_handle(int irq)
 		return;
 
 	irq_handle_hard_irq(data);
+	cpu_notify(IRQ_EXIT);
 }
 
 /** @} */

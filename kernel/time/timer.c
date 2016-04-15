@@ -87,18 +87,19 @@ struct timer *timer_create_timer(struct clocksource *cs, unsigned long ms,
  */
 int timer_stop_timer(struct timer *timer)
 {
-	struct clocksource *cs;
+	struct clocksource *cs = timer->source;
 
 	if(!timer || timer == SIGNALED)
 		return -1;
 
+	_raw_spin_lock(&cs->lock);
 	timer->ticks = 0;
 	timer->handle = NULL;
-	cs = timer->source;
+	timer->tleft = 0;
+	_raw_spin_unlock(&cs->lock);
 
 	if(timer->tleft) {
 		clocksource_delete_timer(cs, timer);
-		timer->tleft = 0;
 		timer_start_timer(timer);
 	}
 
@@ -118,7 +119,7 @@ void timer_process_clock(struct clocksource *cs, unsigned int diff)
 	if(!cs->thead || diff < 0 || diff == 0)
 		return;
 
-	raw_spin_lock(&cs->lock);
+	_raw_spin_lock(&cs->lock);
 	while(cs->thead && diff) {
 		timer = cs->thead;
 
@@ -132,9 +133,9 @@ void timer_process_clock(struct clocksource *cs, unsigned int diff)
 
 		if(timer->tleft == 0) {
 			if(timer->handle) {
-				raw_spin_unlock(&cs->lock);
+				_raw_spin_unlock(&cs->lock);
 				timer->handle(timer, timer->priv_data);
-				raw_spin_lock(&cs->lock);
+				_raw_spin_lock(&cs->lock);
 			}
 
 			cs->thead = cs->thead->next;
@@ -144,13 +145,13 @@ void timer_process_clock(struct clocksource *cs, unsigned int diff)
 			if((timer->tleft = timer->ticks) == 0) {
 				kfree(timer);
 			} else {
-				raw_spin_unlock(&cs->lock);
+				_raw_spin_unlock(&cs->lock);
 				timer_start_timer(timer);
-				raw_spin_lock(&cs->lock);
+				_raw_spin_lock(&cs->lock);
 			}
 		}
 	}
-	raw_spin_unlock(&cs->lock);
+	_raw_spin_unlock(&cs->lock);
 }
 
 

@@ -24,7 +24,7 @@
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/thread.h>
-#include <etaos/evm.h>
+#include <etaos/event.h>
 #include <etaos/types.h>
 #include <etaos/semaphore.h>
 
@@ -57,7 +57,7 @@ void sem_wait(sem_t *sem)
 {
 	sem->value--;
 	if(sem->value < 0)
-		evm_wait_event_queue(&sem->qp, EVM_WAIT_INFINITE);
+		raw_event_wait(&sem->qp, EVM_WAIT_INFINITE);
 }
 
 /**
@@ -70,7 +70,7 @@ void sem_signal(sem_t *sem)
 {
 	sem->value++;
 	if(sem->value <= 0)
-		evm_signal_event_queue(&sem->qp);
+		event_notify(&sem->qp);
 }
 
 /**

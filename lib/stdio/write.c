@@ -32,10 +32,13 @@
 int write(int fd, const void *buff, size_t len)
 {
 	struct vfile * file;
+	int rv;
 
 	file = __iob[fd];
 	if(!file)
-		return -EINVAL;
+		return -EBADF;
 
-	return vfs_write(file, buff, len);
+	rv = vfs_write(file, buff, len);
+
+	return rv;
 }

@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - Event driven mutexes
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - CPU
+ *  Copyright (C) 2015   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,4 +16,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <etaos/event.h>
+#ifndef __CPU_H__
+#define __CPU_H__
+
+#include <etaos/kernel.h>
+#include <asm/io.h>
+
+typedef enum {
+	SCHED_ENTER,
+	SCHED_EXIT,
+	IRQ_ENTER,
+	IRQ_EXIT,
+} cpu_state_t;
+
+#define FOR_EACH_CPU(__name, __type) typeof(__type) __name[CPU_CORE_NUM]
+
+#define CPU_IRQ_EXEC_FLAG 0
+
+CDECL
+extern void cpu_get_state(unsigned long *flags);
+extern void cpu_notify(cpu_state_t state);
+CDECL_END
+
+#endif

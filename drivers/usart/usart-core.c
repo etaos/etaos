@@ -36,33 +36,52 @@ static inline struct usart *to_usart_dev(struct vfile * file)
 static int usart_write(struct vfile * file, const void *buff, size_t len)
 {
 	struct usart *usart;
+	int rv;
 
 	usart = to_usart_dev(file);
-	return usart->write(usart, buff, len);
+	dev_lock(&usart->dev);
+	rv = usart->write(usart, buff, len);
+	dev_unlock(&usart->dev);
+
+	return rv;
 }
 
 static int usart_read(struct vfile * file, void *buff, size_t len)
 {
 	struct usart *usart;
+	int rv;
 
 	usart = to_usart_dev(file);
-	return usart->read(usart, buff, len);
+	dev_lock(&usart->dev);
+	rv = usart->read(usart, buff, len);
+	dev_unlock(&usart->dev);
+	return rv;
 }
 
 static int usart_putc(int c, struct vfile * stream)
 {
 	struct usart *usart;
+	int rv;
 
 	usart = to_usart_dev(stream);
-	return usart->putc(usart, c);
+	dev_lock(&usart->dev);
+	rv = usart->putc(usart, c);
+	dev_unlock(&usart->dev);
+
+	return rv;
 }
 
 static int usart_getc(struct vfile * stream)
 {
 	struct usart *usart;
+	int rv;
 
 	usart = to_usart_dev(stream);
-	return usart->getc(usart);
+	dev_lock(&usart->dev);
+	rv = usart->getc(usart);
+	dev_unlock(&usart->dev);
+
+	return rv;
 }
 
 static struct dev_file_ops usart_fops = {

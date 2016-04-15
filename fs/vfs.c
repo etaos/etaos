@@ -40,7 +40,7 @@ static struct vfile *vfshead;
 int iob_add(struct vfile * stream)
 {
 	int rc;
-		
+
 	for(rc = 3; rc < MAX_OPEN; rc++) {
 		if(__iob[rc] == NULL) {
 			__iob[rc] = stream;

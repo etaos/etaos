@@ -25,6 +25,8 @@
 #include <asm/init.h>
 #endif
 
+#define CPU_CORE_NUM 1
+
 #define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
 #define F_CPU CONFIG_FCPU
 

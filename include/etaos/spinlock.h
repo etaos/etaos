@@ -27,6 +27,13 @@
 #include <asm/spinlock.h>
 #include <asm/irq.h>
 
+#define DEFINE_SPINLOCK(__n) spinlock_t __n = { .lock = 0, }
+#define SPIN_LOCK_INIT(__n) { .lock = 0, }
+
+#define STATIC_SPIN_LOCK_INIT { .lock = 0, }
+
+#define spinlock_init(__l) ((__l)->lock = 0)
+
 #define raw_spin_lock(__l) arch_spin_lock(__l)
 #define raw_spin_unlock(__l) arch_spin_unlock(__l)
 
@@ -55,17 +62,22 @@ static inline void spin_unlock(spinlock_t *lock)
 #endif
 }
 
-#define DEFINE_SPINLOCK(__n) spinlock_t __n = { .lock = 0, }
-#define SPIN_LOCK_INIT(__n) { .lock = 0, }
+static inline void _raw_spin_lock(spinlock_t *lock)
+{
+	preempt_disable();
+	raw_spin_lock(lock);
+}
 
-#define STATIC_SPIN_LOCK_INIT { .lock = 0, }
-
-#define spinlock_init(__l) ((__l)->lock = 0)
+static inline void _raw_spin_unlock(spinlock_t *lock)
+{
+	raw_spin_unlock(lock);
+	preempt_enable_no_resched();
+}
 
 static inline void _spin_lock_irqsave(spinlock_t *lock, unsigned long *flags)
 {
-	irq_save_and_disable(flags);
 	spin_lock(lock);
+	irq_save_and_disable(flags);
 }
 
 static inline void _spin_unlock_irqrestore(spinlock_t *lock, 
@@ -129,24 +141,13 @@ static inline int spin_try_lock(spinlock_t *lock)
 
 CDECL_END
 
-/**
- * @brief Lock a spinlock and disable the interrupts.
- * @param __l Lock to aquire.
- * @param __f Flags to save the interrupt settings in.
- */
-#define spin_lock_irqsave(__l, __f) _spin_lock_irqsave(__l, &__f)
-/**
- * @brief Release a spin lock.
- * @param __l Lock to release.
- * @param __f Interrupt flags.
- *
- * The interrupt flags saved by spin_lock_irqsave are restored by this
- * function, using the second argument.
- */
-#define spin_unlock_irqrestore(__l, __f) _spin_unlock_irqrestore(__l, &__f)
+#define spin_lock_irqsave(_l, _f) _spin_lock_irqsave(_l, &_f)
+#define spin_unlock_irqrestore(_l, _f) _spin_unlock_irqrestore(_l, &_f)
+
 #define raw_spin_lock_irqsave(__l, __f) _raw_spin_lock_irqsave(__l, &__f)
 #define raw_spin_unlock_irqrestore(__l, __f) \
 	_raw_spin_unlock_irqrestore(__l, &__f)
+
 
 #endif /* __SPINLOCK_H__ */
 

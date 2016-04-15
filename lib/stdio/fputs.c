@@ -20,6 +20,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
+#include <etaos/string.h>
 
 /**
  * @addtogroup libc
@@ -34,9 +35,7 @@
  */
 int fputs(char *s, struct vfile * stream)
 {
-	for (; *s; s++) {
-		fputc(*s, stream);
-	}
+	write(stream->fd, s, strlen(s));
 	
 	return 0;
 }

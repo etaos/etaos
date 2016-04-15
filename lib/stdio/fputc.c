@@ -37,11 +37,8 @@ int fputc(int c, struct vfile * stream)
 {
 	int rc = -1;
 
-	if(test_bit(STREAM_WRITE_FLAG, &stream->flags)) {
+	if(test_bit(STREAM_WRITE_FLAG, &stream->flags))
 		rc = stream->put(c, stream);
-		if(rc != -EOF || rc == c)
-			stream->length++;
-	}
 	return rc;
 }
 

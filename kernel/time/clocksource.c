@@ -77,7 +77,7 @@ void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
 {
 	struct timer *_timer;
 
-	raw_spin_lock(&cs->lock);
+	_raw_spin_lock(&cs->lock);
 	for(_timer = cs->thead; _timer; _timer = _timer->next) {
 		if(timer->tleft < _timer->tleft) {
 			_timer->tleft -= timer->tleft;
@@ -95,7 +95,7 @@ void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
 		timer->prev->next = timer;
 	else
 		cs->thead = timer;
-	raw_spin_unlock(&cs->lock);
+	_raw_spin_unlock(&cs->lock);
 }
 
 /**
@@ -116,7 +116,7 @@ tick_t clocksource_update(struct clocksource *cs)
 
 void clocksource_delete_timer(struct clocksource *cs, struct timer *timer)
 {
-	raw_spin_lock(&cs->lock);
+	_raw_spin_lock(&cs->lock);
 	if(timer->prev)
 		timer->prev->next = timer->next;
 	else
@@ -125,6 +125,6 @@ void clocksource_delete_timer(struct clocksource *cs, struct timer *timer)
 		timer->next->prev = timer->prev;
 		timer->next->tleft += timer->tleft;
 	}
-	raw_spin_unlock(&cs->lock);
+	_raw_spin_unlock(&cs->lock);
 }
 
