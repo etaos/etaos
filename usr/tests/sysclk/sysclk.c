@@ -42,7 +42,7 @@ int main(void)
 	stdin->get(stdin);
 	sysclk_ping();
 
-	src = tm_get_source_by_name("sys-clk");
+	src = timer_get_source_by_name("sys-clk");
 	sys_tick = atomic64_get(&src->tc);
 	printf("OK: Clock finished: %lli::%lu - prog end\n", 
 			sys_tick, test_sys_tick);

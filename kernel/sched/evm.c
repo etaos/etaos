@@ -53,7 +53,7 @@ static void raw_evm_signal_event_queue(struct rq *rq, struct thread_queue *qp)
 		qp->qhead = SIGNALED;
 
 	if(tp->timer && tp->timer != SIGNALED) {
-		tm_stop_timer(tp->timer);
+		timer_stop_timer(tp->timer);
 		tp->timer = NULL;
 	}
 
@@ -170,7 +170,7 @@ int evm_wait_event_queue(struct thread_queue *qp, unsigned ms)
 	cs = tp->rq->source;
 
 	if(ms)
-		tp->timer = tm_create_timer(cs, ms, &evm_timeout,
+		tp->timer = timer_create_timer(cs, ms, &evm_timeout,
 				(void*)&qp->qhead, TIMER_ONESHOT_MASK);
 	else
 		tp->timer = NULL;

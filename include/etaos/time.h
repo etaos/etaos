@@ -30,35 +30,7 @@
 #include <etaos/irq.h>
 #include <etaos/spinlock.h>
 #include <etaos/atomic.h>
-
-struct timer;
-/**
- * @struct clocksource
- * @brief The clocksource describes the source of a hardware time.
- */
-struct clocksource {
-	const char *name; //!< Timer name.
-
-	/**
-	 * @brief Enable the timer.
-	 * @param cs Clocksource to enable.
-	 */
-	int (*enable)(struct clocksource* cs);
-	/**
-	 * @brief disable the timer.
-	 * @param cs Clocksource to disable.
-	 */
-	void (*disable)(struct clocksource* cs);
-	unsigned long freq; //!< Frequency of the source (in Hz).
-
-	volatile tick_t count; //!< Tick counter.
-	tick_t tc_update; //!< Timer update value.
-
-	spinlock_t lock; //!< Clocksource lock.
-
-	struct list_head list; //!< List of clocksources.
-	struct timer *thead;
-};
+#include <etaos/clocksource.h>
 
 /**
  * @struct timer
@@ -107,24 +79,12 @@ struct timer {
 
 #define NEVER -1
 
+struct timer_queue {
+	struct timer_queue *next,
+			   *prev;
+};
+
 CDECL
-/**
- * @brief Get the tick count from a clock source.
- * @param cs Clock source which tick count is requested.
- * @return The struct clocksource::count attribute of \p cs.
- */
-static inline tick_t tm_get_tick(struct clocksource *cs)
-{
-	tick_t rv;
-	unsigned long flags;
-
-	irq_save_and_disable(&flags);
-	rv = cs->count;
-	irq_restore(&flags);
-
-	return rv;
-}
-
 /**
  * @brief Safely increment the tick count of a clock source.
  * @param cs Clock source which tick count is to be incremented.
@@ -132,7 +92,7 @@ static inline tick_t tm_get_tick(struct clocksource *cs)
  * 	 disabled.
  * @note This function does provide overflow protection.
  */
-static inline void tm_source_inc(struct clocksource *cs)
+static inline void timer_source_inc(struct clocksource *cs)
 {
 	unsigned int diff;
 	unsigned long flags;
@@ -149,16 +109,12 @@ static inline void tm_source_inc(struct clocksource *cs)
 	irq_restore(&flags);
 }
 
-extern tick_t tm_update_source(struct clocksource *source);
-extern struct timer *tm_create_timer(struct clocksource *cs, unsigned long ms,
+extern struct timer *timer_create_timer(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
 		unsigned long flags);
-extern int tm_clock_source_initialise(const char *name, struct clocksource *cs,
-		unsigned long freq, int (*enable)(struct clocksource *cs),
-		void (*disable)(struct clocksource *cs));
-extern int tm_stop_timer(struct timer *timer);
-extern void tm_process_clock(struct clocksource *cs, unsigned int diff);
-extern struct clocksource *tm_get_source_by_name(const char *name);
+extern int timer_stop_timer(struct timer *timer);
+extern void timer_process_clock(struct clocksource *cs, unsigned int diff);
+extern struct clocksource *timer_get_source_by_name(const char *name);
 
 CDECL_END
 

@@ -48,7 +48,7 @@ CDECL_END
  * The sys_tick variable gets the tick count of the system clock and returns
  * it to the user.
  */
-#define sys_tick tm_get_tick(sys_clk)
+#define sys_tick clocksource_get_tick(sys_clk)
 
 /**
  * @brief Calculate if a certain time unit has passed.

@@ -32,7 +32,7 @@ static void tmtest_init_timers(void)
 	struct clocksource *cs = avr_get_sys_clk();
 
 	printf("Adding 3 timers:\n");
-	tm1 = tm_create_timer(cs, 500, &print_timer, 
+	tm1 = timer_create_timer(cs, 500, &print_timer, 
 			tm1_name, 0);
 	
 	if(tm1)
@@ -49,10 +49,10 @@ int main(void)
 	cs = avr_get_sys_clk();
 	tmtest_init_timers();
 
-	diff = tm_update_source(cs);
+	diff = clocksource_update(cs);
 	while(true) {
-		tm_process_clock(cs, diff);
-		diff = tm_update_source(cs);
+		timer_process_clock(cs, diff);
+		diff = clocksource_update(cs);
 	}
 
 #ifdef CONFIG_SIMUL_AVR

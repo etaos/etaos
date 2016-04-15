@@ -19,6 +19,9 @@ config ARCH_TEST_BIT
 config HARVARD
 	bool
 
+config ARCH_HRTIMER
+	bool
+
 menu "Generic system configuration"
 
 config CPP

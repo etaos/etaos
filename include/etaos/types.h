@@ -41,6 +41,11 @@ typedef unsigned char bool;
 typedef uint64_t tick_t;
 
 /**
+ * @brief System time type.
+ */
+typedef int64_t time_t;
+
+/**
  * @brief Unsigned 8-bit integer.
  */
 typedef unsigned char uint8_t;

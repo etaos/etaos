@@ -85,6 +85,7 @@ config ATMEGA328
 	select ARCH_TNS
 	select ARCH_SET_BIT
 	select ARCH_TEST_BIT
+	select ARCH_HRTIMER
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega328p
@@ -97,6 +98,7 @@ config ATMEGA1280
 	select ARCH_TNS
 	select ARCH_SET_BIT
 	select ARCH_TEST_BIT
+	select ARCH_HRTIMER
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega1280
@@ -109,6 +111,7 @@ config ATMEGA2560
 	select ARCH_TNS
 	select ARCH_SET_BIT
 	select ARCH_TEST_BIT
+	select ARCH_HRTIMER
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega2560

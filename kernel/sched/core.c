@@ -127,7 +127,7 @@ void thread_queue_wait(struct thread_queue *qp, unsigned int ms)
 {
 	struct thread *current = current_thread();
 
-	current->timer = tm_create_timer(current->rq->source, ms,
+	current->timer = timer_create_timer(current->rq->source, ms,
 			&queue_wait_tmo, current, TIMER_ONESHOT_MASK);
 	queue_add_thread(qp, current);
 	schedule();
@@ -578,7 +578,7 @@ void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 	set_bit(THREAD_SLEEPING_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 
-	tp->timer = tm_create_timer(rq->source, ms, &sched_sleep_timeout,
+	tp->timer = timer_create_timer(rq->source, ms, &sched_sleep_timeout,
 			tp, TIMER_ONESHOT_MASK);
 }
 
@@ -710,7 +710,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		qp->qhead = SIGNALED;
 
 	if(tp->timer && tp->timer != SIGNALED) {
-		tm_stop_timer(tp->timer);
+		timer_stop_timer(tp->timer);
 	}
 
 	if(unlikely(rq->current != tp)) {
@@ -897,9 +897,9 @@ static void __hot __schedule(int cpu)
 	irq_signal_threads(rq);
 	rq_signal_threads(rq);
 
-	tdelta = tm_update_source(rq->source);
+	tdelta = clocksource_update(rq->source);
 	if(tdelta)
-		tm_process_clock(rq->source, tdelta);
+		timer_process_clock(rq->source, tdelta);
 
 #ifdef CONFIG_PREEMPT
 	if(prev->slice <= tdelta) {
@@ -1090,7 +1090,7 @@ bool preempt_should_resched(void)
 	struct thread *tp = current_thread();
 
 	rq = tp->rq;
-	diff = tm_get_tick(rq->source);
+	diff = clocksource_get_tick(rq->source);
 	diff -= cs_last_update(rq->source);
 
 	if(diff >= tp->slice) {
