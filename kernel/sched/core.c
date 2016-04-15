@@ -877,17 +877,18 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 static int __schedule_need_resched(struct thread *curr, struct thread *next)
 {
 #ifdef CONFIG_PREEMPT
-	if(test_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags)) {
+	int preempt;
+
+	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
+	if(preempt) {
 		if(thread_is_idle(next)) {
-			clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
 			preempt_reset_slice(curr);
 			return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, 
 					&curr->flags);
 		} else {
-			return (test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG,
-					&curr->flags) ||
+			return (preempt ||
 				test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
-						&curr->flags));
+							&curr->flags));
 		}
 	} else {
 		return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, 
