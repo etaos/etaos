@@ -23,7 +23,7 @@ The COPYING file should contian more information about the licence, or
 if it's not included, look at http://www.gnu.org/licences/.
 
     ETA/OS
-    Copyright (C) 2014, 2015
+    Copyright (C) 2014, 2015, 2016
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
