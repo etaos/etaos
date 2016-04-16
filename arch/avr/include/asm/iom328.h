@@ -41,6 +41,8 @@
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
 
+#define AVR_INTERRUPT_FLAG AVR_IRQ_FLAG
+
 /* stack defs */
 #define AVR_STACK_LOW_ADDR 0x3D
 #define AVR_STACK_HI_ADDR 0x3E

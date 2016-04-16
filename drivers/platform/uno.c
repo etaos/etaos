@@ -30,7 +30,7 @@ static const uint8_t __pgm platform_port_to_gpio[] = {
 	0, 1, 2, 3, 4, 5,
 };
 
-static struct gpio_pin *platform_pin_to_gpio(int pin)
+struct gpio_pin *platform_pin_to_gpio(int pin)
 {
 	uint8_t gpio;
 	struct gpio_chip *chip;
