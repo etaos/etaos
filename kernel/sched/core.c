@@ -43,7 +43,7 @@
 #include <etaos/irq.h>
 #include <etaos/irq_handle.h>
 #include <etaos/bitops.h>
-#include <etaos/time.h>
+#include <etaos/timer.h>
 #include <etaos/spinlock.h>
 
 #include <asm/io.h>

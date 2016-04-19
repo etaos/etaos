@@ -31,7 +31,7 @@
 #include <etaos/event.h>
 #include <etaos/irq.h>
 #include <etaos/bitops.h>
-#include <etaos/time.h>
+#include <etaos/timer.h>
 #include <etaos/spinlock.h>
 
 /**
