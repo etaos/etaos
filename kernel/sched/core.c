@@ -829,6 +829,14 @@ static inline void preempt_reset_slice(struct thread *tp)
 }
 #endif
 
+/**
+ * @brief Prepare the a reschedule.
+ * @param rq Runqueue that is about to be rescheduled.
+ * @param prev Thread that lost the CPU.
+ *
+ * This function is responsible for handling the dynamic priority and time
+ * slice resets/updates.
+ */
 static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 {
 	struct thread *next = rq->current;
@@ -965,6 +973,10 @@ static void __hot __schedule(int cpu)
 	return;
 }
 
+/**
+ * @brief Check if a reschedule is required.
+ * @return true if a reschedule is required, false otherwise.
+ */
 static inline bool need_resched()
 {
 	struct thread *curr = current_thread();
