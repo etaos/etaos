@@ -16,6 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file kernel/time/clocksource.c
+ * @addtogroup tm
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/list.h>
@@ -73,6 +79,11 @@ struct clocksource *clocksource_get_by_name(const char *name)
 	return NULL;
 }
 
+/**
+ * @brief Add a new timer to a clocksource.
+ * @param cs Clocksource to add \p timer to.
+ * @param timer Timer to add.
+ */
 void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
 {
 	struct timer *_timer;
@@ -114,6 +125,11 @@ tick_t clocksource_update(struct clocksource *cs)
 	return diff;
 }
 
+/**
+ * @brief Remove a timer from a clocksource.
+ * @param cs Clocksource to remove \p timer from.
+ * @param timer Timer to remove.
+ */
 void clocksource_delete_timer(struct clocksource *cs, struct timer *timer)
 {
 	_raw_spin_lock(&cs->lock);
@@ -127,4 +143,6 @@ void clocksource_delete_timer(struct clocksource *cs, struct timer *timer)
 	}
 	_raw_spin_unlock(&cs->lock);
 }
+
+/** @} */
 
