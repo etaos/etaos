@@ -29,6 +29,7 @@
 #include <etaos/irq.h>
 #include <etaos/tick.h>
 #include <etaos/stdio.h>
+#include <etaos/math.h>
 
 struct clocksource *sys_clk;
 
@@ -43,6 +44,19 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 
 	timer_source_inc(cs);
 	return IRQ_HANDLED;
+}
+
+/**
+ * @brief Get the system tick in seconds.
+ * @return The system tick in seconds.
+ */
+time_t systick_get_seconds(void)
+{
+	time_t now = sys_tick;
+	double sec_now;
+
+	sec_now = now / 1000;
+	return floor(sec_now);
 }
 
 /**
