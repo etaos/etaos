@@ -9,14 +9,6 @@ menuconfig TIMER
 	  run on top of this susbystem.
 
 if TIMER
-config HRTIMER
-	bool "High Resolution timer"
-	depends on ARCH_HRTIMER
-	default n
-	help
-	  Say 'y' here to enable support for high resolution timers. If
-	  you are not sure, say 'y' here.
-
 config SYS_TICK
 	bool "System tick"
 	default y
