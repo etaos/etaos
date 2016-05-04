@@ -21,10 +21,6 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 
-struct tm _tm = {
-	0,0,0,0,0,0,0,0,0,
-};
-
 /**
  * @brief Get the sytem time.
  * @param Storage pointer for the system time.

@@ -35,9 +35,16 @@ struct tm {
 
 };
 
+#define _BASE_DOW 4
+#define _YEAR_SEC (_DAY_SEC * 365UL)
+#define _DAY_SEC (24UL * 60UL * 60UL)
+#define _FOUR_YEAR_SEC (1461L * _DAY_SEC)
+
 extern struct tm _tm;
 
 CDECL
+extern time_t time(time_t *now);
+
 extern struct tm *localtime(const time_t *t);
 extern int localtime_r(const time_t *t, struct tm *time);
 
