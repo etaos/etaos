@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Timer header
+ *  ETA/OS - Local time functions
  *  Copyright (C) 2016   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,10 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 
+struct tm _tm = {
+	0,0,0,0,0,0,0,0,0,
+};
+
 /**
  * @brief Get the sytem time.
  * @param Storage pointer for the system time.
@@ -39,5 +43,18 @@ time_t time(time_t *now)
 		now[0] = n;
 
 	return n;
+}
+
+int localtime_r(const time_t *t, struct tm *time)
+{
+	return 0;
+}
+
+struct tm *localtime(const time_t *t)
+{
+	if(localtime_r(t, &_tm))
+		return NULL;
+	else
+		return &_tm;
 }
 
