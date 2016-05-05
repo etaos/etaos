@@ -53,10 +53,7 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 time_t systick_get_seconds(void)
 {
 	time_t now = (time_t)sys_tick;
-	double sec_now;
-
-	sec_now = (double)(now / 1000);
-	return floor(sec_now);
+	return (time_t)(now / 1000);
 }
 
 /**
