@@ -128,6 +128,7 @@ static const char *vfprintf_long_int(va_list ap, const char *fmt,
 		case 'd':
 			convert_to_num(va_arg(ap, unsigned long), 10, true, 
 					false, stream);
+			break;
 		case 'u':
 			convert_to_num(va_arg(ap, unsigned long), 10, false,
 					false, stream);
