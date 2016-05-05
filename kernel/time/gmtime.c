@@ -22,11 +22,11 @@
 #include <etaos/tick.h>
 #include <etaos/error.h>
 
-static int _days[] = {
+int _days[] = {
 	-1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364
 };
 
-static int _lpdays[] = {
+int _lpdays[] = {
 	-1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365
 };
 

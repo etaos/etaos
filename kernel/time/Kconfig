@@ -18,6 +18,14 @@ config SYS_TICK
 	  that require precision timing (scheduler, etc..). If unsure
 	  say 'y'.
 
+config DST_BIAS
+	int "DST bias"
+	default -3600
+	help
+	  This is the bias for daylight savings time. This value is
+	  substracted from the standard time when adjusting for daylight
+	  savings time.
+
 config TIMER_DBG
 	bool "Timer debugging"
 	default n

@@ -52,7 +52,7 @@ int main(void)
 
 	while(true) {
 		now = time(NULL);
-		tm = gmtime(&now);
+		tm = localtime(&now);
 		printf_P(PSTR("Date: %i-%i-%i, %i:%i\n"),
 					tm->tm_mday,
 					tm->tm_mon,
