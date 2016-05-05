@@ -50,6 +50,7 @@ int gmtime_r(const time_t *t, struct tm *tm_struct)
 	if(((tmp % 4) == 0 && (tmp % 100) != 0) || (tmp % 400) == 0)
 		isleap = true;
 
+	tmp -= 1900;
 	tm_struct->tm_year = tmp;
 	tm_struct->tm_yday = tval / _DAY_SEC;
 

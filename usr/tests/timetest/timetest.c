@@ -56,7 +56,7 @@ int main(void)
 		printf_P(PSTR("Date: %i-%i-%i, %i:%i\n"),
 					tm->tm_mday,
 					tm->tm_mon,
-					tm->tm_year,
+					tm->tm_year + 1900,
 					tm->tm_hour,
 					tm->tm_min);
 		printf_P(PSTR("Memory available: %u\n"), mm_heap_available());
