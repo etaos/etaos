@@ -4,6 +4,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/stdlib.h>
 #include <etaos/stdio.h>
 #include <etaos/mutex.h>
 #include <etaos/bitops.h>
@@ -44,11 +45,13 @@ int main(void)
 {
 	struct tm *tm;
 	time_t now;
+	char buf[16];
 
 	printf("Application started! (%u)\n", mm_heap_available());
 
 	thread_create("blink-th", &blink_thread, NULL,
 			CONFIG_STACK_SIZE, blink_stack, 150);
+	printf("Time stamp: %i\n", atol("1462454919") == 14624549190);
 
 	while(true) {
 		now = time(NULL);

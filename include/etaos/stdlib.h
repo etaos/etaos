@@ -27,6 +27,10 @@ extern uint32_t random_m(uint32_t max);
 extern uint32_t random(void);
 extern uint32_t random_r(uint32_t *sptr, uint32_t max);
 
+extern long strtol(const char *nptr, char **endptr, int base);
+extern long atol(const char *str);
+extern int atoi(const char *str);
+
 extern void *memcpy(void *dst, const void *src, size_t length);
 extern int   memcmp(const void *r1, const void *r2, size_t nbytes);
 
