@@ -21,6 +21,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/timer.h>
+#include <etaos/spinlock.h>
 
 struct tm {
 	int tm_sec,
@@ -47,6 +48,7 @@ extern int _lpdays[];
 extern bool _daylight;
 
 CDECL
+extern int stime(time_t time);
 extern time_t time(time_t *now);
 extern int time_isindst(struct tm * tb);
 

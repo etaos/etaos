@@ -19,6 +19,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/time.h>
+#include <etaos/clocksource.h>
 #include <etaos/tick.h>
 
 struct transitiondate {
@@ -211,5 +212,18 @@ time_t time(time_t *now)
 		now[0] = n;
 
 	return n;
+}
+
+int stime(time_t time)
+{
+	struct clocksource *cs = sys_clk;
+	unsigned long flags;
+
+	time *= 1000;
+	spin_lock_irqsave(&cs->lock, flags);
+	cs->count = time;
+	spin_unlock_irqrestore(&cs->lock, flags);
+
+	return 0;
 }
 

@@ -51,7 +51,10 @@ int main(void)
 
 	thread_create("blink-th", &blink_thread, NULL,
 			CONFIG_STACK_SIZE, blink_stack, 150);
-	printf("Time stamp: %i\n", atol("1462454919") == 14624549190);
+	read(0, buf, 10);
+	buf[10] = 0;
+	now = (time_t)atol(buf);
+	stime(now);
 
 	while(true) {
 		now = time(NULL);
