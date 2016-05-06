@@ -30,6 +30,7 @@ CDECL
 extern void systick_setup(int irq, struct clocksource *src);
 
 extern struct clocksource *sys_clk;
+extern time_t systick_get_seconds(void);
 
 /**
  * @brief Get the system clock.
