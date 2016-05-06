@@ -36,11 +36,13 @@
 #define TIMER0_OVERFLOW_VECTOR_NUM	23
 #define SPI_STC_VECTOR_NUM		24
 #define TWI_STC_VECTOR_NUM		39
+#define USART_RX_STC_NUM		25
 
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(23)
 #define SPI_STC_VECTOR irq_vector(24)
 #define TWI_STC_VECTOR irq_vector(39)
+#define USART_RX_STC_VECTOR irq_vector(USART_RX_STC_NUM)
 
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)

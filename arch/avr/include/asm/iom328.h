@@ -32,9 +32,11 @@
 #define TIMER0_OVERFLOW_VECTOR_NUM 16
 #define SPI_STC_VECTOR_NUM	   17
 #define TWI_STC_VECTOR_NUM	   24
+#define USART_RX_STC_NUM	   18
 
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(16)
+#define USART_RX_STC_VECTOR irq_vector(USART_RX_STC_NUM)
 #define SPI_STC_VECTOR irq_vector(17)
 #define TWI_STC_VECTOR irq_vector(24)
 
