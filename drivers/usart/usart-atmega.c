@@ -55,13 +55,13 @@ static int atmega_usart_getc(struct usart *usart)
 {
 	int c = 0;
 
-	//irq_enter_critical();
+	irq_enter_critical();
 	usart_rx_buff = (uint8_t*)&c;
 	usart_rx_len = 1;
 	usart_rx_idx = 0;
-	//irq_exit_critical();
+	irq_exit_critical();
 
-	//mutex_wait(&usart_rx_mtx);
+	mutex_wait(&usart_rx_mtx);
 	return c;
 }
 
@@ -113,7 +113,7 @@ static struct usart atmega_usart = {
 
 static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
 {
-	if(usart_rx_idx >= usart_rx_len || !usart_rx_buff)
+	if(!usart_rx_len || !usart_rx_buff)
 		return IRQ_HANDLED;
 
 	if(usart_rx_idx < usart_rx_len) {
@@ -122,8 +122,10 @@ static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
 				   seperately */
 	}
 
-	if(usart_rx_idx >= usart_rx_len)
+	if(usart_rx_idx >= usart_rx_len) {
+		usart_rx_idx = 0;
 		mutex_unlock_from_irq(&usart_rx_mtx);
+	}
 
 	return IRQ_HANDLED;
 }

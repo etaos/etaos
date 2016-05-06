@@ -98,15 +98,19 @@ void sched_init_idle(struct thread *tp, const char *name,
  * @return A pointer to the newly created thread.
  */
 struct thread *thread_create(const char *name, thread_handle_t handle, void *arg,
-			size_t stack_size, void *stack, unsigned char prio)
+			size_t stack_size, void *stack, unsigned char p)
 {
-	struct thread *tp;
+	struct thread *tp, *curr;
 
 	tp = kzalloc(sizeof(*tp));
 	if(!tp)
 		return NULL;
 
-	thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+	thread_initialise(tp, name, handle, arg, stack_size, stack, p);
+	curr = current_thread();
+	if(prio(curr) >= p)
+		set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+	schedule();
 	return tp;
 }
 
