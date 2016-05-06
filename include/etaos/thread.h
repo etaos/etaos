@@ -161,7 +161,7 @@ struct thread {
 #if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
 	struct rr_entity se; //!< Scheduling entity.
 #endif
-	char name[9]; //!< Name of the thread.
+	char name[16]; //!< Name of the thread.
 };
 
 /**
