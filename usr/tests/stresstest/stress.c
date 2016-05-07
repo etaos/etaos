@@ -9,7 +9,7 @@
 #include <etaos/string.h>
 #include <etaos/mem.h>
 #include <etaos/thread.h>
-#include <etaos/evm.h>
+#include <etaos/event.h>
 #include <etaos/mem.h>
 #include <etaos/mutex.h>
 #include <etaos/time.h>
@@ -61,6 +61,8 @@ THREAD(test_th_handle2, arg)
 	size_t flen;
 	char *romdata = NULL;
 	float sram_entry = 3.1415F;
+	struct tm *tm;
+	time_t now;
 
 	sram_stress_write_byte(SRAM_BYTE_ADDR, 0x78);
 	sram_stress_write(SRAM_STRING_ADDR, &sram_entry, sizeof(sram_entry));
@@ -88,6 +90,15 @@ THREAD(test_th_handle2, arg)
 		printf_P(PSTR("[2][%s]: ROMFS: %s\n"), 
 				current_thread_name(), romdata);
 		kfree(romdata);
+		now = time(NULL);
+		tm = localtime(&now);
+		printf_P(PSTR("[2][%s]: Date: %i-%i-%i, %i:%i\n"),
+				current_thread_name(),
+					tm->tm_mday,
+					tm->tm_mon,
+					tm->tm_year + 1900,
+					tm->tm_hour,
+					tm->tm_min);
 
 		sleep(1000);
 	}
@@ -131,6 +142,8 @@ int main(void)
 	const char * ip_msg = "IPM message\n";
 	bool value = true;
 	uint8_t readback = 0;
+	char buff[16];
+	time_t now;
 
 	printf("Application started\n");
 
@@ -147,6 +160,11 @@ int main(void)
 	pgpio_pin_request(13);
 	pgpio_direction_output(13, false);
 	pgpio_pin_release(13);
+
+	read(0, &buff[0], 10);
+	buff[10] = 0;
+	now = (time_t)atol(buff);
+	stime(now);
 
 	while(true) {
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));

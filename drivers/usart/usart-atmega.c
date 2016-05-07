@@ -35,7 +35,7 @@
 #include <asm/usart.h>
 
 static mutex_t usart_rx_mtx;
-static uint8_t *usart_rx_buff = NULL;
+static uint8_t *usart_rx_buff;
 static size_t usart_rx_len;
 static size_t usart_rx_idx;
 
@@ -113,7 +113,7 @@ static struct usart atmega_usart = {
 
 static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
 {
-	if(!usart_rx_len || !usart_rx_buff)
+	if(!usart_rx_len || !usart_rx_buff || usart_rx_idx >= usart_rx_len)
 		return IRQ_HANDLED;
 
 	if(usart_rx_idx < usart_rx_len) {
@@ -130,12 +130,15 @@ static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
 	return IRQ_HANDLED;
 }
 
-
 /**
  * @brief Initialise the ATmega USART.
  */
 static __used void atmega_usart_init(void)
 {
+	usart_rx_buff = NULL;
+	usart_rx_len = 0;
+	usart_rx_idx = 0;
+
 	UBRR0H = UBRR0H_VALUE;
 	UBRR0L = UBRR0L_VALUE;
 	UCSR0A &= ~(BIT(U2X0));
