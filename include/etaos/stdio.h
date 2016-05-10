@@ -149,6 +149,7 @@ extern int read(int fd, void *buff, size_t size);
 extern int ioctl(struct vfile *stream, unsigned long reg, void *buf);
 extern int getc(struct vfile *stream);
 extern int fgetc(struct vfile *stream);
+extern char *fgets(char *buf, int count, struct vfile *stream);
 extern size_t ftell(struct vfile *file);
 
 #ifdef CONFIG_HARVARD
