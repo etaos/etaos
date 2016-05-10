@@ -1,19 +1,8 @@
-menuconfig LIBC
-	tristate "C library configuration"
+config CRT
+	tristate "C runtime library"
 	depends on m
 	default m
 	help
-	  Say 'y' here if you want to build a (and
-	  configure) a standard C library. If you
-	  are unsure say 'y' here.
-
-if LIBC 
-
-source "lib/stdio/Kconfig"
-
-source "lib/stdlib/Kconfig"
-
-source "lib/string/Kconfig"
-
-endif
+	  Say 'y' here to build the standard C library. If unsure,
+	  say 'y' here.
 
