@@ -57,6 +57,9 @@ extern int localtime_r(const time_t *t, struct tm *time);
 
 extern struct tm *gmtime(const time_t *t);
 extern int gmtime_r(const time_t *t, struct tm *gmt);
+
+extern time_t mktime(struct tm *tm);
+extern time_t _mktime(struct tm *tm);
 CDECL_END
 
 #endif
