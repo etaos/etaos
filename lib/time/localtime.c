@@ -22,7 +22,7 @@
 #include <etaos/tick.h>
 
 long _timezone = -3600;
-bool _dst = false;
+long _dstbias = CONFIG_DST_BIAS;
 bool _daylight = true;
 
 int localtime_r(const time_t *t, struct tm *time)

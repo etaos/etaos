@@ -46,6 +46,8 @@ extern struct tm _tm;
 extern int _days[];
 extern int _lpdays[];
 extern bool _daylight;
+extern long _timezone;
+extern long _dstbias;
 
 CDECL
 extern int stime(time_t time);
