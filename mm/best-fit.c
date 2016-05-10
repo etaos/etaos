@@ -81,7 +81,7 @@ MEM void *mm_alloc(size_t size)
 
 		if(c->size > size) {
 			if(c->size <= size+sizeof(*c)+4)
-				break;
+				goto done_l;
 			if(bf_select_new_node(bf, c)) {
 				bf = c;
 				bf_prev = prev;
@@ -95,13 +95,13 @@ MEM void *mm_alloc(size_t size)
 	if(bf) {
 		prev = bf_prev;
 		c = bf;
-		if(bf->size >= size+sizeof(*bf)+4)
-			mm_split_node(bf, size);
+		mm_split_node(bf, size);
 	}
 
 	if(!c)
 		goto err_l;
 
+done_l:
 	mm_use_block(c, prev);
 	rval = c;
 	rval += sizeof(*c);
