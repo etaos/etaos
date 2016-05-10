@@ -11,7 +11,7 @@ libc-files-$(CONFIG_STDIO) += stdio/ioctl.o stdio/getc.o stdio/fgetc.o
 
 libc-files-$(CONFIG_STRING) += string/strlen.o string/strchr.o
 libc-files-$(CONFIG_STRING) += string/strcmp.o string/strnlen.o 
-libc-files-$(CONFIG_STRING) += string/memset.o string/strcat.o
+libc-files-$(CONFIG_STRING) += string/memset.o string/strcat.o string/strdup.o
 
 libc-files-$(CONFIG_HARVARD) += stdio/printf_p.o stdio/vfprintf_p.o
 
