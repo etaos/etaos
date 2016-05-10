@@ -250,6 +250,9 @@ void sleep(unsigned ms)
 /**
  * @brief Get a pointer to the current thread.
  * @return A pointer to the current thread.
+ *
+ * Returns a pointer to the thread that is running on the CPU that
+ * executes this function.
  */
 struct thread *current_thread(void)
 {
