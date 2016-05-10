@@ -4,7 +4,7 @@ libc-files-$(CONFIG_CRT) += stdlib/abs.o stdlib/labs.o
 libc-files-$(CONFIG_CRT) += stdlib/itoa.o stdlib/ltoa.o
 libc-files-$(CONFIG_CRT) += kmalloc.o kzalloc.o kfree.o kcalloc.o
 
-libc-files-$(CONFIG_CRT) += time/gmtime.o time/localtime.o
+libc-files-$(CONFIG_CRT) += time/gmtime.o time/localtime.o time/mktime.o
 
 libc-files-$(CONFIG_CRT) += stdio/putc.o stdio/printf.o stdio/vfprintf.o
 libc-files-$(CONFIG_CRT) += stdio/fputs.o stdio/fputc.o stdio/fprintf.o
