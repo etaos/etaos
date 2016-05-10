@@ -106,7 +106,6 @@ THREAD(test_th_handle2, arg)
 
 THREAD(test_th_handle, arg)
 {
-	int fd;
 	struct ipm msg;
 	uint8_t readback = 0;
 	float sram_data;
@@ -120,11 +119,7 @@ THREAD(test_th_handle, arg)
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
 
-		fd = open("atm-usart", _FDEV_SETUP_RW);
-		if(fd >= 0) {
-			write(fd, msg.data, msg.len);
-			close(fd);
-		}
+		write(to_fd(stdout), msg.data, msg.len);
 
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
 				sizeof(sram_data));
@@ -161,7 +156,7 @@ int main(void)
 	pgpio_direction_output(13, false);
 	pgpio_pin_release(13);
 
-	read(0, &buff[0], 10);
+	read(to_fd(stdin), &buff[0], 10);
 	buff[10] = 0;
 	now = (time_t)atol(buff);
 	stime(now);

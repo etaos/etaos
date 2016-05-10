@@ -132,6 +132,8 @@ extern struct vfile * __iob[];
 #define stdout 	__iob[1]
 #define stderr 	__iob[2]
 
+#define to_fd(__f) (__f)->fd
+
 #define filep(__idx) __iob[__idx]
 
 extern int putc(int c, struct vfile * stream);
