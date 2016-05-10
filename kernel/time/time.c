@@ -196,7 +196,7 @@ int time_isindst(struct tm * tb)
 
 /**
  * @brief Get the sytem time.
- * @param Storage pointer for the system time.
+ * @param now Storage pointer for the system time.
  * @return The system time.
  *
  * The \p time function returns the number of seconds elapsed since midnight

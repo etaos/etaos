@@ -111,7 +111,7 @@ void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
 
 /**
  * @brief Update the clockskew of a clocksource.
- * @param source Clocksource to update.
+ * @param cs Clocksource to update.
  * @return The clockskew of \p source.
  * @note You should call timer_process_clock as soon as possible after calling
  *       this function to keep timers up to date.
