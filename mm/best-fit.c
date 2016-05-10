@@ -95,7 +95,7 @@ MEM void *mm_alloc(size_t size)
 	if(bf) {
 		prev = bf_prev;
 		c = bf;
-		if(bf->size > size+sizeof(*bf)+4)
+		if(bf->size >= size+sizeof(*bf)+4)
 			mm_split_node(bf, size);
 	}
 
