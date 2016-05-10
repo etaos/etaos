@@ -1,9 +1,0 @@
-config STRING
-	tristate "C string library"
-	depends on m
-	default m
-	help
-	  Say 'y' here if you want to build a string
-	  manipulation module. Example functions it provides:
-	  strlen, strcmp, etc.. If you are unsure say 'm'
-	  here.
