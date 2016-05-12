@@ -18,8 +18,8 @@
 
 /**
  * @addtogroup vfs
+ * @{
  */
-/* @{ */
 
 #include <etaos/kernel.h>
 #include <etaos/error.h>

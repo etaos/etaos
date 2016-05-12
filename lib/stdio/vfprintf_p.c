@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libcio
+ * @{
+ */
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -46,3 +50,4 @@ int vfprintf_P(struct vfile * stream, const char *fmt, va_list ap)
 	return rc;
 }
 
+/** @} */

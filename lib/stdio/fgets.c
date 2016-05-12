@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libcio
+ * @{
+ */
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -48,4 +52,6 @@ char *fgets(char *buf, int num, struct vfile *stream)
 	*buffer = '\0';
 	return buf;
 }
+
+/** @} */
 

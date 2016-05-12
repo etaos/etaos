@@ -22,7 +22,7 @@
 #include <etaos/stdio.h>
 
 /**
- * @addtogroup libc
+ * @addtogroup libcio
  * @{
  */
 

@@ -18,3 +18,26 @@
  * The math library contains standard mathematical functions, such as round,
  * log and tan.
  */
+
+ /**
+  * @defgroup libctime Time handling
+  * @ingroup libc
+  * @brief Implementation if standard C time functions.
+  *
+  * These functions can be used to get, convert andjust and store time
+  * as necessary. 'Current time' is handled as the system time.
+  */
+
+/**
+ * @defgroup libcio Standard I/O
+ * @ingroup libc
+ * @brief Standard I/O interface.
+ *
+ * Please note that, in contrast to the standard, the NUT/OS file buffers
+ * (i.e. streams), do not maintain any buffers. All input and or output is
+ * directly handled by the underlaying device drivers.
+ *
+ * The standard streams (stdin, stdout and stderr) are redirected at application
+ * start by ETA/OS, as per configuration.
+ */
+

@@ -24,7 +24,7 @@
 #include <etaos/preempt.h>
 
 /**
- * @addtogroup libc
+ * @addtogroup libcio
  * @{
  */
 

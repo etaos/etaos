@@ -16,12 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup vfs
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 
 /**
- * @ingroup vfs
  * @brief Close a file.
  * @param fd File descriptor to close.
  */
@@ -37,4 +41,6 @@ void close(int fd)
 		iob_remove(fd);
 	}
 }
+
+/** @} */
 

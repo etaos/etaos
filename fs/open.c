@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup vfs
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/stdio.h>
@@ -43,4 +47,6 @@ int open(const char *name, unsigned long flags)
 
 	return -EINVAL;
 }
+
+/** @} */
 

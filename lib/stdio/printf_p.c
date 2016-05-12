@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libcio
+ * @{
+ */
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/stdlib.h>
@@ -33,3 +37,6 @@ int printf_P(const char *fmt, ...)
 
 	return rc;
 }
+
+/** @} */
+

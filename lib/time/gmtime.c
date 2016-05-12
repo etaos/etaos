@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libctime
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/time.h>
@@ -32,6 +37,14 @@ int _lpdays[] = {
 
 struct tm _tm;
 
+/**
+ * @brief Convert a time value.
+ * @param t Pointer to stored time.
+ * @param tm_struct tm structure to store the converted time.
+ * @return If an error occured, nonzero will be returned.
+ *
+ * Thread safe version of gmtime.
+ */
 int gmtime_r(const time_t *t, struct tm *tm_struct)
 {
 	int tmp;
@@ -76,6 +89,13 @@ int gmtime_r(const time_t *t, struct tm *tm_struct)
 	return 0;
 }
 
+/**
+ * @brief Convert a time value.
+ * @param t Pointer to stored time.
+ * @return Returns a tm structure with the converted time. NULL is returned
+ *         if any error occured.
+ * @note This funciton is \b NOT thread safe.
+ */
 struct tm *gmtime(const time_t *t)
 {
 	if(gmtime_r(t, &_tm))
@@ -83,4 +103,6 @@ struct tm *gmtime(const time_t *t)
 	else
 		return &_tm;
 }
+
+/** @} */
 

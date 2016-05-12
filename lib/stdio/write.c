@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libcio
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/stdio.h>
@@ -23,7 +28,6 @@
 #include <etaos/vfs.h>
 
 /**
- * @ingroup libc
  * @brief Write to a file.
  * @param fd File to write to.
  * @param buff Buffer to write into.
@@ -42,3 +46,6 @@ int write(int fd, const void *buff, size_t len)
 
 	return rv;
 }
+
+/** @} */
+

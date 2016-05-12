@@ -16,13 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libcio
+ * @{
+ */
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
 /**
- * @ingroup libc
  * @brief Drive file control options.
  * @param stream Stream to set the IOCTL to.
  * @param reg Control option to read from or write to.
@@ -43,4 +46,6 @@ int ioctl(struct vfile * stream, unsigned long reg, void *buf)
 
 	return rc;
 }
+
+/** @} */
 

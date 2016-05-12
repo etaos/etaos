@@ -16,13 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libcio
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
 /**
- * @ingroup libc
  * @brief Write a single byte from a file.
  * @param stream Stream to write from.
  */
@@ -33,4 +37,6 @@ int fgetc(struct vfile * stream)
 	else
 		return -EINVAL;
 }
+
+/** @} */
 
