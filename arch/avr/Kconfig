@@ -42,7 +42,7 @@ config SIMUL_AVR
 
 choice
 	prompt "STDIO output device"
-	depends on STDIO
+	depends on CRT
 	help
 	  Select which device driver should be used to drive
 	  the STDIO library. By default the USART is selected.

@@ -31,7 +31,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/device.h>
-#include <etaos/spinlock.h>
+#include <etaos/mutex.h>
 
 /**
  * @struct usart
@@ -39,6 +39,7 @@
  */
 struct usart {
 	int timeout; //!< Transmission timeout.
+	mutex_t rx, tx;
 
 	struct device dev; //!< Backend USART device.
 	/**

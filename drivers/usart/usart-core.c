@@ -39,9 +39,9 @@ static int usart_write(struct vfile * file, const void *buff, size_t len)
 	int rv;
 
 	usart = to_usart_dev(file);
-	dev_lock(&usart->dev);
+	mutex_lock(&usart->tx);
 	rv = usart->write(usart, buff, len);
-	dev_unlock(&usart->dev);
+	mutex_unlock(&usart->tx);
 
 	return rv;
 }
@@ -52,9 +52,9 @@ static int usart_read(struct vfile * file, void *buff, size_t len)
 	int rv;
 
 	usart = to_usart_dev(file);
-	dev_lock(&usart->dev);
+	mutex_lock(&usart->rx);
 	rv = usart->read(usart, buff, len);
-	dev_unlock(&usart->dev);
+	mutex_unlock(&usart->rx);
 	return rv;
 }
 
@@ -64,9 +64,9 @@ static int usart_putc(int c, struct vfile * stream)
 	int rv;
 
 	usart = to_usart_dev(stream);
-	dev_lock(&usart->dev);
+	mutex_lock(&usart->tx);
 	rv = usart->putc(usart, c);
-	dev_unlock(&usart->dev);
+	mutex_unlock(&usart->tx);
 
 	return rv;
 }
@@ -77,9 +77,9 @@ static int usart_getc(struct vfile * stream)
 	int rv;
 
 	usart = to_usart_dev(stream);
-	dev_lock(&usart->dev);
+	mutex_lock(&usart->rx);
 	rv = usart->getc(usart);
-	dev_unlock(&usart->dev);
+	mutex_unlock(&usart->rx);
 
 	return rv;
 }
@@ -113,6 +113,8 @@ int usart_initialise(struct usart *usart)
 	int err;
 
 	err = device_initialize(&usart->dev, &usart_fops);
+	mutex_init(&usart->rx);
+	mutex_init(&usart->tx);
 	if(err)
 		return err;
 

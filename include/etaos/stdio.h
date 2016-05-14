@@ -132,6 +132,8 @@ extern struct vfile * __iob[];
 #define stdout 	__iob[1]
 #define stderr 	__iob[2]
 
+#define to_fd(__f) (__f)->fd
+
 #define filep(__idx) __iob[__idx]
 
 extern int putc(int c, struct vfile * stream);
@@ -149,6 +151,7 @@ extern int read(int fd, void *buff, size_t size);
 extern int ioctl(struct vfile *stream, unsigned long reg, void *buf);
 extern int getc(struct vfile *stream);
 extern int fgetc(struct vfile *stream);
+extern char *fgets(char *buf, int count, struct vfile *stream);
 extern size_t ftell(struct vfile *file);
 
 #ifdef CONFIG_HARVARD

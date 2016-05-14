@@ -24,6 +24,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/stdio.h>
+#include <etaos/mutex.h>
 #include <etaos/usart.h>
 #include <etaos/error.h>
 #include <etaos/spinlock.h>
@@ -32,6 +33,11 @@
 
 #include <asm/io.h>
 #include <asm/usart.h>
+
+static mutex_t usart_rx_mtx;
+static uint8_t *usart_rx_buff;
+static size_t usart_rx_len;
+static size_t usart_rx_idx;
 
 static int atmega_usart_putc(struct usart *usart, int c)
 {
@@ -47,26 +53,30 @@ static int atmega_usart_putc(struct usart *usart, int c)
 
 static int atmega_usart_getc(struct usart *usart)
 {
-	int c;
+	int c = 0;
 
-	while(!(UCSR0A & BIT(RXC0)));
-	c = UDR0;
+	irq_enter_critical();
+	usart_rx_buff = (uint8_t*)&c;
+	usart_rx_len = 1;
+	usart_rx_idx = 0;
+	irq_exit_critical();
+
+	mutex_wait(&usart_rx_mtx);
 	return c;
 }
 
 static int atmega_usart_read(struct usart *uart, void *rx, size_t rxlen)
 {
-	unsigned char *rxbuff;
-	size_t i;
-
 	if(!rx)
 		return -EINVAL;
 
-	rxbuff = rx;
-	for(i = 0; i < rxlen; i++) {
-		rxbuff[i] = atmega_usart_getc(uart);
-	}
+	irq_enter_critical();
+	usart_rx_buff = rx;
+	usart_rx_len = rxlen;
+	usart_rx_idx = 0;
+	irq_exit_critical();
 
+	mutex_wait(&usart_rx_mtx);
 	return -EOK;
 }
 
@@ -101,21 +111,47 @@ static struct usart atmega_usart = {
 	.dev = { .name = "atm-usart", },
 };
 
+static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
+{
+	if(!usart_rx_len || !usart_rx_buff || usart_rx_idx >= usart_rx_len)
+		return IRQ_HANDLED;
+
+	if(usart_rx_idx < usart_rx_len) {
+		usart_rx_buff[usart_rx_idx] = UDR0;
+		usart_rx_idx++; /* AVRICC breaks if we don't do this
+				   seperately */
+	}
+
+	if(usart_rx_idx >= usart_rx_len) {
+		usart_rx_idx = 0;
+		mutex_unlock_from_irq(&usart_rx_mtx);
+	}
+
+	return IRQ_HANDLED;
+}
+
 /**
  * @brief Initialise the ATmega USART.
  */
 static __used void atmega_usart_init(void)
 {
+	usart_rx_buff = NULL;
+	usart_rx_len = 0;
+	usart_rx_idx = 0;
+
 	UBRR0H = UBRR0H_VALUE;
 	UBRR0L = UBRR0L_VALUE;
 	UCSR0A &= ~(BIT(U2X0));
 	UCSR0C = BIT(UCSZ01) | BIT(UCSZ00);
-	UCSR0B = BIT(TXEN0) | BIT(RXEN0);
+	UCSR0B = BIT(TXEN0) | BIT(RXEN0) | BIT(RXCIE0);
+	mutex_init(&usart_rx_mtx);
 
 	usart_initialise(&atmega_usart);
 #ifdef CONFIG_STDIO_USART
 	setup_usart_streams(&atmega_usart);
 #endif
+	irq_request(USART_RX_STC_NUM, &usart_rx_irq, IRQ_FALLING_MASK,
+			&atmega_usart);
 }
 
 module_init(atmega_usart_init);

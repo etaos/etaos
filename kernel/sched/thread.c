@@ -98,7 +98,7 @@ void sched_init_idle(struct thread *tp, const char *name,
  * @return A pointer to the newly created thread.
  */
 struct thread *thread_create(const char *name, thread_handle_t handle, void *arg,
-			size_t stack_size, void *stack, unsigned char prio)
+			size_t stack_size, void *stack, unsigned char p)
 {
 	struct thread *tp;
 
@@ -106,7 +106,7 @@ struct thread *thread_create(const char *name, thread_handle_t handle, void *arg
 	if(!tp)
 		return NULL;
 
-	thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+	thread_initialise(tp, name, handle, arg, stack_size, stack, p);
 	return tp;
 }
 
@@ -250,6 +250,9 @@ void sleep(unsigned ms)
 /**
  * @brief Get a pointer to the current thread.
  * @return A pointer to the current thread.
+ *
+ * Returns a pointer to the thread that is running on the CPU that
+ * executes this function.
  */
 struct thread *current_thread(void)
 {

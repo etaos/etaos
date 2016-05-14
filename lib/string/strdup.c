@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Local time functions
+ *  ETA/OS - String duplicate
  *  Copyright (C) 2016   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,35 +17,23 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/string.h>
+#include <etaos/stdlib.h>
+#include <etaos/mem.h>
 #include <etaos/types.h>
-#include <etaos/time.h>
-#include <etaos/tick.h>
 
-long _timezone = -3600;
-bool _dst = false;
-bool _daylight = true;
-
-int localtime_r(const time_t *t, struct tm *time)
+char *strdup(const char *str)
 {
-	time_t timer;
+	size_t len;
+	char *copy;
 
-	timer = *t - _timezone;
-	gmtime_r(&timer, time);
+	len = strlen(str) + 1;
+	copy = kzalloc(len);
 
-	if(_daylight && time_isindst(time)) {
-		timer -= CONFIG_DST_BIAS;
-		gmtime_r(&timer, time);
-		time->tm_isdst = true;
-	}
-
-	return 0;
-}
-
-struct tm *localtime(const time_t *t)
-{
-	if(localtime_r(t, &_tm))
+	if(!copy)
 		return NULL;
-	else
-		return &_tm;
+
+	memcpy(copy, str, len);
+	return copy;
 }
 

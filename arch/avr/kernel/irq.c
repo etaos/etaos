@@ -118,3 +118,9 @@ SIGNAL(TWI_STC_VECTOR)
 	chip->chip_handle(TWI_STC_VECTOR_NUM);
 }
 
+SIGNAL(USART_RX_STC_VECTOR)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+	chip->chip_handle(USART_RX_STC_NUM);
+}
+

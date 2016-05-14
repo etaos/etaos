@@ -36,7 +36,6 @@ THREAD(blink_thread, arg)
 		pgpio_pin_release(13);
 
 		value = !value;
-		printf_P(PSTR("Value: %i\n"), value);
 		sleep(500);
 	}
 }
@@ -45,14 +44,12 @@ int main(void)
 {
 	struct tm *tm;
 	time_t now;
-	char buf[16];
+	char buf[] = "1234567890";
 
-	printf("Application started! (%u)\n", mm_heap_available());
-
+	printf_P(PSTR("Application started! (%u)\n"), mm_heap_available());
 	thread_create("blink-th", &blink_thread, NULL,
 			CONFIG_STACK_SIZE, blink_stack, 150);
-	read(0, buf, 10);
-	buf[10] = 0;
+
 	now = (time_t)atol(buf);
 	stime(now);
 

@@ -52,7 +52,7 @@ int spi_set_mode(struct spidev *dev, spi_ctrl_t mode)
 		return -EINVAL;
 
 	driver = dev->master;
-	mutex_lock(&driver->lock);
+	dev_lock(&dev->dev);
 
 	dev->flags &= ~SPI_MODE0_MASK & 0x3;
 	switch(mode) {
@@ -74,7 +74,7 @@ int spi_set_mode(struct spidev *dev, spi_ctrl_t mode)
 	}
 	
 	rv = driver->ctrl(dev, mode, NULL);
-	mutex_unlock(&driver->lock);
+	dev_unlock(&dev->dev);
 
 	return rv;
 }
@@ -129,9 +129,9 @@ int spi_transfer(struct spidev *dev, struct spi_msg *msg)
 {
 	int rv;
 
-	mutex_lock(&dev->master->lock);
+	dev_lock(&dev->dev);
 	rv = __spi_xfer(dev, msg);
-	mutex_unlock(&dev->master->lock);
+	dev_unlock(&dev->dev);
 
 	return rv;
 }
@@ -151,7 +151,7 @@ int spi_enable_2x(struct spidev *dev)
 		return -EINVAL;
 	master = dev->master;
 
-	mutex_lock(&master->lock);
+	dev_lock(&dev->dev);
 	ret = master->ctrl(dev, SPI_2X, NULL);
 	
 	if(!ret) {
@@ -160,7 +160,7 @@ int spi_enable_2x(struct spidev *dev)
 		else
 			set_bit(SPI_2X_FLAG, &dev->flags);
 	}
-	mutex_unlock(&master->lock);
+	dev_unlock(&dev->dev);
 
 	return ret;
 }
@@ -181,9 +181,9 @@ int spi_set_speed(struct spidev *dev, uint32_t bps)
 
 	driver = dev->master;
 
-	mutex_lock(&driver->lock);
+	dev_lock(&dev->dev);
 	ret = driver->ctrl(dev, SPI_SET_SPEED, &bps);
-	mutex_unlock(&driver->lock);
+	dev_unlock(&dev->dev);
 
 	return ret;
 }
@@ -198,7 +198,6 @@ int spi_bus_init(struct spi_driver *driver)
 	if(!driver)
 		return -EINVAL;
 
-	mutex_init(&driver->lock);
 	list_head_init(&driver->devices);
 	return -EOK;
 }

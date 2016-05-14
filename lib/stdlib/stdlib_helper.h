@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC <string.h>
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - LibC helper functions
+ *  Copyright (C) 2016  Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,20 +16,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __STRING_H__
-#define __STRING_H__
+#ifndef __STDLIB_HELPER_H__
+#define __STDLIB_HELPER_H__
 
-#include <etaos/types.h>
+extern size_t strlen(const char *x);
+static inline void __swap(char *x, char *y)
+{
+	char n;
 
-CDECL
+	n = *x;
+	*x = *y;
+	*y = n;
+}
 
-extern char *strchr(const char *str, int c);
-extern size_t strlen(const char *str);
-extern int strnlen(const char *str, size_t size);
-extern int strcmp(const char *s1, const char *s2);
-extern void *memset(void *dst, int c, size_t n);
-extern char *strcat(char *src, const char *dst);
+static inline char *strrev(char *str)
+{
+	size_t start, end;
+	char *rv;
 
-CDECL_END
+	end = strlen(str) - 1;
+	start = 0;
+	rv = str;
+	while(start < end) {
+		__swap(str+start, str+end);
+		start++;
+		end--;
+	}
 
-#endif
+	return rv;
+}
+
+#endif /* __STDLIB_HELPER_H__ */
+

@@ -1,6 +1,6 @@
 menuconfig SCHED
 	bool "Scheduler"
-	depends on STRING
+	depends on CRT
 	select TIMER
 	select SYS_TICK
 	help

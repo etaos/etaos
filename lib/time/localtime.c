@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC <string.h>
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - Local time functions
+ *  Copyright (C) 2016   Michel Megens <dev@michelmegens.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,20 +16,36 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __STRING_H__
-#define __STRING_H__
-
+#include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/time.h>
+#include <etaos/tick.h>
 
-CDECL
+long _timezone = -3600;
+long _dstbias = CONFIG_DST_BIAS;
+bool _daylight = true;
 
-extern char *strchr(const char *str, int c);
-extern size_t strlen(const char *str);
-extern int strnlen(const char *str, size_t size);
-extern int strcmp(const char *s1, const char *s2);
-extern void *memset(void *dst, int c, size_t n);
-extern char *strcat(char *src, const char *dst);
+int localtime_r(const time_t *t, struct tm *time)
+{
+	time_t timer;
 
-CDECL_END
+	timer = *t - _timezone;
+	gmtime_r(&timer, time);
 
-#endif
+	if(_daylight && time_isindst(time)) {
+		timer -= CONFIG_DST_BIAS;
+		gmtime_r(&timer, time);
+		time->tm_isdst = true;
+	}
+
+	return 0;
+}
+
+struct tm *localtime(const time_t *t)
+{
+	if(localtime_r(t, &_tm))
+		return NULL;
+	else
+		return &_tm;
+}
+

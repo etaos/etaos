@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - LibC <string.h>
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  ETA/OS - LibC fgetc
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,20 +16,36 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __STRING_H__
-#define __STRING_H__
-
+#include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/error.h>
+#include <etaos/bitops.h>
+#include <etaos/stdio.h>
 
-CDECL
+char *fgets(char *buf, int num, struct vfile *stream)
+{
+	int c;
+	char *buffer = buf;
 
-extern char *strchr(const char *str, int c);
-extern size_t strlen(const char *str);
-extern int strnlen(const char *str, size_t size);
-extern int strcmp(const char *s1, const char *s2);
-extern void *memset(void *dst, int c, size_t n);
-extern char *strcat(char *src, const char *dst);
+	if(!buf)
+		return NULL;
 
-CDECL_END
+	while(num-- > 1) {
+		c = fgetc(stream);
+		if(c == '\r')
+			c = '\n';
 
-#endif
+		if(c == -EOF) {
+			*buffer = '\0';
+			return NULL;
+		}
+
+		*buffer++ = (char)c;
+		if(c == '\n')
+			break;
+	}
+
+	*buffer = '\0';
+	return buf;
+}
+
