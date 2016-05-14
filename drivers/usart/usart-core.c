@@ -125,5 +125,5 @@ static void __used usart_core_init(void)
 {
 }
 
-subsys_init(usart_core_init)
+subsys_init(usart_core_init);
 
