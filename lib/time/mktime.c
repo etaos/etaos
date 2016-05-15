@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libctime
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/time.h>
@@ -87,13 +92,29 @@ static time_t __mktime(struct tm *t, bool tz)
 	return tmp1;
 }
 
+/**
+ * @brief Convert a time structure to a epoch timer.
+ * @param tm Time structure to convert.
+ * @return The converted timer value.
+ *
+ * This function assumes that the time stored in \p tm is the localtime.
+ */
 time_t mktime(struct tm *tm)
 {
 	return __mktime(tm, true);
 }
 
+/**
+ * @brief Convert a time structure to a epoch timer.
+ * @param tm Time structure to convert.
+ * @return The converted timer value.
+ *
+ * This function assumes that the time stored in \p tm is standard time (GMT).
+ */
 time_t _mktime(struct tm *tm)
 {
 	return __mktime(tm, false);
 }
+
+/** @} */
 

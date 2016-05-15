@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libctime
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/time.h>
@@ -71,4 +76,6 @@ struct tm *localtime(const time_t *t)
 	else
 		return &_tm;
 }
+
+/** @} */
 
