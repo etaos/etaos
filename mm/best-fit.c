@@ -24,8 +24,6 @@
 #include <etaos/bitops.h>
 
 /**
- * @addtogroup mm
- * @{
  * @addtogroup bf
  * @{
  */

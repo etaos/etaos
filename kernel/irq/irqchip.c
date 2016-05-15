@@ -17,8 +17,6 @@
  */
 
 /**
- * @addtogroup irq
- * @{
  * @addtogroup irqchip
  * @{
  */

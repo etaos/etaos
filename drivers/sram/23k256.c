@@ -18,8 +18,9 @@
 
 /**
  * @file sram/23k256.c
- * @addtogroup sram
- * @{
+ */
+
+/*
  * @addtogroup sram-23k256
  * @{
  */
@@ -213,4 +214,4 @@ void sram_23k256_init(void)
 chip_init(sram_23k256_init);
 
 /** @} */
-/** @} */
+
