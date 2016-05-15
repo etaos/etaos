@@ -94,7 +94,7 @@ int gmtime_r(const time_t *t, struct tm *tm_struct)
  * @param t Pointer to stored time.
  * @return Returns a tm structure with the converted time. NULL is returned
  *         if any error occured.
- * @note This funciton is \b NOT thread safe.
+ * @note This function is \b NOT thread safe.
  */
 struct tm *gmtime(const time_t *t)
 {

@@ -21,10 +21,27 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 
+/**
+ * @brief Timezone difference in seconds.
+ */
 long _timezone = -3600;
+/**
+ * @brief DST difference in seconds.
+ */
 long _dstbias = CONFIG_DST_BIAS;
+/**
+ * @brief Daylight savings control flag.
+ */
 bool _daylight = true;
 
+/**
+ * @brief Get the localtime, keeping the timezone and DST in mind.
+ * @param t Pointer to stored time.
+ * @param time Structure to store the converted time.
+ * @return Nonzero in case of error.
+ *
+ * This is the thread safe version of localtime.
+ */
 int localtime_r(const time_t *t, struct tm *time)
 {
 	time_t timer;
@@ -41,6 +58,12 @@ int localtime_r(const time_t *t, struct tm *time)
 	return 0;
 }
 
+/**
+ * @brief Convert a epoch timer to a time structure.
+ * @param t Pointer to stored time.
+ * @return Converted time, or NULL in case of error.
+ * @note This function is not thread safe.
+ */
 struct tm *localtime(const time_t *t)
 {
 	if(localtime_r(t, &_tm))
