@@ -18,6 +18,11 @@
 
 /** @file etaos/tick.h */
 
+/**
+ * @addtogroup tm
+ * @{
+ */
+
 #ifndef __TICK_H__
 #define __TICK_H__
 
@@ -67,4 +72,6 @@ CDECL_END
 #define time_before(a, b) ((a) < (b))
 
 #endif /* __TICK_H__ */
+
+/** @} */
 

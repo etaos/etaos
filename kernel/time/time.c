@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libctime
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/time.h>
@@ -132,6 +137,11 @@ static void cvtdate(int trantype, int datetype, int year, int month, int week,
 	return;
 }
 
+/**
+ * @brief Check if the a time structure points to a time within DST.
+ * @param tb Time structure to check.
+ * @return Nonzero if DST is active, zero otherwise.
+ */
 int time_isindst(struct tm * tb)
 {
 	long ms;
@@ -214,6 +224,13 @@ time_t time(time_t *now)
 	return n;
 }
 
+/**
+ * @brief Set the system time.
+ * @param time Epoch timer to set.
+ * @note Please note that \p time is handled as the amount of seconds since
+ *       1970.
+ * @return Always zero.
+ */
 int stime(time_t time)
 {
 	struct clocksource *cs = sys_clk;
@@ -226,4 +243,6 @@ int stime(time_t time)
 
 	return 0;
 }
+
+/** @} */
 

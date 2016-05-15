@@ -37,8 +37,8 @@
  * @brief Describes a single (virtual) timer.
  */
 struct timer {
-	struct timer *next;
-	struct timer *prev;
+	struct timer *next; //!< Next pointer.
+	struct timer *prev; //!< Previous pointer.
 
 	struct clocksource *source; //!< Source of the timer.
 	/**
@@ -78,11 +78,6 @@ struct timer {
 #define cs_last_update(__cs) __cs->tc_update
 
 #define NEVER -1
-
-struct timer_queue {
-	struct timer_queue *next,
-			   *prev;
-};
 
 CDECL
 /**
