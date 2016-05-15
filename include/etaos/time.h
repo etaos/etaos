@@ -18,6 +18,8 @@
 
 /**
  * @file include/etaos/time.h Time handling
+ */
+/**
  * @addtogroup libctime
  * @{
  */
@@ -45,11 +47,11 @@ struct tm {
 
 };
 
-#define _BASE_DOW 4
-#define _YEAR_SEC (_DAY_SEC * 365UL)
-#define _DAY_SEC (24UL * 60UL * 60UL)
-#define _FOUR_YEAR_SEC (1461L * _DAY_SEC)
-#define _LEAP_YEAR_ADJUST 17L
+#define _BASE_DOW 4 //!< Base day of the week.
+#define _YEAR_SEC (_DAY_SEC * 365UL) //!< Seconds per year.
+#define _DAY_SEC (24UL * 60UL * 60UL) //!< Seconds per day.
+#define _FOUR_YEAR_SEC (1461L * _DAY_SEC) //!< Seconds per four years.
+#define _LEAP_YEAR_ADJUST 17L //!< Leap year adjustment.
 
 extern struct tm _tm;
 extern int _days[];

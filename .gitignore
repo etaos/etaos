@@ -18,3 +18,4 @@ include/generated
 _theme_packages/
 *.*.swp
 .vimproject
+Documentation/doxygen_sqlite3.db
