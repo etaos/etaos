@@ -200,7 +200,6 @@ extern void irq_handle(int irq);
  * @brief Get the architecture specific IRQ chip.
  * @return The arch IRQ chip.
  * @ingroup archAPI
- * @pure
  */
 extern struct irq_chip *arch_get_irq_chip(void);
 

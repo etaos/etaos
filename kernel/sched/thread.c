@@ -98,7 +98,7 @@ void sched_init_idle(struct thread *tp, const char *name,
  * @return A pointer to the newly created thread.
  */
 struct thread *thread_create(const char *name, thread_handle_t handle, void *arg,
-			size_t stack_size, void *stack, unsigned char p)
+			size_t stack_size, void *stack, unsigned char prio)
 {
 	struct thread *tp;
 
@@ -106,7 +106,7 @@ struct thread *thread_create(const char *name, thread_handle_t handle, void *arg
 	if(!tp)
 		return NULL;
 
-	thread_initialise(tp, name, handle, arg, stack_size, stack, p);
+	thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
 	return tp;
 }
 

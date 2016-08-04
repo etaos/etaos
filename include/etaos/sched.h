@@ -201,14 +201,12 @@ extern struct rq *cpu_to_rq(int cpu);
 /**
  * @ingroup archAPI
  * @brief Get the run queue of the current CPU.
- * @pure
  */
 extern struct rq *sched_get_cpu_rq(void);
 /**
  * @ingroup archAPI
  * @brief Select a run queue to add a thread to.
  * @return The selected run queue.
- * @pure
  *
  * The most effecient run queue is returned (i.e. the run queue with the least
  * amount of threads already on it.
@@ -220,7 +218,6 @@ extern struct rq *sched_select_rq(void);
  * @param rq Run queue requesting the context switch.
  * @param prev Previously running thread.
  * @param next Thread to switch to.
- * @pure
  *
  * Do a context switch to the new given thread.
  */
@@ -234,7 +231,6 @@ extern void cpu_switch_context(struct rq *rq,
  * @param stack Pointer to the base of the stack.
  * @param stack_size Length of \p stack.
  * @param handle Function pointer to the thread handle.
- * @pure
  */
 extern void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 				size_t stack_size, thread_handle_t handle);

@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libcio
+ * @{
+ */
+
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
@@ -95,7 +100,7 @@ struct vfile;
 }
 
 /**
- * @ingroup vfs
+ * @struct vfile
  * @brief File definition
  */
 struct vfile {
@@ -135,7 +140,6 @@ extern struct vfile * __iob[];
 #define to_fd(__f) (__f)->fd
 
 #define filep(__idx) __iob[__idx]
-
 extern int putc(int c, struct vfile * stream);
 extern int fputc(int c, struct vfile * stream);
 extern int fputs(char *c, struct vfile * stream);
@@ -164,3 +168,8 @@ extern int vfprintf_P(struct vfile * stream, const char *fmt, va_list ap);
 CDECL_END
 
 #endif
+
+/**
+ * @}
+ */
+

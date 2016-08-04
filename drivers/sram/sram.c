@@ -18,6 +18,8 @@
 
 /**
  * @file etaos/sram.h
+ */
+/**
  * @addtogroup sram
  * @{
  */

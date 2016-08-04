@@ -16,13 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup vfs
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/stdio.h>
 #include <etaos/bitops.h>
 
 /**
- * @ingroup vfs
  * @brief Write to a file.
  * @param file File to write to.
  * @param buff Buffer to write into.
@@ -37,7 +41,6 @@ int vfs_write(struct vfile *file, const void *buff, size_t size)
 }
 
 /**
- * @ingroup vfs
  * @brief Read from a file.
  * @param file File to read from.
  * @param buff Buffer to store data into.
@@ -50,3 +53,6 @@ int vfs_read(struct vfile *file, void *buff, size_t size)
 	else
 		return -EINVAL;
 }
+
+/** @} */
+

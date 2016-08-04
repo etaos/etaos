@@ -24,7 +24,7 @@
 #include <etaos/bitops.h>
 
 /**
- * @addtogroup libc
+ * @addtogroup libcio
  * @{
  */
 
@@ -43,3 +43,4 @@ int fputc(int c, struct vfile * stream)
 }
 
 /** @} */
+

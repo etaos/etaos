@@ -59,7 +59,7 @@
 
 .macro	FUNCTION name
   .ifdef  .Lfunction
-    .err	; FUNCTION is defined already.
+    .err	/* FUNCTION is defined already. */
   .endif
 	.Lfunction = 1
 #ifdef	FUNC_SEGNAME
@@ -69,7 +69,7 @@
 #endif
 	.type	_U(\name), "function"
   .ifdef   .LEND
-    .err	; .LEND is defined already.
+    .err	/* .LEND is defined already. */
   .endif
 	.size	_U(\name), .LEND - .
 .endm
@@ -140,7 +140,7 @@ _U(\name):
   .endif
 
   .if  \name < 0
-    .err	; Invalid dst arg of 'X_lpm' macro.
+    .err	/* Invalid dst arg of 'X_lpm' macro */
   .endif
 
 .endm	/* REGNO */
@@ -156,7 +156,7 @@ _U(\name):
     .exitm
   .endif
   .if	.L__movw_dst % 1
-    .err	; Invalid dst arg in X_movw macro.
+    .err	/* Invalid dst arg in X_movw macro. */
     .exitm
   .endif
 
@@ -165,7 +165,7 @@ _U(\name):
     .exitm
   .endif
   .if	.L__movw_src % 1
-    .err	; Invalid src arg in X_movw macro.
+    .err	/* Invalid src arg in X_movw macro. */
     .exitm
   .endif
 	mov	.L__movw_dst, .L__movw_src
@@ -197,7 +197,7 @@ _U(\name):
   /* dst evaluation	*/
   REGNO	.L__lpm_dst, \dst
   .if .L__lpm_dst < 0
-    .exitm	; do not multiply errors
+    .exitm	/* do not multiply errors */
   .endif
 
   /* src evaluation	*/    
@@ -211,7 +211,7 @@ _U(\name):
   .endr
 
   .if  (.L__lpm_src < 0)
-    .err	; Invalid src arg of 'X_lpm' macro.
+    .err	/* Invalid src arg of 'X_lpm' macro. */
   .endif
 
   /* instruction(s)	*/    
@@ -228,7 +228,7 @@ _U(\name):
     .endif
   .else
     .if  (.L__lpm_dst >= 30)
-      .err	; Registers 30 and 31 are inhibited as 'X_lpm *,Z+' dst.
+      .err	/* Registers 30 and 31 are inhibited as 'X_lpm *,Z+' dst. */
     .endif
 #if  defined(__AVR_HAVE_LPMX__) && __AVR_HAVE_LPMX__
 	lpm	.L__lpm_dst, Z+

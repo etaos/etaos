@@ -18,8 +18,8 @@
 
 /**
  * @file etaos/sram/23k256.h
- * @addtogroup sram
- * @{
+ */
+/**
  * @addtogroup sram-23k256
  * @{
  */
@@ -35,6 +35,5 @@ CDECL_END
 
 #endif
 
-/** @} */
 /** @} */
 

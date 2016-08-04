@@ -23,7 +23,7 @@
 #include <etaos/string.h>
 
 /**
- * @addtogroup libc
+ * @addtogroup libcio
  * @{
  */
 
@@ -41,3 +41,4 @@ int fputs(char *s, struct vfile * stream)
 }
 
 /** @} */
+
