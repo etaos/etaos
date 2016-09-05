@@ -126,6 +126,12 @@ config PICO_POWER
 	  of your CPU. Do not select this option of you are not
 	  planning to run on a pico power CPU.
 
+config ARCH_POWER_SAVE
+	bool "Power saving"
+	default y
+	help
+	  Selecting this options enables the use of the power saving
+	  module for AVR MCU's. If you are unsure, say 'y' here.
 endmenu
 
 source "kernel/Kconfig"
