@@ -38,19 +38,21 @@ void main(void)
  *
  * @section init-gen Automated initialisation
  *
- * To automatically initialise a subsystem, one has to add one of 3 definitions:
+ * To automatically initialise a subsystem, one has to add one of 4 definitions:
  * 
  * * subsys_init
  * * module_init
  * * device_init
+ * * chip_init
  *
- * All 3 basically have the same effect, the only difference is priority and
+ * All 4 basically have the same effect, the only difference is priority and
  * therefore, order. All subsystems labeled with subsys_init will be
  * initialised first. Examples are the I2C core and the USART core. Secondly,
  * the module_init's will be called. Usually drivers behind the subsystems,
- * such as the ATmega I2C bus. At the verry last, the device_init is called
+ * such as the ATmega I2C bus. Thirdly, the device_init is called
  * initialising all drivers which (usually) depend on another module which
- * has to be already initialised (e.g. and I2C EEPROM chip driver).
+ * has to be already initialised (e.g. and I2C EEPROM chip driver). The
+ * systems initialised with chip_init are initialised last.
  */
 
 /**
@@ -70,5 +72,15 @@ void main(void)
 /**
  * @defgroup arch Architectures
  * @brief Supported architectures
+ */
+
+/**
+ * @defgroup power Power management
+ * @brief Power management module.
+ *
+ * Platform independent power management. Please note that some modes may
+ * not be supported by specific architectures. Configureation options are
+ * available to allow the scheduler to enter hibernation mode in the idle
+ * thread.
  */
 
