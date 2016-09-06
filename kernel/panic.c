@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup kernel
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/stddef.h>
 #include <etaos/error.h>
@@ -24,6 +29,13 @@
 #include <etaos/panic.h>
 #include <etaos/preempt.h>
 
+/**
+ * @brief Halt the system.
+ * @param fmt Text string format to print.
+ * @param ... List of variable arguments to match \p fmt.
+ * @warning This function halts (i.e. purposly crashes) the system, and this
+ *          function does therefore never return.
+ */
 void panic(const char *fmt, ...)
 {
 	va_list list;
@@ -38,4 +50,6 @@ void panic(const char *fmt, ...)
 	irq_disable();
 	for(;;);
 }
+
+/** @} */
 
