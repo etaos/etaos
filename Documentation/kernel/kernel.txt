@@ -75,7 +75,7 @@ void main(void)
  */
 
 /**
- * @defgroup Power management
+ * @defgroup power Power management
  * @brief Power management module.
  *
  * Platform independent power management. Please note that some modes may
