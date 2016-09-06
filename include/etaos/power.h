@@ -54,7 +54,6 @@ extern void arch_hibernate(void);
 extern void arch_set_power_mode(int mode);
 
 /**
- * @ingroup archAPI
  * @brief Select a power mode to hibernate into.
  * @param mode Power saving mode to select.
  */
