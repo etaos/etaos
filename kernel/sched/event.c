@@ -145,7 +145,7 @@ int event_wait(struct thread_queue *qp, unsigned ms)
 	int rv;
 
 	preempt_disable();
-	raw_spin_unlock_irq(&qp->lock);
+	raw_spin_lock_irq(&qp->lock);
 	if(qp->qhead == SIGNALED)
 		qp->qhead = NULL;
 	raw_spin_unlock_irq(&qp->lock);
