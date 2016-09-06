@@ -19,7 +19,13 @@
 #ifndef __PANIC_H__
 #define __PANIC_H__
 
+#define ETAOS_PANIC_STRING "[ETA/OS PANIC]:"
+
 extern void panic(const char *fmt, ...);
+
+#ifdef CONFIG_HARVARD
+extern void panic_P(const char *fmt, ...);
+#endif /* CONFIG_HARVARD */
 
 #endif
 

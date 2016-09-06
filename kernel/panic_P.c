@@ -24,14 +24,14 @@
 #include <etaos/panic.h>
 #include <etaos/preempt.h>
 
-void panic(const char *fmt, ...)
+void panic_P(const char *fmt, ...)
 {
 	va_list list;
 
 	fprintf(stderr, "%s ", ETAOS_PANIC_STRING);
 
 	va_start(list, fmt);
-	vfprintf(stderr, fmt, list);
+	vfprintf_P(stderr, fmt, list);
 	va_end(list);
 
 	preempt_disable();
