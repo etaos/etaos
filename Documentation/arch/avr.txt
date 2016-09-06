@@ -5,6 +5,7 @@
  *
  * Supported ATmega chips:
  * * ATmega328(p)
+ * * ATmega2560
  *
  * @section atmega-init System initialisation
  *

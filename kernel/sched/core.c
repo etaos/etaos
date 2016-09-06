@@ -630,6 +630,36 @@ static void rq_destroy_kill_q(struct rq *rq)
 	raw_spin_unlock_irq(&rq->lock);
 }
 
+/**
+ * @brief Get the number of thread switches of a given CPU.
+ * @param cpu CPU to get the number of context switches for.
+ * @return The number of context switches that occured on \p cpu.
+ */
+static unsigned long __sched_switch_count(int cpu)
+{
+	struct rq *rq;
+	unsigned long num;
+
+	rq = cpu_to_rq(cpu);
+	raw_spin_lock_irq(&rq->lock);
+	num = rq->switch_count;
+	raw_spin_unlock_irq(&rq->lock);
+
+	return num;
+}
+
+/**
+ * @brief Get the number of thread switches on the current CPU.
+ * @return The number of context switches.
+ */
+unsigned long sched_switch_count(void)
+{
+	int cpu;
+
+	cpu = cpu_get_id();
+	return __sched_switch_count(cpu);
+}
+
 #ifdef CONFIG_DYN_PRIO
 /**
  * @brief Reset the dynamic priority.
@@ -885,24 +915,18 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 static int __schedule_need_resched(struct thread *curr, struct thread *next)
 {
 #ifdef CONFIG_PREEMPT
-	int preempt;
+	int preempt, need_resched;
 
 	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
-	if(preempt) {
-		if(thread_is_idle(next)) {
-			preempt_reset_slice(curr);
-			return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, 
-					&curr->flags);
-		} else {
-			return (preempt ||
-				test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
-							&curr->flags));
-		}
-	} else {
-		return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, 
-				&curr->flags);
+	need_resched = test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
+								&curr->flags);
+
+	if(preempt && thread_is_idle(next)) {
+		preempt_reset_slice(next);
+		return need_resched;
 	}
-	
+
+	return preempt | need_resched;
 #else
 	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
 #endif
