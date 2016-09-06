@@ -25,6 +25,8 @@ extern void panic(const char *fmt, ...);
 
 #ifdef CONFIG_HARVARD
 extern void panic_P(const char *fmt, ...);
+#else
+#define panic_P(__fmt, ...) panic(__fmt, __VA_ARGS__)
 #endif /* CONFIG_HARVARD */
 
 #endif
