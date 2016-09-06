@@ -74,3 +74,13 @@ void main(void)
  * @brief Supported architectures
  */
 
+/**
+ * @defgroup Power management
+ * @brief Power management module.
+ *
+ * Platform independent power management. Please note that some modes may
+ * not be supported by specific architectures. Configureation options are
+ * available to allow the scheduler to enter hibernation mode in the idle
+ * thread.
+ */
+
