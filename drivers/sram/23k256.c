@@ -193,8 +193,6 @@ static int __sram_read(struct sram *sram, void *_buff, size_t len)
 
 /**
  * @brief Initialise a 23K256 SRAM chip.
- * @note This function is not automatically called, unlike other device
- *       driver initialisators.
  */
 void sram_23k256_init(void)
 {
