@@ -19,16 +19,19 @@
 #ifndef __POWER_H__
 #define __POWER_H__
 
-#include <asm/power.h>
+#include <etaos/kernel.h>
 
 #define POWER_IDLE	0x1
 #define POWER_STANDBY	0x2
 #define POWER_SAVE	0x4
 #define POWER_DOWN	0x8
 
+extern void arch_hibernate(void);
+extern void arch_set_power_mode(int mode);
+
 static inline void power_set_mode(int mode)
 {
-	arch_power_set_mode(mode);
+	arch_set_power_mode(mode);
 }
 
 static inline void hibernate(void)

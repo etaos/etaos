@@ -49,7 +49,7 @@ static uint8_t avr_power_mode_to_mask(int mode)
 	return mask;
 }
 
-void avr_set_power_mode(int mode)
+void arch_set_power_mode(int mode)
 {
 	uint8_t mask;
 
@@ -70,7 +70,7 @@ void avr_set_power_mode(int mode)
 	SMCR = mask;
 }
 
-void avr_hibernate(void)
+void arch_hibernate(void)
 {
 	SMCR |= BIT(SE);
 

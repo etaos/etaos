@@ -19,11 +19,6 @@
 #ifndef __AVR_POWER_H__
 #define __AVR_POWER_H__
 
-extern void avr_hibernate(void);
-extern void avr_set_power_mode(int mode);
-
-#define arch_power_set_mode(__x) avr_set_power_mode(__x)
-#define arch_hibernate() avr_hibernate()
 
 #endif /* __AVR_POWER_H__ */
 
