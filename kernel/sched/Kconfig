@@ -128,6 +128,15 @@ config TIME_SLICE
 	  code. After that time has expired, the system will give another
 	  thread CPU time.
 
+config IDLE_SLEEP
+	bool "Idle thread power saving"
+	default y
+	help
+	  Say 'y' here to enter power saving mode when the idle thread
+	  is executed. If you are unsure, say 'y' here; the only reason
+	  to not say 'y' here is due to the slight performance loss from
+	  having to wake up the CPU.
+
 config SCHED_DBG
 	bool "Scheduling DBG"
 	help

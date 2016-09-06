@@ -209,5 +209,13 @@
 #define MOSI_GPIO	10
 #define MISO_GPIO	11
 
+/* POWER MANAGEMENT */
+#define SMCR		MEM_IO8(0x33)
+
+#define SE		0
+#define SM0		1
+#define SM1		2
+#define SM2		3
+
 #endif /* __IO1280_H__ */
 
