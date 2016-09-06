@@ -38,6 +38,7 @@
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/power.h>
 #include <etaos/cpu.h>
 #include <etaos/preempt.h>
 #include <etaos/irq.h>
@@ -1065,6 +1066,10 @@ THREAD(idle_thread_func, arg)
 	while(true) {
 		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 		schedule();
+#ifdef CONFIG_IDLE_SLEEP
+		power_set_mode(POWER_IDLE);
+		hibernate();
+#endif
 	}
 }
 

@@ -26,5 +26,15 @@
 #define POWER_SAVE	0x4
 #define POWER_DOWN	0x8
 
+static inline void power_set_mode(int mode)
+{
+	arch_power_set_mode(mode);
+}
+
+static inline void hibernate(void)
+{
+	arch_hibernate();
+}
+
 #endif /* __POWER_H__ */
 
