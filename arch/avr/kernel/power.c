@@ -23,8 +23,6 @@
 
 #include <asm/io.h>
 
-static int avr_pwr_mode = 0;
-
 static uint8_t avr_power_mode_to_mask(int mode)
 {
 	uint8_t mask = 0;
@@ -58,7 +56,6 @@ void arch_set_power_mode(int mode)
 	case POWER_STANDBY:
 	case POWER_SAVE:
 	case POWER_DOWN:
-		avr_pwr_mode = mode;
 		break;
 	default:
 		mode = 0;
@@ -75,7 +72,7 @@ void arch_hibernate(void)
 	SMCR |= BIT(SE);
 
 	__asm__ __volatile__(
-			"sleep"
+			"sleep" "\n\t"
 			:
 			:
 			:
