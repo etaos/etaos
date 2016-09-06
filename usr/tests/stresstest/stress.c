@@ -119,6 +119,7 @@ THREAD(test_th_handle, arg)
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
 
+		printf_P(PSTR("[1][%s]: "), current_thread_name());
 		write(to_fd(stdout), msg.data, msg.len);
 
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
