@@ -6,3 +6,4 @@ obj-y += gpio/
 obj-y += eeprom/
 obj-y += spi/
 obj-y += sram/
+obj-y += analog/
