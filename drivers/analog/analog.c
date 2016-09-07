@@ -18,7 +18,6 @@
 
 #include <etaos/kernel.h>
 #include <etaos/error.h>
-#include <etaos/bitops.h>
 #include <etaos/device.h>
 #include <etaos/analog.h>
 #include <etaos/init.h>
@@ -45,14 +44,18 @@ static int analog_get(struct vfile *file)
 static int analog_ctl(struct vfile *file, unsigned long reg, void *arg)
 {
 	struct analog_chip *chip;
-	int *pin;
+	int pin;
 
 	chip = to_chip(file);
 
 	switch(reg) {
 	case ANALOG_SELECT_PIN:
-		pin = arg;
-		chip->selected_pin = &chip->pins[*pin];
+		pin = *(int*)arg;
+
+		if(pin >= chip->num)
+			return -EINVAL;
+
+		chip->selected_pin = &chip->pins[pin];
 		break;
 	default:
 		return chip->ioctl(chip, reg, arg);
@@ -79,19 +82,35 @@ static int analog_close(struct vfile *file)
 	return -EOK;
 }
 
-struct dev_file_ops analog_fops = {
+static struct dev_file_ops analog_fops = {
 	.open = analog_open,
 	.close = analog_close,
 	.ioctl = &analog_ctl,
 	.get = &analog_get,
 };
 
-void analog_chip_init(struct analog_chip *chip)
+int analog_chip_init(struct analog_chip *chip)
 {
-	chip->pins = NULL;
-	chip->num = 0;
+	struct analog_pin *pin_ary;
+	int i = 0;
+
+	if(!chip->num)
+		return -EINVAL;
+
 	device_initialize(&chip->dev, &analog_fops);
 	chip->dev.dev_data = chip;
+
+	pin_ary = kzalloc(sizeof(*pin_ary) * chip->num);
+	if(!pin_ary)
+		return -ENOMEM;
+
+	for(; i < chip->num; i++) {
+		pin_ary[i].chip = chip;
+		pin_ary[i].num = i;
+	}
+
+	chip->pins = pin_ary;
+	return -EOK;
 }
 
 static void __used analog_init(void)

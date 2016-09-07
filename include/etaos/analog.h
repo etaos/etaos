@@ -41,6 +41,35 @@ typedef enum {
 	ANALOG_SELECT_PIN,
 } analog_ioctl_t;
 
+#define PIN_A0		0
+#define PIN_A1		1
+#define PIN_A2		2
+#define PIN_A3		3
+#define PIN_A4		4
+#define PIN_A5		5
+#define PIN_A6		6
+#define PIN_A7		7
+#define PIN_A8		8
+#define PIN_A9		9
+#define PIN_A10		10
+#define PIN_A11		11
+#define PIN_A12		12
+#define PIN_A13		13
+#define PIN_A14		14
+#define PIN_A15		15
+
+CDECL
+static inline const char *analog_chip_to_name(struct analog_chip *chip)
+{
+	if(!chip)
+		return NULL;
+
+	return chip->dev.name;
+}
+
+extern int analog_chip_init(struct analog_chip *chip);
+CDECL_END
+
 extern struct analog_chip *analog_syschip;
 
 #endif

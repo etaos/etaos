@@ -33,12 +33,14 @@
 #define SPI_STC_VECTOR_NUM	   17
 #define TWI_STC_VECTOR_NUM	   24
 #define USART_RX_STC_NUM	   18
+#define ADC_COMPLETED_NUM	   21
 
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(16)
 #define USART_RX_STC_VECTOR irq_vector(18)
 #define SPI_STC_VECTOR irq_vector(17)
 #define TWI_STC_VECTOR irq_vector(24)
+#define ADC_COMPLETED_VECTOR irq_vector(21)
 
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
@@ -161,6 +163,38 @@
 #define SCK_GPIO	5
 #define MOSI_GPIO	3
 #define MISO_GPIO	4
+
+/* ADC */
+#define ADC_PINS	8
+#define ADMUX_MASK	0x7
+
+#define ADMUX		IO_ADDR(0x7C)
+#define MUX0		0
+#define MUX1		1
+#define MUX2		2
+#define MUX3		3
+#define ADLAR		5
+#define REFS0		6
+#define REFS1		7
+
+#define ADCSRB		IO_ADDR(0x7B)
+#define ADTS0		0
+#define ADTS1		1
+#define ADTS2		2
+#define ACME		6
+
+#define ADCSRA		IO_ADDR(0x7A)
+#define ADPS0		0
+#define ADPS1		1
+#define ADPS2		2
+#define ADIE		3
+#define ADIF		4
+#define ADATE		5
+#define ADSC		6
+#define ADEN		7
+
+#define ADCL		IO_ADDR(0x78)
+#define ADCH		IO_ADDR(0x79)
 
 /* POWER MANAGEMENT */
 #define SMCR		MEM_IO8(0x33)
