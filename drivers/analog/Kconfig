@@ -12,5 +12,10 @@ config ATMEGA_ANALOG
 	help
 	  Say 'y' or 'm' here to build the AVR ATmega ADC module.
 
+config LM35
+	tristate "LM35 temperature sensor"
+	depends on ANALOG
+	help
+	  Say 'y' or 'm' here to build the LM35 temperature sensor driver.
 endif
 
