@@ -180,7 +180,6 @@ int main(void)
 				current_thread_name(), readback);
 
 		temperature = lm35_read(PIN_A0);
-		temperature = ((temperature / 1024) * 5000) / 10;
 		printf_P(PSTR("[0][%s]:   Memory available: %u :: Temperature: %f\n"),
 				current_thread_name(),
 				mm_heap_available(),

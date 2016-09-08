@@ -54,6 +54,7 @@ float lm35_read(int pin)
 	rv = getc(dev);
 	close(fd);
 
+	rv = ((rv / 1024.0) * 5000.0) / 10.0;
 	return rv;
 }
 
