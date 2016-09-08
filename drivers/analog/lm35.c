@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup lm35
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/analog.h>
@@ -25,6 +30,11 @@
 
 static struct analog_chip *lm35_chip;
 
+/**
+ * @brief Read the temperature from the LM35 device.
+ * @param pin Analog pin to read from.
+ * @return The current temperature as measured by the LM35.
+ */
 float lm35_read(int pin)
 {
 	struct vfile *dev;
@@ -47,6 +57,10 @@ float lm35_read(int pin)
 	return rv;
 }
 
+/**
+ * @brief Set the analog the device the LM35 driver should use.
+ * @param chip Analog chip to set.
+ */
 void lm35_set_analog_device(struct analog_chip *chip)
 {
 	if(!chip)
@@ -54,4 +68,6 @@ void lm35_set_analog_device(struct analog_chip *chip)
 	else
 		lm35_chip = chip;
 }
+
+/** @} */
 
