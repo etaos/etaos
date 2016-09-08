@@ -124,3 +124,9 @@ SIGNAL(USART_RX_STC_VECTOR)
 	chip->chip_handle(USART_RX_STC_NUM);
 }
 
+SIGNAL(ADC_COMPLETED_VECTOR)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+	chip->chip_handle(ADC_COMPLETED_NUM);
+}
+

@@ -10,6 +10,8 @@ source "drivers/i2c/Kconfig"
 
 source "drivers/gpio/Kconfig"
 
+source "drivers/analog/Kconfig"
+
 source "drivers/platform/Kconfig"
 
 source "drivers/eeprom/Kconfig"
