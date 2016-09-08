@@ -61,8 +61,11 @@ struct analog_chip {
 	int (*ioctl)(struct analog_chip *chip, unsigned long reg, void *arg);
 };
 
+/**
+ * @brief Analog ioctl registers.
+ */
 typedef enum {
-	ANALOG_SELECT_PIN,
+	ANALOG_SELECT_PIN, //!< Select a new analog pin.
 } analog_ioctl_t;
 
 /**
