@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup analog-atmega
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/bitops.h>
@@ -88,4 +93,6 @@ static void __used avr_adc_init(void)
 }
 
 module_init(avr_adc_init);
+
+/** @} */
 
