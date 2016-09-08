@@ -26,6 +26,15 @@
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
 
+/**
+ * @brief Read a string from a file.
+ * @param buf Buffer to store read data into.
+ * @param num Maximum number of bytes to read.
+ * @param stream File to read from.
+ *
+ * This function reads from the given file until a new line character is
+ * read or \p num bytes have been read, whichever comes first.
+ */
 char *fgets(char *buf, int num, struct vfile *stream)
 {
 	int c;

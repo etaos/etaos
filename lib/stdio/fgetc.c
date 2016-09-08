@@ -27,8 +27,9 @@
 #include <etaos/stdio.h>
 
 /**
- * @brief Write a single byte from a file.
- * @param stream Stream to write from.
+ * @brief Read a single byte from a file.
+ * @param stream Stream to read from.
+ * @return The byte read from \p stream.
  */
 int fgetc(struct vfile * stream)
 {
