@@ -1,0 +1,15 @@
+/**
+ * @defgroup analog ADC
+ * @ingroup dev
+ * @brief Platform independent analog to digital conversion.
+ *
+ * The ADC module provides the application with a portable way to deal with
+ * analog devices. The application can interface with ADC's through the
+ * device tree. After opening a device file to an ADC, a pin can be selected
+ * using ioctl:
+@code{.c}
+int pin = PIN_A7;
+ioctl(adc, ANALOG_SELECT_PIN, &pin);
+@endcode
+ * After selecting the pin, reading from the ADC is done using gets.
+ */

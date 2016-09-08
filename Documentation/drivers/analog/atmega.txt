@@ -1,0 +1,5 @@
+/**
+ * @defgroup analog-atmega ATmega ADC driver
+ * @ingroup analog
+ * @brief AVR ATmega analog to digital converter.
+ */

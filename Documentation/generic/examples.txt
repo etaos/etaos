@@ -1,0 +1,7 @@
+/**
+ * @defgroup Examples ETA/OS example's
+ * @brief ETA/OS application examples.
+ *
+ * Use the examples below to get the initial feel of ETA/OS. The unit tests
+ * can also be used as example code if the examples below aren't sufficient.
+ */
