@@ -16,8 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file include/etaos/lm35.h LM35 driver
+ */
+
 #ifndef __LM35_H__
 #define __LM35_H__
+
+/**
+ * @addtogroup lm35
+ * @{
+ */
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
@@ -26,6 +35,8 @@ CDECL
 extern float lm35_read(int pin);
 extern void lm35_set_analog_device(struct analog_chip *chip);
 CDECL_END
+
+/** @} */
 
 #endif
 
