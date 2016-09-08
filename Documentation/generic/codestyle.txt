@@ -1,5 +1,5 @@
 /**
-  @page contrib Contributing to ETA/OS
+  @page codestyle Coding style
   @tableofcontents
   ETA/OS is free, open source software and is currently maintained and
   written by hobbyists. All help to make ETA/OS a better system is welcome

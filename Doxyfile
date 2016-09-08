@@ -765,7 +765,6 @@ INPUT                  = . \
                          Documentation/drivers/spi/spi.txt \
                          Documentation/drivers/sram/23k256.txt \
                          Documentation/drivers/sram/sram.txt \
-                         Documentation/generic/contributing.txt \
                          Documentation/generic/copying.txt \
                          Documentation/generic/examples.txt \
                          usr/examples/device.c \
@@ -773,7 +772,8 @@ INPUT                  = . \
                          Documentation/drivers/analog/analog.txt \
                          Documentation/drivers/analog/atmega.txt \
                          Documentation/generic/examples.txt \
-                         Documentation/drivers/analog/lm35.txt
+                         Documentation/drivers/analog/lm35.txt \
+                         Documentation/generic/codestyle.txt
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
