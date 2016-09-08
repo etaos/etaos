@@ -1,0 +1,6 @@
+/**
+ * @defgroup lm35 LM35 temperature sensor
+ * @ingroup analog
+ * @brief TI's LM35 temperature sensor. Please note that this driver
+ *        assumes the sensor's V<sub>in</sub> is connected to 5V.
+ */
