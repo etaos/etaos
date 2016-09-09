@@ -78,9 +78,9 @@ labels generally contain more advanced features/bugs.
 Below you'll find the pull request checklist. Please follow this guideline as
 close as possible when submitting a new patch.
 
-- Make sure your [code](#cc) and [documentation](#documentation) follows 
+- Make sure your [code](#cc) and [documentation](#docs) follows 
   the style guides.
-- Write your commit messages following the 'git commit' [checklist](#git-commit-messages).
+- Write your commit messages following the 'git commit' [checklist](#git).
 - Supply your code with test(s).
 - Describe which hardware you have used to test your patch.
 
@@ -97,7 +97,7 @@ can be rejected based on style errors.
 
 @subsection cc C/C++
 ETA/OS follows a slightly modified version of the Linux kernel C/C++ style guide.
-There is a separate [document](http://docs.michelmegens.net/contrib.html) available
+There is a separate [document](codestyle.html) available
 containing the entire C/C++ style guide.
 
 @subsection docs Documentation
