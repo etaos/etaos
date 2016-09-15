@@ -184,7 +184,6 @@
 /**
  * @ingroup atmega
  * @brief Program memory character.
- * @deprecated The use of GNU attributes in typedefs is deprecated.
  */
 typedef char prog_char;
 #else

@@ -17,6 +17,8 @@
 #include <etaos/gpio.h>
 #include <etaos/vfs.h>
 #include <etaos/platform.h>
+#include <etaos/analog.h>
+#include <etaos/lm35.h>
 #include <etaos/ipm.h>
 #include <asm/pgm.h>
 
@@ -119,6 +121,7 @@ THREAD(test_th_handle, arg)
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
 
+		printf_P(PSTR("[1][%s]: "), current_thread_name());
 		write(to_fd(stdout), msg.data, msg.len);
 
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
@@ -139,6 +142,7 @@ int main(void)
 	uint8_t readback = 0;
 	char buff[16];
 	time_t now;
+	float temperature;
 
 	printf("Application started\n");
 
@@ -174,9 +178,12 @@ int main(void)
 		ee_stress_write_byte(EE_BYTE_ADDR, ee_value);
 		printf_P(PSTR("[%u][%s]:   ee-byte read: %u\n"), 0,
 				current_thread_name(), readback);
-		printf_P(PSTR("[0][%s]:   Memory available: %u\n"),
+
+		temperature = lm35_read(PIN_A0);
+		printf_P(PSTR("[0][%s]:   Memory available: %u :: Temperature: %f\n"),
 				current_thread_name(),
-				mm_heap_available());
+				mm_heap_available(),
+				temperature);
 
 		sleep(500);
 	}

@@ -1,6 +1,6 @@
 /*
  *  Eta/OS - ETA/OS stdio header
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  Copyright (C) 2014   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -160,9 +160,12 @@ extern size_t ftell(struct vfile *file);
 
 #ifdef CONFIG_HARVARD
 extern int printf_P(const char *fmt, ...);
+extern int fprintf_P(struct vfile *stream, const char *fmt, ...);
 extern int vfprintf_P(struct vfile * stream, const char *fmt, va_list ap);
 #else
-#define printf_P(fmt, args...) printf(fmt, args)
+#define printf_P(__fmt, args...) printf(__fmt, args)
+#define fprintf_P(__iostream, __fmt, args...) fprintf(__iostream, __fmt, args)
+#define vfprintf_P(__iostream, __fmt, __ap) vfprintf(__iostream, __fmt, __ap)
 #endif
 
 CDECL_END

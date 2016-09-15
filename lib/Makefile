@@ -16,6 +16,7 @@ libc-files-$(CONFIG_CRT) += string/strcmp.o string/strnlen.o
 libc-files-$(CONFIG_CRT) += string/memset.o string/strcat.o string/strdup.o
 
 libc-files-$(CONFIG_HARVARD) += stdio/printf_p.o stdio/vfprintf_p.o
+libc-files-$(CONFIG_HARVARD) += stdio/fprintf_P.o
 
 obj-$(CONFIG_CRT) += c.o
 c-y += $(libc-files-y) $(libc-files-m)

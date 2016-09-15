@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Scheduling core
- *  Copyright (C) 2014, 2015, 2016   Michel Megens <dev@michelmegens.net>
+ *  Copyright (C) 2014, 2015, 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/power.h>
 #include <etaos/cpu.h>
 #include <etaos/preempt.h>
 #include <etaos/irq.h>
@@ -1065,6 +1066,10 @@ THREAD(idle_thread_func, arg)
 	while(true) {
 		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 		schedule();
+#ifdef CONFIG_IDLE_SLEEP
+		power_set_mode(POWER_IDLE);
+		hibernate();
+#endif
 	}
 }
 

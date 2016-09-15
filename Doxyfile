@@ -38,7 +38,7 @@ PROJECT_NAME           = ETA/OS
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 4.3.0
+PROJECT_NUMBER         = 4.4.0
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -765,14 +765,17 @@ INPUT                  = . \
                          Documentation/drivers/spi/spi.txt \
                          Documentation/drivers/sram/23k256.txt \
                          Documentation/drivers/sram/sram.txt \
-                         Documentation/generic/contributing.txt \
                          Documentation/generic/copying.txt \
                          Documentation/generic/examples.txt \
                          usr/examples/device.c \
                          usr/examples/helloworld.c \
                          Documentation/drivers/analog/analog.txt \
                          Documentation/drivers/analog/atmega.txt \
-                         Documentation/drivers/analog/lm35.txt
+                         Documentation/generic/examples.txt \
+                         Documentation/drivers/analog/lm35.txt \
+                         Documentation/generic/codestyle.txt \
+                         Documentation/generic/contributing.txt \
+                         Documentation/generic/coc.txt
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -849,7 +852,9 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = scripts \
-                         include/config
+                         include/config \
+                         CONTRIBUTING.md \
+                         CODE_OF_CONDUCT.md
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

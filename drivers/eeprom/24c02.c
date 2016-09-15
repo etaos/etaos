@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - EEPROM header
- *  Copyright (C) 2014   Michel Megens <dev@michelmegens.net>
+ *  Copyright (C) 2014   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ void eeprom_init_24c02(void)
 	struct i2c_device_info *info;
 	struct i2c_client *client;
 
-	info = i2c_create_info("24C02");
+	info = i2c_create_info(ee_chip.name);
 	info->addr = BASE_SLA_24C02;
 	ee_chip.priv = i2c_new_device(info);
 	client = ee_chip.priv;

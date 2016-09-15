@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - 23K256 SRAM driver
- *  Copyright (C) 2015   Michel Megens <dev@michelmegens.net>
+ *  Copyright (C) 2015   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -193,8 +193,6 @@ static int __sram_read(struct sram *sram, void *_buff, size_t len)
 
 /**
  * @brief Initialise a 23K256 SRAM chip.
- * @note This function is not automatically called, unlike other device
- *       driver initialisators.
  */
 void sram_23k256_init(void)
 {

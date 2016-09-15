@@ -31,7 +31,16 @@ CDECL
 extern void arch_irq_disable(void);
 extern void arch_irq_enable(void);
 CDECL_END
+
+/**
+ * @ingroup archAPI
+ * @brief Disable the IRQ's on the current CPU.
+ */
 #define local_irq_disable() arch_irq_disable()
+/**
+ * @ingroup archAPI
+ * @brief Enable the IRQ's on the current CPU.
+ */
 #define local_irq_enable() arch_irq_enable()
 
 #endif /* __AVR_IRQ_H__ */
