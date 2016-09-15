@@ -100,6 +100,11 @@ static inline void local_irq_disable(void)
 	arch_local_irq_disable();
 }
 
+/**
+ * @brief Check whether the IRQ's are disabled or not.
+ * @retval 1 The interrupts are disabled.
+ * @retval 0 The interrupts are enabled.
+ */
 static inline bool irqs_disabled()
 {
 	unsigned long flags;
