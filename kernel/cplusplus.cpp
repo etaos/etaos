@@ -17,6 +17,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/panic.h>
 #include <etaos/types.h>
 #include <etaos/mem.h>
 
@@ -79,13 +80,11 @@ void __cxa_guard_release (__guard *g)
 
 /**
  * @brief Temporary implementation for pure virtual functions.
- * @todo Implement some big time complaining and add a panic.
  */
 void __cxa_pure_virtual(void)
 {
-	/*
-	 * TODO: Do some big time complaining here
-	 */
+	panic("Virtual funtion not implemented (%s at %i)!",
+			__FILE__, __LINE__);
 }
 
 /**
