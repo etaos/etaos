@@ -56,6 +56,7 @@ CRUROM       = $(srctree)/scripts/crurom/crurom
 CRUROMFLAGS  = -r
 HOSTCFLAGS   = -Wall -Wno-char-subscripts -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOSTCXXFLAGS = -O2
+DOXYGEN      = doxygen
 
 KBUILD_CFLAGS := -Wall -Iinclude
 KBUILD_CXXFLAGS := -Wall -Iinclude
@@ -222,6 +223,9 @@ etaos-link := $(init-y) $(core-y) $(drivers-y) $(libs-y)
 etaos-head := $(head-y)
 export etaos-deps etaos-head
 
+doc:
+	$(Q)$(DOXYGEN)
+
 modules: prepare $(etaos-dirs)
 etaos: prepare $(etaos-img)
 app: $(etaos-target)
@@ -233,7 +237,7 @@ cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
                   $(if $(KBUILD_MODULES),; rm -f $(MODVERDIR)/*)
 cremodverdir:
 	$(cmd_crmodverdir)
-PHONY += modules etaos cremodverdir app
+PHONY += modules etaos cremodverdir app doc
 
 PHONY += $(etaos-dirs) $(etaos-img)
 $(etaos-dirs): scripts
@@ -318,6 +322,7 @@ help:
 	@echo '* modules          - Build all modules'
 	@echo '* modules_install  - Install modules to INSTALL_MOD_PATH/etaos (default: /etaos)'
 	@echo '  version          - Output the ETA/OS version'
+	@echo '  doc              - Generate doxygen documentation'
 	@echo '  help             - Print this help text'
 	@echo ''
 	@echo 'Architecture specific targets ($(SRCARCH)):'
