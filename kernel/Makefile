@@ -1,4 +1,4 @@
-obj-y += init.o sys.o delay.o panic.o
+obj-y += init.o sys.o delay.o panic.o cpu.o
 obj-$(CONFIG_HARVARD) += panic_P.o
 obj-$(CONFIG_CPP) += cplusplus.o
 obj-$(CONFIG_SEM) += semaphore.o
