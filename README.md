@@ -23,7 +23,7 @@ The COPYING file should contian more information about the licence, or
 if it's not included, look at http://www.gnu.org/licences/.
 
     ETA/OS
-    Copyright (C) 2014, 2015, 2016
+    Copyright (C) 2014, 2015, 2016  ETA/OS developers
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ Retreiving:
 or
   * a tarball download
 
-Build tools:
+Build tools (for the host and target system):
   * GCC tool chain (binutils and gcc)
     - gcc
     - ld
@@ -84,3 +84,4 @@ Contributing
 To see how you can help improving ETA/OS, read the contribution guide. You can
 find it in the CONTRIBUTING.md file in the repository or on the
 [web](http://bietje.net/etaos-site/contrib.html).
+
