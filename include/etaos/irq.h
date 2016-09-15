@@ -65,6 +65,18 @@ extern void arch_irq_enable();
 
 /**
  * @ingroup archAPI
+ * @brief Arch backend of local_irq_enable()
+ */
+extern void arch_local_irq_enable();
+
+/**
+ * @ingroup archAPI
+ * @brief Arch backend of local_irq_disable()
+ */
+extern void arch_local_irq_disable();
+
+/**
+ * @ingroup archAPI
  * @brief Check if the interrupts are enabled.
  * @param flags Flags argument.
  *

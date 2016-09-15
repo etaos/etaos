@@ -37,6 +37,16 @@ void arch_irq_enable(void)
 	sei();
 }
 
+void arch_local_irq_enable(void)
+{
+	arch_irq_enable();
+}
+
+void arch_local_irq_disable(void)
+{
+	arch_irq_disable();
+}
+
 unsigned long arch_irq_get_flags(void)
 {
 	return ((unsigned long) (SREG & AVR_IRQ_BITS));
