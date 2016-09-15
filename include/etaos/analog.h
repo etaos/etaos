@@ -104,6 +104,7 @@ static inline const char *analog_chip_to_name(struct analog_chip *chip)
 	return chip->dev.name;
 }
 
+extern int analog_read(struct analog_pin *pin);
 extern int analog_chip_init(struct analog_chip *chip);
 CDECL_END
 
