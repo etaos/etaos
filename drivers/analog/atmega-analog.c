@@ -39,6 +39,7 @@ static int avr_adc_get(struct analog_pin *pin)
 	int num = pin->num;
 	uint8_t low, high;
 
+#ifdef MUX5
 	if(num > PIN_A7) {
 		/*
 		 * We ajust the MUX here. If the analog pins
@@ -50,6 +51,7 @@ static int avr_adc_get(struct analog_pin *pin)
 	} else {
 		ADCSRB &= ~BIT(MUX5);
 	}
+#endif
 
 	ADMUX = (num & 0x7) | BIT(REFS0);
 	ADCSRA |= BIT(ADSC);

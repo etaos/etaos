@@ -56,6 +56,21 @@ static int analog_get(struct vfile *file)
 }
 
 /**
+ * @brief Read from the ADC.
+ * @param pin Analog pin to read from.
+ * @return The value read from the ADC.
+ * @see analog_get
+ * @note This is an API alternative to analog_get (using the device tree).
+ */
+int analog_read(struct analog_pin *pin)
+{
+	struct analog_chip *chip;
+
+	chip = pin->chip;
+	return chip->get(pin);
+}
+
+/**
  * @brief Configure the ADC.
  * @param file Device file used to access the ADC.
  * @param reg Configuration register.
