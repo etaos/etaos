@@ -14,7 +14,7 @@ propose it on the mailing list or sent in a pull request with your changes.
   * [Reporting bugs](#reporting-bugs)
   * [Suggestions](#suggestions)
   * [Code contributions](#code-contributions)
-  * [Patches and pull requests](#patches-and-pull-requests)
+  * [Patches and pull requests](#pull-requests)
 
 [Style guide](#style-guide)
   * [Git](#git-commit-messages)
