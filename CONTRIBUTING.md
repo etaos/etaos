@@ -117,8 +117,8 @@ Please try and follow the style guides below at all times. Keep in mind that pat
 ### C/C++
 
 ETA/OS follows a slightly modified version of the Linux kernel C/C++ style guide.
-There is a separate [document](http://docs.michelmegens.net/contrib.html) available
-containing the entire C/C++ style guide.
+There is a separate [document](http://bietje.net/etaos-site/docs/codestyle.html)
+available containing the entire C/C++ style guide.
 
 ### Documentation
 
