@@ -84,6 +84,22 @@ extern void arch_local_irq_disable();
  */
 extern void raw_irq_enabled_flags(unsigned long *flags);
 
+/**
+ * @brief Enable the IRQ's on the current CPU.
+ */
+static inline void local_irq_enable(void)
+{
+	arch_local_irq_enable();
+}
+
+/**
+ * @brief Disable the IRQ's on the current CPU.
+ */
+static inline void local_irq_disable(void)
+{
+	arch_local_irq_disable();
+}
+
 static inline bool irqs_disabled()
 {
 	unsigned long flags;
