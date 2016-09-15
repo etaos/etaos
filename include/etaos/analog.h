@@ -104,6 +104,15 @@ static inline const char *analog_chip_to_name(struct analog_chip *chip)
 	return chip->dev.name;
 }
 
+static inline struct analog_pin *analog_chip_to_pin(struct analog_chip *chip,
+		int pin)
+{
+	if(chip->num <= pin)
+		return NULL;
+
+	return &chip->pins[pin];
+}
+
 extern int analog_read(struct analog_pin *pin);
 extern int analog_chip_init(struct analog_chip *chip);
 CDECL_END
