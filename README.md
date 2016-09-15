@@ -81,6 +81,6 @@ See the usr/tests/ directory for some examples.
 Contributing
 ------------
 
-ETA/OS is free software, and anyone is more then welcome to contribute to this
-project. If you have written a patch, you can send this patch or pull request to 
-etaos@googlegroups.com. Pull requests using GitHub are not preferred.
+To see how you can help improving ETA/OS, read the contribution guide. You can
+find it in the CONTRIBUTING.md file in the repository or on the
+[web](http://bietje.net/etaos-site/contrib.html).
