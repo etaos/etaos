@@ -31,6 +31,8 @@
 #include <etaos/romfs.h>
 #include <etaos/stdio.h>
 
+__attribute__((weak)) struct romfs *romEntryList = NULL;
+
 /**
  * @brief Open a ROMFS file.
  * @param file File which has to be opened.
