@@ -82,5 +82,5 @@ Contributing
 ------------
 
 ETA/OS is free software, and anyone is more then welcome to contribute to this
-project. If you have written a patch, you can send this patch or pull request to 
-etaos@googlegroups.com. Pull requests using GitHub are not preferred.
+project. If you have written a patch, you can send this patches and pull requests
+to the mailing list on etaos@googlegroups.com, or via [GitLab](https://git.bietje.net/etaos/etaos).
