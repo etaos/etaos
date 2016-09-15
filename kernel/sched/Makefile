@@ -1,4 +1,4 @@
-obj-$(CONFIG_SCHED)		+= core.o algo.o thread.o cpu.o
+obj-$(CONFIG_SCHED)		+= core.o algo.o thread.o
 obj-$(CONFIG_IPM)		+= ipm.o
 obj-$(CONFIG_EVENT_MUTEX)	+= event.o
 
