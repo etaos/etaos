@@ -31,7 +31,9 @@
 #include <etaos/romfs.h>
 #include <etaos/stdio.h>
 
-__attribute__((weak)) struct romfs *romEntryList = NULL;
+#ifdef weak_sym
+weak_sym struct romfs *romEntryList = NULL;
+#endif
 
 /**
  * @brief Open a ROMFS file.
