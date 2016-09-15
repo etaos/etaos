@@ -72,6 +72,11 @@ extern void arch_irq_enable();
  */
 extern void raw_irq_enabled_flags(unsigned long *flags);
 
+/**
+ * @brief Check whether the IRQ's are disabled or not.
+ * @retval 1 The interrupts are disabled.
+ * @retval 0 The interrupts are enabled.
+ */
 static inline bool irqs_disabled()
 {
 	unsigned long flags;
