@@ -15,30 +15,27 @@ static struct thread *test_t;
 
 THREAD(test_th_handle, arg)
 {
-	nice(80);
+	volatile int *trigger = (int*)arg;
 
 	while(true) {
-		printf("test_thread\n");
-		delay(500);
+		if(*trigger) {
+			*trigger = false;
+			printf("test_thread\n");
+		}
 	}
 }
 
 int main(void)
 {
-	const char msg[] = "hello main\n";
-	int fd;
+	int trigger = true;
 
 	printf("Application started (M:%u)!\n", mm_heap_available());
-	test_t = thread_create( "tst", &test_th_handle, NULL,
+	test_t = thread_create( "tst", &test_th_handle, (void*)&trigger,
 			CONFIG_STACK_SIZE, test_thread_stack, 120);
 
-	
 	while(true) {
-		fd = open("atm-usart", _FDEV_SETUP_RW);
-		write(fd, msg, sizeof(msg));
-		close(fd);
-
-		printf("main_thread\n");
+		trigger = true;
+		printf("main_thread (%u)\n", trigger);
 		delay(500);
 	}
 
