@@ -83,5 +83,5 @@ Contributing
 
 To see how you can help improving ETA/OS, read the contribution guide. You can
 find it in the CONTRIBUTING.md file in the repository or on the
-[web](http://bietje.net/etaos-site/contrib.html).
+[web](http://etaos.bietje.net/contrib.html).
 
