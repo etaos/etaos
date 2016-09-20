@@ -1033,6 +1033,11 @@ void __hot schedule(void)
 }
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Reschedule the current run queue with preemption in mind.
+ * @note Applications generally shouldn't call this function.
+ * @see schedule __schedule
+ */
 void __hot preempt_schedule(void)
 {
 	/* we don't want to preempt the current process if either
