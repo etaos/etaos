@@ -1004,8 +1004,12 @@ static inline bool need_resched()
 {
 	struct thread *curr = current_thread();
 
+#ifdef CONFIG_PREEMPT
 	return (test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags) ||
 		test_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags));
+#else
+	return test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+#endif
 }
 
 /**
