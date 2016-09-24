@@ -22,6 +22,7 @@
 #include <etaos/stdio.h>
 #include <etaos/tick.h>
 #include <etaos/stddef.h>
+#include <etaos/hrtimer.h>
 
 /**
  * @ingroup kernel
@@ -59,6 +60,12 @@ int sysctl(sys_ctl_t ctl, ...)
 	case SYS_SET_SYSCLK:
 		stream = (void*)va_arg(va, size_t);
 		sys_clk = stream;
+		err = -EOK;
+		break;
+
+	case SYS_SET_HR_CLK:
+		stream = (void*)va_arg(va, size_t);
+		hr_sys_clk = stream;
 		err = -EOK;
 		break;
 

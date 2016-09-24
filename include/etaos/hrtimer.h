@@ -20,12 +20,12 @@
 #define __HR_TIMERS__
 
 #include <etaos/kernel.h>
-#include <etaos/time.h>
+#include <etaos/timer.h>
 #include <etaos/clocksource.h>
 
 struct hrtimer_source {
 	struct clocksource base; //!< Base clocksource.
-	unsigned long resolution; //!< Resolution in nanoseconds.
+	struct hrtimer *timers; //!< Linked list head.
 };
 
 struct hrtimer {
@@ -36,9 +36,11 @@ struct hrtimer {
 	void (*handle)(struct hrtimer *timer, void *arg);
 	void *handle_argument;
 
-	uint64_t ticks;
-	unsigned long flags;
+	unsigned long ticks,
+		      timer_once;
 };
+
+extern struct clocksource *hr_sys_clk;
 
 /**
  * @name High resolution timer flags
@@ -46,5 +48,21 @@ struct hrtimer {
  */
 #define HRTIMER_ONESHOT		0 //!< Run-once flag.
 /** @} */
+
+CDECL
+static inline void hrtimer_source_init(const char *name,
+				       struct hrtimer_source *src,
+				       int (*enable)(struct clocksource *),
+				       void (*disable)(struct clocksource*),
+				       unsigned long freq)
+{
+	src->timers = NULL;
+	clocksource_init(name, &src->base, freq, enable, disable);
+}
+extern struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
+				void (*handle)(struct hrtimer *, void*),
+				void *arg, unsigned long flags);
+extern irqreturn_t hrtimer_tick(struct irq_data *data, void *arg);
+CDECL_END
 
 #endif

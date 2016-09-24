@@ -110,6 +110,39 @@
 #define OCF0A 0x2
 #define OCF0B 0x4
 
+/* TIMER2 */
+#define TCCR2A		IO_ADDR(0xB0)
+#define WGM20		0
+#define WGM21		1
+#define COM2B0		4
+#define COM2B1		5
+#define COM2A0		6
+#define COM2A1		7
+
+#define TCCR2B		IO_ADDR(0xB1)
+#define CS20		0
+#define CS21		1
+#define CS22		2
+#define WGM22		3
+#define FOC2B		6
+#define FOC2A		7
+
+#define TCNT2		IO_ADDR(0xB2)
+#define OCRA2A		IO_ADDR(0xB3)
+#define OCRA2B		IO_ADDR(0xB4)
+#define ASSR		IO_ADDR(0xB6)
+#define TIMSK2		IO_ADDR(0x70)
+#define TOI2		0
+#define OCIE2A		1
+#define OCIE2B		2
+
+#define TIFR2		IO_ADDR(0x37)
+#define TOV2		0
+#define OCF2A		1
+#define OCF2B		2
+
+#define GTCCR		IO_ADDR(0x43)
+
 /* GPIO defs */
 #define PINB MEM_IO8(0x23)
 #define DDRB MEM_IO8(0x24)
