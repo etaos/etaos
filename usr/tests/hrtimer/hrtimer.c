@@ -4,6 +4,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/types.h>
 #include <etaos/stdio.h>
 #include <etaos/hrtimer.h>
 #include <etaos/thread.h>
@@ -11,10 +12,29 @@
 #include <etaos/mem.h>
 
 #include <asm/pgm.h>
+#include <asm/io.h>
 
-static void hrtimer_handle_func(struct hrtimer *hrt, void *arg)
+#define LED_PORT PORTB
+#define LED_DDR  DDRB
+#define LED_PIN  5
+
+static inline void set_led(bool val)
 {
-	printf("hai\n");
+	if(val) {
+		/* turn the led on */
+		LED_PORT |= BIT(LED_PIN);
+	} else {
+		/* turn the led off */
+		LED_PORT &= ~BIT(LED_PIN);
+	}
+}
+
+static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
+{
+	static bool value = true;
+
+	set_led(value);
+	value = !value;
 }
 
 int main(void)
@@ -23,11 +43,12 @@ int main(void)
 	struct hrtimer_source *src;
 	int i;
 
-	printf("Application started (M:%u)!\n", mm_heap_available());
+	printf_P(PSTR("Application started (M:%u)!\n"), mm_heap_available());
 
-	hrtimer_create(hr_sys_clk, 2000000000, hrtimer_handle_func,
-			NULL, 0UL);
-	hrtimer_create(hr_sys_clk, 500000000, hrtimer_handle_func,
+	LED_DDR |= BIT(LED_PIN);
+	set_led(false);
+
+	hrtimer_create(hr_sys_clk, 2000000, hrtimer1_handle_func,
 			NULL, 0UL);
 
 	src = container_of(hr_sys_clk, struct hrtimer_source, base);
@@ -40,6 +61,7 @@ int main(void)
 	}
 
 	while(true) {
+		printf("Ola\n");
 		sleep(1000);
 	}
 

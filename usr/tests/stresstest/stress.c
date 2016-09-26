@@ -10,6 +10,7 @@
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/event.h>
+#include <etaos/hrtimer.h>
 #include <etaos/mem.h>
 #include <etaos/mutex.h>
 #include <etaos/time.h>
@@ -135,10 +136,19 @@ THREAD(test_th_handle, arg)
 	}
 }
 
+static struct gpio_pin *led_pin;
+
+static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
+{
+	static bool value = true;
+
+	raw_gpio_pin_write(led_pin, value);
+	value = !value;
+}
+
 int main(void)
 {
 	const char * ip_msg = "IPM message\n";
-	bool value = true;
 	uint8_t readback = 0;
 	char buff[16];
 	time_t now;
@@ -156,22 +166,21 @@ int main(void)
 	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,
 			test_stack2, 120);
 
-	pgpio_pin_request(13);
-	pgpio_direction_output(13, false);
-	pgpio_pin_release(13);
+
 
 	read(to_fd(stdin), &buff[0], 10);
 	buff[10] = 0;
 	now = (time_t)atol(buff);
 	stime(now);
 
+	pgpio_pin_request(13);
+	pgpio_direction_output(13, false);
+	led_pin = platform_pin_to_gpio(13);
+	hrtimer_create(hr_sys_clk, 2000000, hrtimer1_handle_func,
+			NULL, 0UL);
+
 	while(true) {
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));
-
-		pgpio_pin_request(13);
-		pgpio_write_pin(13, value);
-		pgpio_pin_release(13);
-		value = !value;
 
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
 		ee_value += 1;

@@ -23,12 +23,13 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/bitops.h>
 #include <etaos/irq.h>
 #include <etaos/list.h>
 #include <etaos/tick.h>
+#include <etaos/hrtimer.h>
 
 #include <asm/io.h>
-#include <asm/cpu.h>
 
 static struct irq_chip avr_irq_chip = {
 	.name = "avr_irq_chip",
@@ -70,6 +71,21 @@ void avr_start_sysclk(int irq, struct clocksource *src)
 	TIMSK0 = TOIE0;
 	TCCR0A = WGM00 | WGM01;
 	TCCR0B = WGM02 | CS00 | CS01;
+}
+
+void avr_start_hrclock(int irq, struct clocksource *src)
+{
+	hrtimer_init(irq, src);
+#if F_CPU == 16000000
+	OCR2A = 250;
+#elif F_CPU == 8000000
+	OCR20 = 125;
+#else
+#error Unsupported CPU frequency for HR clock
+#endif
+	TIMSK2 = BIT(TOIE2);
+	TCCR2A = BIT(WGM20) | BIT(WGM21);
+	TCCR2B = BIT(WGM22) | BIT(CS20) | BIT(CS21);
 }
 /* @} */
 

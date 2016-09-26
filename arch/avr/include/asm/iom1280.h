@@ -38,6 +38,7 @@
 #define TWI_STC_VECTOR_NUM		39
 #define USART_RX_STC_NUM		25
 #define ADC_COMPLETED_NUM		29
+#define TIMER2_OVERFLOW_VECTOR_NUM	15
 
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(23)
@@ -45,6 +46,7 @@
 #define TWI_STC_VECTOR irq_vector(39)
 #define USART_RX_STC_VECTOR irq_vector(25)
 #define ADC_COMPLETED_VECTOR irq_vector(29)
+#define TIMER2_OVERFLOW_VECTOR irq_vector(15)
 
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
@@ -137,11 +139,11 @@
 #define FOC2A		7
 
 #define TCNT2		IO_ADDR(0xB2)
-#define OCRA2A		IO_ADDR(0xB3)
-#define OCRA2B		IO_ADDR(0xB4)
+#define OCR2A		IO_ADDR(0xB3)
+#define OCR2B		IO_ADDR(0xB4)
 #define ASSR		IO_ADDR(0xB6)
 #define TIMSK2		IO_ADDR(0x70)
-#define TOI2		0
+#define TOIE2		0
 #define OCIE2A		1
 #define OCIE2B		2
 

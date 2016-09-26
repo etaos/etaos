@@ -63,6 +63,7 @@ extern struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 				void (*handle)(struct hrtimer *, void*),
 				void *arg, unsigned long flags);
 extern irqreturn_t hrtimer_tick(struct irq_data *data, void *arg);
+extern void hrtimer_init(int irq, struct clocksource *src);
 CDECL_END
 
 #endif

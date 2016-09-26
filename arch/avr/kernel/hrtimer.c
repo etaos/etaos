@@ -26,7 +26,6 @@
 #include <asm/time.h>
 #include <asm/irq.h>
 #include <asm/io.h>
-#include <asm/cpu.h>
 
 #define AVR_HRTIMER_FREQ 2000
 
@@ -41,6 +40,7 @@ static void __used avr_hrtimer_init(void)
 	hrtimer_source_init(avr_hrtimer_src.base.name, &avr_hrtimer_src,
 			NULL, NULL, AVR_HRTIMER_FREQ);
 	sysctl(SYS_SET_HR_CLK, &avr_hrtimer_src.base);
+	avr_start_hrclock(TIMER2_OVERFLOW_VECTOR_NUM, &avr_hrtimer_src.base);
 }
 
 subsys_init(avr_hrtimer_init);

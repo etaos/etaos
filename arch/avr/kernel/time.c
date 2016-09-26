@@ -31,7 +31,6 @@
 #include <asm/time.h>
 #include <asm/irq.h>
 #include <asm/io.h>
-#include <asm/cpu.h>
 
 /**
  * @def AVR_SYSCLK_FRQ

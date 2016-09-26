@@ -130,3 +130,8 @@ irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
 	return IRQ_HANDLED;
 }
 
+void hrtimer_init(int irq, struct clocksource *src)
+{
+	irq_request(irq, &hrtimer_tick, IRQ_RISING_MASK, src);
+}
+
