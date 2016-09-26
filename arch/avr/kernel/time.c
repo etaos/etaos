@@ -23,6 +23,8 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/bitops.h>
+#include <etaos/tick.h>
 #include <etaos/error.h>
 #include <etaos/time.h>
 #include <etaos/delay.h>
@@ -60,6 +62,26 @@ struct clocksource *avr_get_sys_clk(void)
 static int avr_sysclk_enable(struct clocksource *cs)
 {
 	return -EOK;
+}
+
+/**
+ * @brief Start the AVR system clock.
+ * @param irq IRQ vector number.
+ * @param src Clocksource structure for the AVR sysclk.
+ */
+static void avr_start_sysclk(int irq, struct clocksource *src)
+{
+	systick_setup(irq, src);
+#if F_CPU == 16000000
+	OCR0A = 250;
+#elif F_CPU == 8000000
+	OCRA0 = 125;
+#else
+#error Unsupported CPU frequency for timer IRQ
+#endif
+	TIMSK0 = TOIE0;
+	TCCR0A = WGM00 | WGM01;
+	TCCR0B = WGM02 | CS00 | CS01;
 }
 
 /**

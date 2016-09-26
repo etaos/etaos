@@ -23,6 +23,4 @@
 
 CDECL
 extern struct clocksource *avr_get_sys_clk(void);
-extern void avr_start_sysclk(int irq, struct clocksource *src);
-extern void avr_start_hrclock(int irq, struct clocksource *src);
 #endif

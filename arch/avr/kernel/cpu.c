@@ -53,39 +53,5 @@ struct irq_chip *arch_get_irq_chip(void)
 	return &avr_irq_chip;
 }
 
-/**
- * @brief Start the AVR system clock.
- * @param irq IRQ vector number.
- * @param src Clocksource structure for the AVR sysclk.
- */
-void avr_start_sysclk(int irq, struct clocksource *src)
-{
-	systick_setup(irq, src);
-#if F_CPU == 16000000
-	OCR0A = 250;
-#elif F_CPU == 8000000
-	OCRA0 = 125;
-#else
-#error Unsupported CPU frequency for timer IRQ
-#endif
-	TIMSK0 = TOIE0;
-	TCCR0A = WGM00 | WGM01;
-	TCCR0B = WGM02 | CS00 | CS01;
-}
-
-void avr_start_hrclock(int irq, struct clocksource *src)
-{
-	hrtimer_init(irq, src);
-#if F_CPU == 16000000
-	OCR2A = 250;
-#elif F_CPU == 8000000
-	OCR20 = 125;
-#else
-#error Unsupported CPU frequency for HR clock
-#endif
-	TIMSK2 = BIT(TOIE2);
-	TCCR2A = BIT(WGM20) | BIT(WGM21);
-	TCCR2B = BIT(WGM22) | BIT(CS20) | BIT(CS21);
-}
 /* @} */
 
