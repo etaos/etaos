@@ -22,7 +22,7 @@
 #include <etaos/sched.h>
 #include <etaos/mem.h>
 
-#include <asm/time.h>
+#include <asm/timer.h>
 #include <asm/sched.h>
 #include <asm/io.h>
 

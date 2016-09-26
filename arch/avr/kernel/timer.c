@@ -30,7 +30,7 @@
 #include <etaos/delay.h>
 #include <etaos/init.h>
 
-#include <asm/time.h>
+#include <asm/timer.h>
 #include <asm/irq.h>
 #include <asm/io.h>
 

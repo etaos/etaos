@@ -29,7 +29,7 @@
 #include <etaos/init.h>
 
 #include <asm/sched.h>
-#include <asm/time.h>
+#include <asm/timer.h>
 #include <asm/io.h>
 #include <asm/simulavr.h>
 #include <asm/usart.h>
