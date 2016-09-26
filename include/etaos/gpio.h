@@ -124,6 +124,9 @@ extern int raw_gpio_pin_write(struct gpio_pin *pin, int val);
 extern int raw_gpio_read_pin(struct gpio_pin *pin);
 extern int gpio_get_direction(struct gpio_pin *pin);
 extern int gpio_pin_release(struct gpio_pin *pin);
+extern int __raw_gpio_direction_input(struct gpio_pin *pin);
+extern int __raw_gpio_direction_output(struct gpio_pin *pin, int value);
+extern int __raw_gpio_pin_write(struct gpio_pin *pin, int val);
 
 /**
  * @brief Configure a pin as open drain.

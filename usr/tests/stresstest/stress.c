@@ -142,7 +142,7 @@ static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
 {
 	static bool value = true;
 
-	raw_gpio_pin_write(led_pin, value);
+	__raw_gpio_pin_write(led_pin, value);
 	value = !value;
 }
 
