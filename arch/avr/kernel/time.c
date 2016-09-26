@@ -24,7 +24,8 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
-#include <etaos/time.h>
+#include <etaos/timer.h>
+#include <etaos/tick.h>
 #include <etaos/delay.h>
 #include <etaos/init.h>
 
@@ -117,6 +118,57 @@ void arch_delay_us(double __us)
 	delay_loop(__ticks);
 }
 #endif
+
+/**
+ * @brief Start the AVR system clock.
+ * @param irq IRQ vector number.
+ * @param src Clocksource structure for the AVR sysclk.
+ */
+void avr_start_sysclk(int irq, struct clocksource *src)
+{
+	systick_setup(irq, src);
+#if F_CPU == 16000000
+	OCR0A = 250;
+#elif F_CPU == 8000000
+	OCRA0 = 125;
+#else
+#error Unsupported CPU frequency for timer IRQ
+#endif
+	TIMSK0 = TOIE0;
+	TCCR0A = WGM00 | WGM01;
+	TCCR0B = WGM02 | CS00 | CS01;
+}
+
+extern void preempt_schedule(void);
+SIGNAL(TIMER0_OVERFLOW_VECTOR)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+
+#ifdef CONFIG_IRQ_DEBUG
+	test_sys_tick++;
+
+	if((test_sys_tick % 5000) == 0)
+		chip->chip_handle(EXT_IRQ0_NUM);
+#endif
+
+	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
+
+#ifdef CONFIG_PREEMPT
+	__asm__ __volatile__(
+			"sei"	"\n\t"
+			:
+			:
+			: "memory"
+			);
+	preempt_schedule();
+	__asm__ __volatile__(
+			"cli"	"\n\t"
+			:
+			:
+			: "memory"
+			);
+#endif
+}
 
 subsys_init(avr_timer_init);
 

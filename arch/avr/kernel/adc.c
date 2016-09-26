@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR CPU
- *  Copyright (C) 2014, 2015   Michel Megens <dev@bietje.net>
+ *  ETA/OS - AVR ADC support
+ *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,41 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @addtogroup atmega
- */
-/* @{ */
-
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
-#include <etaos/list.h>
-#include <etaos/tick.h>
 
 #include <asm/io.h>
-#include <asm/cpu.h>
+#include <asm/irq.h>
 
-static struct irq_chip avr_irq_chip = {
-	.name = "avr_irq_chip",
-	.irqs = STATIC_INIT_LIST_HEAD(avr_irq_chip.irqs),
-	.chip_handle = &irq_handle,
-	.sleep = NULL,
-	.resume = NULL,
-};
-
-int cpu_get_id(void)
+SIGNAL(ADC_COMPLETED_VECTOR)
 {
-	return 0;
+	struct irq_chip *chip = arch_get_irq_chip();
+	chip->chip_handle(ADC_COMPLETED_NUM);
 }
-
-/**
- * @brief Get the AVR IRQ chip.
- * @return ATmega AVR IRQ chip.
- */
-struct irq_chip *arch_get_irq_chip(void)
-{
-	return &avr_irq_chip;
-}
-
-/* @} */
 
