@@ -160,6 +160,11 @@ void avr_start_sysclk(int irq, struct clocksource *src)
 	TCCR0B = WGM02 | CS00 | CS01;
 }
 
+#ifdef CONFIG_IRQ_DEBUG
+extern unsigned long test_sys_tick;
+unsigned long test_sys_tick = 0;
+#endif
+
 extern void preempt_schedule(void);
 SIGNAL(TIMER0_OVERFLOW_VECTOR)
 {
@@ -173,22 +178,6 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 #endif
 
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
-
-#ifdef CONFIG_PREEMPT
-	__asm__ __volatile__(
-			"sei"	"\n\t"
-			:
-			:
-			: "memory"
-			);
-	preempt_schedule();
-	__asm__ __volatile__(
-			"cli"	"\n\t"
-			:
-			:
-			: "memory"
-			);
-#endif
 }
 
 subsys_init(avr_timer_init);

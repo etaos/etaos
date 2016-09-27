@@ -80,8 +80,3 @@ void cpu_request_irq(struct irq_data *data)
 	}
 }
 
-#ifdef CONFIG_IRQ_DEBUG
-extern unsigned long test_sys_tick;
-unsigned long test_sys_tick = 0;
-#endif
-
