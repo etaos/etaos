@@ -27,6 +27,7 @@
 #include <etaos/irq.h>
 #include <etaos/error.h>
 #include <etaos/bitops.h>
+#include <etaos/cpu.h>
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 
@@ -156,6 +157,15 @@ int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 
 	set_bit(IRQ_ENABLE_FLAG, &data->flags);
 	return err;
+}
+
+bool in_irq_context(void)
+{
+	unsigned long cpu_flags;
+
+	cpu_flags = 0UL;
+	cpu_get_state(&cpu_flags);
+	return test_bit(CPU_IRQ_EXEC_FLAG, &cpu_flags);
 }
 
 /**

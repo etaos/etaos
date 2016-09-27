@@ -1004,8 +1004,12 @@ static inline bool need_resched()
 {
 	struct thread *curr = current_thread();
 
+#ifdef CONFIG_PREEMPT
 	return (test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags) ||
 		test_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags));
+#else
+	return test_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+#endif
 }
 
 /**
@@ -1029,10 +1033,13 @@ void __hot schedule(void)
 }
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Reschedule the current run queue with preemption in mind.
+ * @note Applications generally shouldn't call this function.
+ * @see schedule __schedule
+ */
 void __hot preempt_schedule(void)
 {
-	int cpu;
-
 	/* we don't want to preempt the current process if either
 	 * a) the interrupts are disabled or
 	 * b) the preemption counter != 0
@@ -1040,11 +1047,7 @@ void __hot preempt_schedule(void)
 	if(likely(!preemptible()))
 		return;
 
-	do {
-		cpu = cpu_get_id();
-		__schedule(cpu);
-	} while(need_resched());
-
+	schedule();
 	return;
 }
 #endif

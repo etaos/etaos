@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR time
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - AVR I2C support
+ *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,10 +15,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/irq.h>
 
-#ifndef __AVR_TIME_H__
-#define __AVR_TIME_H__
+#include <asm/io.h>
+#include <asm/irq.h>
 
-struct clocksource *avr_get_sys_clk(void);
+SIGNAL(TWI_STC_VECTOR)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+	chip->chip_handle(TWI_STC_VECTOR_NUM);
+}
 
-#endif

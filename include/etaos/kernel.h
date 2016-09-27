@@ -109,6 +109,7 @@ typedef enum sys_ctl {
 	SYS_SET_STDIN,
 
 	SYS_SET_SYSCLK,
+	SYS_SET_HR_CLK,
 
 } sys_ctl_t;
 

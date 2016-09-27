@@ -146,7 +146,6 @@ int gpio_direction_input(struct gpio_pin *pin)
 {
 	struct gpio_chip *chip;
 	unsigned long flags;
-	int err;
 
 	chip = pin->chip;
 	spin_lock_irqsave(&chip->lock, flags);
@@ -156,7 +155,21 @@ int gpio_direction_input(struct gpio_pin *pin)
 	}
 	spin_unlock_irqrestore(&chip->lock, flags);
 
-	err = chip->direction_input(chip, pin->nr);
+	return __raw_gpio_direction_input(pin);
+}
+
+/**
+ * @brief Configure a pin as input.
+ * @param pin Pin to configure as input.
+ * @note Does not do any pin allocation checks.
+ * @return An error code.
+ */
+int __raw_gpio_direction_input(struct gpio_pin *pin)
+{
+	int err;
+	struct gpio_chip *chip = pin->chip;
+
+	err = chip->direction_input(pin->chip, pin->nr);
 	if(!err)
 		clear_bit(GPIO_IS_OUTPUT, &pin->flags);
 
@@ -187,7 +200,6 @@ int raw_gpio_direction_ouput(struct gpio_pin *pin, int value)
 {
 	struct gpio_chip *chip;
 	unsigned long flags;
-	int err;
 
 	if(value && test_bit(GPIO_OPEN_DRAIN, &pin->flags))
 		return gpio_direction_input(pin);
@@ -203,7 +215,23 @@ int raw_gpio_direction_ouput(struct gpio_pin *pin, int value)
 	}
 	spin_unlock_irqrestore(&chip->lock, flags);
 
-	err = chip->direction_output(chip, value, pin->nr);
+	return __raw_gpio_direction_output(pin, value);
+
+}
+
+/**
+ * @brief Set a pin to OUTPUT.
+ * @param pin Pin to configure as output.
+ * @param value Value to write to the pin.
+ * @note Does not do any pin allocation checks.
+ * @return Error code. Zero on success.
+ */
+int __raw_gpio_direction_output(struct gpio_pin *pin, int value)
+{
+	int err;
+	struct gpio_chip *chip = pin->chip;
+
+	err = chip->direction_output(pin->chip, value, pin->nr);
 	if(!err)
 		set_bit(GPIO_IS_OUTPUT, &pin->flags);
 
@@ -229,6 +257,21 @@ int raw_gpio_pin_write(struct gpio_pin *pin, int val)
 		return -EINVAL;
 	}
 	spin_unlock_irqrestore(&chip->lock, flags);
+
+	return __raw_gpio_pin_write(pin, val);
+}
+
+/**
+ * @brief Write a boolean value to a GPIO pin.
+ * @param pin Pin to write to.
+ * @param val Value to write.
+ * @return Error code. Zero on success.
+ * @note Does not do any pin allocation checks.
+ * @note This function doesn't take GPIO_ACTIVE_LOW into account.
+ */
+int __raw_gpio_pin_write(struct gpio_pin *pin, int val)
+{
+	struct gpio_chip *chip = pin->chip;
 
 	if(test_bit(GPIO_IS_OUTPUT, &pin->flags))
 		return chip->set(chip, val, pin->nr);

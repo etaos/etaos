@@ -26,6 +26,13 @@ config DST_BIAS
 	  substracted from the standard time when adjusting for daylight
 	  savings time.
 
+config HRTIMER
+	bool "High resolution timers"
+	default n
+	help
+	  Say 'y' here if your application needs high resolution timers
+	  (which are generally ran from interrupt context).
+
 config TIMER_DBG
 	bool "Timer debugging"
 	default n

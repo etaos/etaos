@@ -123,7 +123,21 @@ static inline int preempt_count(void)
 	return *preempt_counter_ptr();
 }
 
-#define preemptible() ((preempt_count() == 0) && !irqs_disabled())
+extern bool in_irq_context();
+
+/**
+ * @brief Check if a thread is preemptible.
+ * @retval 0 If the thread is not preemptible.
+ * @retval 1 If the thread is preemptible.
+ */
+static inline int preemptible()
+{
+	if((preempt_count() == 0) && (!irqs_disabled() || in_irq_context()))
+		return true;
+
+	return false;
+}
+extern void preempt_schedule(void);
 
 #else /* !CONFIG_PREEMPT */
 
@@ -138,6 +152,7 @@ static inline int preempt_count(void)
 #define preempt_enable_no_resched()
 #define preempt_disable()
 #define preempt_test() 1
+#define preempt_schedule()
 #endif /* CONFIG_PREEMPT */
 
 CDECL_END

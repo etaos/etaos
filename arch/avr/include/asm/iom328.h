@@ -34,6 +34,7 @@
 #define TWI_STC_VECTOR_NUM	   24
 #define USART_RX_STC_NUM	   18
 #define ADC_COMPLETED_NUM	   21
+#define TIMER2_OVERFLOW_VECTOR_NUM  9
 
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(16)
@@ -41,6 +42,7 @@
 #define SPI_STC_VECTOR irq_vector(17)
 #define TWI_STC_VECTOR irq_vector(24)
 #define ADC_COMPLETED_VECTOR irq_vector(21)
+#define TIMER2_OVERFLOW_VECTOR irq_vector(9)
 
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
@@ -109,6 +111,39 @@
 #define TOV   0x1
 #define OCF0A 0x2
 #define OCF0B 0x4
+
+/* TIMER2 */
+#define TCCR2A		IO_ADDR(0xB0)
+#define WGM20		0
+#define WGM21		1
+#define COM2B0		4
+#define COM2B1		5
+#define COM2A0		6
+#define COM2A1		7
+
+#define TCCR2B		IO_ADDR(0xB1)
+#define CS20		0
+#define CS21		1
+#define CS22		2
+#define WGM22		3
+#define FOC2B		6
+#define FOC2A		7
+
+#define TCNT2		IO_ADDR(0xB2)
+#define OCR2A		IO_ADDR(0xB3)
+#define OCR2B		IO_ADDR(0xB4)
+#define ASSR		IO_ADDR(0xB6)
+#define TIMSK2		IO_ADDR(0x70)
+#define TOIE2		0
+#define OCIE2A		1
+#define OCIE2B		2
+
+#define TIFR2		IO_ADDR(0x37)
+#define TOV2		0
+#define OCF2A		1
+#define OCF2B		2
+
+#define GTCCR		IO_ADDR(0x43)
 
 /* GPIO defs */
 #define PINB MEM_IO8(0x23)

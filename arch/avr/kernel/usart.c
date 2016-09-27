@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR CPU
- *  Copyright (C) 2014   Michel Megens <dev@bietje.net>
+ *  ETA/OS - AVR USART support
+ *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AVR_CPU_H__
-#define __AVR_CPU_H__
-
 #include <etaos/kernel.h>
-#include <etaos/time.h>
+#include <etaos/types.h>
+#include <etaos/irq.h>
 
-CDECL
-extern void avr_start_sysclk(int irq, struct clocksource *src);
-CDECL_END
-#endif
+#include <asm/io.h>
+#include <asm/irq.h>
+
+SIGNAL(USART_RX_STC_VECTOR)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+	chip->chip_handle(USART_RX_STC_NUM);
+}
 

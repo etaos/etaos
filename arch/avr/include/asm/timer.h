@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR CPU
- *  Copyright (C) 2014, 2015   Michel Megens <dev@bietje.net>
+ *  ETA/OS - AVR time
+ *  Copyright (C) 2014   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,41 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @addtogroup atmega
- */
-/* @{ */
+#ifndef __AVR_TIME_H__
+#define __AVR_TIME_H__
 
 #include <etaos/kernel.h>
-#include <etaos/types.h>
-#include <etaos/bitops.h>
-#include <etaos/irq.h>
-#include <etaos/list.h>
-#include <etaos/tick.h>
-#include <etaos/hrtimer.h>
 
-#include <asm/io.h>
-
-static struct irq_chip avr_irq_chip = {
-	.name = "avr_irq_chip",
-	.irqs = STATIC_INIT_LIST_HEAD(avr_irq_chip.irqs),
-	.chip_handle = &irq_handle,
-	.sleep = NULL,
-	.resume = NULL,
-};
-
-int cpu_get_id(void)
-{
-	return 0;
-}
-
-/**
- * @brief Get the AVR IRQ chip.
- * @return ATmega AVR IRQ chip.
- */
-struct irq_chip *arch_get_irq_chip(void)
-{
-	return &avr_irq_chip;
-}
-/* @} */
-
+CDECL
+extern struct clocksource *avr_get_sys_clk(void);
+#endif
