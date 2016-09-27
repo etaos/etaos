@@ -112,6 +112,7 @@ static inline bool irqs_disabled()
 	raw_irq_enabled_flags(&flags);
 	return flags == 0UL;
 }
+
 CDECL_END
 
 /**
@@ -216,6 +217,7 @@ struct irq_chip {
 
 CDECL
 
+extern bool in_irq_context(void);
 extern int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq);
 extern int irq_chip_init(struct irq_chip *chip, const char *name);
 extern int irq_request(int irq, irq_vector_t vector, unsigned long flags,

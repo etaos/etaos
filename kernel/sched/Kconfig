@@ -130,6 +130,7 @@ config TIME_SLICE
 
 config IDLE_SLEEP
 	bool "Idle thread power saving"
+	depends on ARCH_POWER_SAVE
 	default y
 	help
 	  Say 'y' here to enter power saving mode when the idle thread

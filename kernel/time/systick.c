@@ -26,6 +26,7 @@
 #include <etaos/types.h>
 #include <etaos/atomic.h>
 #include <etaos/time.h>
+#include <etaos/preempt.h>
 #include <etaos/irq.h>
 #include <etaos/tick.h>
 #include <etaos/stdio.h>
@@ -43,6 +44,7 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 	struct clocksource *cs = (struct clocksource*)data;
 
 	timer_source_inc(cs);
+	preempt_schedule();
 	return IRQ_HANDLED;
 }
 
