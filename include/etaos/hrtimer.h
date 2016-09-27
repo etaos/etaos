@@ -62,11 +62,13 @@ struct hrtimer {
 
 extern struct clocksource *hr_sys_clk;
 
+#define HRTIMER_ONESHOT		0 //!< Run-once flag bit.
+
 /**
  * @name High resolution timer flags
  * @{
  */
-#define HRTIMER_ONESHOT		0 //!< Run-once flag.
+#define HRTIMER_ONESHOT_FLAG   BIT(HRTIMER_ONESHOT) //!< Run-once flag.
 /** @} */
 
 CDECL
