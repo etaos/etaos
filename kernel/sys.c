@@ -62,12 +62,13 @@ int sysctl(sys_ctl_t ctl, ...)
 		sys_clk = stream;
 		err = -EOK;
 		break;
-
+#ifdef CONFIG_HRTIMER
 	case SYS_SET_HR_CLK:
 		stream = (void*)va_arg(va, size_t);
 		hr_sys_clk = stream;
 		err = -EOK;
 		break;
+#endif
 
 	default:
 		err = -EINVAL;
