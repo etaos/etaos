@@ -46,6 +46,7 @@
 #include <etaos/bitops.h>
 #include <etaos/timer.h>
 #include <etaos/spinlock.h>
+#include <etaos/panic.h>
 
 #include <asm/io.h>
 #include <asm/sched.h>
@@ -1033,6 +1034,20 @@ void __hot schedule(void)
 }
 
 #ifdef CONFIG_PREEMPT
+void __hot preempt_schedule_irq(void)
+{
+	int cpu;
+
+	if(preempt_count())
+		return;
+
+	do {
+		cpu = cpu_get_id();
+		__schedule(cpu);
+	} while(need_resched());
+	return;
+}
+
 /**
  * @brief Reschedule the current run queue with preemption in mind.
  * @note Applications generally shouldn't call this function.

@@ -44,7 +44,7 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 	struct clocksource *cs = (struct clocksource*)data;
 
 	timer_source_inc(cs);
-	preempt_schedule();
+	preempt_schedule_irq();
 	return IRQ_HANDLED;
 }
 
