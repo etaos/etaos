@@ -1041,6 +1041,11 @@ void __hot schedule(void)
 }
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Preempt a thread from IRQ context.
+ * @note This function will panic if the CPU is not in IRQ context.
+ * @see __schedule preempt_schedule
+ */
 void __hot preempt_schedule_irq(void)
 {
 	int cpu;
@@ -1062,6 +1067,9 @@ void __hot preempt_schedule_irq(void)
  * @brief Reschedule the current run queue with preemption in mind.
  * @note Applications generally shouldn't call this function.
  * @see schedule __schedule
+ *
+ * This function is the preemption entry point for in-application preemption
+ * (such as preemption from preempt_enable).
  */
 void __hot preempt_schedule(void)
 {
