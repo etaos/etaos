@@ -36,6 +36,7 @@ typedef enum {
 CDECL
 extern void cpu_get_state(unsigned long *flags);
 extern void cpu_notify(cpu_state_t state);
+extern void cpu_set_state(unsigned long *flags);
 CDECL_END
 
 #endif

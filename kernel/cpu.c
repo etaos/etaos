@@ -63,3 +63,13 @@ void cpu_get_state(unsigned long *flags)
 	irq_restore(&_flags);
 }
 
+void cpu_set_state(unsigned long *flags)
+{
+	unsigned long _flags;
+	int cpu = cpu_get_id();
+
+	irq_save_and_disable(&_flags);
+	cpu_flags[cpu] = *flags;
+	irq_restore(&_flags);
+}
+
