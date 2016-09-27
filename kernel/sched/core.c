@@ -1053,8 +1053,10 @@ void __hot preempt_schedule_irq(void)
 	if(preempt_count())
 		return;
 
-	if(!in_irq_context())
-		panic("preempt_schedule_irq() called outside of IRQ context\n");
+	if(!in_irq_context()) {
+		panic_P("preempt_schedule_irq() called outside "
+				"of IRQ context\n");
+	}
 
 	do {
 		cpu = cpu_get_id();
