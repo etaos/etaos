@@ -97,6 +97,10 @@ extern double log10(double __x);
  */
 extern double exp(double __x);
 
+#define to_ns(__s) (__s * 1E9) //!< Convert seconds to nanoseconds
+#define to_us(__s) (__s * 1E6) //!< Convert seconds to microseconds
+#define to_ms(__s) (__s * 1E3) //!< Convert seconds to miliseconds
+
 /** @} */
 
 #endif
