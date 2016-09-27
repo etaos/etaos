@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup kernel
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/compiler.h>
 #include <etaos/types.h>
@@ -27,6 +32,10 @@
 
 static FOR_EACH_CPU(cpu_flags, unsigned long);
 
+/**
+ * @brief Notify the CPU of a specific event.
+ * @param state CPU state to notify the kernel about.
+ */
 void cpu_notify(cpu_state_t state)
 {
 	int cpu = cpu_get_id();
@@ -53,6 +62,10 @@ void cpu_notify(cpu_state_t state)
 	}
 }
 
+/**
+ * @brief Get the current CPU state.
+ * @param flags Parameter to store the CPU flags in.
+ */
 void cpu_get_state(unsigned long *flags)
 {
 	unsigned long _flags;
@@ -63,6 +76,12 @@ void cpu_get_state(unsigned long *flags)
 	irq_restore(&_flags);
 }
 
+/**
+ * @brief Set a specific CPU state.
+ * @param flags New CPU flags to set for the current CPU.
+ * @note Usually used in conjunction with cpu_get_state.
+ * @see cpu_get_state.
+ */
 void cpu_set_state(unsigned long *flags)
 {
 	unsigned long _flags;
@@ -72,4 +91,6 @@ void cpu_set_state(unsigned long *flags)
 	cpu_flags[cpu] = *flags;
 	irq_restore(&_flags);
 }
+
+/** @} */
 
