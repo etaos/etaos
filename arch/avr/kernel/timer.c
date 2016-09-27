@@ -140,31 +140,6 @@ void arch_delay_us(double __us)
 }
 #endif
 
-/**
- * @brief Start the AVR system clock.
- * @param irq IRQ vector number.
- * @param src Clocksource structure for the AVR sysclk.
- */
-void avr_start_sysclk(int irq, struct clocksource *src)
-{
-	systick_setup(irq, src);
-#if F_CPU == 16000000
-	OCR0A = 250;
-#elif F_CPU == 8000000
-	OCRA0 = 125;
-#else
-#error Unsupported CPU frequency for timer IRQ
-#endif
-	TIMSK0 = TOIE0;
-	TCCR0A = WGM00 | WGM01;
-	TCCR0B = WGM02 | CS00 | CS01;
-}
-
-#ifdef CONFIG_IRQ_DEBUG
-extern unsigned long test_sys_tick;
-unsigned long test_sys_tick = 0;
-#endif
-
 extern void preempt_schedule(void);
 SIGNAL(TIMER0_OVERFLOW_VECTOR)
 {
