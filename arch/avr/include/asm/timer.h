@@ -19,6 +19,8 @@
 #ifndef __AVR_TIME_H__
 #define __AVR_TIME_H__
 
-struct clocksource *avr_get_sys_clk(void);
+#include <etaos/kernel.h>
 
+CDECL
+extern struct clocksource *avr_get_sys_clk(void);
 #endif

@@ -23,12 +23,13 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/bitops.h>
 #include <etaos/irq.h>
 #include <etaos/list.h>
 #include <etaos/tick.h>
+#include <etaos/hrtimer.h>
 
 #include <asm/io.h>
-#include <asm/cpu.h>
 
 static struct irq_chip avr_irq_chip = {
 	.name = "avr_irq_chip",
@@ -52,24 +53,5 @@ struct irq_chip *arch_get_irq_chip(void)
 	return &avr_irq_chip;
 }
 
-/**
- * @brief Start the AVR system clock.
- * @param irq IRQ vector number.
- * @param src Clocksource structure for the AVR sysclk.
- */
-void avr_start_sysclk(int irq, struct clocksource *src)
-{
-	systick_setup(irq, src);
-#if F_CPU == 16000000
-	OCR0A = 250;
-#elif F_CPU == 8000000
-	OCRA0 = 125;
-#else
-#error Unsupported CPU frequency for timer IRQ
-#endif
-	TIMSK0 = TOIE0;
-	TCCR0A = WGM00 | WGM01;
-	TCCR0B = WGM02 | CS00 | CS01;
-}
 /* @} */
 
