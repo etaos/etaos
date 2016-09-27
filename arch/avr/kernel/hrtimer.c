@@ -63,7 +63,6 @@ SIGNAL(TIMER2_OVERFLOW_VECTOR)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 	chip->chip_handle(TIMER2_OVERFLOW_VECTOR_NUM);
-
 }
 
 subsys_init(avr_hrtimer_init);

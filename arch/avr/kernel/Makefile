@@ -1,4 +1,8 @@
 obj-n += dummy.o
+obj-$(CONFIG_ATMEGA_ANALOG:m=y) += adc.o
+obj-$(CONFIG_I2C_ATMEGA:m=y) += i2c.o
+obj-$(CONFIG_ATMEGA_SPI:m=y) += spi.o
+obj-$(CONFIG_ATMEGA_USART:m=y) += usart.o
 obj-$(CONFIG_SIMUL_AVR) += simulavr.o
 obj-$(CONFIG_IRQ_SUPPORT) += irq.o
 obj-$(CONFIG_TIMER) += timer.o
