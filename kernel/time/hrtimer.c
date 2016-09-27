@@ -64,7 +64,7 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 	hrsrc = container_of(src, struct hrtimer_source, base);
 
 	if(!timer)
-		panic("No memory available\n");
+		panic_P("No memory available\n");
 
 	resolution = (1.0f/src->freq) * 1E9;
 	timer->ticks = ns / resolution;
