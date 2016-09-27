@@ -26,8 +26,7 @@
 #include <etaos/bitops.h>
 #include <etaos/tick.h>
 #include <etaos/error.h>
-#include <etaos/timer.h>
-#include <etaos/tick.h>
+#include <etaos/time.h>
 #include <etaos/delay.h>
 #include <etaos/init.h>
 
@@ -139,21 +138,6 @@ void arch_delay_us(double __us)
 	delay_loop(__ticks);
 }
 #endif
-
-extern void preempt_schedule(void);
-SIGNAL(TIMER0_OVERFLOW_VECTOR)
-{
-	struct irq_chip *chip = arch_get_irq_chip();
-
-#ifdef CONFIG_IRQ_DEBUG
-	test_sys_tick++;
-
-	if((test_sys_tick % 5000) == 0)
-		chip->chip_handle(EXT_IRQ0_NUM);
-#endif
-
-	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
-}
 
 subsys_init(avr_timer_init);
 
