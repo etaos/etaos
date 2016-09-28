@@ -16,40 +16,70 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file include/etaos/hrtimer.h High resolution timers
+ */
+
 #ifndef __HR_TIMERS__
 #define __HR_TIMERS__
+
+/**
+ * @addtogroup hrtimer
+ * @{
+ */
 
 #include <etaos/kernel.h>
 #include <etaos/timer.h>
 #include <etaos/clocksource.h>
 
+/**
+ * @brief HR timer clock source.
+ */
 struct hrtimer_source {
 	struct clocksource base; //!< Base clocksource.
 	struct hrtimer *timers; //!< Linked list head.
 };
 
+/**
+ * @brief High resolution timer structure.
+ */
 struct hrtimer {
 	struct hrtimer *next, //!< List next pointer.
 		       *prev; //!< List prev pointer.
 	struct hrtimer_source *base; //!< Timer base.
 
+	/**
+	 * @brief Handler for the timer.
+	 * @param timer Reference to the timer.
+	 * @param arg Handler argument.
+	 */
 	void (*handle)(struct hrtimer *timer, void *arg);
-	void *handle_argument;
+	void *handle_argument; //!< Argument passed to \p handle.
 
-	unsigned long ticks,
-		      timer_once;
+	unsigned long ticks, //!< Number of ticks per interval.
+		      timer_once; //!< Set if the timer is repeating.
 };
 
 extern struct clocksource *hr_sys_clk;
+
+#define HRTIMER_ONESHOT		0 //!< Run-once flag bit.
 
 /**
  * @name High resolution timer flags
  * @{
  */
-#define HRTIMER_ONESHOT		0 //!< Run-once flag.
+#define HRTIMER_ONESHOT_FLAG   BIT(HRTIMER_ONESHOT) //!< Run-once flag.
 /** @} */
 
 CDECL
+/**
+ * @brief Initialise a HR timer clocksource.
+ * @param name Name for the clocksource.
+ * @param src HR timer source to initialise.
+ * @param enable Function to enable the source.
+ * @param disable Function to disable to source.
+ * @param freq Frequency (IRQ interval) of the source.
+ */
 static inline void hrtimer_source_init(const char *name,
 				       struct hrtimer_source *src,
 				       int (*enable)(struct clocksource *),
@@ -59,6 +89,7 @@ static inline void hrtimer_source_init(const char *name,
 	src->timers = NULL;
 	clocksource_init(name, &src->base, freq, enable, disable);
 }
+
 extern struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 				void (*handle)(struct hrtimer *, void*),
 				void *arg, unsigned long flags);
@@ -66,4 +97,6 @@ extern irqreturn_t hrtimer_tick(struct irq_data *data, void *arg);
 extern void hrtimer_init(int irq, struct clocksource *src);
 CDECL_END
 
+/** @} */
 #endif
+

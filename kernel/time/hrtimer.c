@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup hrtimer
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/panic.h>
@@ -24,6 +29,9 @@
 #include <etaos/clocksource.h>
 #include <etaos/hrtimer.h>
 
+/**
+ * @brief The system high resolution clock source.
+ */
 struct clocksource *hr_sys_clk;
 
 static void hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer)
@@ -52,6 +60,15 @@ static void hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer
 	_raw_spin_unlock(&src->base.lock);
 }
 
+/**
+ * @brief Create a new high resolution timer.
+ * @param src Clock source to run the timer on.
+ * @param ns Interval in nanoseconds.
+ * @param handle Timer handler.
+ * @param arg Argument to \p handle.
+ * @param flags Timer flags.
+ * @return The created hrtimer.
+ */
 struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 				void (*handle)(struct hrtimer *, void*),
 				void *arg, unsigned long flags)
@@ -117,6 +134,11 @@ static void hrtimer_handle(struct hrtimer_source *cs)
 	}
 }
 
+/**
+ * @brief High resolution timer interrupt.
+ * @param data IRQ data.
+ * @param arg IRQ argument (clocksource).
+ */
 irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
 {
 	struct clocksource *src;
@@ -130,8 +152,15 @@ irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
 	return IRQ_HANDLED;
 }
 
+/**
+ * @brief Initialise the hrtimer core.
+ * @param irq HR timer IRQ number.
+ * @param src HR timer clock source.
+ */
 void hrtimer_init(int irq, struct clocksource *src)
 {
 	irq_request(irq, &hrtimer_tick, IRQ_RISING_MASK, src);
 }
+
+/** @} */
 
