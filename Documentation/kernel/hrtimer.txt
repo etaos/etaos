@@ -1,0 +1,12 @@
+/* ================ HR timer support ================ */
+
+/**
+ * @defgroup hrtimer High resolution timer management.
+ * @ingroup kernel
+ * @brief Asynchronous high resolution timer support.
+ *
+ * The timer management provides functions to start and stop asynchronous,
+ * high resolution/precision, timers. Please note that the timer handlers
+ * of these timers are ran in IRQ context (not in application context like
+ * the normal timers(!)).
+ */
