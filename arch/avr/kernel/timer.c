@@ -156,7 +156,6 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 #endif
 
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
-
 }
 
 subsys_init(avr_timer_init);

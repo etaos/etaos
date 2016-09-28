@@ -32,6 +32,8 @@ struct thread;
 CDECL
 
 extern void schedule(void);
+extern void preempt_schedule(void);
+extern void preempt_schedule_irq(void);
 extern bool preempt_should_resched(void);
 
 #ifdef CONFIG_PREEMPT
@@ -96,7 +98,7 @@ static inline int preempt_test(void)
 static inline void preempt_enable(void)
 {
 	if(preempt_dec_and_test())
-		schedule();
+		preempt_schedule();
 }
 
 /**
@@ -125,19 +127,7 @@ static inline int preempt_count(void)
 
 extern bool in_irq_context();
 
-/**
- * @brief Check if a thread is preemptible.
- * @retval 0 If the thread is not preemptible.
- * @retval 1 If the thread is preemptible.
- */
-static inline int preemptible()
-{
-	if((preempt_count() == 0) && (!irqs_disabled() || in_irq_context()))
-		return true;
-
-	return false;
-}
-extern void preempt_schedule(void);
+#define preemptible() (preempt_count() == 0 && !irqs_disabled())
 
 #else /* !CONFIG_PREEMPT */
 
@@ -153,6 +143,7 @@ extern void preempt_schedule(void);
 #define preempt_disable()
 #define preempt_test() 1
 #define preempt_schedule()
+#define preempt_schedule_irq()
 #endif /* CONFIG_PREEMPT */
 
 CDECL_END

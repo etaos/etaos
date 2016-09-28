@@ -140,6 +140,8 @@ struct thread {
 	int preemt_cnt; //!< Preempt enable counter.
 #endif
 
+	unsigned long cpu_state; //!< CPU flags for this thread.
+
 	bool on_rq; //!< Run queue enable.
 	struct rq *rq; //!< Run queue pointer.
 	unsigned long flags; //!< Thread flags

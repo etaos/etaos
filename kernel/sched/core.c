@@ -46,6 +46,7 @@
 #include <etaos/bitops.h>
 #include <etaos/timer.h>
 #include <etaos/spinlock.h>
+#include <etaos/panic.h>
 
 #include <asm/io.h>
 #include <asm/sched.h>
@@ -545,7 +546,11 @@ int rq_remove_thread(struct thread *tp)
 static void rq_update(struct rq *rq)
 {
 	struct sched_class *class;
+	unsigned long flags = 0UL;
+	struct thread *tp = rq->current;
 
+	flags = tp->cpu_state;
+	cpu_set_state(&flags);
 	class = rq->sched_class;
 	if(class->post_schedule)
 		class->post_schedule(rq);
@@ -703,6 +708,7 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 						struct thread *new)
 {
 	struct sched_class *class = rq->sched_class;
+	unsigned long flags = 0UL;
 
 	if(prev) {
 		if(test_bit(THREAD_RUNNING_FLAG, &prev->flags)) {
@@ -717,6 +723,8 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 
 	/* prev != new (this condition is ensured by __schedule) */
 	class->rm_thread(rq, new);
+	cpu_get_state(&flags);
+	prev->cpu_state = flags;
 	raw_spin_unlock_irq(&rq->lock);
 	cpu_switch_context(rq, prev, new);
 }
@@ -1034,9 +1042,36 @@ void __hot schedule(void)
 
 #ifdef CONFIG_PREEMPT
 /**
+ * @brief Preempt a thread from IRQ context.
+ * @note This function will panic if the CPU is not in IRQ context.
+ * @see __schedule preempt_schedule
+ */
+void __hot preempt_schedule_irq(void)
+{
+	int cpu;
+
+	if(preempt_count())
+		return;
+
+	if(!in_irq_context()) {
+		panic_P("preempt_schedule_irq() called outside "
+				"of IRQ context\n");
+	}
+
+	do {
+		cpu = cpu_get_id();
+		__schedule(cpu);
+	} while(need_resched());
+	return;
+}
+
+/**
  * @brief Reschedule the current run queue with preemption in mind.
  * @note Applications generally shouldn't call this function.
  * @see schedule __schedule
+ *
+ * This function is the preemption entry point for in-application preemption
+ * (such as preemption from preempt_enable).
  */
 void __hot preempt_schedule(void)
 {

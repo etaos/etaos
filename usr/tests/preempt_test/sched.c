@@ -20,7 +20,6 @@ THREAD(test_th_handle, arg)
 	while(true) {
 		if(*trigger) {
 			*trigger = false;
-			printf("test_thread\n");
 		}
 	}
 }
@@ -36,7 +35,7 @@ int main(void)
 	while(true) {
 		trigger = true;
 		printf("main_thread (%u)\n", trigger);
-		delay(500);
+		sleep(500);
 	}
 
 	return 0;

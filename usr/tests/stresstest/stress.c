@@ -154,7 +154,7 @@ int main(void)
 	time_t now;
 	float temperature;
 
-	printf("Application started\n");
+	printf_P(PSTR("Application started (m: %u)\n"), mm_heap_available());
 
 	ipm_queue_init(&ipm_q, 2);
 	ee_stress_write_byte(EE_BYTE_ADDR, 0xAC);
