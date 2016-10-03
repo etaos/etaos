@@ -40,8 +40,8 @@ static inline void clear_bit(unsigned nr, volatile void *flags)
 {
 	volatile unsigned char *p = ((volatile unsigned char*)flags) + 
 		(nr / BITS_PER_BYTE);
-	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	volatile unsigned char tmp;
+	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
+	register unsigned char tmp;
 
 	__asm__ __volatile__(
 			"ld %0, %a2"	"\n\t"
@@ -63,8 +63,8 @@ static inline void set_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((volatile unsigned char*)addr) + 
 		(nr / BITS_PER_BYTE);
-	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	volatile unsigned char tmp;
+	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
+	register unsigned char tmp;
 
 	__asm__ __volatile__(
 			"ld %0, %a2"	"\n\t"
@@ -86,8 +86,8 @@ static inline int test_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((unsigned char *)addr) + 
 		(nr / BITS_PER_BYTE);
-	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	volatile unsigned char tmp;
+	register char msk = 1UL << (nr % BITS_PER_BYTE);
+	register unsigned char tmp;
 
 	__asm__ __volatile__(
 			"ld %0, %a1"	"\n\t"
@@ -110,8 +110,8 @@ static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((unsigned char*)addr) + 
 		(nr / BITS_PER_BYTE);
-	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	volatile unsigned char tmp, old;
+	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
+	register unsigned char tmp, old;
 
 	__asm__ __volatile__(
 			"ld %0, %a3"	"\n\t"
@@ -137,8 +137,8 @@ static inline int test_and_set_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((unsigned char*)addr) + 
 		(nr / BITS_PER_BYTE);
-	unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	volatile unsigned char tmp, old;
+	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
+	register unsigned char tmp, old;
 
 	__asm__ __volatile__(
 			"ld %0, %a3"	"\n\t"
