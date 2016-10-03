@@ -64,7 +64,7 @@ int main(void)
 	if(!found && !found2)
 		printf("[OK] devices deleted succefully!\n");
 	else
-		printf("[ERR] devices not deltedted succesfully!\n");
+		printf("[ERR] devices not deleted succesfully!\n");
 
 #ifdef CONFIG_SIMUL_AVR
 	simul_avr_exit(1);

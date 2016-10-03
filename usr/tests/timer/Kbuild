@@ -1,4 +1,4 @@
-obj-y += mmtest.o
+obj-y += timer.o
 ETAOS_LIBS += -lusart-atmega -lusart -ldriver-core -lc
 ETAOS_LIB_DIR := usr/lib/etaos
 APP_TARGET := test-app.img

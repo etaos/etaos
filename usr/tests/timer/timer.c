@@ -10,12 +10,11 @@
 #include <etaos/mem.h>
 #include <etaos/list.h>
 #include <etaos/irq.h>
-#include <etaos/time.h>
-#include <etaos/evm.h>
+#include <etaos/timer.h>
+#include <etaos/clocksource.h>
+#include <etaos/tick.h>
 
 #include <asm/io.h>
-#include <asm/time.h>
-#include <asm/simulavr.h>
 
 static struct timer *tm1;
 static char *tm1_name = "tm1";
@@ -29,24 +28,24 @@ static void print_timer(struct timer *timer, void *data)
 
 static void tmtest_init_timers(void)
 {
-	struct clocksource *cs = avr_get_sys_clk();
+	struct clocksource *cs = sys_clk;
 
-	printf("Adding 3 timers:\n");
+	printf("Adding 1 timer: ");
 	tm1 = timer_create_timer(cs, 500, &print_timer, 
 			tm1_name, 0);
 	
 	if(tm1)
-		printf("[OK] Timer 1 added\n");
+		printf("[OK]\n");
 }
 
 int main(void)
 {
 	unsigned int diff;
 	struct clocksource *cs;
-	
-	printf("Application started!\n");
 
-	cs = avr_get_sys_clk();
+	printf("Application started! (%u)\n", mm_heap_available());
+
+	cs = sys_clk;
 	tmtest_init_timers();
 
 	diff = clocksource_update(cs);

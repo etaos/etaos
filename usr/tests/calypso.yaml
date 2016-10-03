@@ -1,0 +1,43 @@
+hardware: 
+  ard-mega: 
+    cpu: ATmega2560
+    name: "Arduino Mega"
+  ard-uno: 
+    cpu: ATmega328p
+    name: "Arduino Uno"
+
+unit-tests: 
+  stress-test: 
+    hardware: ard-mega
+    autorun: false
+    mode: manual
+    name: "Stress test"
+    path: usr/tests/stresstest
+    execute: clean all hex upload
+    config: config-atmega2560.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+  preempt-test:
+    autorun: true
+    hardware: ard-uno
+    mode: auto
+    name: "Preemption test"
+    path: usr/tests/preempt_test
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+  sched-test:
+    autorun: true
+    hardware: ard-uno
+    mode: auto
+    name: "Sched test"
+    path: usr/tests/schedtest
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+

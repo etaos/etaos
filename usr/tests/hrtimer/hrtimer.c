@@ -7,9 +7,8 @@
 #include <etaos/types.h>
 #include <etaos/stdio.h>
 #include <etaos/hrtimer.h>
-#include <etaos/thread.h>
-#include <etaos/sched.h>
 #include <etaos/mem.h>
+#include <etaos/bitops.h>
 
 #include <asm/pgm.h>
 #include <asm/io.h>
@@ -61,8 +60,6 @@ int main(void)
 	}
 
 	while(true) {
-		printf("Ola\n");
-		sleep(1000);
 	}
 
 	return 0;

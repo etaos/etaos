@@ -6,44 +6,41 @@
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/mem.h>
+#include <etaos/vfs.h>
 #include <etaos/thread.h>
-#include <etaos/eeprom.h>
-#include <etaos/delay.h>
 
-#include <etaos/eeprom/24c02.h>
+#define EEPROM_WRITE_ADDR 0x20
 
 int main(void)
 {
-	unsigned char readback;
 	int fd;
+	struct vfile *file;
+	unsigned char readback = 0;
+
+	printf("Application started! (M:%u)\n", mm_heap_available());
 
 	fd = open("24C02", _FDEV_SETUP_RW);
-
 	if(fd >= 0) {
-		printf("Writng to eeprom!\n");
-		ioctl(filep(fd), EEPROM_RESET_WR_IDX, NULL);
-		putc(0xAC, filep(fd));
-	}
-	close(fd);
-	
-	delay(200);
-	while(true) {
-		fd = open("24C02", _FDEV_SETUP_RW);
-		if(fd >= 0) {
-			ioctl(filep(fd), EEPROM_RESET_RD_IDX, NULL);
-			readback = getc(filep(fd));
-		}
-		else
-			readback = (unsigned char)-1;
+		file = filep(fd);
+		lseek(file, EEPROM_WRITE_ADDR, SEEK_SET);
+		putc(0xBA, file);
+		
+		/*
+		 * now get the byte back
+		 */
+		lseek(file, EEPROM_WRITE_ADDR, SEEK_SET);
+		readback = getc(file);
 		close(fd);
-
-		if(readback == 0xAC)
-			printf("[OK] readback: %u\n", readback);
-		else
-			printf("[ERR] readback: %u\n", readback);
-
-		delay(500);
 	}
+
+	if(readback == 0xBA)
+		printf("[OK] EEPROM test passed!\n");
+	else
+		printf("[ERROR] EEPROM test failed!\n");
+
+	while(true) {
+	}
+
 	return 0;
 }
 

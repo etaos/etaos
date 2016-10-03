@@ -29,5 +29,6 @@ hex: all
 	@$(OBJCOPY) -R .eeprom -O ihex test-app.img test-app.hex 
 
 upload:
-	@$(AVRDUDE) -q -V -p $(MCU) -c $(PROGRAMMER) -b $(BAUD) -P $(PORT) \
+	@$(AVRDUDE) -D -q -V -p $(MCU) -c $(PROGRAMMER) -b $(BAUD) -P $(PORT) \
 		-C /etc/avrdude.conf -U flash:w:test-app.hex:i
+

@@ -32,8 +32,9 @@ THREAD(test_th_handle, arg)
 	while(true) {
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
+		printf("[test]:\t");
 		write(fd, msg.data, msg.len);
-		printf("test_thread\n");
+		printf("[test]:\ttest_thread\n");
 	}
 }
 
@@ -51,9 +52,9 @@ int main(void)
 	
 	while(true) {
 		if(time_after(sys_tick, tick_orig + 3000))
-			printf("tm after: 3000\n");
+			printf("[main]:\ttm after: 3000\n");
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));
-		printf("maint mem: %u\n", mm_heap_available());
+		printf("[main]:\tmem: %u\n", mm_heap_available());
 
 		sleep(500);
 	}

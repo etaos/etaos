@@ -34,7 +34,7 @@ int main(void)
 
 	while(true) {
 		trigger = true;
-		printf("main_thread (%u)\n", trigger);
+		printf("main_thread (%u)\n", mm_heap_available());
 		sleep(500);
 	}
 

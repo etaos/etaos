@@ -1,17 +1,12 @@
 ETAOS=$(shell pwd)/../../..
-SIMULAVR=/usr/bin/simulavr
 AVRDUDE=/usr/bin/avrdude
 OBJCOPY=/usr/bin/avr-objcopy
-RD=0x21
-WR=0x20
-EX=0x22
 CPUFREQ=16000000
 
-MCU=atmega328p
-PROGRAMMER=arduino
+MCU=atmega2560
+PROGRAMMER=stk500v2
 BAUD=115200
 PORT=/dev/ttyACM0
-#PORT=/dev/pts/2
 
 MAKEFLAGS += -rR --no-print-directory
 
@@ -29,5 +24,6 @@ hex: all
 	@$(OBJCOPY) -R .eeprom -O ihex test-app.img test-app.hex 
 
 upload:
-	@$(AVRDUDE) -q -V -p $(MCU) -c $(PROGRAMMER) -b $(BAUD) -P $(PORT) \
+	@$(AVRDUDE) -D -q -V -p $(MCU) -c $(PROGRAMMER) -b $(BAUD) -P $(PORT) \
 		-C /etc/avrdude.conf -U flash:w:test-app.hex:i
+
