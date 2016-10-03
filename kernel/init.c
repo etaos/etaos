@@ -29,6 +29,13 @@ void main_thread_func(void *arg)
 void main_init(void)
 #endif
 {
+#ifndef CONFIG_SCHED
+	/* normally the scheduler enables the interrupts, we don't have a
+	 * scheduler to take care of us so we have to do it ourselves.
+	 */
+	irq_enable();
+#endif
+
 	main();
 	while(true);
 }
