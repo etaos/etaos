@@ -25,11 +25,10 @@
 extern int main(void);
 #ifdef CONFIG_SCHED
 void main_thread_func(void *arg)
+{
 #else
 void main_init(void)
-#endif
 {
-#ifndef CONFIG_SCHED
 	/* normally the scheduler enables the interrupts, we don't have a
 	 * scheduler to take care of us so we have to do it ourselves.
 	 */
