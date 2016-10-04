@@ -115,6 +115,13 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 	return timer;
 }
 
+/**
+ * @brief Stop a currently running hrtimer.
+ * @param timer HR timer to stop.
+ * @return An error code.
+ * @retval -EINVAL if something went wrong.
+ * @retval -EOK if the timer was succesfully stopped and deleted.
+ */
 int hrtimer_stop(struct hrtimer *timer)
 {
 	struct clocksource *cs;
