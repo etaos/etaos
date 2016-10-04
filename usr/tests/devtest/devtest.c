@@ -7,6 +7,8 @@
 #include <etaos/stdio.h>
 #include <etaos/device.h>
 
+#include <uapi/etaos/test.h>
+
 #include <asm/io.h>
 #include <asm/simulavr.h>
 
@@ -66,6 +68,7 @@ int main(void)
 	else
 		printf("[ERR] devices not deleted succesfully!\n");
 
+	printf(CALYPSO_EXIT);
 #ifdef CONFIG_SIMUL_AVR
 	simul_avr_exit(1);
 #endif
