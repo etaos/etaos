@@ -90,11 +90,22 @@ static inline void hrtimer_source_init(const char *name,
 	clocksource_init(name, &src->base, freq, enable, disable);
 }
 
+/**
+ * @brief Get the base clocksource of a hrtimer.
+ * @param timer hrtimer to get the base clocksource for.
+ * @return The base clocksource of \p timer.
+ */
+static inline struct clocksource *hrtimer_to_source(struct hrtimer *timer)
+{
+	return &timer->base->base;
+}
+
 extern struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 				void (*handle)(struct hrtimer *, void*),
 				void *arg, unsigned long flags);
 extern irqreturn_t hrtimer_tick(struct irq_data *data, void *arg);
 extern void hrtimer_init(int irq, struct clocksource *src);
+extern int hrtimer_stop(struct hrtimer *timer);
 CDECL_END
 
 /** @} */

@@ -23,6 +23,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/error.h>
 #include <etaos/panic.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
@@ -60,6 +61,18 @@ static void hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer
 	_raw_spin_unlock(&src->base.lock);
 }
 
+static void hrtimer_source_delete(struct hrtimer_source *src, struct hrtimer *timer)
+{
+	if(timer->prev)
+		timer->prev->next = timer->next;
+	else
+		src->timers = timer->next;
+	if(timer->next) {
+		timer->next->prev = timer->prev;
+		timer->next->ticks += timer->ticks;
+	}
+}
+
 /**
  * @brief Create a new high resolution timer.
  * @param src Clock source to run the timer on.
@@ -83,6 +96,10 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 	if(!timer)
 		panic_P("No memory available\n");
 
+	/*
+	 * Alternatively:
+	 * ticks = (ns * src->freq) / 1E9;
+	 */
 	resolution = (1.0f/src->freq) * 1E9;
 	timer->ticks = ns / resolution;
 	timer->handle = handle;
@@ -96,6 +113,24 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 
 	hrtimer_source_add(hrsrc, timer);
 	return timer;
+}
+
+int hrtimer_stop(struct hrtimer *timer)
+{
+	struct clocksource *cs;
+
+	if(!timer || timer == SIGNALED)
+		return -EINVAL;
+
+	cs = hrtimer_to_source(timer);
+
+	_raw_spin_lock(&cs->lock);
+	timer->handle = NULL;
+	hrtimer_source_delete(timer->base, timer);
+	_raw_spin_unlock(&cs->lock);
+	kfree(timer);
+
+	return -EOK;
 }
 
 static void hrtimer_handle(struct hrtimer_source *cs)
