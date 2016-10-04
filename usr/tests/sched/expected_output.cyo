@@ -1,0 +1,16 @@
+Application started!
+[main]:	IPM posted
+[test]:	IPM message
+[test]:	test_thread
+[main]:	IPM posted
+[test]:	IPM message
+[test]:	test_thread
+[main]:	tm after: 1000
+[main]:	IPM posted
+[test]:	IPM message
+[test]:	test_thread
+[main]:	tm after: 1000
+[main]:	IPM posted
+[main]:	tm after: 1000
+[main]:	IPM posted
+calypso_exit
