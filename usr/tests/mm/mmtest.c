@@ -7,6 +7,8 @@
 #include <etaos/stdio.h>
 #include <etaos/mem.h>
 
+#include <uapi/etaos/test.h>
+
 static void mem_test(void)
 {
 	void *tmp;
@@ -25,6 +27,7 @@ int main(void)
 	printf("Application started!\n");
 	mem_test();
 
+	printf(CALYPSO_EXIT);
 	return 0;
 }
 
