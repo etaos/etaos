@@ -12,32 +12,139 @@ unit-tests:
     autorun: false
     mode: manual
     name: "Stress test"
-    path: usr/tests/stresstest
+    path: usr/tests/stress
     execute: clean all hex upload
     config: config-atmega2560.conf
     port: /dev/ttyACM0
     baud: 9600
     libdir: usr/lib
+
+  irqthread-test: 
+    hardware: ard-mega
+    autorun: true
+    mode: auto
+    name: "IRQ thread test"
+    path: usr/tests/irqthread
+    execute: clean all hex upload
+    config: config-atmega2560.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
+  eeprom-test: 
+    hardware: ard-mega
+    autorun: true
+    mode: auto
+    name: "EEPROM test"
+    path: usr/tests/eeprom
+    execute: clean all hex upload
+    config: config-atmega2560.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
   preempt-test:
     autorun: true
     hardware: ard-uno
     mode: auto
     name: "Preemption test"
-    path: usr/tests/preempt_test
+    path: usr/tests/preempt
     execute: clean all hex upload
     config: config-atmega328p.conf
     port: /dev/ttyACM0
     baud: 9600
     libdir: usr/lib
+    compare: expected_output.cyo
+
   sched-test:
     autorun: true
     hardware: ard-uno
     mode: auto
     name: "Sched test"
-    path: usr/tests/schedtest
+    path: usr/tests/sched
     execute: clean all hex upload
     config: config-atmega328p.conf
     port: /dev/ttyACM0
     baud: 9600
     libdir: usr/lib
+    compare: expected_output.cyo
+
+  cxx-test:
+    autorun: true
+    hardware: ard-uno
+    mode: auto
+    name: "CXX test"
+    path: usr/tests/cxx
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
+  mm-test:
+    autorun: true
+    hardware: ard-uno
+    mode: manual
+    name: "Memory test"
+    path: usr/tests/mm
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+
+  hrtimer-test:
+    autorun: true
+    hardware: ard-uno
+    mode: manual
+    name: "HR timer test"
+    path: usr/tests/hrtimer
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
+  dev-test:
+    autorun: true
+    hardware: ard-uno
+    mode: auto
+    name: "Device test"
+    path: usr/tests/dev
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
+  timer-test:
+    autorun: true
+    hardware: ard-uno
+    mode: auto
+    name: "Timer test"
+    path: usr/tests/timer
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
+  time-test:
+    autorun: true
+    hardware: ard-uno
+    mode: auto
+    name: "Time test"
+    path: usr/tests/time
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
 
