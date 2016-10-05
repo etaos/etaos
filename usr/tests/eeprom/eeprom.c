@@ -9,6 +9,9 @@
 #include <etaos/vfs.h>
 #include <etaos/thread.h>
 
+#include <asm/pgm.h>
+#include <uapi/etaos/test.h>
+
 #define EEPROM_WRITE_ADDR 0x20
 
 int main(void)
@@ -17,7 +20,8 @@ int main(void)
 	struct vfile *file;
 	unsigned char readback = 0;
 
-	printf("Application started! (M:%u)\n", mm_heap_available());
+	irq_enable();
+	printf_P(PSTR("Application started!\n"));
 
 	fd = open("24C02", _FDEV_SETUP_RW);
 	if(fd >= 0) {
@@ -38,9 +42,7 @@ int main(void)
 	else
 		printf("[ERROR] EEPROM test failed!\n");
 
-	while(true) {
-	}
-
+	printf(CALYPSO_EXIT);
 	return 0;
 }
 
