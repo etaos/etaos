@@ -9,13 +9,18 @@
 #include <etaos/hrtimer.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
+#include <etaos/delay.h>
 
 #include <asm/pgm.h>
 #include <asm/io.h>
 
+#include <uapi/etaos/test.h>
+
 #define LED_PORT PORTB
 #define LED_DDR  DDRB
 #define LED_PIN  5
+
+static volatile unsigned long counter = 0UL;
 
 static inline void set_led(bool val)
 {
@@ -34,34 +39,35 @@ static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
 
 	set_led(value);
 	value = !value;
+	counter += 1;
 }
 
 int main(void)
 {
 	struct hrtimer *timer;
-	struct hrtimer_source *src;
-	int i;
+	int i = 0;
 
-	printf_P(PSTR("Application started (M:%u)!\n"), mm_heap_available());
+	printf_P(PSTR("Application started!\n"));
 
 	LED_DDR |= BIT(LED_PIN);
 	set_led(false);
 
-	hrtimer_create(hr_sys_clk, 2000000, hrtimer1_handle_func,
+	timer = hrtimer_create(hr_sys_clk, 2000000, hrtimer1_handle_func,
 			NULL, 0UL);
 
-	src = container_of(hr_sys_clk, struct hrtimer_source, base);
-	timer = src->timers;
-
-	for(i = 0; timer; i++) {
-		printf_P(PSTR("Timer %i has %u ticks left.\n"),
-				i, timer->ticks);
-		timer = timer->next;
+	for(; i < 5; i++) {
+		delay(1000);
 	}
 
-	while(true) {
-	}
+	hrtimer_stop(timer);
 
+	printf_P(PSTR("HR timer test: "));
+	if(counter > 0UL)
+		printf("[OK]\n");
+	else
+		printf("[ERR]\n");
+
+	printf(CALYPSO_EXIT);
 	return 0;
 }
 

@@ -99,7 +99,7 @@ unit-tests:
   hrtimer-test:
     autorun: true
     hardware: ard-uno
-    mode: manual
+    mode: auto
     name: "HR timer test"
     path: usr/tests/hrtimer
     execute: clean all hex upload
