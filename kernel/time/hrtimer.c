@@ -22,6 +22,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/stdio.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/panic.h>
@@ -88,7 +89,6 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 {
 	struct hrtimer *timer;
 	struct hrtimer_source *hrsrc;
-	unsigned long resolution;
 
 	timer = kzalloc(sizeof(*timer));
 	hrsrc = container_of(src, struct hrtimer_source, base);
@@ -96,12 +96,7 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 	if(!timer)
 		panic_P("No memory available\n");
 
-	/*
-	 * Alternatively:
-	 * ticks = (ns * src->freq) / 1E9;
-	 */
-	resolution = (1.0f/src->freq) * 1E9;
-	timer->ticks = ns / resolution;
+	timer->ticks = (ns * src->freq) / 1E9;
 	timer->handle = handle;
 	timer->handle_argument = arg;
 	timer->base = hrsrc;
