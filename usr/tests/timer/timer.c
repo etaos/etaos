@@ -14,11 +14,12 @@
 #include <etaos/clocksource.h>
 #include <etaos/tick.h>
 
-#include <asm/io.h>
+#include <uapi/etaos/test.h>
+#include <asm/pgm.h>
 
 static struct timer *tm1;
 static char *tm1_name = "tm1";
-unsigned long timer_cnt = 0;
+volatile unsigned long timer_cnt = 0;
 
 static void print_timer(struct timer *timer, void *data)
 {
@@ -26,7 +27,7 @@ static void print_timer(struct timer *timer, void *data)
 	timer_cnt++;
 }
 
-static void tmtest_init_timers(void)
+static struct timer *tmtest_init_timers(void)
 {
 	struct clocksource *cs = sys_clk;
 
@@ -36,27 +37,29 @@ static void tmtest_init_timers(void)
 	
 	if(tm1)
 		printf("[OK]\n");
+
+	return tm1;
 }
 
 int main(void)
 {
 	unsigned int diff;
 	struct clocksource *cs;
+	struct timer *timer1;
 
-	printf("Application started! (%u)\n", mm_heap_available());
+	printf_P(PSTR("Application started!\n"));
 
 	cs = sys_clk;
-	tmtest_init_timers();
-
+	timer1 = tmtest_init_timers();
 	diff = clocksource_update(cs);
-	while(true) {
+
+	while(timer_cnt < 5) {
 		timer_process_clock(cs, diff);
 		diff = clocksource_update(cs);
 	}
 
-#ifdef CONFIG_SIMUL_AVR
-	simul_avr_exit(0);
-#endif
+	timer_stop_timer(timer1);
+	printf(CALYPSO_EXIT);
 	return 0;
 }
 
