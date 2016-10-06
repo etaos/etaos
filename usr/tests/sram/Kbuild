@@ -1,6 +1,6 @@
 obj-y += sram.o
 
-ETAOS_LIBS += -l23k256 -lsram -latmega-spi -lspidev -latmega-gpio -lgpio \
+ETAOS_LIBS += -l23k256 -lsram -latmega-spi -lspi-core -latmega-gpio -lgpio \
 		-lusart-atmega -lusart \
 		-ldriver-core -lc
 ETAOS_LIB_DIR := usr/lib/etaos
