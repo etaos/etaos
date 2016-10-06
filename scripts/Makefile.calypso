@@ -2,5 +2,5 @@ MAKE := /usr/bin/make
 MAKEFLAGS += -rR --no-print-directory
 
 all:
-	@cd $(TEST); $(MAKE) clean all hex upload
+	@cd $(TEST); $(MAKE) $(TARGETS)
 
