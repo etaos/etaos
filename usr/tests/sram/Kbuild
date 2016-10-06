@@ -1,0 +1,8 @@
+obj-y += sram.o
+
+ETAOS_LIBS += -l23k256 -lsram -latmega-spi -lspidev -latmega-gpio -lgpio \
+		-lusart-atmega -lusart \
+		-ldriver-core -lc
+ETAOS_LIB_DIR := usr/lib/etaos
+APP_TARGET := test-app.img
+clean-files += test-app.img test-app.hex

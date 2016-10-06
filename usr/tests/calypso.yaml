@@ -32,7 +32,7 @@ unit-tests:
     libdir: usr/lib
     compare: expected_output.cyo
 
-  eeprom-test: 
+  eeprom-test:
     hardware: ard-mega
     autorun: true
     mode: auto
