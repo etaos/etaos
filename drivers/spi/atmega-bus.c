@@ -206,6 +206,7 @@ static void __used atmega_spi_init(void)
 
 	/* software initialisation */
 	mutex_init(&master_xfer_mutex);
+	mutex_init(&atmega_spi_driver.lock);
 	master_rx_buff = NULL;
 	master_tx_buff = NULL;
 	master_index = 0;

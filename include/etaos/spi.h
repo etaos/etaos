@@ -29,6 +29,7 @@
 #include <etaos/error.h>
 #include <etaos/mem.h>
 #include <etaos/device.h>
+#include <etaos/mutex.h>
 
 struct spidev;
 
@@ -64,6 +65,7 @@ struct spi_driver {
 	struct list_head devices; //!< Amount of attached SPI devices.
 	char retries; //!< Transmission retry number.
 	int timeout; //!< Transmission timeout.
+	mutex_t lock; //!< Driver lock.
 
 	struct gpio_pin *mosi, //!< Master Output Slave Input
 			*miso, //!< Master Input Slave Output
