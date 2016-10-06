@@ -32,6 +32,7 @@
  * @param buf Buffer which can be read from or written into.
  * @note Make sure that buf is long enough. See the documentation of the
  *       specific device driver for information on the length of the buffer.
+ * @return An error code.
  */
 int ioctl(struct vfile * stream, unsigned long reg, void *buf)
 {

@@ -32,6 +32,7 @@
  * @param fd File to write to.
  * @param buff Buffer to write into.
  * @param len Size of \p buff.
+ * @return Number of bytes written to \p fd or an error code.
  */
 int write(int fd, const void *buff, size_t len)
 {

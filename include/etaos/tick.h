@@ -39,6 +39,7 @@ extern time_t systick_get_seconds(void);
 
 /**
  * @brief Get the system clock.
+ * @return The system clock data pointer.
  * @note The system clock has to be set first using sysctl.
  */
 static inline struct clocksource *sys_get_clock(void)

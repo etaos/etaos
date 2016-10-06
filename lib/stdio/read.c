@@ -32,6 +32,7 @@
  * @param fd File to read from.
  * @param buff Buffer to store data into.
  * @param len Size of \p buff.
+ * @return Number of bytes read or an error code.
  */
 int read(int fd, void *buff, size_t len)
 {

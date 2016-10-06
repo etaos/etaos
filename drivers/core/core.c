@@ -171,6 +171,7 @@ static inline int dev_name_is_unique(struct device *dev)
  * @param data Private device data.
  * @param fops Device file operations.
  * @note \p name must be unique.
+ * @return The created device.
  */
 struct device *device_create(const char *name, void *data,
 		struct dev_file_ops *fops)
@@ -324,6 +325,7 @@ struct device *dev_get_by_name(const char *name)
  * @brief Register a platform device.
  * @param pdev Platform device to register.
  * @param fops File operations for the device.
+ * @return An error code.
  */
 int dev_register_pdev(struct platform_device *pdev, struct dev_file_ops *fops)
 {

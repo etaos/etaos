@@ -55,6 +55,7 @@ void srand(uint32_t seed)
 /**
  * @brief Generate a new random number, with a given maximum.
  * @param max Maximum number to generate.
+ * @return The generated random number.
  *
  * The output of random_m(x) will have the range of [0, x].
  */
@@ -78,6 +79,7 @@ uint32_t random(void)
  * @brief Generate a random number, while giving a seed and maximum.
  * @param sptr Pointer to the seed to use.
  * @param max Maximum number to generate.
+ * @return The generated random number.
  */
 uint32_t random_r(uint32_t *sptr, uint32_t max)
 {

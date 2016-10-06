@@ -30,6 +30,7 @@
  * @brief Open a file on the virtual file system.
  * @param name File name to look for.
  * @param flags File flags.
+ * @return The file descriptor. If an error occurs -EINVAL is returned.
  */
 int open(const char *name, unsigned long flags)
 {

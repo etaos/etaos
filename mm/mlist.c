@@ -171,7 +171,7 @@ void mm_split_node(struct heap_node *node, size_t ns)
 
 /**
  * @brief Return a node into the heap.
- * @brief node Node to return.
+ * @param block Node to return.
  * @return Error code.
  * @retval 0 If the node was returned succesfully.
  * @retval -1 If the node couldn't be returned into the heap.

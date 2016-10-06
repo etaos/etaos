@@ -44,6 +44,7 @@ static inline struct eeprom *to_eeprom_chip(struct vfile * file)
  * @param stream File stream.
  * @param buf Buffer with data to write.
  * @param len Length of \p buf.
+ * @return An error code.
  */
 static int eeprom_write(struct vfile * stream, const void *buf, size_t len)
 {
@@ -69,6 +70,7 @@ static int eeprom_write(struct vfile * stream, const void *buf, size_t len)
  * @param stream File stream.
  * @param buf Buffer to read data into.
  * @param len Length of \p buf.
+ * @return An error code.
  */
 static int eeprom_read(struct vfile * stream, void *buf, size_t len)
 {

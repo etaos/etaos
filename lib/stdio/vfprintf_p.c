@@ -33,6 +33,7 @@
  * @param stream File to write to.
  * @param fmt Format string (stored in program memory).
  * @param ap VA list to complete the format string.
+ * @return Number of bytes written to \p stream.
  */
 int vfprintf_P(struct vfile * stream, const char *fmt, va_list ap)
 {

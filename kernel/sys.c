@@ -29,6 +29,7 @@
  * @brief sysctl - change system wide settings.
  * @param ctl Setting you want to change.
  * @param ... ctl arguments.
+ * @return An error code.
  * @see sys_ctl_t
  */
 int sysctl(sys_ctl_t ctl, ...)

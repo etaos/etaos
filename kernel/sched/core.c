@@ -105,6 +105,7 @@ void irq_handle_fn(void *data)
  * @param tp Thread to get the thread_queue for.
  * @note You have to be sure that the thread is on one. If its not, a false
  *       thread queue is returned.
+ * @return The run queue \p tp is on.
  */
 static inline struct thread_queue *thread_to_queue(struct thread *tp)
 {
@@ -440,6 +441,7 @@ void rq_add_thread_no_lock(struct thread *tp)
  * @brief Add a thread to a run queue.
  * @param rq Run queue to add \p tp to.
  * @param tp Thread to add.
+ * @return An error code.
  *
  * struct rq::lock will be locked (and unlocked).
  */
@@ -468,6 +470,7 @@ int rq_add_thread(struct rq *rq, struct thread *tp)
  * @brief Remove a thread from a run queue without rescheduling.
  * @param rq RQ to remove from.
  * @param tp Thread to remove.
+ * @return An error code.
  */
 int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp)
 {
@@ -499,6 +502,7 @@ int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp)
  * @brief Remove a thread from a run queue.
  * @param rq RQ to add to.
  * @param tp Thread to remove.
+ * @return An error code.
  */
 static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 {
@@ -517,6 +521,7 @@ static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 /**
  * @brief Remove a thread from a run queue.
  * @param tp Thread to remove.
+ * @return An error code.
  *
  * struct rq::lock will be locked (and unlocked).
  */
@@ -597,6 +602,8 @@ void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 /**
  * @brief Obtain the next runnable task of a run queue.
  * @param rq Run queue to get the next runnable from.
+ * @return The next runnable thread. If no new thread is found, the current
+ *         thread will be returned.
  */
 static struct thread *sched_get_next_runnable(struct rq *rq)
 {

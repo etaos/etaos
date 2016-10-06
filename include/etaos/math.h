@@ -27,73 +27,87 @@
 /**
  * @brief Rounds __x to the nearest integer.
  * @param __x Floating point number to round.
+ * @return The rounded number.
  */
 extern double round(double __x);
 /**
  * @brief Compute the cosine of \p __x.
  * @param __x Number to compute the cosine of.
+ * @return The cosine of __x.
  */
 extern double cos(double __x);
 /**
  * @brief Compute the sine of \p __x.
  * @param __x Number to compute the sine of.
+ * @return The sine of __x.
  */
 extern double sin(double __x);
 /**
  * @brief Compute the tangent \p __x.
  * @param __x Number to compute the tangent of.
+ * @return The tangent of __x.
  */
 extern double tan(double __x);
 /**
  * @brief Compute the arc cosine.
  * @param __x Number to compute the arc cosine of.
+ * @return The inverse cosine of __x.
  */
 extern double acos(double __x);
 /**
  * @brief Compute the arc sine.
  * @param __x Number to compute the arc sine of.
+ * @return The inverse sine of __x.
  */
 extern double asin(double __x);
 /**
  * @brief Compute the arc tangent
  * @param __x Number to compute the arc tangent of.
+ * @return The inverse tangent of __x.
  */
 extern double atan(double __x);
 /**
  * @brief Compute the arc tangent of \p __y / \p __x.
  * @param __x Length of x.
  * @param __y Length of y.
+ * @return The inverse tan2 of __y and __x.
  * @retval is in the range [-pi, +pi].
  */
 extern double atan2(double __y, double __x);
 /**
  * @brief Compute the square root of x.
  * @param __x Number to compute the sqrt of.
+ * @return The square root of __x.
  */
 extern double sqrt(double __x);
 /**
  * @brief Round a number up.
  * @param __x Number to round up.
+ * @return The ceiling of __x.
  */
 extern double ceil(double __x);
 /**
  * @brief Round a number down.
  * @param __x Number to round down.
+ * @return The floor of __x.
  */
 extern double floor(double __x);
 /**
  * @brief Compute the natural logarithm of \p __x.
  * @param __x Number calculate the ln of.
+ * @return The natural log of __x.
  */
 extern double log(double __x);
 /**
  * @brief The log10() function return the logarithm of argument \p __x to base 10.
  * @param __x Number to calculate the log base 10 for.
+ * @return The log10 of __x.
  */
 extern double log10(double __x);
 /**
  * @brief Compute the exponential value of \p __x.
  * @param __x Number to compute the exponential value for.
+ * @return The exponential value of __x.
  */
 extern double exp(double __x);
 

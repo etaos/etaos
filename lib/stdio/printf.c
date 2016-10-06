@@ -28,8 +28,9 @@
 
 /**
  * @brief Write a formated string to stdout.
- * @param fmt
+ * @param fmt Format string.
  * @param ... Variable argument list.
+ * @return Number of bytes written to stdout.
  *
  * The first argument contains a formatted string, for example:
  * @code{.c}

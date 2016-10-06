@@ -91,6 +91,7 @@ void irq_restore(unsigned long *flags)
 /**
  * @brief Request a threaded IRQ.
  * @param data IRQ data.
+ * @return An error code.
  */
 static int irq_request_threaded_irq(struct irq_thread_data *data)
 {
@@ -116,6 +117,7 @@ static int irq_request_threaded_irq(struct irq_thread_data *data)
  * @param vector IRQ handler.
  * @param flags IRQ flags.
  * @param priv Private IRQ data.
+ * @return An error code. -EOK if no error ocurred.
  */
 int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 		void *priv)
@@ -172,6 +174,7 @@ bool in_irq_context(void)
  * @brief Set the IRQ handle function.
  * @param irq IRQ vector to set the handle for.
  * @param vector IRQ handle to set.
+ * @return An error code.
  */
 int irq_set_handle(int irq, irq_vector_t vector)
 {

@@ -175,6 +175,8 @@ static void hrtimer_handle(struct hrtimer_source *cs)
  * @brief High resolution timer interrupt.
  * @param data IRQ data.
  * @param arg IRQ argument (clocksource).
+ * @return IRQ handle status.
+ * @retval IRQ_HANDLED
  */
 irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
 {

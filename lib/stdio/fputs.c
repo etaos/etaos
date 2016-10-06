@@ -32,6 +32,7 @@
  * @param s String to write.
  * @param stream Stream to write to.
  * @note Uses fputc internally
+ * @return An error code.
  */
 int fputs(char *s, struct vfile * stream)
 {

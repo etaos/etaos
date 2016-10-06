@@ -26,6 +26,22 @@
 #include <etaos/stdio.h>
 #include <asm/pgm.h>
 
+/**
+ * @brief Write a formated string to a stream.
+ * @param out File to write to.
+ * @param fmt Format string.
+ * @param ... Variable argument list.
+ * @return Number of bytes written to \p stream.
+ *
+ * The first argument contains a formatted string, for example:
+ * @code{.c}
+   printf(stderr, "Hey there, it is %u:%uPM\n", 6, 23);
+   @endcode
+ *
+ * The %u means 'replace with unsigned integer from the variable argument list.
+ * What will be written to the file in the end:
+ * Hey there, it is 6:23PM
+ */
 int fprintf_P(struct vfile *out, const char *fmt, ...)
 {
 	int rc;

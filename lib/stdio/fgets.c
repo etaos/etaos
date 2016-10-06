@@ -31,6 +31,7 @@
  * @param buf Buffer to store read data into.
  * @param num Maximum number of bytes to read.
  * @param stream File to read from.
+ * @return The string read from \p stream.
  *
  * This function reads from the given file until a new line character is
  * read or \p num bytes have been read, whichever comes first.

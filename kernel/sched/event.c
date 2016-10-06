@@ -138,6 +138,7 @@ void event_notify(struct thread_queue *qp)
  * @param qp Queue to wait on.
  * @param ms Maximum time to wait in miliseconds.
  * @note Set ms to 0 to wait infinitly.
+ * @return An error code.
  * @see EVM_WAIT_INFINITE
  */
 int event_wait(struct thread_queue *qp, unsigned ms)
@@ -160,6 +161,7 @@ int event_wait(struct thread_queue *qp, unsigned ms)
  * @brief Wait for an event in a specified queue.
  * @param qp Queue to wait in.
  * @param ms Maximum time to wait in miliseconds.
+ * @return An error code.
  *
  * Give up the CPU untill an event is posted to this queue, or a timeout based
  * on \p ms occurs.

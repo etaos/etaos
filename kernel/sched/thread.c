@@ -119,6 +119,7 @@ struct thread *thread_create(const char *name, thread_handle_t handle, void *arg
  * @param stack_size Size of the stack.
  * @param stack Pointer to the stack.
  * @param prio Priority of the thread.
+ * @return An error code.
  */
 int thread_initialise(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 

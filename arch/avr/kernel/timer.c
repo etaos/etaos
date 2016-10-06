@@ -57,6 +57,7 @@ struct clocksource *avr_get_sys_clk(void)
 /**
  * @brief Enable the AVR system clock.
  * @param cs Clocksource which has to be enabled.
+ * @return An error code.
  * @note Dummy function, the AVR sysclk is enabled on initialise.
  */
 static int avr_sysclk_enable(struct clocksource *cs)

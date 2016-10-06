@@ -105,6 +105,7 @@ static int analog_ctl(struct vfile *file, unsigned long reg, void *arg)
  * @brief Open the ADC device.
  * @param file Device file used to access the ADC.
  * @note Acquires the ADC device lock.
+ * @return An error code.
  */
 static int analog_open(struct vfile *file)
 {
@@ -119,6 +120,7 @@ static int analog_open(struct vfile *file)
  * @brief Close the ADC device.
  * @param file Device file used to access the ADC.
  * @note Releases the ADC device lock.
+ * @return An error code.
  */
 static int analog_close(struct vfile *file)
 {

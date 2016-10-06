@@ -29,8 +29,9 @@
 /**
  * @brief Write a formated string to a stream.
  * @param stream File to write to.
- * @param fmt
+ * @param fmt Format string.
  * @param ... Variable argument list.
+ * @return Number of bytes written to \p stream.
  *
  * The first argument contains a formatted string, for example:
  * @code{.c}

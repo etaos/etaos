@@ -38,6 +38,8 @@ struct clocksource *sys_clk;
  * @brief System tick IRQ handler.
  * @param irq IRQ data.
  * @param data Private data.
+ * @return IRQ handle status.
+ * @retval IRQ_HANDLED
  */
 static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 {

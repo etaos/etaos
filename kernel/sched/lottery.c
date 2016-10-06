@@ -77,6 +77,7 @@ static void lottery_add_thread(struct rq *rq, struct thread *tp)
  * @brief Remove a thread from the lottery run queue.
  * @param rq Run queue to remove from.
  * @param tp Thread which is to be removed.
+ * @return An error code.
  */
 static int lottery_remove_thread(struct rq *rq, struct thread *tp)
 {
@@ -146,6 +147,7 @@ static inline bool lottery_single_thread_available(struct rq *rq)
 /**
  * @brief Get the next runnable thread from the lottery scheduler.
  * @param rq Run queue to pick a thread from.
+ * @return The next runnable thread.
  *
  * A new thread is selected for execution using a pseudo random number
  * generator.
@@ -186,6 +188,7 @@ try_again:
 /**
  * @brief Generate new lottery tickets.
  * @param num Amount of tickets to generate.
+ * @return An error code.
  */
 static int lottery_generate_tickets(int num)
 {

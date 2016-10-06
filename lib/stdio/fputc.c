@@ -32,6 +32,7 @@
  * @brief Write one character to a stream.
  * @param c Character to write.
  * @param stream Stream to write \p c to.
+ * @return An error code.
  */
 int fputc(int c, struct vfile * stream)
 {

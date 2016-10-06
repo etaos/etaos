@@ -39,6 +39,7 @@ static struct list_head sources = STATIC_INIT_LIST_HEAD(sources);
  * @param freq Frequency of the clock source.
  * @param enable Function pointer to enable the source.
  * @param disable Function pointer to disable the source.
+ * @return An error code.
  */
 int clocksource_init(const char *name, struct clocksource *cs,
 		unsigned long freq, int (*enable)(struct clocksource *cs),

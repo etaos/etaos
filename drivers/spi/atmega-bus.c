@@ -88,6 +88,7 @@ static irqreturn_t atmega_spi_stc_irq(struct irq_data *irq, void *data)
  * @brief Set the speed of the ATmega SPI bus.
  * @param dev Device requesting the new bitrate.
  * @param rate New bit rate.
+ * @return An error code.
  *
  * The bit rate is calculated using the following formula:
  * \f$x_r = \frac{f_c}{n}\f$. \n
@@ -131,6 +132,7 @@ static int atmega_spi_setspeed(struct spidev *dev, uint32_t rate)
  * @param dev Device driver requesting a control register change.
  * @param ctrl Control register to change.
  * @param data Parameter for \p ctrl.
+ * @return An error code.
  */
 static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
 {

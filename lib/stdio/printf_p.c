@@ -26,6 +26,21 @@
 #include <etaos/stdio.h>
 #include <asm/pgm.h>
 
+/**
+ * @brief Write a formated string to stdout.
+ * @param fmt Format string.
+ * @param ... Variable argument list.
+ * @return Number of bytes written to stdout.
+ *
+ * The first argument contains a formatted string, for example:
+ * @code{.c}
+   printf("Hey there, it is %u:%uPM\n", 6, 23);
+   @endcode
+ *
+ * The %u means 'replace with unsigned integer from the variable argument list.
+ * What will be written to stdout in the end:
+ * Hey there, it is 6:23PM
+ */
 int printf_P(const char *fmt, ...)
 {
 	int rc;
