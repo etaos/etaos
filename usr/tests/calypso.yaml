@@ -45,6 +45,19 @@ unit-tests:
     libdir: usr/lib
     compare: expected_output.cyo
 
+  sram-test:
+    hardware: ard-mega
+    autorun: true
+    mode: auto
+    name: "SRAM test"
+    path: usr/tests/sram
+    execute: clean all hex upload
+    config: config-atmega2560.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
   preempt-test:
     autorun: true
     hardware: ard-uno
