@@ -17,7 +17,7 @@
  */
 
 /**
- * @file spi/spidev.c
+ * @file spi/spi-core.c
  * @addtogroup spi
  * @{
  */
