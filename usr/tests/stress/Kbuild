@@ -3,7 +3,7 @@ crurom-y := data
 crurom-obj := romfs.o
 
 ETAOS_LIBS += -l24c02 -leeprom -latmega-i2c -li2c-core -latmega-gpio -lgpio \
-		-lusart-atmega -lusart -lspidev -latmega-spi \
+		-lusart-atmega -lusart -lspi-core -latmega-spi \
 		-lsram -l23k256 -latmega-analog -lanalog \
 		-ldriver-core -lplatform -llm35 -lc
 ETAOS_LIB_DIR := usr/lib/etaos
