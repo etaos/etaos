@@ -163,7 +163,7 @@
 
   Enter the following command:
   @code
-  git format-patch --to etaos@michelmegens.net HEAD~2..HEAD
+  git format-patch --to etaos@googlegroups.net HEAD~2..HEAD
   @endcode
 
   git format-patch will generate a patch-file-per-commit of the given range
@@ -172,7 +172,7 @@
 
   @subsection snt-patch Sending patches
   Once your patch has been created sent them <b>inline</b> to the ETA/OS
-  mailing list (etaos@michelmegens.net). If you want to you can also CC
+  mailing list (etaos@googlegroups.net). If you want to you can also CC
   the maintainer of the file you have patched, his or her email should
   be in the top of the file.
 
