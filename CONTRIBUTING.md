@@ -66,7 +66,8 @@ developed. The former is, as the name implies, a well rounded suggestion - ready
 implemented. These kind of suggestions are tracked as GitLab issue's. See the
 checklist below to see what information such a suggestion has to contain. Because
 we don't want to kill any idea's you can always put less well rounded suggestions on
-the [mailing list](mailto:etaos@googlegroups.com). Please note that public API
+the [mailing list](mailto:etaos@googlegroups.com). You can sign up to the mailing
+list [here](https://groups.google.com/forum/#!forum/etaos). Please note that public API
 functions should not be changed. Their internals can be changed, but not the
 return value or its parameters.
 
@@ -110,7 +111,7 @@ Please try and follow the style guides below at all times. Keep in mind that pat
 ### Git commit messages
   * Use the present tense ("Add feature", not "Added feature").
   * On the first line, include subsystem (and module) your patch belongs to (e.g.
-    "sched: core: optimized __schedule_need_resched()").
+    "sched: core: optimize __schedule_need_resched()").
   * Limit the first line to 72 characters or less
   * If applicable, include references to issue's and pull requests.
 
