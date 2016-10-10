@@ -100,6 +100,19 @@ static struct thread *rr_next_runnable(struct rq *rq)
 	return runnable;
 }
 
+#ifdef CONFIG_PREEMPT
+static bool rr_preempt_chk(struct rq *rq, struct thread *cur)
+{
+	struct thread *nxt;
+
+	nxt = rr_next_runnable(rq);
+	if(prio(nxt) <= prio(cur))
+		return true;
+
+	return false;
+}
+#endif
+
 #ifdef CONFIG_EVENT_MUTEX
 /**
  * @brief Get the next runnable thread after \p tp.
@@ -146,6 +159,9 @@ struct sched_class rr_class = {
 	.rm_thread = &rr_rm_thread,
 	.add_thread = &rr_add_thread,
 	.next_runnable = &rr_next_runnable,
+#ifdef CONFIG_PREEMPT
+	.preempt_chk = &rr_preempt_chk,
+#endif
 #ifdef CONFIG_DYN_PRIO
 	.dyn_prio_update = &rr_update_dyn_prio,
 #endif

@@ -98,6 +98,15 @@ struct sched_class {
 	 */
 	struct thread *(*thread_after)(struct thread *tp);
 #endif
+#ifdef CONFIG_PREEMPT
+	/**
+	 * @brief Check if a thread needs to be preempted.
+	 * @param rq Run queue we're on.
+	 * @param cur Current thread which could be preempted
+	 * @return True if we need to preempt, false otherwise.
+	 */
+	bool (*preempt_chk)(struct rq *rq, struct thread *cur);
+#endif
 #ifdef CONFIG_THREAD_QUEUE
 	/** 
 	 * @brief Add a thread to the queue

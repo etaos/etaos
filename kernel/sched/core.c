@@ -947,6 +947,18 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 #endif
 }
 
+#ifdef CONFIG_PREEMPT
+static void preempt_chk(struct rq *rq, struct thread *cur)
+{
+	struct sched_class *class = rq->sched_class;
+
+	if(class->preempt_chk(rq, cur))
+		set_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+}
+#else
+#define preempt_chk(__rq, __cur)
+#endif
+
 /**
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
@@ -960,7 +972,7 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot __schedule(int cpu)
+static void __hot __schedule(int cpu, bool preempt)
 {
 	struct rq *rq;
 	struct thread *next,
@@ -969,8 +981,8 @@ static void __hot __schedule(int cpu)
 
 	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
-	prev = rq->current;
 	raw_spin_lock_irq(&rq->lock);
+	prev = rq->current;
 
 	irq_signal_threads(rq);
 	rq_signal_threads(rq);
@@ -986,6 +998,9 @@ static void __hot __schedule(int cpu)
 	} else {
 		prev->slice -= tdelta;
 	}
+
+	if(preempt)
+		preempt_chk(rq, prev);
 #endif
 
 	next = sched_get_next_runnable(rq);
@@ -1044,7 +1059,7 @@ void __hot schedule(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu);
+		__schedule(cpu, preemptible());
 	} while(need_resched());
 }
 
@@ -1068,7 +1083,7 @@ void __hot preempt_schedule_irq(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu);
+		__schedule(cpu, true);
 	} while(need_resched());
 	return;
 }

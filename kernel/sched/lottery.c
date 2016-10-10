@@ -144,6 +144,13 @@ static inline bool lottery_single_thread_available(struct rq *rq)
 	return true;
 }
 
+#ifdef CONFIG_PREEMPT
+static bool lottery_preempt_chk(struct rq *rq, struct thread *cur)
+{
+	return false;
+}
+#endif
+
 /**
  * @brief Get the next runnable thread from the lottery scheduler.
  * @param rq Run queue to pick a thread from.
@@ -255,6 +262,9 @@ struct sched_class lottery_class = {
 	.rm_thread = &lottery_remove_thread,
 	.add_thread = &lottery_add_thread,
 	.next_runnable = &lottery_next_runnable,
+#ifdef CONFIG_PREEMPT
+	.preempt_chk = &lottery_preempt_chk,
+#endif
 #ifdef CONFIG_EVENT_MUTEX
 	.thread_after = &lottery_thread_after,
 #endif
