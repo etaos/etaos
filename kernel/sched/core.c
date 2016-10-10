@@ -716,7 +716,6 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 						struct thread *new)
 {
 	struct sched_class *class = rq->sched_class;
-	unsigned long flags = 0UL;
 
 	if(prev) {
 		if(test_bit(THREAD_RUNNING_FLAG, &prev->flags)) {
@@ -731,8 +730,6 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 
 	/* prev != new (this condition is ensured by __schedule) */
 	class->rm_thread(rq, new);
-	cpu_get_state(&flags);
-	prev->cpu_state = flags;
 	raw_spin_unlock_irq(&rq->lock);
 	cpu_switch_context(rq, prev, new);
 }
@@ -887,6 +884,7 @@ static inline void preempt_reset_slice(struct thread *tp)
 static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 {
 	struct thread *next = rq->current;
+	unsigned long flags = 0UL;
 
 	/*
 	 * Update the dynamic priorities of all threads that still
@@ -906,6 +904,8 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 	 */
 	preempt_reset_slice(next);
 	preempt_reset_slice(prev);
+	cpu_get_state(&flags);
+	prev->cpu_state = flags;
 }
 
 /**
@@ -992,12 +992,10 @@ static void __hot __schedule(int cpu, bool preempt)
 		timer_process_clock(rq->source, tdelta);
 
 #ifdef CONFIG_PREEMPT
-	if(prev->slice <= tdelta) {
-		prev->slice = CONFIG_TIME_SLICE;
+	if(prev->slice <= tdelta)
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
-	} else {
+	else
 		prev->slice -= tdelta;
-	}
 
 	if(preempt)
 		preempt_chk(rq, prev);
