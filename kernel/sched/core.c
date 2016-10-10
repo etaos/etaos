@@ -47,6 +47,7 @@
 #include <etaos/timer.h>
 #include <etaos/spinlock.h>
 #include <etaos/panic.h>
+#include <etaos/tick.h>
 
 #include <asm/io.h>
 #include <asm/sched.h>
@@ -1117,20 +1118,15 @@ THREAD(idle_thread_func, arg)
 }
 
 /**
- * @brief Initialise the scheduler.
+ * @brief Start the scheduler.
  * @note This function doesn't return.
  *
  * The arch init initialises the scheduler using this function during boot.
  */
-void sched_init(void)
+void sched_start(void)
 {
 	struct rq *rq;
 
-	if(sys_sched_class.init)
-		sys_sched_class.init();
-
-	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
-			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack);
 	rq = sched_get_cpu_rq();
 	idle_thread.rq = rq;
 	rq->current = &idle_thread;
@@ -1291,6 +1287,22 @@ unsigned char prio(struct thread *tp)
 		return 0;
 }
 #endif
+
+static void __used sched_init(void)
+{
+	struct rq *rq;
+
+	rq = sched_get_cpu_rq();
+	rq->source = sched_get_clock();
+
+	if(sys_sched_class.init)
+		sys_sched_class.init();
+
+	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
+			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack);
+}
+
+subsys_init(sched_init);
 
 /* @} */
 

@@ -21,8 +21,7 @@
 
 #ifndef __ASSEMBLER__
 CDECL
-extern void avr_init_sched();
-extern void sched_init();
+extern void sched_start();
 CDECL_END
 
 #define SUBSYS_ATTRIB __attribute__((section (".subsysinit"))) \
@@ -43,9 +42,7 @@ CDECL_END
 #define CHIP_INIT_CALL(init_fn) DEV_INIT_CONTENT(init_fn)
 
 #ifdef CONFIG_SCHED
-#define sys_init() \
-	avr_init_sched(); \
-	sched_init();
+#define sys_init() sched_start();
 #else
 #define sys_init() main_init();
 #endif

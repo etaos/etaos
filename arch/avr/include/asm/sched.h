@@ -25,11 +25,9 @@
 #include <asm/io.h>
 
 CDECL
-extern void avr_init_sched(void);
 extern void avr_save_stack(stack_t *stack, struct thread *current);
 extern void avr_switch_context(stack_t *s, struct thread *tp);
 
-extern void sched_init(void);
 CDECL_END
 #define main_stack_ptr ((void*)(INTERNAL_RAMEND-CONFIG_STACK_SIZE))
 

@@ -26,7 +26,11 @@
 #include <asm/sched.h>
 #include <asm/io.h>
 
+#ifdef CONFIG_SQS
+static DEFINE_RQ(grq, &sys_sched_class);
+#else
 static DEFINE_RQ(avr_rq, &sys_sched_class);
+#endif
 
 /*static struct rq avr_rq = {
 	.sched_class = &sys_sched_class,
@@ -42,16 +46,28 @@ static DEFINE_RQ(avr_rq, &sys_sched_class);
 
 }; */
 
-/**
- * @brief Initialise the AVR scheduling core.
- * @see avr_get_sys_clk
- *
- * Basically initialises the clocksource of the AVR run queue.
- */
-void avr_init_sched(void)
+#ifdef CONFIG_SQS
+struct rq *sched_get_grq()
 {
-	avr_rq.source = avr_get_sys_clk();
+	return &grq;
 }
+
+struct rq *cpu_to_rq(int cpu)
+{
+	return &grq;
+}
+
+struct rq *sched_get_cpu_rq(void)
+{
+	return &grq;
+}
+
+struct rq *sched_select_rq(void)
+{
+	return &grq;
+}
+
+#else
 
 struct rq *cpu_to_rq(int cpu)
 {
@@ -66,6 +82,12 @@ struct rq *sched_get_cpu_rq(void)
 struct rq *sched_select_rq(void)
 {
 	return &avr_rq;
+}
+#endif
+
+struct clocksource *sched_get_clock(void)
+{
+	return avr_get_sys_clk();
 }
 
 void sched_create_stack_frame(struct thread *tp, stack_t *stack,

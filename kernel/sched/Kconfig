@@ -43,6 +43,14 @@ config LOTTERY
 
 endmenu
 
+config SQS
+	bool "Single queue scheduler"
+	default y
+	help
+	  Say 'y' here to use a single run queue, even if multiple CPU
+	  cores are present. On lower end CPU's this generally produces better
+	  throughput. If you're unsure, say 'y' here.
+
 config RR_SHARED
 	bool
 	help

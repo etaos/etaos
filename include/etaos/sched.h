@@ -194,11 +194,33 @@ extern bool should_resched(void);
 extern int cpu_get_id(void);
 /**
  * @ingroup archAPI
+ * @brief Get the scheduling clock source.
+ * @return The scheduling clock source.
+ */
+extern struct clocksource *sched_get_clock(void);
+/**
+ * @ingroup archAPI
  * @brief Get the RQ of the given cpu.
  * @param cpu CPU to get the run queue from.
  * @return The run queue of \p cpu.
  */
 extern struct rq *cpu_to_rq(int cpu);
+
+#ifdef CONFIG_SQS
+/**
+ * @ingroup archAPI
+ * @brief Get the global run queue
+ * @return The global run queue.
+ */
+extern struct rq *sched_get_grq(void);
+/**
+ * @ingroup archAPI
+ * @brief Set the global run queue.
+ * @param rq The global run queue.
+ */
+extern void sched_set_grq(struct rq *rq);
+#endif
+
 /**
  * @ingroup archAPI
  * @brief Get the run queue of the current CPU.
@@ -213,6 +235,7 @@ extern struct rq *sched_get_cpu_rq(void);
  * amount of threads already on it.
  */
 extern struct rq *sched_select_rq(void);
+
 /**
  * @ingroup archAPI
  * @brief Reschedule the CPU.
@@ -261,7 +284,7 @@ extern void rq_add_thread_no_lock(struct thread *tp);
 
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 extern void sched_yield(struct rq *rq);
-extern void sched_init(void);
+extern void sched_start(void);
 
 #if defined(CONFIG_SYS_RR)
 extern struct sched_class rr_class;
