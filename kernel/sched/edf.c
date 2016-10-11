@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup edf
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -28,21 +33,49 @@ static void edf_init(void)
 {
 }
 
+/**
+ * @brief Calculate the EDF priority ratio.
+ * @param prio Nice value to calculate the ratio for.
+ * @return The priority ratio for \p pio.
+ *
+ * The priority ratio is calculated using the following formula:\n\n
+ * \f$f(p) = \frac{13}{24}p + 10\f$\n\n
+ * Where:
+ * * \f$f(p)\f$ is the priority ratio
+ * * \f$p\f$ is the nice value
+ */
 static inline int edf_calc_ratio(unsigned char prio)
 {
 	return ((13 * prio) / 24) + 10;
 }
 
+/**
+ * @brief Check whether or not a deadline occurrs before another.
+ * @param node Deadline of a node already in the run queue.
+ * @param this Deadline to check against \p node.
+ * @return True if this <= node, false otherwise.
+ */
 static bool edf_sort_before(time_t node, time_t this)
 {
 	return this <= node;
 }
 
+/**
+ * @brief Get the deadline from a round robin entity.
+ * @param entity Round robin entity to get the deadline from.
+ * @return The deadline stored in \p entity.
+ */
 static time_t deadline(struct rr_entity *entity)
 {
 	return entity->deadline;
 }
 
+/**
+ * @brief Insert a thread into a raw queue using EDF.
+ * @param tpp Raw queue pointer to insert into.
+ * @param tp Thread pointer to insert.
+ * @return An error code (-EOK on success).
+ */
 static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 {
 	struct thread *thread;
@@ -160,6 +193,16 @@ static struct thread *edf_next_runnable(struct rq *rq)
 }
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Check if the current thread should be preempted.
+ * @param rq The run queue we're on.
+ * @param cur The current thread.
+ * @return True if \p cur should be preempted, false otherwise.
+ *
+ * This function only checks if the thread should be preempted according
+ * to the EDF principles. It has no regard to the time slice (__schedule
+ * handles time slice preemption).
+ */
 static bool edf_preempt_chk(struct rq *rq, struct thread *cur)
 {
 	struct thread *nxt;
@@ -185,6 +228,9 @@ static struct thread *edf_thread_after(struct thread *tp)
 }
 #endif
 
+/**
+ * @brief EDF scheduling class.
+ */
 struct sched_class edf_class = {
 	.init = &edf_init,
 	.rm_thread = &edf_rm_thread,
@@ -202,3 +248,7 @@ struct sched_class edf_class = {
 	.queue_rm = &edf_thread_queue_remove,
 #endif
 };
+
+/**
+ * @}
+ */
