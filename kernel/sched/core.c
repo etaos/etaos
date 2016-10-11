@@ -962,6 +962,7 @@ static void preempt_chk(struct rq *rq, struct thread *cur)
 /**
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
+ * @param preempt Boolean indicating if we can preempt a thread or not.
  * @note This function also updates:
  * 	   - threads signaled from an IRQ;
  * 	   - timers;
