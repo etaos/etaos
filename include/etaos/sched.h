@@ -289,7 +289,10 @@ extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 extern void sched_yield(struct rq *rq);
 extern void sched_start(void);
 
-#if defined(CONFIG_SYS_RR)
+#if defined(CONFIG_SYS_EDF)
+extern struct sched_class edf_class;
+#define sys_sched_class edf_class
+#elif defined(CONFIG_SYS_RR)
 extern struct sched_class rr_class;
 #define sys_sched_class rr_class
 

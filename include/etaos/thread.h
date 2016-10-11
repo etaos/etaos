@@ -99,6 +99,7 @@ struct lottery_ticket {
 struct rr_entity {
 	struct thread *next; //!< List entry pointer.
 	struct list_head tickets;
+	time_t deadline;
 };
 
 #ifdef CONFIG_THREAD_QUEUE

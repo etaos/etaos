@@ -13,6 +13,13 @@ if SCHED
 
 menu "Scheduling algorithms"
 
+config EDF
+	bool "(Virtual) Earliest Deadline First"
+	select RR_SHARED
+	select RR_ENTITY
+	help
+	  Say 'y' here to build the Earliest Deadline First algorithm.
+
 config RR
 	bool "Round robin scheduler"
 	select RR_SHARED
@@ -65,6 +72,10 @@ choice
 	help
 	  Select the default scheduling policy.
 
+config SYS_EDF
+	bool "Earliest deadline first scheduler"
+	depends on EDF
+
 config SYS_RR
 	bool "Round robin scheduler"
 	depends on RR
@@ -109,7 +120,7 @@ config IPM
 
 config DYN_PRIO
 	bool "Dynamic priorities"
-	depends on SYS_RR
+	depends on SYS_RR && !SYS_EDF
 	help
 	  Say 'y' here to enable dynamic priorities. Dynamic
 	  priorities are an extra set of priorites set by
@@ -120,7 +131,7 @@ config DYN_PRIO
 
 config PREEMPT
 	bool "CPU preemption"
-	depends on SYS_RR
+	depends on SYS_RR || SYS_EDF
 	help
 	  Say 'y' here to enable preemption. Preemption allows
 	  the scheduler to preempt the currently running task at

@@ -164,7 +164,7 @@ int main(void)
 	thread_create("test-1", &test_th_handle, NULL,
 			CONFIG_STACK_SIZE, test_stack, 150);
 	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,
-			test_stack2, 120);
+			test_stack2, 80);
 
 
 
