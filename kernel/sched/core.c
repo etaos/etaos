@@ -992,10 +992,12 @@ static void __hot __schedule(int cpu, bool preempt)
 		timer_process_clock(rq->source, tdelta);
 
 #ifdef CONFIG_PREEMPT
-	if(prev->slice <= tdelta)
+	if(prev->slice <= tdelta) {
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
-	else
+		prev->slice = 0;
+	} else {
 		prev->slice -= tdelta;
+	}
 
 	if(preempt)
 		preempt_chk(rq, prev);
