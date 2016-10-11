@@ -222,12 +222,6 @@ extern struct rq *cpu_to_rq(int cpu);
  * @return The global run queue.
  */
 extern struct rq *sched_get_grq(void);
-/**
- * @ingroup archAPI
- * @brief Set the global run queue.
- * @param rq The global run queue.
- */
-extern void sched_set_grq(struct rq *rq);
 #endif
 
 /**
