@@ -72,6 +72,45 @@
  */
 
 /**
+ * @defgroup edf Earliest Deadline First scheduler
+ * @ingroup sched
+ * @brief Documentation for the (virtual) earliest deadline first algorithm.
+ *
+ * @section principle Prinicple
+ *
+ * The earliest deadline first algorithm is a realtime scheduling algorithm
+ * which uses deadlines (time) to determine the next thread to execute.
+ * For ETA/OS it is (probably) not possible to archive hard realtime using EDF
+ * because:
+ *
+ * * The scheduling clock is not precise enough
+ * * It is extremely hard if not impossible to know before hand how long threads need to execute
+ *
+ * Therefore, it is a better solution to using virtual deadlines. This means
+ * that there is no guarantee whatsoever that the thread will be executed by 
+ * the time the deadline expires, it is merely used to select the next thread 
+ * for execution.
+ *
+ * @section prios Priorities
+ *
+ * Priorities can be handled by using so called _priority_ _ratios_. A priority
+ * is calculated using the nice value of a thread with the following formula:
+ *
+ * \f$f(p) = \frac{13p}{24} + 10\f$
+ *
+ * Where:
+ * * p is the nice value of the thread
+ *
+ * The actual deadline can then be calculated using:
+ *
+ * \f$D = t + f(p)\f$
+ *
+ * Where:
+ * * D is the deadline
+ * * t is currently tick on the scheduling clock
+ */
+
+/**
  * @defgroup rr Round robin scheduler
  * @ingroup sched
  * @brief The round robin scheduling algorithm.
