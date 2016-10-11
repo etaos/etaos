@@ -41,15 +41,14 @@ static inline void clear_bit(unsigned nr, volatile void *flags)
 	volatile unsigned char *p = ((volatile unsigned char*)flags) + 
 		(nr / BITS_PER_BYTE);
 	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	register unsigned char tmp;
 
 	__asm__ __volatile__(
-			"ld %0, %a2"	"\n\t"
-			"com %3"	"\n\t"
-			"and %0, %3"	"\n\t"
-			"st %a1, %0"	"\n\t"
-			: "=&r" (tmp), "=z" (p)
-			: "z" (p), "r" (msk)
+			"ld __tmp_reg__, %a1"	"\n\t"
+			"com %2"		"\n\t"
+			"and __tmp_reg__, %2"	"\n\t"
+			"st %a0, __tmp_reg__"	"\n\t"
+			: "=b" (p)
+			: "0" (p), "a" (msk)
 			: "memory"
 			);
 }
@@ -64,14 +63,13 @@ static inline void set_bit(unsigned nr, volatile void *addr)
 	volatile unsigned char *p = ((volatile unsigned char*)addr) + 
 		(nr / BITS_PER_BYTE);
 	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	register unsigned char tmp;
 
 	__asm__ __volatile__(
-			"ld %0, %a2"	"\n\t"
-			"or %0, %3"	"\n\t"
-			"st %a1, %0"	"\n\t"
-			: "=&r" (tmp), "=z" (p)
-			: "z" (p), "r" (msk)
+			"ld __tmp_reg__, %a1"	"\n\t"
+			"or __tmp_reg__, %2"	"\n\t"
+			"st %a0, __tmp_reg__"	"\n\t"
+			: "=b" (p)
+			: "0" (p), "a" (msk)
 			: "memory"
 			);
 }
@@ -86,14 +84,14 @@ static inline int test_bit(unsigned nr, volatile void *addr)
 {
 	volatile unsigned char *p = ((unsigned char *)addr) + 
 		(nr / BITS_PER_BYTE);
-	register char msk = 1UL << (nr % BITS_PER_BYTE);
+	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
 	register unsigned char tmp;
 
 	__asm__ __volatile__(
 			"ld %0, %a1"	"\n\t"
 			"and %0, %2"	"\n\t"
 			: "=&r" (tmp)
-			: "z" (p), "d" (msk)
+			: "b" (p), "a" (msk)
 			: "memory"
 			);
 
@@ -111,19 +109,20 @@ static inline int test_and_clear_bit(unsigned nr, volatile void *addr)
 	volatile unsigned char *p = ((unsigned char*)addr) + 
 		(nr / BITS_PER_BYTE);
 	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	register unsigned char tmp, old;
+	register unsigned char old;
 
 	__asm__ __volatile__(
-			"ld %0, %a3"	"\n\t"
-			"mov %2, %0"	"\n\t"
-			"and %2, %4"	"\n\t"
-			"com %4"	"\n\t"
-			"and %0, %4"	"\n\t"
-			"st %a1, %0"	"\n\t"
-			: "=&r" (tmp), "=z" (p), "=&r" (old)
-			: "z" (p), "d" (msk)
+			"ld __tmp_reg__, %a2"	"\n\t"
+			"mov %1, __tmp_reg__"	"\n\t"
+			"and %1, %3"		"\n\t"
+			"com %3"		"\n\t"
+			"and __tmp_reg__, %3"	"\n\t"
+			"st %a0, __tmp_reg__"	"\n\t"
+			: "=b" (p), "=&r" (old)
+			: "0" (p), "a" (msk)
 			: "memory"
 			);
+
 	return old != 0;
 }
 
@@ -138,16 +137,16 @@ static inline int test_and_set_bit(unsigned nr, volatile void *addr)
 	volatile unsigned char *p = ((unsigned char*)addr) + 
 		(nr / BITS_PER_BYTE);
 	register unsigned char msk = 1UL << (nr % BITS_PER_BYTE);
-	register unsigned char tmp, old;
+	register unsigned char old;
 
 	__asm__ __volatile__(
-			"ld %0, %a3"	"\n\t"
-			"mov %2, %0"	"\n\t"
-			"and %2, %4"	"\n\t"
-			"or %0, %4"	"\n\t"
-			"st %a1, %0"	"\n\t"
-			: "=&r" (tmp), "=z" (p), "=&r" (old)
-			: "z" (p), "d" (msk)
+			"ld __tmp_reg__, %a2"	"\n\t"
+			"mov %1, __tmp_reg__"	"\n\t"
+			"and %1, %3"		"\n\t"
+			"or __tmp_reg__, %3"	"\n\t"
+			"st %a0, __tmp_reg__"	"\n\t"
+			: "=b" (p), "=&r" (old)
+			: "0" (p), "a" (msk)
 			: "memory"
 			);
 	return old != 0;
