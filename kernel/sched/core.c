@@ -935,7 +935,7 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 	int preempt = 0;
 	
 	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
-	if(thread_is_idle(next) && preempt) {
+	if(unlikely(thread_is_idle(next) && preempt)) {
 		preempt_reset_slice(curr);
 		return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
 	}
