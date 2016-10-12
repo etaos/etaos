@@ -80,7 +80,7 @@ int rr_shared_queue_remove(struct thread *volatile*tpp,
 
 	while(thread) {
 		if(thread == tp) {
-			err = 0;
+			err = -EOK;
 			*tpp = tp->se.next;
 #ifdef CONFIG_EVENT_MUTEX
 			if(tp->ec) {

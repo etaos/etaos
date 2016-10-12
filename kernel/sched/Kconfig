@@ -11,37 +11,8 @@ menuconfig SCHED
 
 if SCHED
 
-menu "Scheduling algorithms"
-
-config RR
-	bool "Round robin scheduler"
-	select RR_SHARED
-	select RR_ENTITY
-	help
-	  Say 'y' here to use the round robin algorithm to
-	  schedule different threads.
-
-config FIFO
-	bool "FIFO scheduler"
-	select RR_SHARED
-	select RR_ENTITY
-	help
-	  Say 'y' here to use the FIFO scheduling algorithm to
-	  schedule threads. The FIFO scheduler does not take
-	  priorities into account when scheduling new threads.
-	  The queue's are sorted with the time of insertion used
-	  as the sorting key.
-
-config LOTTERY
-	bool "Lottery scheduler"
-	select RR_SHARED
-	select RR_ENTITY
-	help
-	  Say 'y'here to build the lottery scheduler. The lottery
-	  scheduler depends on random number generation to pick
-	  threads in a 'fair' way.
-
-endmenu
+source "kernel/sched/Kconfig.algo"
+source "kernel/sched/Kconfig.core"
 
 config RR_SHARED
 	bool
@@ -51,35 +22,6 @@ config RR_SHARED
 
 config RR_ENTITY
 	bool
-
-choice
-	prompt "Default algorithm"
-	help
-	  Select the default scheduling policy.
-
-config SYS_RR
-	bool "Round robin scheduler"
-	depends on RR
-
-config SYS_FIFO
-	bool "FIFO scheduler"
-	depends on FIFO
-
-config SYS_LOTTERY
-	bool "Lottery scheduler"
-	depends on LOTTERY
-
-endchoice
-
-config THREAD_QUEUE
-	bool "Thread queues"
-	select FIFO
-	help
-	  Enable support for thread queue's by saying 'y' here.
-	  Thread queue's are a storage mechanism for threads using
-	  the default scheduling policy as its storage mechanism.
-	  You can select a storage mechanism (aka scheduling
-	  algorithm) above.
 
 config EVENT_MUTEX
 	bool "Event mutexes"
@@ -99,51 +41,11 @@ config IPM
 	  'y' here. IPM can be used to communicate between different
 	  threads which might also be running on another CPU.
 
-config DYN_PRIO
-	bool "Dynamic priorities"
-	depends on SYS_RR
-	help
-	  Say 'y' here to enable dynamic priorities. Dynamic
-	  priorities are an extra set of priorites set by
-	  the scheduler to make the scheduling process more fair
-	  and reduce the chance that 2 high priority threads
-	  dead swap the entire scheduling system. If you are
-	  unsure say 'y' here.
-
-config PREEMPT
-	bool "CPU preemption"
-	depends on SYS_RR
-	help
-	  Say 'y' here to enable preemption. Preemption allows
-	  the scheduler to preempt the currently running task at
-	  any given moment.
-
-config TIME_SLICE
-	int "Time slice"
-	default 10
-	depends on PREEMPT
-	help
-	  Configure the time slice of threads. The time slice defines
-	  a period of time which threads have to execute a piece of
-	  code. After that time has expired, the system will give another
-	  thread CPU time.
-
-config IDLE_SLEEP
-	bool "Idle thread power saving"
-	depends on ARCH_POWER_SAVE
-	default y
-	help
-	  Say 'y' here to enter power saving mode when the idle thread
-	  is executed. If you are unsure, say 'y' here; the only reason
-	  to not say 'y' here is due to the slight performance loss from
-	  having to wake up the CPU.
-
 config SCHED_DBG
 	bool "Scheduling DBG"
 	help
 	  Say 'y' here to enable the scheduling debugger. This
 	  function is only useful for ETAO/OS developers. If you
 	  are unsure say 'n' here.
-
 endif
 

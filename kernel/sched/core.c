@@ -47,6 +47,7 @@
 #include <etaos/timer.h>
 #include <etaos/spinlock.h>
 #include <etaos/panic.h>
+#include <etaos/tick.h>
 
 #include <asm/io.h>
 #include <asm/sched.h>
@@ -715,7 +716,6 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 						struct thread *new)
 {
 	struct sched_class *class = rq->sched_class;
-	unsigned long flags = 0UL;
 
 	if(prev) {
 		if(test_bit(THREAD_RUNNING_FLAG, &prev->flags)) {
@@ -730,8 +730,6 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 
 	/* prev != new (this condition is ensured by __schedule) */
 	class->rm_thread(rq, new);
-	cpu_get_state(&flags);
-	prev->cpu_state = flags;
 	raw_spin_unlock_irq(&rq->lock);
 	cpu_switch_context(rq, prev, new);
 }
@@ -886,6 +884,7 @@ static inline void preempt_reset_slice(struct thread *tp)
 static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 {
 	struct thread *next = rq->current;
+	unsigned long flags = 0UL;
 
 	/*
 	 * Update the dynamic priorities of all threads that still
@@ -905,6 +904,8 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 	 */
 	preempt_reset_slice(next);
 	preempt_reset_slice(prev);
+	cpu_get_state(&flags);
+	prev->cpu_state = flags;
 }
 
 /**
@@ -936,7 +937,7 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 	int preempt = 0;
 	
 	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
-	if(thread_is_idle(next) && preempt) {
+	if(unlikely(thread_is_idle(next) && preempt)) {
 		preempt_reset_slice(curr);
 		return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
 	}
@@ -948,9 +949,22 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 #endif
 }
 
+#ifdef CONFIG_PREEMPT
+static void preempt_chk(struct rq *rq, struct thread *cur)
+{
+	struct sched_class *class = rq->sched_class;
+
+	if(class->preempt_chk(rq, cur))
+		set_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+}
+#else
+#define preempt_chk(__rq, __cur)
+#endif
+
 /**
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
+ * @param preempt Boolean indicating if we can preempt a thread or not.
  * @note This function also updates:
  * 	   - threads signaled from an IRQ;
  * 	   - timers;
@@ -961,7 +975,7 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot __schedule(int cpu)
+static void __hot __schedule(int cpu, bool preempt)
 {
 	struct rq *rq;
 	struct thread *next,
@@ -970,8 +984,8 @@ static void __hot __schedule(int cpu)
 
 	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
-	prev = rq->current;
 	raw_spin_lock_irq(&rq->lock);
+	prev = rq->current;
 
 	irq_signal_threads(rq);
 	rq_signal_threads(rq);
@@ -982,11 +996,14 @@ static void __hot __schedule(int cpu)
 
 #ifdef CONFIG_PREEMPT
 	if(prev->slice <= tdelta) {
-		prev->slice = CONFIG_TIME_SLICE;
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
+		prev->slice = 0;
 	} else {
 		prev->slice -= tdelta;
 	}
+
+	if(preempt)
+		preempt_chk(rq, prev);
 #endif
 
 	next = sched_get_next_runnable(rq);
@@ -1045,7 +1062,7 @@ void __hot schedule(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu);
+		__schedule(cpu, preemptible());
 	} while(need_resched());
 }
 
@@ -1069,7 +1086,7 @@ void __hot preempt_schedule_irq(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu);
+		__schedule(cpu, true);
 	} while(need_resched());
 	return;
 }
@@ -1119,20 +1136,15 @@ THREAD(idle_thread_func, arg)
 }
 
 /**
- * @brief Initialise the scheduler.
+ * @brief Start the scheduler.
  * @note This function doesn't return.
  *
  * The arch init initialises the scheduler using this function during boot.
  */
-void sched_init(void)
+void sched_start(void)
 {
 	struct rq *rq;
 
-	if(sys_sched_class.init)
-		sys_sched_class.init();
-
-	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
-			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack);
 	rq = sched_get_cpu_rq();
 	idle_thread.rq = rq;
 	rq->current = &idle_thread;
@@ -1293,6 +1305,22 @@ unsigned char prio(struct thread *tp)
 		return 0;
 }
 #endif
+
+static void __used sched_init(void)
+{
+	struct rq *rq;
+
+	rq = sched_get_cpu_rq();
+	rq->source = sched_get_clock();
+
+	if(sys_sched_class.init)
+		sys_sched_class.init();
+
+	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
+			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack);
+}
+
+subsys_init(sched_init);
 
 /* @} */
 

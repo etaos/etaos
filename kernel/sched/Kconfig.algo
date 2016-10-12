@@ -1,0 +1,73 @@
+# Scheduling algo options
+
+menu "Scheduling algorithms"
+
+config EDF
+	bool "(Virtual) Earliest Deadline First"
+	select RR_SHARED
+	select RR_ENTITY
+	help
+	  Say 'y' here to build the Earliest Deadline First algorithm.
+
+config RR
+	bool "Round robin scheduler"
+	select RR_SHARED
+	select RR_ENTITY
+	help
+	  Say 'y' here to use the round robin algorithm to
+	  schedule different threads.
+
+config FIFO
+	bool "FIFO scheduler"
+	select RR_SHARED
+	select RR_ENTITY
+	help
+	  Say 'y' here to use the FIFO scheduling algorithm to
+	  schedule threads. The FIFO scheduler does not take
+	  priorities into account when scheduling new threads.
+	  The queue's are sorted with the time of insertion used
+	  as the sorting key.
+
+config LOTTERY
+	bool "Lottery scheduler"
+	select RR_SHARED
+	select RR_ENTITY
+	help
+	  Say 'y'here to build the lottery scheduler. The lottery
+	  scheduler depends on random number generation to pick
+	  threads in a 'fair' way.
+
+endmenu
+
+choice
+	prompt "Default algorithm"
+	help
+	  Select the default scheduling policy.
+
+config SYS_EDF
+	bool "Earliest deadline first scheduler"
+	depends on EDF
+
+config SYS_RR
+	bool "Round robin scheduler"
+	depends on RR
+
+config SYS_FIFO
+	bool "FIFO scheduler"
+	depends on FIFO
+
+config SYS_LOTTERY
+	bool "Lottery scheduler"
+	depends on LOTTERY
+
+endchoice
+
+config EDF_LOOKUP_TABLE
+	bool "Priority ratio lookup table"
+	default n
+	depends on EDF
+	help
+	  Say 'y' here to use a look up table instead of a function
+	  to convert a priority into a priority ratio. Doing so will
+	  improve throughput on systems with a busy scheduler.
+

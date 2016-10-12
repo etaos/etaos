@@ -6,3 +6,4 @@ algo-$(CONFIG_RR)		+= rr.o
 algo-$(CONFIG_RR_SHARED)	+= rr-shared.o
 algo-$(CONFIG_FIFO)		+= fifo.o
 algo-$(CONFIG_LOTTERY)		+= lottery.o
+algo-$(CONFIG_EDF)		+= edf.o

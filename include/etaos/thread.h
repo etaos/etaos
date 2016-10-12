@@ -98,7 +98,12 @@ struct lottery_ticket {
  */
 struct rr_entity {
 	struct thread *next; //!< List entry pointer.
+#ifdef CONFIG_LOTTERY
 	struct list_head tickets;
+#endif
+#ifdef CONFIG_EDF
+	time_t deadline;
+#endif
 };
 
 #ifdef CONFIG_THREAD_QUEUE

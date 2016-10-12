@@ -66,6 +66,20 @@ static void fifo_queue_insert(struct thread *volatile*tpp, struct thread *tp)
 #endif
 }
 
+#ifdef CONFIG_PREEMPT
+static struct thread *fifo_next_runnable(struct rq *rq);
+static bool fifo_preempt_chk(struct rq *rq, struct thread *cur)
+{
+	struct thread *next;
+
+	next = fifo_next_runnable(rq);
+	if(prio(next) <= prio(cur))
+		return true;
+
+	return false;
+}
+#endif
+
 #ifdef CONFIG_THREAD_QUEUE
 /**
  * @brief Add a new thread to a queue.
@@ -160,6 +174,9 @@ struct sched_class fifo_class = {
 	.rm_thread = &fifo_rm_thread,
 	.add_thread = &fifo_add_thread,
 	.next_runnable = &fifo_next_runnable,
+#ifdef CONFIG_PREEMPT
+	.preempt_chk = &fifo_preempt_chk,
+#endif
 #ifdef CONFIG_EVENT_MUTEX
 	.thread_after = &fifo_thread_after,
 #endif
