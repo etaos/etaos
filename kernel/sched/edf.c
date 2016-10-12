@@ -124,11 +124,6 @@ static const unsigned char __pgm __prio_array[] = {
 	edf_prio_ratio(255)
 };
 
-static inline int edf_calc_ratio(unsigned char prio)
-{
-	return pgm_read_byte(__prio_array + prio);
-}
-#else
 /**
  * @brief Calculate the EDF priority ratio.
  * @param prio Nice value to calculate the ratio for.
@@ -140,6 +135,11 @@ static inline int edf_calc_ratio(unsigned char prio)
  * * \f$f(p)\f$ is the priority ratio
  * * \f$p\f$ is the nice value
  */
+static inline int edf_calc_ratio(unsigned char prio)
+{
+	return pgm_read_byte(__prio_array + prio);
+}
+#else
 static inline int edf_calc_ratio(unsigned char prio)
 {
 	return ((13 * prio) / 24) + 10;
