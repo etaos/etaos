@@ -178,7 +178,7 @@ export LDFLAGS_etaos
 
 PHONY += version
 version:
-	@echo $(KERNELVERSION)
+	@echo "ETA/OS $(KERNELVERSION)"
 
 PHONY += headers_install
 # header install
