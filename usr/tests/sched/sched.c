@@ -34,9 +34,9 @@ THREAD(test_th_handle, arg)
 	while(*idx < 2) {
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
-		printf("[test]:\t");
+		printf_P(PSTR("[test]:\t"));
 		write(fd, msg.data, msg.len);
-		printf("[test]:\ttest_thread\n");
+		printf_P(PSTR("[test]:\ttest_thread\n"));
 	}
 
 	kill();
@@ -57,9 +57,9 @@ int main(void)
 
 	for(; idx < 5; idx++) {
 		if(time_after(sys_tick, tick_orig + 1000))
-			printf("[main]:\ttm after: 1000\n");
+			printf_P(PSTR("[main]:\ttm after: 1000\n"));
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));
-		printf("[main]:\tIPM posted\n");
+		printf_P(PSTR("[main]:\tIPM posted\n"));
 
 		sleep(500);
 	}
