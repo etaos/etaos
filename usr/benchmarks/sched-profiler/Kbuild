@@ -1,0 +1,5 @@
+obj-y += sched-profiler.o
+ETAOS_LIBS += -lusart-atmega -lusart -ldriver-core -lc
+ETAOS_LIB_DIR=usr/lib/etaos
+APP_TARGET=sched-profiler.img
+clean-files=sched-profiler.img sched-profiler.hex
