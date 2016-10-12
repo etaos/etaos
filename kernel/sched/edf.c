@@ -92,6 +92,9 @@ static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 	thread = *tpp;
 	se->deadline = clocksource_get_tick(clock) + edf_calc_ratio(prio(tp));
 
+	if(test_bit(THREAD_IDLE_FLAG, &tp->flags))
+		se->deadline += 15778463000000LL;
+
 	if(thread == SIGNALED) {
 		thread = NULL;
 #ifdef CONFIG_EVENT_MUTEX
