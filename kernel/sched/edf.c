@@ -29,10 +29,6 @@
 
 #include "rr_shared.h"
 
-static void edf_init(void)
-{
-}
-
 /**
  * @brief Calculate the EDF priority ratio.
  * @param prio Nice value to calculate the ratio for.
@@ -235,7 +231,6 @@ static struct thread *edf_thread_after(struct thread *tp)
  * @brief EDF scheduling class.
  */
 struct sched_class edf_class = {
-	.init = &edf_init,
 	.rm_thread = &edf_rm_thread,
 	.add_thread = &edf_add_thread,
 	.next_runnable = &edf_next_runnable,
