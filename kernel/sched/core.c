@@ -915,16 +915,18 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
  * @retval 1 if __schedule should reschedule.
  * @retval 0 if __schedule should not reschedule.
  *
- * The decision to reschedule is made as following:
+ * When the next runnable thread is the idle thread and only
+ * \p PREEMPT_NEED_RESCHED_FLAG is set, the timeslice is reset and no
+ * reschedule operation occurs.
  *
- * Check the PREEMPT_NEED_RESCHED_FLAG flag. If this flag is set and \p next
- * is the idle thread a reschedule will only occur if THREAD_NEED_RESCHED_FLAG
- * is set (PREEMPT_NEED_RESCHED_FLAG is discarded). If \p next is \b not the
- * idle thread, the return value will be:
- * \f$ x \lor y \f$ \n
- * where \p x is the value of PREEMPT_NEED_RESCHED_FLAG; \n
- * \p y is the value of THREAD_NEED_RESCHED_FLAG. \n
- * \n
+ * If the next thread is _not_ the idle thread, the return value \p rv
+ * will be:\n\n
+ *
+ * \f$ f(rv) = x \lor y\f$\n\n
+ * Where:
+ * * \f$x\f$ is the \p PREEMPT_NEED_RESCHED_FLAG
+ * * \f$y\f$ is the \p THREAD_NEED_RESCHED_FLAG
+ *
  * When preemption is not enabled the value of THREAD_NEED_RESCHED_FLAG is
  * returned.
  */
