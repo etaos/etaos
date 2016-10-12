@@ -62,3 +62,12 @@ config SYS_LOTTERY
 
 endchoice
 
+config EDF_LOOKUP_TABLE
+	bool "Priority ratio lookup table"
+	default n
+	depends on EDF
+	help
+	  Say 'y' here to use a look up table instead of a function
+	  to convert a priority into a priority ratio. Doing so will
+	  improve throughput on systems with a busy scheduler.
+
