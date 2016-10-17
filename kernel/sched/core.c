@@ -630,11 +630,13 @@ static void rq_destroy_kill_q(struct rq *rq)
 {
 	struct thread *walker, *tmp;
 
-	walker = rq->kill_queue;
-	if(!walker)
-		return;
-
 	raw_spin_lock_irq(&rq->lock);
+	walker = rq->kill_queue;
+	if(!walker) {
+		raw_spin_unlock_irq(&rq->lock);
+		return;
+	}
+
 	for(tmp = walker->rq_next; walker; 
 			walker = tmp, tmp = walker->rq_next) {
 		raw_rq_remove_kill_thread(rq, walker);
