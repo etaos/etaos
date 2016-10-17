@@ -23,19 +23,25 @@
 #include <etaos/thread.h>
 
 extern int main(void);
+void kinit(void)
+{
 #ifdef CONFIG_SCHED
-void main_thread_func(void *arg)
-{
+	sched_start();
 #else
-void main_init(void)
-{
 	/* normally the scheduler enables the interrupts, we don't have a
 	 * scheduler to take care of us so we have to do it ourselves.
 	 */
 	irq_enable();
+	main();
+	while(true);
 #endif
+}
 
+#ifdef CONFIG_SCHED
+void main_thread_func(void *arg)
+{
 	main();
 	while(true);
 }
+#endif
 

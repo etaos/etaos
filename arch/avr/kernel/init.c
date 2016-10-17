@@ -56,8 +56,7 @@ void avr_init(void)
 #endif
 
 	dev_init();
-	sys_init();
-
+	kinit();
 	while(1);
 }
 
