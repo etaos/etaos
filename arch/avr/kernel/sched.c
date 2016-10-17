@@ -26,9 +26,7 @@
 #include <asm/sched.h>
 #include <asm/io.h>
 
-#ifdef CONFIG_SQS
-static DEFINE_RQ(grq, &sys_sched_class);
-#else
+#ifndef CONFIG_SQS
 static DEFINE_RQ(avr_rq, &sys_sched_class);
 #endif
 
@@ -47,24 +45,19 @@ static DEFINE_RQ(avr_rq, &sys_sched_class);
 }; */
 
 #ifdef CONFIG_SQS
-struct rq *sched_get_grq()
-{
-	return &grq;
-}
-
 struct rq *cpu_to_rq(int cpu)
 {
-	return &grq;
+	return sched_get_grq();
 }
 
 struct rq *sched_get_cpu_rq(void)
 {
-	return &grq;
+	return sched_get_grq();
 }
 
 struct rq *sched_select_rq(void)
 {
-	return &grq;
+	return sched_get_grq();
 }
 
 #else
