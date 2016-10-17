@@ -103,9 +103,6 @@ static struct thread *rr_next_runnable(struct rq *rq)
 #ifdef CONFIG_PREEMPT
 static bool rr_preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
 {
-	struct thread *nxt;
-
-	nxt = rr_next_runnable(rq);
 	if(prio(nxt) <= prio(cur))
 		return true;
 
