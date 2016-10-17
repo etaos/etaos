@@ -216,11 +216,6 @@ extern struct clocksource *sched_get_clock(void);
 extern struct rq *cpu_to_rq(int cpu);
 
 #ifdef CONFIG_SQS
-/**
- * @ingroup archAPI
- * @brief Get the global run queue
- * @return The global run queue.
- */
 extern struct rq *sched_get_grq(void);
 #endif
 

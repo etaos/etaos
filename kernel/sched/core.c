@@ -58,6 +58,19 @@ static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
 static bool thread_is_idle(struct thread *tp);
 #endif
 
+#ifdef CONFIG_SQS
+static DEFINE_RQ(grq, &sys_sched_class);
+
+/**
+ * @brief Get the global run queue
+ * @return The global run queue.
+ */
+struct rq *sched_get_grq(void)
+{
+	return &grq;
+}
+#endif
+
 #ifdef CONFIG_IRQ_THREAD
 DEFINE_THREAD_QUEUE(irq_thread_queue);
 
