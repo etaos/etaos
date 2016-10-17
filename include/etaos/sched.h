@@ -105,7 +105,7 @@ struct sched_class {
 	 * @param cur Current thread which could be preempted
 	 * @return True if we need to preempt, false otherwise.
 	 */
-	bool (*preempt_chk)(struct rq *rq, struct thread *cur);
+	bool (*preempt_chk)(struct rq *rq, struct thread *cur, struct thread *nxt);
 #endif
 #ifdef CONFIG_THREAD_QUEUE
 	/** 

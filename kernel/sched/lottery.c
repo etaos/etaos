@@ -145,7 +145,8 @@ static inline bool lottery_single_thread_available(struct rq *rq)
 }
 
 #ifdef CONFIG_PREEMPT
-static bool lottery_preempt_chk(struct rq *rq, struct thread *cur)
+static bool lottery_preempt_chk(struct rq *rq, struct thread *cur,
+		struct thread *next)
 {
 	return false;
 }

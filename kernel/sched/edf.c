@@ -303,11 +303,9 @@ static struct thread *edf_next_runnable(struct rq *rq)
  * to the EDF principles. It has no regard to the time slice (__schedule
  * handles time slice preemption).
  */
-static bool edf_preempt_chk(struct rq *rq, struct thread *cur)
+static bool edf_preempt_chk(struct rq *rq,
+		struct thread *cur, struct thread *nxt)
 {
-	struct thread *nxt;
-
-	nxt = edf_next_runnable(rq);
 	return edf_sort_before(deadline(&cur->se), deadline(&nxt->se));
 }
 #endif

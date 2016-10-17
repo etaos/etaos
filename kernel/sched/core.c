@@ -950,15 +950,15 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 }
 
 #ifdef CONFIG_PREEMPT
-static void preempt_chk(struct rq *rq, struct thread *cur)
+static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
 {
 	struct sched_class *class = rq->sched_class;
 
-	if(class->preempt_chk(rq, cur))
+	if(class->preempt_chk(rq, cur, nxt))
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
 }
 #else
-#define preempt_chk(__rq, __cur)
+#define preempt_chk(__rq, __cur, __nxt)
 #endif
 
 /**
@@ -1001,12 +1001,12 @@ static void __hot __schedule(int cpu, bool preempt)
 	} else {
 		prev->slice -= tdelta;
 	}
-
-	if(preempt)
-		preempt_chk(rq, prev);
 #endif
 
 	next = sched_get_next_runnable(rq);
+
+	if(preempt)
+		preempt_chk(rq, prev, next);
 
 	/*
 	 * Only reschedule if we have to. The decision is based on the
