@@ -148,6 +148,27 @@ static inline bool lottery_single_thread_available(struct rq *rq)
 static bool lottery_preempt_chk(struct rq *rq, struct thread *cur,
 		struct thread *next)
 {
+	double tickets_cur, tickets_next;
+
+	tickets_cur = tickets_next = -0.04;
+
+	if(cur->prio < 250) {
+		tickets_cur *= cur->prio;
+		tickets_cur += 10;
+	} else {
+		tickets_cur = 1;
+	}
+
+	if(next->prio < 250) {
+		tickets_next *= next->prio;
+		tickets_next += 10;
+	} else {
+		tickets_next = 1;
+	}
+
+	if(round(tickets_cur) >= round(tickets_next))
+		return true;
+
 	return false;
 }
 #endif
