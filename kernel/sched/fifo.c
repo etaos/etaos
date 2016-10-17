@@ -71,7 +71,6 @@ static struct thread *fifo_next_runnable(struct rq *rq);
 static bool fifo_preempt_chk(struct rq *rq, struct thread *cur,
 		struct thread *next)
 {
-	next = fifo_next_runnable(rq);
 	if(prio(next) <= prio(cur))
 		return true;
 
