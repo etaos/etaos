@@ -11,6 +11,7 @@
 #include <etaos/thread.h>
 #include <etaos/event.h>
 #include <etaos/hrtimer.h>
+#include <etaos/irq.h>
 #include <etaos/mem.h>
 #include <etaos/mutex.h>
 #include <etaos/time.h>
@@ -23,6 +24,7 @@
 #include <etaos/ipm.h>
 #include <asm/pgm.h>
 
+#include <asm/io.h>
 #include <etaos/sram/23k256.h>
 
 static void *test_stack;
@@ -53,6 +55,16 @@ extern int sram_stress_write(uint16_t addr, const void *buff, size_t len);
 static char *current_thread_name(void)
 {
 	return current_thread()->name;
+}
+
+static irqreturn_t threaded_irq_handle(struct irq_data *data, void *arg)
+{
+	const char *str = arg;
+
+	if(str)
+		printf_P(PSTR("[irq]:       %s\n"), str);
+
+	return IRQ_HANDLED;
 }
 
 THREAD(test_th_handle2, arg)
@@ -113,6 +125,9 @@ THREAD(test_th_handle, arg)
 	uint8_t readback = 0;
 	float sram_data;
 	char ee_string[sizeof(ee_test)];
+
+	irq_request(EXT_IRQ0_NUM, &threaded_irq_handle, IRQ_FALLING_MASK |
+			IRQ_THREADED_MASK, ee_string);
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
