@@ -58,6 +58,19 @@ static int raw_rq_remove_thread(struct rq *rq, struct thread *tp);
 static bool thread_is_idle(struct thread *tp);
 #endif
 
+#ifdef CONFIG_SQS
+static DEFINE_RQ(grq, &sys_sched_class);
+
+/**
+ * @brief Get the global run queue
+ * @return The global run queue.
+ */
+struct rq *sched_get_grq(void)
+{
+	return &grq;
+}
+#endif
+
 #ifdef CONFIG_IRQ_THREAD
 DEFINE_THREAD_QUEUE(irq_thread_queue);
 
@@ -630,11 +643,13 @@ static void rq_destroy_kill_q(struct rq *rq)
 {
 	struct thread *walker, *tmp;
 
-	walker = rq->kill_queue;
-	if(!walker)
-		return;
-
 	raw_spin_lock_irq(&rq->lock);
+	walker = rq->kill_queue;
+	if(!walker) {
+		raw_spin_unlock_irq(&rq->lock);
+		return;
+	}
+
 	for(tmp = walker->rq_next; walker; 
 			walker = tmp, tmp = walker->rq_next) {
 		raw_rq_remove_kill_thread(rq, walker);
@@ -950,15 +965,15 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 }
 
 #ifdef CONFIG_PREEMPT
-static void preempt_chk(struct rq *rq, struct thread *cur)
+static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
 {
 	struct sched_class *class = rq->sched_class;
 
-	if(class->preempt_chk(rq, cur))
+	if(class->preempt_chk(rq, cur, nxt))
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
 }
 #else
-#define preempt_chk(__rq, __cur)
+#define preempt_chk(__rq, __cur, __nxt)
 #endif
 
 /**
@@ -1001,12 +1016,12 @@ static void __hot __schedule(int cpu, bool preempt)
 	} else {
 		prev->slice -= tdelta;
 	}
-
-	if(preempt)
-		preempt_chk(rq, prev);
 #endif
 
 	next = sched_get_next_runnable(rq);
+
+	if(preempt)
+		preempt_chk(rq, prev, next);
 
 	/*
 	 * Only reschedule if we have to. The decision is based on the

@@ -78,13 +78,16 @@ void irq_handle(int irq)
 
 	cpu_notify(IRQ_ENTER);
 	data = irq_to_data(irq);
+
 	if(!data)
-		return;
+		goto err_l;
 	
 	if(!test_bit(IRQ_ENABLE_FLAG, &data->flags))
-		return;
+		goto err_l;
 
 	irq_handle_hard_irq(data);
+
+err_l:
 	cpu_notify(IRQ_EXIT);
 }
 

@@ -97,7 +97,7 @@ static int irq_request_threaded_irq(struct irq_thread_data *data)
 {
 	void *stack;
 
-	stack = kzalloc(CONFIG_STACK_SIZE);
+	stack = kzalloc(CONFIG_IRQ_STACK_SIZE);
 	if(!stack)
 		return -ENOMEM;
 

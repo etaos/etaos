@@ -68,11 +68,9 @@ static void fifo_queue_insert(struct thread *volatile*tpp, struct thread *tp)
 
 #ifdef CONFIG_PREEMPT
 static struct thread *fifo_next_runnable(struct rq *rq);
-static bool fifo_preempt_chk(struct rq *rq, struct thread *cur)
+static bool fifo_preempt_chk(struct rq *rq, struct thread *cur,
+		struct thread *next)
 {
-	struct thread *next;
-
-	next = fifo_next_runnable(rq);
 	if(prio(next) <= prio(cur))
 		return true;
 
