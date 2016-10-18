@@ -24,6 +24,15 @@ config IDLE_STACK_SIZE
 	  takes a seperate number from the main stack, due
 	  to the fact that the idle stack is much smaller.
 
+config IRQ_STACK_SIZE
+	int "Threaded IRQ stack size"
+	depends on IRQ_THREAD
+	default 768
+	help
+	  Set the size for the stacks of threaded IRQ's. Please
+	  note that the stacks of threaded IRQ's are generally
+	  a tad bigger than normal threads.
+
 config FCPU
 	int "CPU frequency"
 	default 8000000
