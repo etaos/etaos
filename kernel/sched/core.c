@@ -879,6 +879,12 @@ static inline void sched_do_signal_threads(struct rq *rq)
 #endif
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Reset the time slice for a thread.
+ * @param tp Thread to reset the time slice for.
+ *
+ * The time slice of thread \p tp will be reset to \p CONFIG_TIME_SLICE.
+ */
 static inline void preempt_reset_slice(struct thread *tp)
 {
 	if(tp)
