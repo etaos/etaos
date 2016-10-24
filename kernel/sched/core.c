@@ -973,6 +973,15 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 }
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Check if the algorithm wants to preempt the current thread.
+ * @param rq Run queue we are on.
+ * @param cur Current thread.
+ * @param nxt Next thread.
+ *
+ * When the algorithm wants to preempt the current thread, the
+ * \p PREEMPT_NEED_RESCHED_FLAG will be set.
+ */
 static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
 {
 	struct sched_class *class = rq->sched_class;
