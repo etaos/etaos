@@ -794,6 +794,8 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 /**
  * @def current
  * @param _rq Run queue to get the current thread from.
+ *
+ * Get the current thread from a specific run queue.
  */
 #define current(_rq) ((_rq)->current)
 
