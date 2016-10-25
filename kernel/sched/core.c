@@ -957,16 +957,18 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 static int __schedule_need_resched(struct thread *curr, struct thread *next)
 {
 #ifdef CONFIG_PREEMPT
-	int preempt = 0;
-	
+	int preempt;
+
+	if(unlikely(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)))
+		return true;
+
 	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
 	if(unlikely(thread_is_idle(next) && preempt)) {
 		preempt_reset_slice(curr);
-		return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+		return false;
 	}
 
-	return (preempt |
-		test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags));
+	return preempt;
 #else
 	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
 #endif
