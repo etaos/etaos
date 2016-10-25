@@ -1190,7 +1190,6 @@ void sched_start(void)
 /**
  * @brief Check whether a thread is the idle thread or not.
  * @param tp Thread to check.
- * @note Pointer comparison is used to check the thread.
  * @retval false If \p tp is not the idle thread.
  * @retval true If \p tp is the idle thread.
  */
@@ -1198,8 +1197,8 @@ static bool thread_is_idle(struct thread *tp)
 {
 	if(!tp)
 		return false;
-	
-	return (tp == &idle_thread);
+
+	return test_bit(THREAD_IDLE_FLAG, &tp->flags);
 }
 
 /**
