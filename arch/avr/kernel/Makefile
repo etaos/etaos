@@ -1,4 +1,5 @@
 obj-n += dummy.o
+obj-$(CONFIG_DELAY_US) += delay.o
 obj-$(CONFIG_ATMEGA_ANALOG:m=y) += adc.o
 obj-$(CONFIG_I2C_ATMEGA:m=y) += i2c.o
 obj-$(CONFIG_ATMEGA_SPI:m=y) += spi.o
