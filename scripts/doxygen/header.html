@@ -28,9 +28,14 @@
     <body>
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
-                <div class="navbar-header">
-                    <a class="navbar-brand">$projectname $projectnumber</a>
-                </div>
+		<div class="row">
+		    <div class="col-sm-2 logo">
+			<img alt="Logo" src="$relpath^$projectlogo"/>
+		    </div>
+		    <div class="col-sm-2 project-number">
+                        <a class="navbar-brand">$projectnumber</a>
+		    </div>
+	        </div>
             </div>
         </nav>
         <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
