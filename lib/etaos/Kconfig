@@ -1,6 +1,6 @@
 config LIBETAOS
 	tristate "ETA/OS C++ runtime"
-	depends on CPP && m
+	depends on CPP && SCHED && m
 	default n
 	help
 	  Say 'm' here to build the C++ run time libraries.

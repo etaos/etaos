@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - ETA/OS STL kernel
+ *  Eta/OS - ETA/OS STL kernel header
  *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,46 +16,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __STL_KERNEL_H__
+#define __STL_KERNEL_H__
+
 #include <etaos/kernel.h>
-#include <etaos/types.h>
-#include <etaos/error.h>
 #include <etaos/thread.h>
-#include <etaos/sched.h>
-#include <etaos/event.h>
-#include <etaos/time.h>
 
-#include <etaos/stl/kernel.h>
+class Kernel {
+public:
+	static void yield(void);
+	static void schedule(void);
+	static void sleep(unsigned int ms);
+	static void wait(void);
+	static void signal(struct thread *tp);
+	static time_t time(void);
 
-void Kernel::yield(void)
-{
-	::yield();
-}
+private:
+	Kernel() {}
+};
 
-void Kernel::schedule(void)
-{
-	::schedule();
-}
-
-void Kernel::sleep(unsigned int time)
-{
-	::sleep(time);
-}
-
-void Kernel::wait(void)
-{
-	::wait();
-}
-
-void Kernel::signal(struct thread *tp)
-{
-	::signal(tp);
-}
-
-time_t Kernel::time(void)
-{
-	time_t rv;
-
-	::time(&rv);
-	return rv;
-}
+#endif /* __STL_KERNEL_H__ */
 

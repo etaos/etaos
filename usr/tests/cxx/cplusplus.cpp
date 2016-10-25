@@ -8,6 +8,8 @@
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 
+#include <etaos/stl/kernel.h>
+
 #include <uapi/etaos/test.h>
 
 static unsigned char test_thread_stack[CONFIG_STACK_SIZE];
@@ -50,7 +52,7 @@ THREAD(test_th_handle, arg)
 
 	for(i = 0; i < 5; i++) {
 		printf("[tt] CPP test: %i::%i\n", tc->getA(), tc->getB());
-		sleep(500);
+		Kernel::sleep(500);
 	}
 
 	kill();
@@ -68,7 +70,7 @@ int main(void)
 
 	for(i = 0; i < 5; i++) {
 		printf("[mt] CPP test: %i::%i\n", tc->getA(), tc->getB());
-		sleep(500);
+		Kernel::sleep(500);
 	}
 
 	printf(CALYPSO_EXIT);
