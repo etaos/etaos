@@ -101,7 +101,7 @@ static void __used avr_timer_init(void)
 #ifdef CONFIG_DELAY_US
 static inline double us_to_loops(double us)
 {
-	return ((1.324503311f * us) + 0.1324503) * 0.9;
+	return (1.19205297 * us) + 0.11920527;
 }
 
 void arch_delay_us(double __us)
