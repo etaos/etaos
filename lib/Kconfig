@@ -6,3 +6,5 @@ config CRT
 	  Say 'y' here to build the standard C library. If unsure,
 	  say 'y' here.
 
+source "lib/etaos/Kconfig"
+

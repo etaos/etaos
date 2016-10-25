@@ -20,4 +20,5 @@ libc-files-$(CONFIG_HARVARD) += stdio/fprintf_P.o
 
 obj-$(CONFIG_CRT) += c.o
 c-y += $(libc-files-y) $(libc-files-m)
+obj-$(CONFIG_LIBETAOS) += etaos/
 
