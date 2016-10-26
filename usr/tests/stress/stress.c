@@ -127,7 +127,7 @@ THREAD(test_th_handle, arg)
 	char ee_string[sizeof(ee_test)];
 
 	irq_request(EXT_IRQ0_NUM, &threaded_irq_handle, IRQ_FALLING_MASK |
-			IRQ_THREADED_MASK, ee_string);
+			IRQ_THREADED_MASK, "threaded IRQ test");
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);

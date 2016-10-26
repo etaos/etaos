@@ -123,7 +123,7 @@ void arch_delay_us(double __us)
 #endif
 
 #ifdef CONFIG_IRQ_DEBUG
-unsigned long test_sys_tick = 0UL;
+unsigned short test_sys_tick = 0;
 #endif
 
 SIGNAL(TIMER0_OVERFLOW_VECTOR)
@@ -133,9 +133,9 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 #ifdef CONFIG_IRQ_DEBUG
 	test_sys_tick++;
 
-	if(test_sys_tick == 5000UL) {
+	if(test_sys_tick == 5000) {
 		chip->chip_handle(EXT_IRQ0_NUM);
-		test_sys_tick = 0UL;
+		test_sys_tick = 0;
 	}
 #endif
 
