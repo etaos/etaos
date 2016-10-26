@@ -27,6 +27,8 @@
 #include <etaos/clocksource.h>
 #include <etaos/tick.h>
 
+static struct clocksource *time_src = NULL;
+
 struct transitiondate {
 	int yr,
 	    yd;
@@ -217,11 +219,26 @@ time_t time(time_t *now)
 {
 	time_t n;
 
-	n = systick_get_seconds();
+	if(unlikely(!time_src))
+		time_src = sys_clk;
+
+	n = clocksource_get_seconds(time_src);
 	if(now)
 		now[0] = n;
 
 	return n;
+}
+
+/**
+ * @brief Set the clock source to use for the time API.
+ * @param src Clock source to set.
+ */
+void time_set_clocksource(struct clocksource *src)
+{
+	if(!src)
+		src = sys_clk;
+
+	time_src = src;
 }
 
 /**

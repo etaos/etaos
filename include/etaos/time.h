@@ -61,6 +61,7 @@ extern long _timezone;
 extern long _dstbias;
 
 CDECL
+extern void time_set_clocksource(struct clocksource *src);
 extern int stime(time_t time);
 extern time_t time(time_t *now);
 extern int time_isindst(struct tm * tb);
