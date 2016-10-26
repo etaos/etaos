@@ -33,7 +33,7 @@
  * @ingroup libc
  * @brief Standard I/O interface.
  *
- * Please note that, in contrast to the standard, the NUT/OS file buffers
+ * Please note that, in contrast to the standard, the ETA/OS file buffers
  * (i.e. streams), do not maintain any buffers. All input and or output is
  * directly handled by the underlaying device drivers.
  *
