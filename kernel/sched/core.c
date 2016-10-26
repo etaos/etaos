@@ -1022,15 +1022,13 @@ static void __hot __schedule(int cpu, bool preempt, bool irq)
 	raw_spin_lock_irq(&rq->lock);
 	prev = rq->current;
 
-
 	if(!irq) {
 		irq_signal_threads(rq);
 		rq_signal_threads(rq);
-
-		tdelta = clocksource_update(rq->source);
-		if(tdelta)
-			timer_process_clock(rq->source, tdelta);
 	}
+
+	tdelta = clocksource_update(rq->source);
+	timer_process_clock(rq->source, tdelta);
 
 #ifdef CONFIG_PREEMPT
 	if(prev->slice <= tdelta) {
