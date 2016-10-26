@@ -10,6 +10,7 @@
 
 #include <etaos/stl/kernel.h>
 #include <etaos/stl/cpu.h>
+#include <etaos/stl/platform.h>
 
 #include <uapi/etaos/test.h>
 
@@ -68,11 +69,11 @@ int main(void)
 				CONFIG_STACK_SIZE, test_thread_stack, 80);
 
 	tc = new TestClass(5,6);
-	CPU::pin_out(CPU::pin16, value);
+	Platform::pin_out(CPU::pin14, value);
 
 	for(i = 0; i < 5; i++) {
 		printf("[mt] CPP test: %i::%i\n", tc->getA(), tc->getB());
-		CPU::pin_write(CPU::pin16, value);
+		Platform::pin_write(CPU::pin14, value);
 		value = !value;
 		Kernel::sleep(500);
 	}
