@@ -61,6 +61,21 @@ int clocksource_init(const char *name, struct clocksource *cs,
 }
 
 /**
+ * @brief Get the clock count of a clocksource in seconds.
+ * @param src Clock to get the tick count of.
+ * @return The clock count in seconds of \p src.
+ */
+time_t clocksource_get_seconds(struct clocksource *src)
+{
+	time_t tick;
+
+	tick = clocksource_get_tick(src);
+	tick /= src->freq;
+
+	return tick;
+}
+
+/**
  * @brief Get a timer source based on its name.
  * @param name Name to search for.
  * @return The clock source, if found.
