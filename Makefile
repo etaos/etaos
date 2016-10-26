@@ -184,8 +184,8 @@ version:
 version_string = `make version`
 tag:
 	@echo "Creating a git reference for $(version_string)"
-	@$(GIT) commit -asS -m \'$(version_string)\'
-	@$(GIT) tag -sm \'$(version_string)\'
+	@$(GIT) commit -asS --message="$(version_string)"
+	@$(GIT) tag "v$(KERNELVERSION)" -s --message "$(version_string)"
 
 PHONY += headers_install
 # header install
