@@ -69,11 +69,11 @@ int main(void)
 				CONFIG_STACK_SIZE, test_thread_stack, 80);
 
 	tc = new TestClass(5,6);
-	Platform::pin_out(CPU::pin14, value);
+	Platform::pin_out(CPU::pin13, value);
 
 	for(i = 0; i < 5; i++) {
 		printf("[mt] CPP test: %i::%i\n", tc->getA(), tc->getB());
-		Platform::pin_write(CPU::pin14, value);
+		Platform::pin_write(CPU::pin13, value);
 		value = !value;
 		Kernel::sleep(500);
 	}
