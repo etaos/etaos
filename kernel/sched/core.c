@@ -873,7 +873,7 @@ static void rq_signal_threads(struct rq *rq)
 	return;
 }
 #else
-static inline void sched_do_signal_threads(struct rq *rq)
+static void rq_signal_threads(struct rq *rq)
 {
 }
 #endif
@@ -999,6 +999,7 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
  * @param preempt Boolean indicating if we can preempt a thread or not.
+ * @param irq Boolean indicating if we are in IRQ context or not.
  * @note This function also updates:
  * 	   - threads signaled from an IRQ;
  * 	   - timers;
@@ -1009,7 +1010,7 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot __schedule(int cpu, bool preempt)
+static void __hot __schedule(int cpu, bool preempt, bool irq)
 {
 	struct rq *rq;
 	struct thread *next,
@@ -1021,12 +1022,15 @@ static void __hot __schedule(int cpu, bool preempt)
 	raw_spin_lock_irq(&rq->lock);
 	prev = rq->current;
 
-	irq_signal_threads(rq);
-	rq_signal_threads(rq);
 
-	tdelta = clocksource_update(rq->source);
-	if(tdelta)
-		timer_process_clock(rq->source, tdelta);
+	if(!irq) {
+		irq_signal_threads(rq);
+		rq_signal_threads(rq);
+
+		tdelta = clocksource_update(rq->source);
+		if(tdelta)
+			timer_process_clock(rq->source, tdelta);
+	}
 
 #ifdef CONFIG_PREEMPT
 	if(prev->slice <= tdelta) {
@@ -1096,7 +1100,7 @@ void __hot schedule(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu, preemptible());
+		__schedule(cpu, preemptible(), false);
 	} while(need_resched());
 }
 
@@ -1120,7 +1124,7 @@ void __hot preempt_schedule_irq(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu, true);
+		__schedule(cpu, true, true);
 	} while(need_resched());
 	return;
 }
