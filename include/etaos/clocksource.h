@@ -91,6 +91,7 @@ extern int clocksource_init(const char *name, struct clocksource *cs,
 extern void clocksource_add_timer(struct clocksource *cs, struct timer *t);
 extern void clocksource_delete_timer(struct clocksource *cs, struct timer *timer);
 extern tick_t clocksource_update(struct clocksource *cs);
+extern time_t clocksource_get_seconds(struct clocksource *src);
 CDECL_END
 
 #endif /* CLOCKSOURCE_H */
