@@ -16,9 +16,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file include/etaos/stl/platform.h Platform class
+ */
+
 #ifndef __PLATFORM_STL_H__
 #define __PLATFORM_STL_H__
 
+/**
+ * @addtogroup stl
+ * @{
+ */
+
+/**
+ * @brief A platform specific utility class.
+ *
+ * The Platform class provides utility methods the manipulate platform
+ * specific peripherals.
+ */
 class Platform {
 public:
 	static void pin_write(unsigned short pin, int& value);
@@ -30,6 +45,8 @@ public:
 private:
 	explicit Platform() {}
 };
+
+/** @} */
 
 #endif /* __PLATFORM_STL_H__ */
 

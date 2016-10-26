@@ -24,6 +24,11 @@
 
 #include <etaos/stl/platform.h>
 
+/**
+ * @brief Write to a platform pin.
+ * @param pin Pin to write to.
+ * @param value Value to write to \p pin.
+ */
 void Platform::pin_write(unsigned short pin, int& value)
 {
 	if(pgpio_pin_request(pin))
@@ -33,6 +38,11 @@ void Platform::pin_write(unsigned short pin, int& value)
 	pgpio_pin_release(pin);
 }
 
+/**
+ * @brief Read from a platform pin.
+ * @param pin Pin to read from.
+ * @return The value read from \p pin.
+ */
 int Platform::pin_read(unsigned short pin)
 {
 	int rv;
@@ -46,6 +56,11 @@ int Platform::pin_read(unsigned short pin)
 	return rv;
 }
 
+/**
+ * @brief Change the direction of a platform pin to output.
+ * @param pin Pin to set to output.
+ * @param value Value to set on \p pin.
+ */
 void Platform::pin_out(unsigned short pin, int& value)
 {
 	if(pgpio_pin_request(pin))
@@ -55,6 +70,10 @@ void Platform::pin_out(unsigned short pin, int& value)
 	pgpio_pin_release(pin);
 }
 
+/**
+ * @brief Change the direction of a platform pin to input.
+ * @param pin Pin to change to input.
+ */
 void Platform::pin_in(unsigned short pin)
 {
 	if(pgpio_pin_request(pin))
