@@ -23,4 +23,6 @@
 
 CDECL
 extern struct clocksource *avr_get_sys_clk(void);
+extern void delay_loop(unsigned long num);
+CDECL_END
 #endif

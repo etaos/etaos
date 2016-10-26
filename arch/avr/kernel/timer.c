@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR time
- *  Copyright (C) 2014, 2015   Michel Megens
+ *  ETA/OS - AVR timers
+ *  Copyright (C) 2014, 2015, 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include <etaos/error.h>
 #include <etaos/time.h>
 #include <etaos/delay.h>
+#include <etaos/math.h>
 #include <etaos/init.h>
 
 #include <asm/timer.h>
@@ -97,46 +98,27 @@ static void __used avr_timer_init(void)
 	sysctl(SYS_SET_SYSCLK, &sysclk);
 }
 
-#define delay_loop2(__count) \
-	__asm__ __volatile__( \
-		"1: sbiw %0,1" "\n\t" \
-		"brne 1b" \
-		: "=w" (__count) \
-		: "0" (__count) \
-	);
-
-#define delay_loop(__count) \
-	__asm__ volatile ( \
-		"1: dec %0" "\n\t" \
-		"brne 1b" \
-		: "=r" (__count) \
-		: "0" (__count) \
-	);
-
 #ifdef CONFIG_DELAY_US
+static inline double us_to_loops(double us)
+{
+	return (1.19205297 * us) + 0.11920527;
+}
+
 void arch_delay_us(double __us)
 {
-	double __tmp;
-	uint16_t __ticks;
-	double __tmp2;
+	unsigned long loops = 0UL;
 
-	__tmp = ((F_CPU) / 3e6) * __us;
-	__tmp2 = ((F_CPU) / 4e6) * __us;
-	if (__tmp < 1.0) {
-		__ticks = 1;
-	}
-	else if (__tmp2 > 65535) {
-		delay(__us / 1000);
-		return;
-	} else if (__tmp > 255) {
-		__ticks = (uint16_t)__tmp2;
-		delay_loop2(__ticks);
-		return;
-	} else {
-		__ticks = (uint8_t)__tmp;
-	}
-
-	delay_loop(__ticks);
+	/*
+	 * Calculate the number of delay loops using the following
+	 * formula:
+	 *
+	 * f(x) = 1324503.311t + 0.1324503
+	 * Where:
+	 *  - f(x) is the number of delay loops required
+	 *  - t is the delay time in seconds
+	 */
+	loops = us_to_loops(__us);
+	delay_loop(loops);
 }
 #endif
 

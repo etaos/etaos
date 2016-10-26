@@ -794,6 +794,8 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 /**
  * @def current
  * @param _rq Run queue to get the current thread from.
+ *
+ * Get the current thread from a specific run queue.
  */
 #define current(_rq) ((_rq)->current)
 
@@ -871,12 +873,18 @@ static void rq_signal_threads(struct rq *rq)
 	return;
 }
 #else
-static inline void sched_do_signal_threads(struct rq *rq)
+static void rq_signal_threads(struct rq *rq)
 {
 }
 #endif
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Reset the time slice for a thread.
+ * @param tp Thread to reset the time slice for.
+ *
+ * The time slice of thread \p tp will be reset to \p CONFIG_TIME_SLICE.
+ */
 static inline void preempt_reset_slice(struct thread *tp)
 {
 	if(tp)
@@ -949,22 +957,33 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 static int __schedule_need_resched(struct thread *curr, struct thread *next)
 {
 #ifdef CONFIG_PREEMPT
-	int preempt = 0;
-	
+	int preempt;
+
+	if(unlikely(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)))
+		return true;
+
 	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
 	if(unlikely(thread_is_idle(next) && preempt)) {
 		preempt_reset_slice(curr);
-		return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+		return false;
 	}
 
-	return (preempt |
-		test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags));
+	return preempt;
 #else
 	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
 #endif
 }
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Check if the algorithm wants to preempt the current thread.
+ * @param rq Run queue we are on.
+ * @param cur Current thread.
+ * @param nxt Next thread.
+ *
+ * When the algorithm wants to preempt the current thread, the
+ * \p PREEMPT_NEED_RESCHED_FLAG will be set.
+ */
 static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
 {
 	struct sched_class *class = rq->sched_class;
@@ -980,6 +999,7 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
  * @param preempt Boolean indicating if we can preempt a thread or not.
+ * @param irq Boolean indicating if we are in IRQ context or not.
  * @note This function also updates:
  * 	   - threads signaled from an IRQ;
  * 	   - timers;
@@ -990,7 +1010,7 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot __schedule(int cpu, bool preempt)
+static void __hot __schedule(int cpu, bool preempt, bool irq)
 {
 	struct rq *rq;
 	struct thread *next,
@@ -1002,12 +1022,15 @@ static void __hot __schedule(int cpu, bool preempt)
 	raw_spin_lock_irq(&rq->lock);
 	prev = rq->current;
 
-	irq_signal_threads(rq);
-	rq_signal_threads(rq);
 
-	tdelta = clocksource_update(rq->source);
-	if(tdelta)
-		timer_process_clock(rq->source, tdelta);
+	if(!irq) {
+		irq_signal_threads(rq);
+		rq_signal_threads(rq);
+
+		tdelta = clocksource_update(rq->source);
+		if(tdelta)
+			timer_process_clock(rq->source, tdelta);
+	}
 
 #ifdef CONFIG_PREEMPT
 	if(prev->slice <= tdelta) {
@@ -1077,7 +1100,7 @@ void __hot schedule(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu, preemptible());
+		__schedule(cpu, preemptible(), false);
 	} while(need_resched());
 }
 
@@ -1101,7 +1124,7 @@ void __hot preempt_schedule_irq(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu, true);
+		__schedule(cpu, true, true);
 	} while(need_resched());
 	return;
 }
@@ -1171,7 +1194,6 @@ void sched_start(void)
 /**
  * @brief Check whether a thread is the idle thread or not.
  * @param tp Thread to check.
- * @note Pointer comparison is used to check the thread.
  * @retval false If \p tp is not the idle thread.
  * @retval true If \p tp is the idle thread.
  */
@@ -1179,8 +1201,8 @@ static bool thread_is_idle(struct thread *tp)
 {
 	if(!tp)
 		return false;
-	
-	return (tp == &idle_thread);
+
+	return test_bit(THREAD_IDLE_FLAG, &tp->flags);
 }
 
 /**
