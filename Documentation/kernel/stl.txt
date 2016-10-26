@@ -1,0 +1,15 @@
+/**
+@defgroup stl C++ runtime library
+@brief The C++ standard library for ETA/OS.
+@note This library can be used by linking with -letaos
+
+The C++ STL is a library designed to make building ETA/OS application with
+C++ a ton easier. The library consists of 3 core components:
+
+- Kernel
+- CPU
+- Platform
+
+Each of these components has its own class. Please note that these classes
+cannot be instantiated.
+*/
