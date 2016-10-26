@@ -1,5 +1,5 @@
 /*
- *  Eta/OS - ETA/OS STL kernel
+ *  ETA/OS - ETA/OS STL kernel
  *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
