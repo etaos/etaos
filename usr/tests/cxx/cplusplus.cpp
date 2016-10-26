@@ -9,6 +9,7 @@
 #include <etaos/thread.h>
 
 #include <etaos/stl/kernel.h>
+#include <etaos/stl/cpu.h>
 
 #include <uapi/etaos/test.h>
 
@@ -61,15 +62,18 @@ THREAD(test_th_handle, arg)
 int main(void)
 {
 	TestClass *tc;
-	int i;
+	int i, value = 0;
 
 	test_t = thread_create( "tst", &test_th_handle, NULL,
 				CONFIG_STACK_SIZE, test_thread_stack, 80);
 
 	tc = new TestClass(5,6);
+	CPU::pin_out(CPU::pin16, value);
 
 	for(i = 0; i < 5; i++) {
 		printf("[mt] CPP test: %i::%i\n", tc->getA(), tc->getB());
+		CPU::pin_write(CPU::pin16, value);
+		value = !value;
 		Kernel::sleep(500);
 	}
 

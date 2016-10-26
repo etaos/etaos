@@ -86,12 +86,12 @@ unit-tests:
 
   cxx-test:
     autorun: true
-    hardware: ard-uno
+    hardware: ard-mega
     mode: auto
     name: "CXX test"
     path: usr/tests/cxx
     execute: clean all hex upload
-    config: config-atmega328p.conf
+    config: config-atmega2560.conf
     port: /dev/ttyACM0
     baud: 9600
     libdir: usr/lib

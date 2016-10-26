@@ -1,5 +1,7 @@
 obj-y += cplusplus.o
-ETAOS_LIBS += -lusart-atmega -lusart -ldriver-core -letaos -lc
+ETAOS_LIBS += -latmega-gpio -lgpio \
+		-lusart-atmega -lusart -latmega-analog -lanalog \
+		-ldriver-core -lplatform -letaos -lc
 ETAOS_LIB_DIR := usr/lib/etaos
 APP_TARGET := test-app.img
 clean-files += test-app.img test-app.hex
