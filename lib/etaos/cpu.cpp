@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup stl
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -24,6 +29,11 @@
 
 #include <etaos/stl/cpu.h>
 
+/**
+ * @brief Write a value to a pin.
+ * @param pin Pin to write to.
+ * @param value Value to set on \p pin.
+ */
 void CPU::pin_write(unsigned short pin, int& value)
 {
 	struct gpio_pin *p = gpio_chip_to_pin(gpio_sys_chip, pin);
@@ -35,6 +45,11 @@ void CPU::pin_write(unsigned short pin, int& value)
 	gpio_pin_release(p);
 }
 
+/**
+ * @brief Read from a GPIO pin.
+ * @param pin Pin to read from.
+ * @return The value read from \p pin.
+ */
 int CPU::pin_read(unsigned short pin)
 {
 	int rv;
@@ -49,6 +64,10 @@ int CPU::pin_read(unsigned short pin)
 	return rv;
 }
 
+/**
+ * @brief Set a GPIO pin to input.
+ * @param pin Pin to set to input.
+ */
 void CPU::pin_in(unsigned short pin)
 {
 	struct gpio_pin *p = gpio_chip_to_pin(gpio_sys_chip, pin);
@@ -60,6 +79,11 @@ void CPU::pin_in(unsigned short pin)
 	gpio_pin_release(p);
 }
 
+/**
+ * @brief Set a GPIO pin to output.
+ * @param pin Pin to set to output.
+ * @param value Value to set on pin.
+ */
 void CPU::pin_out(unsigned short pin, int& value)
 {
 	struct gpio_pin *p = gpio_chip_to_pin(gpio_sys_chip, pin);
@@ -71,6 +95,11 @@ void CPU::pin_out(unsigned short pin, int& value)
 	gpio_pin_release(p);
 }
 
+/**
+ * @brief Read from the ADC.
+ * @param pin Analog pin to read from.
+ * @return The analog value read from \p pin.
+ */
 int CPU::adc_read(unsigned short pin)
 {
 	int fd, rv;
@@ -88,4 +117,6 @@ int CPU::adc_read(unsigned short pin)
 
 	return rv;
 }
+
+/** @} */
 

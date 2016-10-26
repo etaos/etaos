@@ -16,8 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file include/etaos/stl/cpu.h STL CPU header
+ */
+
 #ifndef __STL_CPU_H__
 #define __STL_CPU_H__
+
+/**
+ * @addtogroup stl
+ * @{
+ */
 
 #include <etaos/types.h>
 #include <etaos/gpio.h>
@@ -25,6 +34,13 @@
 
 #include <asm/io.h>
 
+/**
+ * @brief Utility class to provide access to hardware.
+ *
+ * The CPU class contains utility methods to access the core of the
+ * hardware ETA/OS is running on. There is no need to create on instance
+ * of CPU since all of its methods and fields are declared static.
+ */
 class CPU {
 public:
 #if GPIO_PINS >= 24
@@ -95,6 +111,8 @@ public:
 private:
 	CPU(void) {}
 };
+
+/** @} */
 
 #endif /* __STL_CPU_H__ */
 
