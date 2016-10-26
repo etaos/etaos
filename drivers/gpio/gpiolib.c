@@ -106,10 +106,12 @@ int gpio_pin_request(struct gpio_pin *pin)
 
 	chip = pin->chip;
 	spin_lock_irqsave(&chip->lock, flags);
-	if(test_and_set_bit(GPIO_REQUESTED, &pin->flags))
+	if(test_and_set_bit(GPIO_REQUESTED, &pin->flags)) {
 		err = -EINVAL;
-	else
+	} else {
 		err = -EOK;
+		preempt_disable();
+	}
 	spin_unlock_irqrestore(&chip->lock, flags);
 
 	return err;
@@ -126,10 +128,12 @@ int gpio_pin_release(struct gpio_pin *pin)
 		return -EINVAL;
 
 	spin_lock_irqsave(&chip->lock, flags);
-	if(test_and_clear_bit(GPIO_REQUESTED, &pin->flags))
+	if(test_and_clear_bit(GPIO_REQUESTED, &pin->flags)) {
 		err = -EOK;
-	else
+		preempt_enable();
+	} else {
 		err = 1;
+	}
 	spin_unlock_irqrestore(&chip->lock, flags);
 
 	return err;
