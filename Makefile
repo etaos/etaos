@@ -57,6 +57,7 @@ CRUROMFLAGS  = -r
 HOSTCFLAGS   = -Wall -Wno-char-subscripts -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOSTCXXFLAGS = -O2
 DOXYGEN      = doxygen
+GIT          = git
 
 KBUILD_CFLAGS := -Wall -Iinclude
 KBUILD_CXXFLAGS := -Wall -Iinclude
@@ -179,6 +180,12 @@ export LDFLAGS_etaos
 PHONY += version
 version:
 	@echo "ETA/OS $(KERNELVERSION)"
+
+version_string = `make version`
+tag:
+	@echo "Creating a git reference for $(version_string)"
+	@$(GIT) commit -asS -m \'$(version_string)\'
+	@$(GIT) tag -sm \'$(version_string)\'
 
 PHONY += headers_install
 # header install
