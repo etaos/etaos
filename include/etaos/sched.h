@@ -102,7 +102,8 @@ struct sched_class {
 	/**
 	 * @brief Check if a thread needs to be preempted.
 	 * @param rq Run queue we're on.
-	 * @param cur Current thread which could be preempted
+	 * @param cur Current thread which could be preempted.
+	 * @param nxt The thread that is to be ran next.
 	 * @return True if we need to preempt, false otherwise.
 	 */
 	bool (*preempt_chk)(struct rq *rq, struct thread *cur, struct thread *nxt);

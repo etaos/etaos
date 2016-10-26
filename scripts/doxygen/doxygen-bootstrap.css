@@ -50,6 +50,14 @@ body {
     line-height: 44px;
 }
 
+.row {
+	position:relative;
+}
+
+.project-number {
+	padding-top:120px;
+}
+
 #footer > .container {
     padding-left: 15px;
     padding-right: 15px;

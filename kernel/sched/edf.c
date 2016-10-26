@@ -297,6 +297,7 @@ static struct thread *edf_next_runnable(struct rq *rq)
  * @brief Check if the current thread should be preempted.
  * @param rq The run queue we're on.
  * @param cur The current thread.
+ * @param nxt The thread that is to be ran next.
  * @return True if \p cur should be preempted, false otherwise.
  *
  * This function only checks if the thread should be preempted according
