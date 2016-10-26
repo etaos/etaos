@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup stl
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -26,31 +31,63 @@
 
 #include <etaos/stl/kernel.h>
 
+/**
+ * @brief Yield the current thread.
+ *
+ * Check if there are other threads of higher priority than the current one,
+ * and if so reschedule the current thread.
+ */
 void Kernel::yield(void)
 {
 	::yield();
+	Kernel::schedule();
 }
 
+/**
+ * @brief Reschedule the current thread.
+ *
+ * The current thread will only be rescheduled if the scheduler deems it
+ * neccessary.
+ */
 void Kernel::schedule(void)
 {
 	::schedule();
 }
 
+/**
+ * @brief Sleep the current thread.
+ * @param time Time to sleep in milliseconds.
+ */
 void Kernel::sleep(unsigned int time)
 {
 	::sleep(time);
 }
 
+/**
+ * @brief Put the current thread in a waiting state.
+ * @see Kernel::signal
+ *
+ * The current thread will keep waiting until it is signalled using #signal.
+ */
 void Kernel::wait(void)
 {
 	::wait();
 }
 
+/**
+ * @brief Signal a waiting thread.
+ * @param tp Thread to signal.
+ * @see Kernel::wait
+ */
 void Kernel::signal(struct thread *tp)
 {
 	::signal(tp);
 }
 
+/**
+ * @brief Get the current time stamp.
+ * @return The current time stamp.
+ */
 time_t Kernel::time(void)
 {
 	time_t rv;
@@ -58,4 +95,6 @@ time_t Kernel::time(void)
 	::time(&rv);
 	return rv;
 }
+
+/** @} */
 

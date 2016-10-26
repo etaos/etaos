@@ -16,12 +16,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file include/etaos/stl/kernel.h STL kernel class
+ */
+
 #ifndef __STL_KERNEL_H__
 #define __STL_KERNEL_H__
+
+/**
+ * @addtogroup stl
+ * @{
+ */
 
 #include <etaos/kernel.h>
 #include <etaos/thread.h>
 
+/**
+ * @brief Utility class for system pheripherals.
+ *
+ * The Kernal class contains utility methods to receive information about the
+ * system state (such as time) and manipulate the system (e.g. scheduling
+ * functions).
+ */
 class Kernel {
 public:
 	static void yield(void);
@@ -34,6 +50,8 @@ public:
 private:
 	Kernel() {}
 };
+
+/** @} */
 
 #endif /* __STL_KERNEL_H__ */
 
