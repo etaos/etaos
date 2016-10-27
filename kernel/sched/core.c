@@ -896,6 +896,32 @@ static inline void preempt_reset_slice(struct thread *tp)
 }
 #endif
 
+static void __rq_update_clock(struct rq *rq)
+{
+	tick_t tdelta = 0;
+	struct thread *prev = rq->current;
+
+	tdelta = clocksource_update(rq->source);
+	timer_process_clock(rq->source, tdelta);
+
+#ifdef CONFIG_PREEMPT
+	if(prev->slice <= tdelta) {
+		set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
+		prev->slice = 0;
+	} else {
+		prev->slice -= tdelta;
+	}
+#endif
+}
+
+void rq_update_clock(void)
+{
+	struct rq *rq;
+
+	rq = sched_get_cpu_rq();
+	__rq_update_clock(rq);
+}
+
 /**
  * @brief Prepare the a reschedule.
  * @param rq Runqueue that is about to be rescheduled.
@@ -1015,7 +1041,6 @@ static void __hot __schedule(int cpu, bool preempt, bool irq)
 	struct rq *rq;
 	struct thread *next,
 		      *prev;
-	tick_t tdelta = 0;
 
 	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
@@ -1027,18 +1052,7 @@ static void __hot __schedule(int cpu, bool preempt, bool irq)
 		rq_signal_threads(rq);
 	}
 
-	tdelta = clocksource_update(rq->source);
-	timer_process_clock(rq->source, tdelta);
-
-#ifdef CONFIG_PREEMPT
-	if(prev->slice <= tdelta) {
-		set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
-		prev->slice = 0;
-	} else {
-		prev->slice -= tdelta;
-	}
-#endif
-
+	__rq_update_clock(rq);
 	next = sched_get_next_runnable(rq);
 
 	if(preempt)
