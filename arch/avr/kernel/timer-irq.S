@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR IRQ definitions
- *  Copyright (C) 2014, 2015   Michel Megens
+ *  ETA/OS - AVR timer handlers
+ *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,24 +16,47 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AVR_IRQ_H__
-#define __AVR_IRQ_H__
+#include <asm/io.h>
+#include <asm/irq.h>
+#include <asm/init.h>
 
-#define IRQ_ENTRY_ATTRIBS signal, used, externally_visible
-#define __isr __attribute__((used, externally_visible))
+/* define standard registers */
+__tmp_reg__  = 0
+__zero_reg__ = 1
 
-#define irq_vector(num) __vector_ ## num
+.section .text
 
-#define SIGNAL(_vector) \
-	void _vector(void) __attribute__((IRQ_ENTRY_ATTRIBS)); \
-	void _vector(void)
+.global TIMER0_OVERFLOW_VECTOR
+.type TIMER0_OVERFLOW_VECTOR, @function
+.extern timer0_isr
+TIMER0_OVERFLOW_VECTOR:
+	push r18
+	push r19
+	push r20
+	push r21
+	push r22
+	push r23
+	push r24
+	push r25
+	push r26
+	push r27
+	push r30
+	push r31
 
-#ifndef __ASSEMBLER__
-CDECL
-extern void arch_irq_disable(void);
-extern void arch_irq_enable(void);
-CDECL_END
-#endif /* __ASSEMBLER__ */
+	call timer0_isr
 
-#endif /* __AVR_IRQ_H__ */
+	pop r31
+	pop r30
+	pop r27
+	pop r26
+	pop r25
+	pop r24
+	pop r23
+	pop r22
+	pop r21
+	pop r20
+	pop r19
+	pop r18
+
+	reti
 
