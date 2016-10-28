@@ -16,13 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <asm/asmdef.h>
 #include <asm/io.h>
 #include <asm/irq.h>
 #include <asm/init.h>
-
-/* define standard registers */
-__tmp_reg__  = 0
-__zero_reg__ = 1
 
 .extern timer0_isr
 .extern rq_update_clock
@@ -30,95 +27,19 @@ __zero_reg__ = 1
 .section .text
 
 timer_irq_update_clocksource:
-#ifndef AVR_22BIT_PC
-	push r20
-#endif
-	push r21
-	push r22
-	push r23
-	push r24
-	push r25
-	push r26
-	push r27
-	push r30
-	push r31
-
-	push r0
-	push r1
-
-	in __tmp_reg__, AVR_STATUS_ADDR
-	push __tmp_reg__
-
-	eor __zero_reg__, __zero_reg__
-
+	irq_return_save
 	XCALL rq_update_clock
-
-	pop __tmp_reg__
-	out AVR_STATUS_ADDR, __tmp_reg__
-
-	pop r1
-	pop r0
-
-	pop r31
-	pop r30
-	pop r27
-	pop r26
-	pop r25
-	pop r24
-	pop r23
-	pop r22
-	pop r21
-	pop r20
-	pop r19
-	pop r18
+	irq_return_restore
 
 	ret
 
 .global TIMER0_OVERFLOW_VECTOR
 .type TIMER0_OVERFLOW_VECTOR, @function
 TIMER0_OVERFLOW_VECTOR:
-	push r18
-	push r19
-	push r20
-	push r21
-	push r22
-	push r23
-	push r24
-	push r25
-	push r26
-	push r27
-	push r30
-	push r31
-
-	push r0
-	push r1
-
-	in __tmp_reg__, AVR_STATUS_ADDR
-	push __tmp_reg__
-
-	eor __zero_reg__, __zero_reg__
-
+	__irq_save__
 	XCALL timer0_isr
+	__irq_restore__
 
-	pop __tmp_reg__
-	out AVR_STATUS_ADDR, __tmp_reg__
-	/* restore the stack */
-
-	pop r1
-	pop r0
-
-	pop r31
-	pop r30
-	pop r27
-	pop r26
-	pop r25
-	pop r24
-	pop r23
-	pop r22
-	pop r21
-#ifndef AVR_22BIT_PC
-	pop r20
-#endif
 	/* The registers r18:r20 are popped of by timer_irq_update_clocksource */
 	/*
 	pop r19
