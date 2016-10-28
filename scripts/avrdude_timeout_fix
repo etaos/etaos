@@ -1,0 +1,6 @@
+#!/bin/bash
+
+tty_prog=stty
+tty_prog_args="57600 raw ignbrk hup"
+
+$tty_prog $tty_prog_args < $*
