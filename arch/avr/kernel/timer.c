@@ -126,7 +126,7 @@ void arch_delay_us(double __us)
 unsigned short test_sys_tick = 0;
 #endif
 
-void __isr timer0_isr(void)
+int __isr timer0_isr(void)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 
@@ -140,7 +140,7 @@ void __isr timer0_isr(void)
 #endif
 
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
-	return;
+	return 0;
 }
 
 subsys_init(avr_timer_init);

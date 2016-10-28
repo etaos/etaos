@@ -902,23 +902,24 @@ static void __rq_update_clock(struct rq *rq)
 	struct thread *prev = rq->current;
 
 	tdelta = clocksource_update(rq->source);
-	timer_process_clock(rq->source, tdelta);
+	if(tdelta != 0LL) {
+		timer_process_clock(rq->source, tdelta);
 
 #ifdef CONFIG_PREEMPT
-	if(prev->slice <= tdelta) {
-		set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
-		prev->slice = 0;
-	} else {
-		prev->slice -= tdelta;
+		if(prev->slice <= tdelta) {
+			set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
+			prev->slice = 0;
+		} else {
+			prev->slice -= tdelta;
+		}
 	}
 #endif
 }
 
 void rq_update_clock(void)
 {
-	struct rq *rq;
+	struct rq *rq = &grq;
 
-	rq = sched_get_cpu_rq();
 	__rq_update_clock(rq);
 }
 
@@ -1050,9 +1051,9 @@ static void __hot __schedule(int cpu, bool preempt, bool irq)
 	if(!irq) {
 		irq_signal_threads(rq);
 		rq_signal_threads(rq);
+		__rq_update_clock(rq);
 	}
 
-	__rq_update_clock(rq);
 	next = sched_get_next_runnable(rq);
 
 	if(preempt)

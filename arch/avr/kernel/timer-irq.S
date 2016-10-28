@@ -24,15 +24,15 @@
 __tmp_reg__  = 0
 __zero_reg__ = 1
 
+.extern timer0_isr
+.extern rq_update_clock
+
 .section .text
 
-.global TIMER0_OVERFLOW_VECTOR
-.type TIMER0_OVERFLOW_VECTOR, @function
-.extern timer0_isr
-TIMER0_OVERFLOW_VECTOR:
-	push r18
-	push r19
+timer_irq_update_clocksource:
+#ifndef AVR_22BIT_PC
 	push r20
+#endif
 	push r21
 	push r22
 	push r23
@@ -43,7 +43,21 @@ TIMER0_OVERFLOW_VECTOR:
 	push r30
 	push r31
 
-	call timer0_isr
+	push r0
+	push r1
+
+	in __tmp_reg__, AVR_STATUS_ADDR
+	push __tmp_reg__
+
+	eor __zero_reg__, __zero_reg__
+
+	XCALL rq_update_clock
+
+	pop __tmp_reg__
+	out AVR_STATUS_ADDR, __tmp_reg__
+
+	pop r1
+	pop r0
 
 	pop r31
 	pop r30
@@ -58,5 +72,68 @@ TIMER0_OVERFLOW_VECTOR:
 	pop r19
 	pop r18
 
+	ret
+
+.global TIMER0_OVERFLOW_VECTOR
+.type TIMER0_OVERFLOW_VECTOR, @function
+TIMER0_OVERFLOW_VECTOR:
+	push r18
+	push r19
+	push r20
+	push r21
+	push r22
+	push r23
+	push r24
+	push r25
+	push r26
+	push r27
+	push r30
+	push r31
+
+	push r0
+	push r1
+
+	in __tmp_reg__, AVR_STATUS_ADDR
+	push __tmp_reg__
+
+	eor __zero_reg__, __zero_reg__
+
+	XCALL timer0_isr
+
+	pop __tmp_reg__
+	out AVR_STATUS_ADDR, __tmp_reg__
+	/* restore the stack */
+
+	pop r1
+	pop r0
+
+	pop r31
+	pop r30
+	pop r27
+	pop r26
+	pop r25
+	pop r24
+	pop r23
+	pop r22
+	pop r21
+#ifndef AVR_22BIT_PC
+	pop r20
+#endif
+	/* The registers r18:r20 are popped of by timer_irq_update_clocksource */
+	/*
+	pop r19
+	pop r18
+	*/
+#ifdef AVR_22BIT_PC
+	ldi r20, pm_hh8(timer_irq_update_clocksource)
+#endif
+	ldi r19, pm_hi8(timer_irq_update_clocksource)
+	ldi r18, pm_lo8(timer_irq_update_clocksource)
+
+	push r18
+	push r19
+#ifdef AVR_22BIT_PC
+	push r20
+#endif
 	reti
 
