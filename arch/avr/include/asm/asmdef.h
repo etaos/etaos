@@ -45,8 +45,10 @@ __zero_reg__ = 1
 	push r0
 	push r1
 
+#ifdef AVR_HAVE_RAMPZ
 	in __tmp_reg__, AVR_RAMPZ_ADDR
 	push __tmp_reg__
+#endif
 
 	in __tmp_reg__, AVR_STATUS_ADDR
 	push __tmp_reg__
@@ -59,8 +61,10 @@ __zero_reg__ = 1
 	pop __tmp_reg__
 	out AVR_STATUS_ADDR, __tmp_reg__
 
+#ifdef AVR_HAVE_RAMPZ
 	pop __tmp_reg__
 	out AVR_RAMPZ_ADDR, __tmp_reg__
+#endif
 
 	pop r1
 	pop r0
@@ -97,8 +101,10 @@ __zero_reg__ = 1
 	push r0
 	push r1
 
+#ifdef AVR_HAVE_RAMPZ
 	in __tmp_reg__, AVR_RAMPZ_ADDR
 	push __tmp_reg__
+#endif
 
 	in __tmp_reg__, AVR_STATUS_ADDR
 	push __tmp_reg__
@@ -110,10 +116,11 @@ __zero_reg__ = 1
 .macro __irq_restore__ ref
 	pop __tmp_reg__
 	out AVR_STATUS_ADDR, __tmp_reg__
-	/* restore the stack */
 
+#ifdef AVR_HAVE_RAMPZ
 	pop __tmp_reg__
 	out AVR_RAMPZ_ADDR, __tmp_reg__
+#endif
 
 	pop r1
 	pop r0
@@ -127,6 +134,7 @@ __zero_reg__ = 1
 	pop r23
 	pop r22
 	pop r21
+#ifdef CONFIG_SCHED
 #ifndef AVR_22BIT_PC
 	pop r20
 #else /* #ifdef AVR_22BIT_PC */
@@ -139,6 +147,11 @@ __zero_reg__ = 1
 	push r19
 #ifdef AVR_22BIT_PC
 	push r20
+#endif
+#else
+	pop r20
+	pop r19
+	pop r18
 #endif
 .endm
 

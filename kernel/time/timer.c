@@ -87,16 +87,17 @@ struct timer *timer_create_timer(struct clocksource *cs, unsigned long ms,
  */
 int timer_stop_timer(struct timer *timer)
 {
+	unsigned long flags;
 	struct clocksource *cs = timer->source;
 
 	if(!timer || timer == SIGNALED)
 		return -1;
 
-	_raw_spin_lock(&cs->lock);
+	raw_spin_lock_irqsave(&cs->lock, flags);
 	timer->ticks = 0;
 	timer->handle = NULL;
 	timer->tleft = 0;
-	_raw_spin_unlock(&cs->lock);
+	raw_spin_unlock_irqrestore(&cs->lock, flags);
 
 	if(timer->tleft) {
 		clocksource_delete_timer(cs, timer);

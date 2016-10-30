@@ -614,17 +614,17 @@ static void sched_sleep_timeout(struct timer *timer, void *arg)
  */
 void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 {
-	struct rq *rq;
+	unsigned long flags;
+	struct rq *rq = tp->rq;
 
-	preempt_disable();
-	rq = tp->rq;
+	raw_spin_lock_irqsave(&rq->lock, flags);
 	set_bit(THREAD_SLEEPING_FLAG, &tp->flags);
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 
 	tp->timer = timer_create_timer(rq->source, ms, &sched_sleep_timeout,
 			tp, TIMER_ONESHOT_MASK);
-	preempt_enable_no_resched();
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
 /**
@@ -951,8 +951,11 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 #ifdef CONFIG_PREEMPT
 	int preempt;
 
-	if(unlikely(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags)))
+	if(unlikely(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
+					&curr->flags))) {
+		clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
 		return true;
+	}
 
 	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
 	if(unlikely(thread_is_idle(next) && preempt)) {
@@ -1121,7 +1124,7 @@ void __hot preempt_schedule(void)
 }
 #endif
 
-static struct thread idle_thread, main_thread;
+struct thread idle_thread, main_thread;
 static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE];
 
 THREAD(idle_thread_func, arg)
@@ -1131,6 +1134,7 @@ THREAD(idle_thread_func, arg)
 	irq_enable();
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack_ptr, 120);
+	preempt_disable();
 
 	while(true) {
 		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);

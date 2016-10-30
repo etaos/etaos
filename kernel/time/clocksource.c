@@ -127,9 +127,9 @@ void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
 {
 	unsigned long flags;
 
-	_spin_lock_irqsave(&cs->lock, &flags);
+	raw_spin_lock_irqsave(&cs->lock, flags);
 	raw_clocksource_add_timer(cs, timer);
-	_spin_unlock_irqrestore(&cs->lock, &flags);
+	raw_spin_unlock_irqrestore(&cs->lock, flags);
 }
 
 /**
@@ -155,7 +155,9 @@ tick_t clocksource_update(struct clocksource *cs)
  */
 void clocksource_delete_timer(struct clocksource *cs, struct timer *timer)
 {
-	_raw_spin_lock(&cs->lock);
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&cs->lock, flags);
 	if(timer->prev)
 		timer->prev->next = timer->next;
 	else
@@ -164,7 +166,7 @@ void clocksource_delete_timer(struct clocksource *cs, struct timer *timer)
 		timer->next->prev = timer->prev;
 		timer->next->tleft += timer->tleft;
 	}
-	_raw_spin_unlock(&cs->lock);
+	raw_spin_unlock_irqrestore(&cs->lock, flags);
 }
 
 /** @} */
