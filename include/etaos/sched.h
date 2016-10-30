@@ -286,6 +286,8 @@ extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 extern void sched_yield(struct rq *rq);
 extern void sched_start(void);
 
+extern void irq_thread_signal(struct irq_thread_data *data);
+
 #if defined(CONFIG_SYS_EDF)
 extern struct sched_class edf_class;
 #define sys_sched_class edf_class

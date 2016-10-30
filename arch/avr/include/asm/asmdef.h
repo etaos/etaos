@@ -20,6 +20,7 @@
 #define __ASM_DEF_H__
 
 #include <asm/io.h>
+#include <asm/config.h>
 
 #ifdef __ASSEMBLER__
 /* define standard registers */
@@ -44,6 +45,9 @@ __zero_reg__ = 1
 	push r0
 	push r1
 
+	in __tmp_reg__, AVR_RAMPZ_ADDR
+	push __tmp_reg__
+
 	in __tmp_reg__, AVR_STATUS_ADDR
 	push __tmp_reg__
 
@@ -54,6 +58,9 @@ __zero_reg__ = 1
 .macro irq_return_restore
 	pop __tmp_reg__
 	out AVR_STATUS_ADDR, __tmp_reg__
+
+	pop __tmp_reg__
+	out AVR_RAMPZ_ADDR, __tmp_reg__
 
 	pop r1
 	pop r0
@@ -90,6 +97,9 @@ __zero_reg__ = 1
 	push r0
 	push r1
 
+	in __tmp_reg__, AVR_RAMPZ_ADDR
+	push __tmp_reg__
+
 	in __tmp_reg__, AVR_STATUS_ADDR
 	push __tmp_reg__
 
@@ -97,10 +107,13 @@ __zero_reg__ = 1
 .endm
 
 /* Restore state before leaving the IRQ */
-.macro __irq_restore__
+.macro __irq_restore__ ref
 	pop __tmp_reg__
 	out AVR_STATUS_ADDR, __tmp_reg__
 	/* restore the stack */
+
+	pop __tmp_reg__
+	out AVR_RAMPZ_ADDR, __tmp_reg__
 
 	pop r1
 	pop r0
@@ -116,6 +129,16 @@ __zero_reg__ = 1
 	pop r21
 #ifndef AVR_22BIT_PC
 	pop r20
+#else /* #ifdef AVR_22BIT_PC */
+	ldi r20, pm_hh8(\ref)
+#endif /* AVR_22BIT_PC */
+	ldi r19, pm_hi8(\ref)
+	ldi r18, pm_lo8(\ref)
+
+	push r18
+	push r19
+#ifdef AVR_22BIT_PC
+	push r20
 #endif
 .endm
 

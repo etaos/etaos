@@ -95,16 +95,10 @@ struct clocksource *clocksource_get_by_name(const char *name)
 	return NULL;
 }
 
-/**
- * @brief Add a new timer to a clocksource.
- * @param cs Clocksource to add \p timer to.
- * @param timer Timer to add.
- */
-void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
+void raw_clocksource_add_timer(struct clocksource *cs, struct timer *timer)
 {
 	struct timer *_timer;
 
-	_raw_spin_lock(&cs->lock);
 	for(_timer = cs->thead; _timer; _timer = _timer->next) {
 		if(timer->tleft < _timer->tleft) {
 			_timer->tleft -= timer->tleft;
@@ -122,7 +116,20 @@ void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
 		timer->prev->next = timer;
 	else
 		cs->thead = timer;
-	_raw_spin_unlock(&cs->lock);
+}
+
+/**
+ * @brief Add a new timer to a clocksource.
+ * @param cs Clocksource to add \p timer to.
+ * @param timer Timer to add.
+ */
+void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
+{
+	unsigned long flags;
+
+	_spin_lock_irqsave(&cs->lock, &flags);
+	raw_clocksource_add_timer(cs, timer);
+	_spin_unlock_irqrestore(&cs->lock, &flags);
 }
 
 /**

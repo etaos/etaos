@@ -28,9 +28,9 @@
 #include <asm/irq.h>
 
 #define DEFINE_SPINLOCK(__n) spinlock_t __n = { .lock = 0, }
-#define SPIN_LOCK_INIT(__n) { .lock = 0, }
+#define SPIN_LOCK_INIT(__n) { .lock = 0,}
 
-#define STATIC_SPIN_LOCK_INIT { .lock = 0, }
+#define STATIC_SPIN_LOCK_INIT { .lock = 0,}
 
 #define spinlock_init(__l) ((__l)->lock = 0)
 
@@ -76,28 +76,32 @@ static inline void _raw_spin_unlock(spinlock_t *lock)
 
 static inline void _spin_lock_irqsave(spinlock_t *lock, unsigned long *flags)
 {
-	spin_lock(lock);
+	preempt_disable();
 	irq_save_and_disable(flags);
+	raw_spin_lock(lock);
 }
 
 static inline void _spin_unlock_irqrestore(spinlock_t *lock, 
 					   unsigned long *flags)
 {
+	raw_spin_unlock(lock);
 	irq_restore(flags);
-	spin_unlock(lock);
+	preempt_enable();
 }
 
 static inline void _raw_spin_lock_irqsave(spinlock_t *lock, unsigned long *flags)
 {
-	raw_spin_lock(lock);
+	preempt_disable();
 	irq_save_and_disable(flags);
+	raw_spin_lock(lock);
 }
 
 static inline void _raw_spin_unlock_irqrestore(spinlock_t *lock, 
 					   unsigned long *flags)
 {
-	irq_restore(flags);
 	raw_spin_unlock(lock);
+	irq_restore(flags);
+	preempt_enable_no_resched();
 }
 
 /**
@@ -105,9 +109,9 @@ static inline void _raw_spin_unlock_irqrestore(spinlock_t *lock,
  * @param lock Spin lock that has to be locked.
  * @note The local interrupts will also be disabled.
  */
-static inline void raw_spin_lock_irq(spinlock_t *lock)
+static inline void raw_spin_lock_irq(spinlock_t *lock, unsigned long *flags)
 {
-	local_irq_disable();
+	irq_save_and_disable(flags);
 	arch_spin_lock(lock);
 }
 
@@ -116,10 +120,10 @@ static inline void raw_spin_lock_irq(spinlock_t *lock)
  * @param lock Spin lock that has to be unlocked.
  * @note The local interrupts will also be enabled.
  */
-static inline void raw_spin_unlock_irq(spinlock_t *lock)
+static inline void raw_spin_unlock_irq(spinlock_t *lock, unsigned long *flags)
 {
-	local_irq_enable();
 	arch_spin_unlock(lock);
+	irq_restore(flags);
 }
 
 /**

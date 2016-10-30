@@ -121,9 +121,9 @@ void event_notify(struct thread_queue *qp)
 
 	preempt_disable();
 	if(!tp) {
-		raw_spin_lock_irq(&qp->lock);
+		raw_spin_lock_irq(&qp->lock, &flags);
 		qp->qhead = SIGNALED;
-		raw_spin_unlock_irq(&qp->lock);
+		raw_spin_unlock_irq(&qp->lock, &flags);
 	} else if(tp != SIGNALED) {
 		rq = sched_get_cpu_rq();
 		__raw_event_notify(rq, qp);
@@ -144,12 +144,13 @@ void event_notify(struct thread_queue *qp)
 int event_wait(struct thread_queue *qp, unsigned ms)
 {
 	int rv;
+	unsigned long flags;
 
 	preempt_disable();
-	raw_spin_lock_irq(&qp->lock);
+	raw_spin_lock_irq(&qp->lock, &flags);
 	if(qp->qhead == SIGNALED)
 		qp->qhead = NULL;
-	raw_spin_unlock_irq(&qp->lock);
+	raw_spin_unlock_irq(&qp->lock, &flags);
 
 	preempt_enable_no_resched();
 	rv = raw_event_wait(qp, ms);
@@ -173,15 +174,15 @@ int raw_event_wait(struct thread_queue *qp, unsigned ms)
 	struct clocksource *cs;
 
 	preempt_disable();
-	raw_spin_lock_irqsave(&qp->lock, flags);
+	raw_spin_lock_irq(&qp->lock, &flags);
 	if(qp->qhead == SIGNALED) {
 		qp->qhead = NULL;
-		raw_spin_unlock_irqrestore(&qp->lock, flags);
+		raw_spin_unlock_irq(&qp->lock, &flags);
 		preempt_enable_no_resched();
 		yield();
 		return -EOK;
 	} else {
-		raw_spin_unlock_irqrestore(&qp->lock, flags);
+		raw_spin_unlock_irq(&qp->lock, &flags);
 	}
 
 	tp = current_thread();

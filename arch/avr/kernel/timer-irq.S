@@ -16,45 +16,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <asm/asmdef.h>
 #include <asm/io.h>
-#include <asm/irq.h>
 #include <asm/init.h>
+#include <asm/asmdef.h>
+#include <asm/irq.h>
+
+/* define standard registers */
+__tmp_reg__  = 0
+__zero_reg__ = 1
 
 .extern timer0_isr
 .extern rq_update_clock
+.extern preempt_schedule_irq
+.extern timer_trigger_dbg_irq
 
 .section .text
 
+.func timer_irq_update_clocksource
 timer_irq_update_clocksource:
 	irq_return_save
+	cli
+#ifdef CONFIG_IRQ_DEBUG
+	XCALL timer_trigger_dbg_irq
+#endif
 	XCALL rq_update_clock
+#ifdef CONFIG_PREEMPT_FULL
+	XCALL preempt_schedule_irq
+#endif
+	sei
 	irq_return_restore
-
 	ret
+.endfunc
 
 .global TIMER0_OVERFLOW_VECTOR
 .type TIMER0_OVERFLOW_VECTOR, @function
 TIMER0_OVERFLOW_VECTOR:
 	__irq_save__
 	XCALL timer0_isr
-	__irq_restore__
-
-	/* The registers r18:r20 are popped of by timer_irq_update_clocksource */
-	/*
-	pop r19
-	pop r18
-	*/
-#ifdef AVR_22BIT_PC
-	ldi r20, pm_hh8(timer_irq_update_clocksource)
-#endif
-	ldi r19, pm_hi8(timer_irq_update_clocksource)
-	ldi r18, pm_lo8(timer_irq_update_clocksource)
-
-	push r18
-	push r19
-#ifdef AVR_22BIT_PC
-	push r20
-#endif
+	__irq_restore__ timer_irq_update_clocksource
 	reti
 

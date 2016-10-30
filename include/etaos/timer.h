@@ -83,25 +83,10 @@ CDECL
 /**
  * @brief Safely increment the tick count of a clock source.
  * @param cs Clock source which tick count is to be incremented.
- * @note The lock of \p cs won't be aquired, only interrupts will be
- * 	 disabled.
- * @note This function does provide overflow protection.
  */
 static inline void timer_source_inc(struct clocksource *cs)
 {
-	unsigned int diff;
-	unsigned long flags;
-
-	irq_save_and_disable(&flags);
-	if((cs->count + 1UL) == 0) {
-		diff = cs->count - cs->tc_update;
-		diff += 1;
-		cs->tc_update = 0;
-		cs->count = diff;
-	} else {
-		cs->count++;
-	}
-	irq_restore(&flags);
+	cs->count += 1LL;
 }
 
 extern struct timer *timer_create_timer(struct clocksource *cs, unsigned long ms,

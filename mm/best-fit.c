@@ -66,8 +66,9 @@ MEM void *mm_alloc(size_t size)
 {
 	void *rval = NULL;
 	struct heap_node *c, *bf, *bf_prev, *prev;
+	unsigned long flags;
 
-	spin_lock(&mlock);
+	spin_lock_irqsave(&mlock, flags);
 	c = mm_head;
 	prev = NULL;
 	bf = NULL;
@@ -105,7 +106,7 @@ done_l:
 	rval += sizeof(*c);
 
 err_l:
-	spin_unlock(&mlock);
+	spin_unlock_irqrestore(&mlock, flags);
 	return rval;
 }
 
@@ -119,9 +120,10 @@ err_l:
 int mm_kfree(void *ptr)
 {
 	struct heap_node *node, *c;
+	unsigned long flags;
 	int err = -1;
 
-	spin_lock(&mlock);
+	spin_lock_irqsave(&mlock, flags);
 	node = ptr - sizeof(*node);
 
 	if(node->magic != MM_MAGIC_BYTE)
@@ -145,7 +147,7 @@ int mm_kfree(void *ptr)
 	err = 0;
 
 err_l:
-	spin_unlock(&mlock);
+	spin_unlock_irqrestore(&mlock, flags);
 	return err;
 }
 

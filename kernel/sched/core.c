@@ -83,11 +83,25 @@ DEFINE_THREAD_QUEUE(irq_thread_queue);
 static void irq_thread_wait(void)
 {
 	struct thread *tp = current_thread();
-	
+
 	set_bit(THREAD_WAITING_FLAG, &tp->flags);
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	schedule();
+}
+
+void irq_thread_signal(struct irq_thread_data *data)
+{
+	struct thread *tp = data->owner;
+
+	if(!tp)
+		return;
+
+	if(test_and_clear_bit(THREAD_WAITING_FLAG, &tp->flags))
+	{
+		set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+		rq_add_thread_no_lock(tp);
+	}
 }
 
 /**
@@ -642,11 +656,12 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
 static void rq_destroy_kill_q(struct rq *rq)
 {
 	struct thread *walker, *tmp;
+	unsigned long flags;
 
-	raw_spin_lock_irq(&rq->lock);
+	raw_spin_lock_irq(&rq->lock, &flags);
 	walker = rq->kill_queue;
 	if(!walker) {
-		raw_spin_unlock_irq(&rq->lock);
+		raw_spin_unlock_irq(&rq->lock, &flags);
 		return;
 	}
 
@@ -656,7 +671,7 @@ static void rq_destroy_kill_q(struct rq *rq)
 		sched_free_stack_frame(walker);
 		kfree(walker);
 	}
-	raw_spin_unlock_irq(&rq->lock);
+	raw_spin_unlock_irq(&rq->lock, &flags);
 }
 
 /**
@@ -670,9 +685,9 @@ static unsigned long __sched_switch_count(int cpu)
 	unsigned long num;
 
 	rq = cpu_to_rq(cpu);
-	raw_spin_lock_irq(&rq->lock);
+	spin_lock(&rq->lock);
 	num = rq->switch_count;
-	raw_spin_unlock_irq(&rq->lock);
+	spin_unlock(&rq->lock);
 
 	return num;
 }
@@ -728,7 +743,8 @@ static inline void dyn_prio_update(struct rq *rq)
  * @param new New thread to replace \p prev.
  */
 static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
-						struct thread *new)
+						struct thread *new,
+						unsigned long *flags)
 {
 	struct sched_class *class = rq->sched_class;
 
@@ -745,7 +761,7 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 
 	/* prev != new (this condition is ensured by __schedule) */
 	class->rm_thread(rq, new);
-	raw_spin_unlock_irq(&rq->lock);
+	raw_spin_unlock_irq(&rq->lock, flags);
 	cpu_switch_context(rq, prev, new);
 }
 
@@ -798,46 +814,6 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
  * Get the current thread from a specific run queue.
  */
 #define current(_rq) ((_rq)->current)
-
-#ifdef CONFIG_IRQ_THREAD
-/**
- * @brief Signal threads that function as an IRQ.
- * @param rq Current run queue.
- *
- * IRQ's can be configured to be handled in threaded context instead of IRQ
- * context. This function is responsible for waking up the correct threads
- * when one of these IRQ's has been triggered by external hardware.
- */
-static void irq_signal_threads(struct rq *rq)
-{
-	struct list_head *icarriage;
-	struct irq_chip *chip = irq_get_chip();
-	struct irq_data *idata;
-	struct irq_thread_data *tdata;
-	struct thread *tp;
-
-	list_for_each(icarriage, &chip->irqs) {
-		idata = list_entry(icarriage, struct irq_data, irq_list);
-		if(likely(!test_bit(IRQ_THREADED_FLAG, &idata->flags) ||
-				!test_bit(IRQ_ENABLE_FLAG, &idata->flags)))
-			continue;
-
-		tdata = container_of(idata, struct irq_thread_data, idata);
-		tp = tdata->owner;
-		if(tp->ec) {
-			clear_bit(THREAD_WAITING_FLAG, &tp->flags);
-			rq_add_thread_no_lock(tp);
-			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
-		}
-	}
-
-	return;
-}
-#else
-static inline void irq_signal_threads(struct rq *rq)
-{
-}
-#endif
 
 #ifdef CONFIG_EVENT_MUTEX
 /**
@@ -898,22 +874,11 @@ static inline void preempt_reset_slice(struct thread *tp)
 
 static void __rq_update_clock(struct rq *rq)
 {
-	tick_t tdelta = 0;
-	struct thread *prev = rq->current;
+	unsigned int tdelta = 0;
 
 	tdelta = clocksource_update(rq->source);
-	if(tdelta != 0LL) {
-		timer_process_clock(rq->source, tdelta);
+	timer_process_clock(rq->source, tdelta);
 
-#ifdef CONFIG_PREEMPT
-		if(prev->slice <= tdelta) {
-			set_bit(PREEMPT_NEED_RESCHED_FLAG, &prev->flags);
-			prev->slice = 0;
-		} else {
-			prev->slice -= tdelta;
-		}
-	}
-#endif
 }
 
 void rq_update_clock(void)
@@ -1037,22 +1002,19 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot __schedule(int cpu, bool preempt, bool irq)
+static void __hot __schedule(int cpu, bool preempt)
 {
 	struct rq *rq;
 	struct thread *next,
 		      *prev;
+	unsigned long flags;
 
 	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
-	raw_spin_lock_irq(&rq->lock);
+	raw_spin_lock_irq(&rq->lock, &flags);
 	prev = rq->current;
 
-	if(!irq) {
-		irq_signal_threads(rq);
-		rq_signal_threads(rq);
-		__rq_update_clock(rq);
-	}
+	rq_signal_threads(rq);
 
 	next = sched_get_next_runnable(rq);
 
@@ -1069,11 +1031,11 @@ static void __hot __schedule(int cpu, bool preempt, bool irq)
 		rq->switch_count++;
 
 		__schedule_prepare(rq, prev);
-		rq_switch_context(rq, prev, next);
+		rq_switch_context(rq, prev, next, &flags);
 		rq_update(rq);
 
 	} else {
-		raw_spin_unlock_irq(&rq->lock);
+		raw_spin_unlock_irq(&rq->lock, &flags);
 	}
 
 	rq_destroy_kill_q(rq);
@@ -1113,7 +1075,7 @@ void __hot schedule(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu, preemptible(), false);
+		__schedule(cpu, preemptible());
 	} while(need_resched());
 }
 
@@ -1130,14 +1092,9 @@ void __hot preempt_schedule_irq(void)
 	if(preempt_count())
 		return;
 
-	if(!in_irq_context()) {
-		panic_P("preempt_schedule_irq() called outside "
-				"of IRQ context\n");
-	}
-
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu, true, true);
+		__schedule(cpu, true);
 	} while(need_resched());
 	return;
 }
@@ -1174,7 +1131,6 @@ THREAD(idle_thread_func, arg)
 	irq_enable();
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack_ptr, 120);
-	preempt_disable();
 
 	while(true) {
 		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);

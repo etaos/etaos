@@ -38,12 +38,16 @@ DEFINE_SPINLOCK(mlock);
  */
 void mm_heap_add_block(void *start, size_t size)
 {
-	spin_lock(&mlock);
-	if(!mm_head)
+	unsigned long flags;
+
+	spin_lock_irqsave(&mlock, flags);
+	if(!mm_head) {
+		spin_unlock_irqrestore(&mlock, flags);
 		return;
+	}
 
 	mm_init_node(start, size - sizeof(struct heap_node));
-	spin_unlock(&mlock);
+	spin_unlock_irqrestore(&mlock, flags);
 	kfree(start+sizeof(struct heap_node));
 }
 

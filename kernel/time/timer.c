@@ -106,6 +106,7 @@ int timer_stop_timer(struct timer *timer)
 	return 0;
 }
 
+extern void raw_clocksource_add_timer(struct clocksource *cs, struct timer *timer);
 /**
  * @brief Process a given clock source and its timers.
  * @param cs Clock source to process.
@@ -116,10 +117,12 @@ void timer_process_clock(struct clocksource *cs, unsigned int diff)
 {
 	struct timer *timer;
 	
-	if(!cs->thead || diff < 0 || diff == 0)
-		return;
-
 	_raw_spin_lock(&cs->lock);
+	if(!cs->thead || diff < 0 || diff == 0) {
+		_raw_spin_unlock(&cs->lock);
+		return;
+	}
+
 	while(cs->thead && diff) {
 		timer = cs->thead;
 
@@ -133,9 +136,7 @@ void timer_process_clock(struct clocksource *cs, unsigned int diff)
 
 		if(timer->tleft == 0) {
 			if(timer->handle) {
-				_raw_spin_unlock(&cs->lock);
 				timer->handle(timer, timer->priv_data);
-				_raw_spin_lock(&cs->lock);
 			}
 
 			cs->thead = cs->thead->next;
@@ -145,9 +146,7 @@ void timer_process_clock(struct clocksource *cs, unsigned int diff)
 			if((timer->tleft = timer->ticks) == 0) {
 				kfree(timer);
 			} else {
-				_raw_spin_unlock(&cs->lock);
-				timer_start_timer(timer);
-				_raw_spin_lock(&cs->lock);
+				raw_clocksource_add_timer(cs, timer);
 			}
 		}
 	}

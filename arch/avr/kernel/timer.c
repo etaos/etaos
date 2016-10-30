@@ -124,23 +124,25 @@ void arch_delay_us(double __us)
 
 #ifdef CONFIG_IRQ_DEBUG
 unsigned short test_sys_tick = 0;
-#endif
 
-int __isr timer0_isr(void)
+void timer_trigger_dbg_irq(void)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
-
-#ifdef CONFIG_IRQ_DEBUG
 	test_sys_tick++;
 
 	if(test_sys_tick == 5000) {
 		chip->chip_handle(EXT_IRQ0_NUM);
 		test_sys_tick = 0;
 	}
+}
 #endif
 
+void __isr timer0_isr(void)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
-	return 0;
+	return;
 }
 
 subsys_init(avr_timer_init);

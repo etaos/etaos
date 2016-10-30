@@ -28,6 +28,7 @@
 #include <etaos/irq.h>
 #include <etaos/panic.h>
 #include <etaos/preempt.h>
+#include <etaos/thread.h>
 
 /**
  * @brief Halt the system.
