@@ -17,9 +17,10 @@ config IRQ_THREAD
 	  overhead in the kernel. If unsure say 'n' here.
 
 config IRQ_DEBUG
-	bool "IRQ debug support"
+	bool "Threaded IRQ debug support"
+	depends on IRQ_THREAD
 	help
-	  Say 'y' here if you want to build IRQ debugging. This
-	  option is useful for ETA/OS developers. If you are
+	  Say 'y' here if you want to build debugging symbols for IRQ
+	  threads. This option is useful for ETA/OS developers. If you are
 	  unsure say 'N' here.
 endif
