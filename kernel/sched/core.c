@@ -131,6 +131,12 @@ static inline struct thread_queue *thread_to_queue(struct thread *tp)
 		return NULL;
 }
 
+/**
+ * @brief Thread queue timeout function.
+ * @param timer Timer that has timed out.
+ * @param arg Thread related to the event.
+ * @note This function is a timer handle.
+ */
 static void queue_wait_tmo(struct timer *timer, void *arg)
 {
 	struct thread *tp = arg;
@@ -143,6 +149,11 @@ static void queue_wait_tmo(struct timer *timer, void *arg)
 	rq_add_thread_no_lock(tp);
 }
 
+/**
+ * @brief Let a thread wait on a thread queue.
+ * @param qp Thread queue to wait on.
+ * @param ms Miliseconds to wait on \p qp.
+ */
 void thread_queue_wait(struct thread_queue *qp, unsigned int ms)
 {
 	struct thread *current = current_thread();
