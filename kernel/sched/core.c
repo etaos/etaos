@@ -1136,7 +1136,7 @@ THREAD(idle_thread_func, arg)
 
 	irq_enable();
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
-			CONFIG_STACK_SIZE, main_stack_ptr, 120);
+			CONFIG_STACK_SIZE, main_stack_ptr, SCHED_DEFAULT_PRIO);
 	preempt_disable();
 
 	while(true) {
