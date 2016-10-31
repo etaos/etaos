@@ -83,8 +83,7 @@ void sched_init_idle(struct thread *tp, const char *name,
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack)
 {
-	raw_thread_init(tp, name, handle, arg, stack_size,
-			stack, SCHED_LOWEST_PRIO);
+	raw_thread_init(tp, name, handle, arg, stack_size, stack, 255);
 	set_bit(THREAD_IDLE_FLAG, &tp->flags);
 }
 
