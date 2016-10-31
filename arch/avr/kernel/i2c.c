@@ -22,7 +22,7 @@
 #include <asm/io.h>
 #include <asm/irq.h>
 
-SIGNAL(TWI_STC_VECTOR)
+void i2c_stc_irq(void)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 	chip->chip_handle(TWI_STC_VECTOR_NUM);

@@ -25,14 +25,13 @@
 .section .text
 
 /* void asm_sched_preempt_schedule(void); */
-.global asm_sched_preempt_schedule_irq
-.type asm_sched_preempt_schedule_irq, @function
+.global asm_preempt_schedule_irq
+.type asm_preempt_schedule_irq, @function
 asm_preempt_schedule_irq:
-#ifdef CONFIG_PREEMPT_FULL
+#ifdef CONFIG_PREEMPT
 	irq_return_save
 	cli
 	XCALL preempt_schedule_irq
-	sei
 	irq_return_restore
 #endif
 	ret

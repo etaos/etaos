@@ -878,7 +878,6 @@ static void __rq_update_clock(struct rq *rq)
 
 	tdelta = clocksource_update(rq->source);
 	timer_process_clock(rq->source, tdelta);
-
 }
 
 void rq_update_clock(void)
@@ -951,7 +950,7 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
 #ifdef CONFIG_PREEMPT
 	int preempt;
 
-	if(unlikely(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
+	if(likely(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
 					&curr->flags))) {
 		clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
 		return true;
@@ -1000,7 +999,6 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  * 	   - timers;
  * 	   - threads which have used up their time slice;
  * 	   - the kill queue of the run queue;
- * 	   - irq threads which have to be woken up.
  * @see __schedule_need_resched
  *
  * struct rq::lock will be locked (and unlocked).
@@ -1017,6 +1015,11 @@ static void __hot __schedule(int cpu, bool preempt)
 	raw_spin_lock_irq(&rq->lock, &flags);
 	prev = rq->current;
 
+	/*
+	 * Run the sched clock and wake up threads that received an event
+	 * from an IRQ.
+	 */
+	rq_update_clock();
 	rq_signal_threads(rq);
 
 	next = sched_get_next_runnable(rq);
@@ -1124,7 +1127,7 @@ void __hot preempt_schedule(void)
 }
 #endif
 
-struct thread idle_thread, main_thread;
+static struct thread idle_thread, main_thread;
 static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE];
 
 THREAD(idle_thread_func, arg)

@@ -26,31 +26,16 @@ __tmp_reg__  = 0
 __zero_reg__ = 1
 
 .extern timer0_isr
-.extern rq_update_clock
 .extern preempt_schedule_irq
+.extern asm_preempt_schedule_irq
 
 .section .text
-
-.func asm_preempt_schedule_timer
-asm_preempt_schedule_timer:
-#ifdef CONFIG_SCHED
-	irq_return_save
-	cli
-	XCALL rq_update_clock
-#ifdef CONFIG_PREEMPT_FULL
-	XCALL preempt_schedule_irq
-#endif
-	sei
-	irq_return_restore
-#endif
-	ret
-.endfunc
 
 .global TIMER0_OVERFLOW_VECTOR
 .type TIMER0_OVERFLOW_VECTOR, @function
 TIMER0_OVERFLOW_VECTOR:
 	__irq_save__
 	XCALL timer0_isr
-	__irq_restore__ asm_preempt_schedule_timer
+	__irq_restore__ asm_preempt_schedule_irq
 	reti
 

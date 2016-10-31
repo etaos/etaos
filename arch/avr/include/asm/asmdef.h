@@ -134,7 +134,7 @@ __zero_reg__ = 1
 	pop r23
 	pop r22
 	pop r21
-#ifdef CONFIG_SCHED
+#ifdef CONFIG_PREEMPT_FULL
 #ifndef AVR_22BIT_PC
 	pop r20
 #else /* #ifdef AVR_22BIT_PC */
