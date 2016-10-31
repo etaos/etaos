@@ -76,9 +76,8 @@ DEFINE_THREAD_QUEUE(irq_thread_queue);
 
 /**
  * @brief Put an IRQ thread in a waiting state.
- * @note The thread wont wake up until it is signaled and woken up by
- *       irq_signal_threads.
- * @see irq_signal_threads schedule
+ * @note This is a specialised version of #wait.
+ * @see signal irq_thread_signal wait
  */
 static void irq_thread_wait(void)
 {
@@ -90,6 +89,11 @@ static void irq_thread_wait(void)
 	schedule();
 }
 
+/**
+ * @brief Wake an IRQ thread up.
+ * @param data Threaded IRQ to wake up.
+ * @see signal wait irq_thread_wait
+ */
 void irq_thread_signal(struct irq_thread_data *data)
 {
 	struct thread *tp = data->owner;
@@ -741,6 +745,8 @@ static inline void dyn_prio_update(struct rq *rq)
  * @param rq Run queue to use for the context.
  * @param prev Previous thread.
  * @param new New thread to replace \p prev.
+ * @param flags IRQ flags stored by __schedule
+ * @see __schedule
  */
 static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 						struct thread *new,
@@ -872,6 +878,10 @@ static inline void preempt_reset_slice(struct thread *tp)
 }
 #endif
 
+/**
+ * @brief Update the scheduling clock.
+ * @param rq Run queue (AKA CPU) to update.
+ */
 static void __rq_update_clock(struct rq *rq)
 {
 	unsigned int tdelta = 0;
@@ -880,6 +890,10 @@ static void __rq_update_clock(struct rq *rq)
 	timer_process_clock(rq->source, tdelta);
 }
 
+/**
+ * @brief API version of #__rq_update_clock.
+ * @see __rq_update_clock
+ */
 void rq_update_clock(void)
 {
 	struct rq *rq = &grq;
@@ -993,7 +1007,6 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
  * @param preempt Boolean indicating if we can preempt a thread or not.
- * @param irq Boolean indicating if we are in IRQ context or not.
  * @note This function also updates:
  * 	   - threads signaled from an IRQ;
  * 	   - timers;
@@ -1088,8 +1101,11 @@ void __hot schedule(void)
 #ifdef CONFIG_PREEMPT
 /**
  * @brief Preempt a thread from IRQ context.
- * @note This function will panic if the CPU is not in IRQ context.
- * @see __schedule preempt_schedule
+ * @see __schedule preempt_schedule.
+ *
+ * This function is the entry point to the scheduler from locations where
+ * the interrupts are already disabled. The most notable use of this function
+ * is the 'off IRQ return' preemption calls.
  */
 void __hot preempt_schedule_irq(void)
 {
