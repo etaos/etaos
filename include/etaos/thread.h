@@ -184,8 +184,18 @@ struct thread {
 #define THREAD_IDLE_FLAG	 6 //!< Thread is the idle thread.
 /** @} */
 
-CDECL
+/**
+ * @name Thread priority's
+ * @{
+ */
+#define SCHED_DEFAULT_PRIO	120 //!< Default 'avarage' priority.
+#define SCHED_HIGH_PRIO		 40 //!< Standard high priority.
+#define SCHED_LOW_PRIO		200 //!< Standard low priority.
+#define SCHED_HIGHEST_PRIO	  0 //!< Highest possible priority.
+#define SCHED_LOWEST_PRIO	255 //!< Lowest possible priority.
+/** @} */
 
+CDECL
 extern int thread_initialise(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack, unsigned char prio);

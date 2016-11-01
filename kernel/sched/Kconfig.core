@@ -38,6 +38,14 @@ config PREEMPT
 	  the scheduler to preempt the currently running task at
 	  any given moment.
 
+config PREEMPT_FULL
+	bool "Full CPU preemption"
+	depends on PREEMPT
+	help
+	  Say 'y' here to enable full CPU preemtion. Full CPU preemption
+	  means that the scheduler is also called after an interrupt
+	  finished its execution.
+
 config TIME_SLICE
 	int "Time slice"
 	default 10

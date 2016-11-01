@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - AVR I2C support
+ *  ETA/OS - AVR timer handlers
  *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -15,16 +15,27 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <etaos/kernel.h>
-#include <etaos/types.h>
-#include <etaos/irq.h>
 
 #include <asm/io.h>
+#include <asm/init.h>
+#include <asm/asmdef.h>
 #include <asm/irq.h>
 
-void i2c_stc_irq(void)
-{
-	struct irq_chip *chip = arch_get_irq_chip();
-	chip->chip_handle(TWI_STC_VECTOR_NUM);
-}
+/* define standard registers */
+__tmp_reg__  = 0
+__zero_reg__ = 1
+
+.extern timer0_isr
+.extern preempt_schedule_irq
+.extern asm_preempt_schedule_irq
+
+.section .text
+
+.global TIMER0_OVERFLOW_VECTOR
+.type TIMER0_OVERFLOW_VECTOR, @function
+TIMER0_OVERFLOW_VECTOR:
+	__irq_save__
+	XCALL timer0_isr
+	__irq_restore__ asm_preempt_schedule_irq
+	reti
 

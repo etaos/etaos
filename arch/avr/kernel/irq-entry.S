@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - AVR I2C support
+ *  ETA/OS - AVR IRQ entry points
  *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -15,16 +15,32 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <etaos/kernel.h>
-#include <etaos/types.h>
-#include <etaos/irq.h>
 
-#include <asm/io.h>
 #include <asm/irq.h>
+#include <asm/asmdef.h>
+#include <asm/io.h>
 
-void i2c_stc_irq(void)
-{
-	struct irq_chip *chip = arch_get_irq_chip();
-	chip->chip_handle(TWI_STC_VECTOR_NUM);
-}
+.extern i2c_stc_irq
+.extern spi_stc_irq
+.extern asm_preempt_schedule_irq
+
+#if defined(CONFIG_I2C_ATMEGA) || defined(CONFIG_I2C_ATMEGA_MODULE)
+.global TWI_STC_VECTOR
+.type TWI_STC_VECTOR, @function
+TWI_STC_VECTOR:
+	__irq_save__
+	XCALL i2c_stc_irq
+	__irq_restore__ asm_preempt_schedule_irq
+	reti
+#endif
+
+#if defined(CONFIG_ATMEGA_SPI) || defined(CONFIG_ATMEGA_SPI_MODULE)
+.global SPI_STC_VECTOR
+.type SPI_STC_VECTOR, @function
+SPI_STC_VECTOR:
+	__irq_save__
+	XCALL spi_stc_irq
+	__irq_restore__ asm_preempt_schedule_irq
+	reti
+#endif
 

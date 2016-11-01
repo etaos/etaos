@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file avr/include/asm/spinlock.h AVR spinlock header
+ */
+
 #if !defined(__MUTEX_H__) && !defined(__SPINLOCK_H__)
 #error Do not include <asm/spinlock.h> directly. \
 	Use <etaos/mutex.h> or <etaos/spinlock.h>!
@@ -39,16 +43,31 @@ static inline void spin_lock_init(spinlock_t *lock)
 	lock->lock = 0;
 }
 
+/**
+ * @ingroup archAPI
+ * @brief Arch implementation of the spin wait.
+ * @param spin Spin to wait for.
+ */
 static inline void arch_spin_wait(spinlock_t *spin)
 {
 	avr_spin_wait((unsigned char*)&spin->lock);
 }
 
+/**
+ * @ingroup archAPI
+ * @brief Raw version of spin_lock.
+ * @param spin Spin lock to lock.
+ */
 static inline void arch_spin_lock(spinlock_t *spin)
 {
 	avr_spin_lock((unsigned char*)&spin->lock);
 }
 
+/**
+ * @ingroup archAPI
+ * @brief Raw version of spin_unlock
+ * @param spin Spin lock to unlock.
+ */
 static inline void arch_spin_unlock(spinlock_t *spin)
 {
 	avr_spin_unlock((unsigned char*)&spin->lock);

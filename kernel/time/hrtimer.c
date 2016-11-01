@@ -36,11 +36,10 @@
  */
 struct clocksource *hr_sys_clk;
 
-static void hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer)
+static void raw_hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer)
 {
 	struct hrtimer *carriage;
 
-	_raw_spin_lock(&src->base.lock);
 	for(carriage = src->timers; carriage; carriage = carriage->next) {
 		if(timer->ticks < carriage->ticks) {
 			carriage->ticks -= timer->ticks;
@@ -59,7 +58,15 @@ static void hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer
 		timer->prev->next = timer;
 	else
 		src->timers = timer;
-	_raw_spin_unlock(&src->base.lock);
+}
+
+static void hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer)
+{
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&src->base.lock, flags);
+	raw_hrtimer_source_add(src, timer);
+	raw_spin_unlock_irqrestore(&src->base.lock, flags);
 }
 
 static void hrtimer_source_delete(struct hrtimer_source *src, struct hrtimer *timer)
@@ -120,16 +127,17 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 int hrtimer_stop(struct hrtimer *timer)
 {
 	struct clocksource *cs;
+	unsigned long flags;
 
 	if(!timer || timer == SIGNALED)
 		return -EINVAL;
 
 	cs = hrtimer_to_source(timer);
 
-	_raw_spin_lock(&cs->lock);
+	raw_spin_lock_irqsave(&cs->lock, flags);
 	timer->handle = NULL;
 	hrtimer_source_delete(timer->base, timer);
-	_raw_spin_unlock(&cs->lock);
+	raw_spin_unlock_irqrestore(&cs->lock, flags);
 	kfree(timer);
 
 	return -EOK;
@@ -166,7 +174,7 @@ static void hrtimer_handle(struct hrtimer_source *cs)
 			if((timer->ticks = timer->timer_once) == 0)
 				kfree(timer);
 			else
-				hrtimer_source_add(cs, timer);
+				raw_hrtimer_source_add(cs, timer);
 		}
 	}
 }

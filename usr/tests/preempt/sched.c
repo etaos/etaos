@@ -54,7 +54,7 @@ int main(void)
 	if(counter == 5)
 		printf_P(PSTR("[OK]"));
 	else
-		printf_P(PSTR("[ERROR]"));
+		printf_P(PSTR("[ERROR] (counter = %i)"), counter);
 	putc('\n', stdout);
 
 	printf(CALYPSO_EXIT);

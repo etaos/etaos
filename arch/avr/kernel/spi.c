@@ -23,7 +23,7 @@
 #include <asm/io.h>
 #include <asm/irq.h>
 
-SIGNAL(SPI_STC_VECTOR)
+void __isr spi_stc_irq(void)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 	chip->chip_handle(SPI_STC_VECTOR_NUM);

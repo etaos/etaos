@@ -20,6 +20,7 @@
 #define __AVR_IRQ_H__
 
 #define IRQ_ENTRY_ATTRIBS signal, used, externally_visible
+#define __isr __attribute__((used, externally_visible))
 
 #define irq_vector(num) __vector_ ## num
 
@@ -27,10 +28,12 @@
 	void _vector(void) __attribute__((IRQ_ENTRY_ATTRIBS)); \
 	void _vector(void)
 
+#ifndef __ASSEMBLER__
 CDECL
 extern void arch_irq_disable(void);
 extern void arch_irq_enable(void);
 CDECL_END
+#endif /* __ASSEMBLER__ */
 
 #endif /* __AVR_IRQ_H__ */
 

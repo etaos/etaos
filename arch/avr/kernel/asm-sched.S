@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - AVR I2C support
+ *  ETA/OS - AVR scheduling
  *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -15,16 +15,24 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <etaos/kernel.h>
-#include <etaos/types.h>
-#include <etaos/irq.h>
 
+#include <asm/asmdef.h>
 #include <asm/io.h>
-#include <asm/irq.h>
+#include <asm/init.h>
 
-void i2c_stc_irq(void)
-{
-	struct irq_chip *chip = arch_get_irq_chip();
-	chip->chip_handle(TWI_STC_VECTOR_NUM);
-}
+.extern preempt_schedule_irq
+
+.section .text
+
+/* void asm_sched_preempt_schedule(void); */
+.global asm_preempt_schedule_irq
+.type asm_preempt_schedule_irq, @function
+asm_preempt_schedule_irq:
+#ifdef CONFIG_PREEMPT
+	irq_return_save
+	cli
+	XCALL preempt_schedule_irq
+	irq_return_restore
+#endif
+	ret
 

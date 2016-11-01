@@ -191,6 +191,7 @@ int main(void)
 	pgpio_pin_request(13);
 	pgpio_direction_output(13, false);
 	led_pin = platform_pin_to_gpio(13);
+	pgpio_pin_release(13);
 	hrtimer_create(hr_sys_clk, 2000000, hrtimer1_handle_func,
 			NULL, 0UL);
 

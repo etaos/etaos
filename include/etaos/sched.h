@@ -281,9 +281,14 @@ extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
 extern void rq_add_thread_no_lock(struct thread *tp);
 
+extern void rq_update_clock(void);
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 extern void sched_yield(struct rq *rq);
 extern void sched_start(void);
+
+#ifdef CONFIG_IRQ_THREAD
+extern void irq_thread_signal(struct irq_thread_data *data);
+#endif
 
 #if defined(CONFIG_SYS_EDF)
 extern struct sched_class edf_class;
