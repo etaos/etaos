@@ -18,7 +18,7 @@ portable embedded applications. Some of its features:
 License
 -------
 
-ETA/OS is licenced as GNU General Public Licence version 3 or newer. 
+ETA/OS is licenced as GNU Lesser General Public Licence version 3 or newer. 
 The COPYING file should contian more information about the licence, or
 if it's not included, look at http://www.gnu.org/licences/.
 
@@ -26,16 +26,16 @@ if it's not included, look at http://www.gnu.org/licences/.
     Copyright (C) 2014, 2015, 2016  ETA/OS developers <etaos@googlegroups.com>
 
     This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Lesser Lesser General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    GNU Lesser Lesser General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
+    You should have received a copy of the GNU Lesser Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Compiling ETA/OS
