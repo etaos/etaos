@@ -85,3 +85,33 @@ To see how you can help improving ETA/OS, read the contribution guide. You can
 find it in the CONTRIBUTING.md file in the repository or on the
 [web](http://etaos.bietje.net/contrib.html).
 
+Trouble shooting
+----------------
+
+* Solving the avrdude timeout for the Arduino Mega / ATmega2560:
+
+For some reason, avrdude is sometimes unable to properly communicate
+with the ATmega2560. This solution can be tried when you receive the
+following error:
+
+	avrdude: stk500v2_ReceiveMessage(): timeout
+
+If you run into this error, there are 3 'scripts' provided to work around
+it:
+
+```bash
+user@pc$ scripts/avrdude_timeout_fix [DEVICE_FILE]
+```
+
+Now you can upload your binaries to the ATmega.
+
+If you would like a tty-fix script and an upload in one, then you should give
+either calypso (for unit tests) or `scripts/avr_upload` a try.
+
+```bash
+user@pc$ scripts/avr_upload -h
+```
+
+Please note that these are not 'run once and be good forever' scripts. They need
+to be ran before _every_ upload.
+
