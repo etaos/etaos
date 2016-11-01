@@ -2,6 +2,5 @@ MAKE := /usr/bin/make
 MAKEFLAGS += -rR --no-print-directory
 
 all:
-	@scripts/avr_tty_fix /dev/ttyACM0
 	@cd $(TEST); $(MAKE) $(TARGETS)
 
