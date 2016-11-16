@@ -11,6 +11,7 @@
 #include <etaos/stl/kernel.h>
 #include <etaos/stl/cpu.h>
 #include <etaos/stl/platform.h>
+#include <etaos/stl/sram.h>
 
 #include <uapi/etaos/test.h>
 
@@ -47,16 +48,24 @@ int TestClass::getB()
 THREAD(test_th_handle, arg)
 {
 	TestClass *tc;
+	SRAM *sram;
+	char readback;
 	int i;
 
 	tc = new TestClass(10, 11);
+	sram = new SRAM("23K256");
+	sram->putc(0x20, 'E');
 	nice(150);
 
 	for(i = 0; i < 5; i++) {
 		printf("[tt] CPP test: %i::%i\n", tc->getA(), tc->getB());
+		readback = (*sram)[0x20];
+		printf("[tt] SRAM test: %c\n", readback);
 		Kernel::sleep(500);
 	}
 
+	delete sram;
+	delete tc;
 	kill();
 }
 

@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Platform implementation
+ *  ETA/OS - ETA/OS STL SRAM
  *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,45 +16,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file include/etaos/stl/sram.h SRAM class header
+ */
+
+#ifndef __SRAM_STL_H__
+#define __SRAM_STL_H__
+
+/**
+ * @addtogroup stl
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/error.h>
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 #include <etaos/sram.h>
 
 #include <etaos/stl/chardev.h>
-#include <etaos/stl/sram.h>
 
-SRAM::SRAM(const char *filename) : CharacterDevice(filename)
-{
-}
+class SRAM : public CharacterDevice {
+public:
+	explicit SRAM(const char *filename);
+	virtual ~SRAM(void);
 
-SRAM::~SRAM(void)
-{
-}
+	int read(size_t addr, void *buff, size_t& len);
+	int write(size_t addr, const void *buff, size_t& len);
+	int putc(size_t addr, int c);
 
-int SRAM::read(size_t addr, void *buff, size_t& len)
-{
-	lseek(this->devfile, addr, SEEK_SET);
-	return CharacterDevice::read(buff, len);
-}
+	int operator[](size_t idx);
+};
 
-int SRAM::write(size_t addr, const void *buff, size_t& len)
-{
-	lseek(this->devfile, addr, SEEK_SET);
-	return CharacterDevice::write(buff, len);
-}
+/** @} */
 
-int SRAM::putc(size_t addr, int c)
-{
-	lseek(this->devfile, addr, SEEK_SET);
-	return CharacterDevice::putc(c);
-}
-
-int SRAM::operator[](size_t idx)
-{
-	lseek(this->devfile, idx, SEEK_SET);
-	return CharacterDevice::getc();
-}
+#endif /* __SRAM_STL_H__ */
 
