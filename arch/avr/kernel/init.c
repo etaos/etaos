@@ -51,7 +51,7 @@ extern void __attribute__((noinline)) dev_init(void);
 void avr_init(void)
 {
 #ifdef CONFIG_MALLOC
-	size_t hsize = RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
+	size_t hsize = INTERNAL_RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
 	mm_init((void*)mm_heap_start, hsize);
 #endif
 
