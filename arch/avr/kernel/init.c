@@ -57,8 +57,10 @@ void avr_init(void)
 		((size_t)mm_heap_start);
 
 	mm_init((void*)mm_heap_start, hsize);
+#if CONFIG_EXT_MEM > 0
 	avr_sre();
 	mm_heap_add_block((void*)EXTERNAL_RAMSTART, CONFIG_EXT_MEM);
+#endif
 	main_stack_ptr = kzalloc(CONFIG_STACK_SIZE);
 #endif
 
