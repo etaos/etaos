@@ -22,6 +22,7 @@
 #define RAMEND INTERNAL_RAMEND + CONFIG_EXT_MEM
 #define INTERNAL_RAMEND 0x21FF
 #define RAMSTART 0x200
+#define EXTERNAL_RAMSTART 0x2200
 
 #if defined(CONFIG_ATMEGA2560)
 #define AVR_22BIT_PC 1
@@ -154,7 +155,21 @@
 
 #define GTCCR		IO_ADDR(0x43)
 
+/* External memory interface */
+#define XMCRA MEM_IO8(0x74)
+#define SRE		7
+#define XMCRB MEM_IO8(0x75)
+
 /* GPIO defs */
+#define P0		0
+#define P1		1
+#define P2		2
+#define P3		3
+#define P4		4
+#define P5		5
+#define P6		6
+#define P7		7
+
 #define PINA MEM_IO8(0x20)
 #define DDRA MEM_IO8(0x21)
 #define PORTA MEM_IO8(0x22)
@@ -287,6 +302,12 @@
 #define SM0		1
 #define SM1		2
 #define SM2		3
+
+#ifndef __ASSEMBLER__
+CDECL
+extern void avr_sre(void);
+CDECL_END
+#endif
 
 #endif /* __IO1280_H__ */
 

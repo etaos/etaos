@@ -1,5 +1,8 @@
 menu "AVR system configuration"
 
+config ARCH_EXT_MEM
+	bool
+
 config EXT_MEM
 	int "External memory"
 	help
@@ -108,6 +111,7 @@ config ATMEGA1280
 	select ARCH_SET_BIT
 	select ARCH_TEST_BIT
 	select ARCH_HRTIMER
+	select ARCH_EXT_MEM
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega1280
@@ -121,6 +125,7 @@ config ATMEGA2560
 	select ARCH_SET_BIT
 	select ARCH_TEST_BIT
 	select ARCH_HRTIMER
+	select ARCH_EXT_MEM
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega2560
