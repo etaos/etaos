@@ -78,6 +78,22 @@ After that, you are ready to compile an application. To compile an application
 you need application sources and Kbuild file in a sepperate directory (anywhere).
 See the usr/tests/ directory for some examples.
 
+Testing
+-------
+
+ETA/OS comes with a set of unit tests, which can be found in the `usr/tests`
+directory. These tests can be ran manually, ofcourse, or the running process
+can be automated for most tests using a tool called Calypso. Calypso can be
+download as a Ruby gem:
+
+`user@pc# gem install calypso`
+
+Running all available unit tests can be done with the following command:
+
+`user@pc$ calypso -yfc usr/calypso.yaml`
+
+For test configurations, please check the Calypso help: `calypso -h` command.
+
 Contributing
 ------------
 
@@ -99,18 +115,14 @@ following error:
 If you run into this error, there are 3 'scripts' provided to work around
 it:
 
-```bash
-user@pc$ scripts/avrdude_timeout_fix [DEVICE_FILE]
-```
+`user@pc$ scripts/avrdude_timeout_fix [DEVICE_FILE]`
 
 Now you can upload your binaries to the ATmega.
 
 If you would like a tty-fix script and an upload in one, then you should give
 either calypso (for unit tests) or `scripts/avr_upload` a try.
 
-```bash
-user@pc$ scripts/avr_upload -h
-```
+`user@pc$ scripts/avr_upload -h`
 
 Please note that these are not 'run once and be good forever' scripts. They need
 to be ran before _every_ upload.
