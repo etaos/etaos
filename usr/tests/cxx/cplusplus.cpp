@@ -12,6 +12,7 @@
 #include <etaos/stl/cpu.h>
 #include <etaos/stl/platform.h>
 #include <etaos/stl/sram.h>
+#include <etaos/stl/eeprom.h>
 
 #include <uapi/etaos/test.h>
 
@@ -72,21 +73,28 @@ THREAD(test_th_handle, arg)
 int main(void)
 {
 	TestClass *tc;
+	EEPROM *ee;
 	int i, value = 0;
+	char readback;
 
 	test_t = thread_create( "tst", &test_th_handle, NULL,
 				CONFIG_STACK_SIZE, test_thread_stack, 80);
 
 	tc = new TestClass(5,6);
+	ee = new EEPROM("24C02");
 	Platform::pin_out(CPU::pin13, value);
+	ee->putc(0x10, 'X');
 
 	for(i = 0; i < 5; i++) {
+		readback = (*ee)[0x10];
 		printf("[mt] CPP test: %i::%i\n", tc->getA(), tc->getB());
+		printf("[mt] EEPROM test: %c\n", readback);
 		Platform::pin_write(CPU::pin13, value);
 		value = !value;
 		Kernel::sleep(500);
 	}
 
+	delete ee;
 	printf(CALYPSO_EXIT);
 	return 0;
 }

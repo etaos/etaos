@@ -1,5 +1,7 @@
 obj-y += cplusplus.o
-ETAOS_LIBS += -lsram -l23k256 -latmega-spi -lspi-core -latmega-gpio -lgpio \
+ETAOS_LIBS += -l24c02 -leeprom -li2c-core -latmega-i2c -lsram -l23k256 \
+		-latmega-spi -lspi-core \
+		-latmega-gpio -lgpio \
 		-lusart-atmega -lusart -latmega-analog -lanalog \
 		-ldriver-core -lplatform -letaos -lc
 ETAOS_LIB_DIR := usr/lib/etaos
