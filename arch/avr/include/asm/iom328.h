@@ -19,7 +19,7 @@
 #ifndef __IOM328_H_
 #define __IOM328_H_
 
-#define RAMEND 0x7FF
+#define RAMEND 0x8FF
 #define INTERNAL_RAMEND RAMEND
 #define RAMSTART 0x100
 

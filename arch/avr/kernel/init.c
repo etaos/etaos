@@ -38,6 +38,8 @@
 extern void avr_init(void);
 extern void avr_install_irqs(void);
 extern char __heap_start;
+
+void *main_stack_ptr = NULL;
 static const char *mm_heap_start = &__heap_start;
 
 extern void __attribute__((noinline)) dev_init(void);
@@ -51,13 +53,27 @@ extern void __attribute__((noinline)) dev_init(void);
 void avr_init(void)
 {
 #ifdef CONFIG_MALLOC
-	size_t hsize = RAMEND - CONFIG_STACK_SIZE - ((size_t)mm_heap_start);
+	size_t hsize = INTERNAL_RAMEND - INIT_STACK_SIZE -
+		((size_t)mm_heap_start);
+
 	mm_init((void*)mm_heap_start, hsize);
+#if CONFIG_EXT_MEM > 0
+	avr_sre();
+	mm_heap_add_block((void*)EXTERNAL_RAMSTART, CONFIG_EXT_MEM);
+#endif
+	main_stack_ptr = kzalloc(CONFIG_STACK_SIZE);
 #endif
 
 	dev_init();
 	kinit();
 	while(1);
+}
+
+void finalize_init(void)
+{
+	void *old_stack = (void*)(INTERNAL_RAMEND - INIT_STACK_SIZE);
+
+	mm_heap_add_block(old_stack, INIT_STACK_SIZE);
 }
 
 /* @} */

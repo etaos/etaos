@@ -52,6 +52,7 @@
 
 CDECL
 extern void kinit(void);
+extern void finalize_init(void);
 #ifdef CONFIG_SCHED
 extern void main_thread_func(void *arg);
 #endif

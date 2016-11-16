@@ -28,7 +28,7 @@
 #include <etaos/sram/23k256.h>
 
 static void *test_stack;
-static uint8_t test_stack2[CONFIG_STACK_SIZE];
+static void *test_stack2;
 
 static struct ipm_queue ipm_q;
 static uint8_t ee_value = 0x0;
@@ -176,6 +176,7 @@ int main(void)
 	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);
 
 	test_stack = kzalloc(CONFIG_STACK_SIZE);
+	test_stack2 = kzalloc(CONFIG_STACK_SIZE);
 	thread_create("test-1", &test_th_handle, NULL,
 			CONFIG_STACK_SIZE, test_stack, 150);
 	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,

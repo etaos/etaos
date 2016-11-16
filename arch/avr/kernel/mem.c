@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - Init
- *  Copyright (C) 2014, 2015  Michel Megens
+ *  ETA/OS - ATmega memory
+ *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,41 +16,36 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup atmega
+ */
+/* @{ */
+
 #include <etaos/kernel.h>
-#include <etaos/init.h>
-#include <etaos/types.h>
-#include <etaos/sched.h>
-#include <etaos/thread.h>
+#include <etaos/bitops.h>
 #include <etaos/mem.h>
 
-#ifdef weak_sym
-weak_sym void finalize_init(void)
-{
-}
-#endif
+#include <asm/io.h>
 
-extern int main(void);
-void kinit(void)
+/**
+ * @brief Enable the external SRAM interface.
+ *
+ * SRE stands for <b>SR</b>AM <b>e</b>nable.
+ */
+void avr_sre(void)
 {
-#ifdef CONFIG_SCHED
-	sched_start();
-#else
-	/* normally the scheduler enables the interrupts, we don't have a
-	 * scheduler to take care of us so we have to do it ourselves.
-	 */
-	irq_enable();
-	finalize_init();
-	main();
-	while(true);
-#endif
+	/* Enable the external memory interface */
+	XMCRA = BIT(SRE);
+
+	/* Enable the RAM device */
+	DDRD |= BIT(P7);
+	PORTD &= ~BIT(P7);
+
+	/* Set bank selection pins to output */
+	DDRL |= BIT(P5) | BIT(P6) | BIT(P7);
+	/* Select bank 0 */
+	PORTL &= ~(BIT(P5) | BIT(P6) | BIT(P7));
 }
 
-#ifdef CONFIG_SCHED
-void main_thread_func(void *arg)
-{
-	finalize_init();
-	main();
-	while(true);
-}
-#endif
+/** @} */
 
