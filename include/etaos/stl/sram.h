@@ -36,6 +36,9 @@
 
 #include <etaos/stl/chardev.h>
 
+/**
+ * @brief UAPI class for SRAM chips.
+ */
 class SRAM : public CharacterDevice {
 public:
 	explicit SRAM(const char *filename);

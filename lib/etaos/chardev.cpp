@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup stl
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -24,6 +29,10 @@
 
 #include <etaos/stl/chardev.h>
 
+/**
+ * @brief Create a new character device.
+ * @param file Device filename of the character device.
+ */
 CharacterDevice::CharacterDevice(const char *file)
 {
 	this->fd = open(file, _FDEV_SETUP_RW);
@@ -34,12 +43,19 @@ CharacterDevice::CharacterDevice(const char *file)
 	this->devfile = filep(this->fd);
 }
 
+/**
+ * @brief Destroy a character device.
+ */
 CharacterDevice::~CharacterDevice(void)
 {
 	if(this->fd > 0);
 		close(this->fd);
 }
 
+/**
+ * @brief Check if the character device is opened correctly.
+ * @return True if the character device is opened correctly, false otherwise.
+ */
 bool CharacterDevice::check(void)
 {
 	if(this->fd < 0)
@@ -48,6 +64,13 @@ bool CharacterDevice::check(void)
 	return true;
 }
 
+/**
+ * @brief Read from a device file.
+ * @param buff Buffer to read data into.
+ * @param len Length of \p buff.
+ * @return An error code.
+ * @see ::read
+ */
 int CharacterDevice::read(void *buff, size_t& len)
 {
 	if(!this->check())
@@ -56,6 +79,13 @@ int CharacterDevice::read(void *buff, size_t& len)
 	return ::read(this->fd, buff, len);
 }
 
+/**
+ * @brief Write data to a character device.
+ * @param buff Buffer to write data from.
+ * @param len Length of \p buff.
+ * @return An error code.
+ * @see ::write.
+ */
 int CharacterDevice::write(const void *buff, size_t& len)
 {
 	if(!this->check())
@@ -64,6 +94,12 @@ int CharacterDevice::write(const void *buff, size_t& len)
 	return ::write(this->fd, buff, len);
 }
 
+/**
+ * @brief Write a single character to a character device.
+ * @param c Character to write.
+ * @return An error code.
+ * @see ::putc
+ */
 int CharacterDevice::putc(int& c)
 {
 	if(!this->check())
@@ -72,6 +108,11 @@ int CharacterDevice::putc(int& c)
 	return ::putc(c, this->devfile);
 }
 
+/**
+ * @brief Read a single byte from a character device.
+ * @return The character read.
+ * @see ::getc
+ */
 int CharacterDevice::getc(void)
 {
 	if(!this->check())
@@ -79,4 +120,6 @@ int CharacterDevice::getc(void)
 
 	return ::getc(this->devfile);
 }
+
+/** @} */
 

@@ -35,6 +35,9 @@
  * @{
  */
 
+/**
+ * @brief UAPI class for EEPROM chips.
+ */
 class EEPROM : public CharacterDevice {
 public:
 	explicit EEPROM(const char *file);

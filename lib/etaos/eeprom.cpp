@@ -33,24 +33,53 @@ EEPROM::~EEPROM(void)
 {
 }
 
+/**
+ * @brief Read from an EEPROM chip.
+ * @param addr Address to start reading.
+ * @param buff Buffer to read into.
+ * @param len Length of \p buff.
+ * @return An error code.
+ * @see ::read
+ */
 int EEPROM::read(size_t addr, void *buff, size_t& len)
 {
 	lseek(this->devfile, addr, SEEK_SET);
 	return CharacterDevice::read(buff, len);
 }
 
+/**
+ * @brief Write to an EEPROM chip.
+ * @param addr Address to start writing at.
+ * @param buff Buffer to write from.
+ * @param len Length of \p buff.
+ * @return An error code.
+ * @see ::write
+ */
 int EEPROM::write(size_t addr, const void *buff, size_t& len)
 {
 	lseek(this->devfile, addr, SEEK_SET);
 	return CharacterDevice::write(buff, len);
 }
 
+/**
+ * @brief Write a single character.
+ * @param addr Address to write to.
+ * @param c Character to write.
+ * @return An error code.
+ * @see ::putc
+ */
 int EEPROM::putc(size_t addr, int c)
 {
 	lseek(this->devfile, addr, SEEK_SET);
 	return CharacterDevice::putc(c);
 }
 
+/**
+ * @brief Read a single character.
+ * @param idx Address to read from.
+ * @return The read character.
+ * @see CharacterDevice::getc
+ */
 int EEPROM::operator[](size_t idx)
 {
 	lseek(this->devfile, idx, SEEK_SET);

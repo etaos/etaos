@@ -33,6 +33,9 @@
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 
+/**
+ * @brief Representation of a character device.
+ */
 class CharacterDevice {
 public:
 	explicit CharacterDevice(const char *file);
@@ -44,8 +47,8 @@ public:
 	int putc(int& c);
 
 protected:
-	struct vfile *devfile;
-	int fd;
+	struct vfile *devfile; //!< Backend device file.
+	int fd; //!< Backend file descriptor.
 
 private:
 	bool check(void);
