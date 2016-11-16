@@ -21,6 +21,13 @@
 #include <etaos/types.h>
 #include <etaos/sched.h>
 #include <etaos/thread.h>
+#include <etaos/mem.h>
+
+#ifdef weak_sym
+weak_sym void finalize_init(void)
+{
+}
+#endif
 
 extern int main(void);
 void kinit(void)
@@ -32,6 +39,7 @@ void kinit(void)
 	 * scheduler to take care of us so we have to do it ourselves.
 	 */
 	irq_enable();
+	finalize_init();
 	main();
 	while(true);
 #endif
@@ -40,6 +48,7 @@ void kinit(void)
 #ifdef CONFIG_SCHED
 void main_thread_func(void *arg)
 {
+	finalize_init();
 	main();
 	while(true);
 }
