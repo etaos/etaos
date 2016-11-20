@@ -31,6 +31,8 @@ extern void *memset(void *dst, int c, size_t n);
 extern char *strcat(char *src, const char *dst);
 extern char *strcpy(char *dst, const char *src);
 extern char *strncpy(char *dst, const char *src, size_t num);
+extern char *strtok_r(char *s, const char *delimeter, char **last);
+extern char *strtok(char *s, const char *delimeter);
 
 CDECL_END
 
