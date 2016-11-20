@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <etaos/kernel.h>
+#include <etaos/string.h>
+#include <etaos/types.h>
+
 char *strcpy(char *dst, const char *src)
 {
 	char *rv = dst;
