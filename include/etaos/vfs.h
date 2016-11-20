@@ -37,9 +37,39 @@ typedef enum {
 	SEEK_END, //!< Set the index to the file end + input.
 } lseek_t;
 
+typedef enum {
+	FS_FILE_OPEN,
+	FS_FILE_READ,
+	FS_FILE_WRITE,
+	FS_FILE_CLOSE,
+
+	FS_DIR_CREATE,
+	FS_DIR_OPEN,
+	FS_DIR_READ,
+} fs_ctrl_t;
+
+/**
+ * @brief File system driver.
+ *
+ * Structure describing how a file system operates.
+ */
+struct fs_driver {
+	int (*open)(const char *path, int mode); //!< Open a file.
+	int (*close)(struct vfile*); //!< File close.
+	int (*read)(struct vfile*, void*, size_t); //!< Read from a file.
+	int (*write)(struct vfile*, const void*, size_t); //!< Write to a file.
+	int (*flush)(struct vfile*); //!< Flush the file.
+	int (*put)(int c, struct vfile*); //!< Write 1 byte to a file.
+	int (*get)(struct vfile*); //!< Read 1 byte from a file.
+
+	/**
+	 * @brief I/O control function pointer.
+	 */
+	int (*ioctl)(struct vfile*, unsigned long reg, void *buf);
+};
+
 struct dirent {
 	char *name;
-	struct vfile *device;
 
 	struct list_head entry;
 	struct list_head children;
