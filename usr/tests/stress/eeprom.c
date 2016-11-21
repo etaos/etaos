@@ -17,7 +17,7 @@ int ee_stress_write_byte(uint8_t addr, uint8_t byte)
 	int fd, rc;
 	struct vfile * stream; 
 
-	fd = open("24C02", _FDEV_SETUP_RW);
+	fd = open("/dev/24C02", _FDEV_SETUP_RW);
 
 	if(fd >= 0) {
 		stream = filep(fd);
@@ -36,7 +36,7 @@ int ee_stress_read_byte(uint8_t addr, uint8_t *store)
 	int rc, fd;
 	struct vfile * stream;
 
-	fd = open("24C02", _FDEV_SETUP_RW);
+	fd = open("/dev/24C02", _FDEV_SETUP_RW);
 
 	if(fd >= 0) {
 		stream = filep(fd);
@@ -57,7 +57,7 @@ int ee_stress_read(uint8_t addr, void *buff, size_t len)
 	int rc, fd;
 	struct vfile *stream;
 
-	fd = open("24C02", _FDEV_SETUP_RW);
+	fd = open("/dev/24C02", _FDEV_SETUP_RW);
 
 	if(fd >= 0) {
 		stream = filep(fd);
@@ -76,7 +76,7 @@ int ee_stress_write(uint8_t addr, const void *buff, size_t len)
 	int fd, rc = -EOK;
 	struct vfile *stream;
 
-	fd = open("24C02", _FDEV_SETUP_RW);
+	fd = open("/dev/24C02", _FDEV_SETUP_RW);
 
 	if(fd >= 0) {
 		stream = filep(fd);

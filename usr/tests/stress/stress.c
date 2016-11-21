@@ -88,7 +88,7 @@ THREAD(test_th_handle2, arg)
 		printf_P(PSTR("[2][%s]: SRAM: %u :: RAND: %u\n"),
 				current_thread_name(), sram_readback, rand);
 
-		fd = open("test.txt", O_RDONLY);
+		fd = open("/romfs/test.txt", O_RDONLY);
 		if(fd >= 0) {
 			file = filep(fd);
 

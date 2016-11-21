@@ -21,6 +21,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/vfs.h>
 
 #include <asm/pgm.h>
 
@@ -35,5 +36,6 @@ struct romfs {
 };
 
 extern struct romfs *romEntryList;
+extern struct fs_driver romfs;
 
 #endif
