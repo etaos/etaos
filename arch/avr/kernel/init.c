@@ -71,7 +71,7 @@ void avr_init(void)
 
 void finalize_init(void)
 {
-	void *old_stack = (void*)(INTERNAL_RAMEND - INIT_STACK_SIZE);
+	void *old_stack = (void*)(INTERNAL_RAMEND - INIT_STACK_SIZE+1);
 
 	mm_heap_add_block(old_stack, INIT_STACK_SIZE);
 }
