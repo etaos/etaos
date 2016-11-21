@@ -55,6 +55,9 @@ struct dirent *dirent_find(struct dirent *root, const char *path)
 	if(!root || !path)
 		return NULL;
 
+	if(!strcmp(root->name, path))
+		return root;
+
 	sections = fs_split_path(path);
 	search = root;
 	for(idx = 0; sections[idx]; idx++) {
@@ -80,7 +83,11 @@ struct dirent *dirent_find(struct dirent *root, const char *path)
 
 struct dirent *dirent_add_child(struct dirent *parent, struct dirent *child)
 {
+	if(!parent || !child)
+		return NULL;
+
 	child->parent = parent;
+	child->fs = parent->fs;
 	list_add(&child->entry, &parent->children);
 	return child;
 }
@@ -94,6 +101,24 @@ struct vfile *dirent_add_file(struct dirent *dir, struct vfile *file)
 	dir->file_head = file;
 
 	return file;
+}
+
+struct vfile *dirent_find_file(struct dirent *dir, const char *filename)
+{
+	struct vfile *carriage;
+
+	if(!dir || !filename)
+		return NULL;
+
+	carriage = dir->file_head;
+	while(carriage) {
+		if(!strcmp(carriage->name, filename))
+			return carriage;
+
+		carriage = carriage->next;
+	}
+
+	return NULL;
 }
 
 struct vfile *dirent_remove_file(struct dirent *dir, struct vfile *file)

@@ -27,9 +27,144 @@
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 #include <etaos/init.h>
+#include <etaos/mem.h>
+#include <etaos/spinlock.h>
+
+#include <etaos/fs/util.h>
+#include <etaos/fs/basename.h>
 
 struct vfile * __iob[MAX_OPEN];
 static struct vfile *vfshead;
+
+static spinlock_t vfs_lock;
+struct dirent vfs_root = {
+	.name = "/",
+	.parent = NULL,
+	.entry = STATIC_INIT_LIST_HEAD(vfs_root.entry),
+	.children = STATIC_INIT_LIST_HEAD(vfs_root.children),
+	.file_head = NULL,
+	.fs = NULL,
+};
+
+int mount(struct fs_driver *fs, const char *path)
+{
+	struct dirent *dir;
+	unsigned long flags;
+
+	if(!fs || !path)
+		return -EINVAL;
+
+	spin_lock_irqsave(&vfs_lock, flags);
+	if((dir = dirent_find(&vfs_root, path)) == NULL) {
+		spin_unlock_irqrestore(&vfs_lock, flags);
+		return -EINVAL;
+	}
+
+	dir->fs = fs;
+	spin_unlock_irqrestore(&vfs_lock, flags);
+	return -EOK;
+}
+
+int mkdir(const char *path)
+{
+	char *base;
+	char *dirname;
+	struct dirent *dir, *parent;
+	unsigned long flags;
+
+	spin_lock_irqsave(&vfs_lock, flags);
+	dirname = basename(path);
+	base = basepath(path);
+
+	if(!dirname || !base)
+		goto err;
+
+	parent = dirent_find(&vfs_root, base);
+	if(!parent)
+		goto err;
+
+	dir = dirent_create(dirname);
+	if(!dir)
+		goto err;
+
+	dirent_add_child(parent, dir);
+
+	kfree(dirname);
+	kfree(base);
+	spin_unlock_irqrestore(&vfs_lock, flags);
+
+	return -EOK;
+
+err:
+	if(dirname)
+		kfree(dirname);
+	if(base)
+		kfree(base);
+
+	spin_unlock_irqrestore(&vfs_lock, flags);
+	return -EINVAL;
+}
+
+int vfs_add_file(const char *path, struct vfile *file)
+{
+	struct dirent *dir;
+	unsigned long flags;
+
+	spin_lock_irqsave(&vfs_lock, flags);
+
+	dir = dirent_find(&vfs_root, path);
+	if(!dir) {
+		spin_unlock_irqrestore(&vfs_lock, flags);
+		return -EINVAL;
+	}
+
+	dirent_add_file(dir, file);
+	spin_unlock_irqrestore(&vfs_lock, flags);
+
+	return -EOK;
+}
+
+struct fs_driver *vfs_path_to_fs(const char *path)
+{
+	struct dirent *dir;
+	unsigned long flags;
+
+	spin_lock_irqsave(&vfs_lock, flags);
+	dir = dirent_find(&vfs_root, path);
+	spin_unlock_irqrestore(&vfs_lock, flags);
+
+	return dir ? dir->fs : NULL;
+}
+
+struct vfile *vfs_find_file(const char *path)
+{
+	unsigned long flags;
+	struct dirent *dir;
+	char *filepath, *filename;
+	struct vfile *file;
+
+	filepath = basepath(path);
+	filename = basename(path);
+
+	if(!filepath || !filename) {
+		if(filename)
+			kfree(filename);
+		if(filepath)
+			kfree(filepath);
+
+		return NULL;
+	}
+
+	spin_lock_irqsave(&vfs_lock, flags);
+	dir = dirent_find(&vfs_root, filepath);
+	/* dirent_find_file handles NULL dirs correctly */
+	file = dirent_find_file(dir, filename);
+	spin_unlock_irqrestore(&vfs_lock, flags);
+
+	kfree(filepath);
+	kfree(filename);
+	return file;
+}
 
 /**
  * @brief Add a file to the file descriptor array.
@@ -75,6 +210,7 @@ void vfs_init(void)
 {
 	int i = 3;
 
+	spinlock_init(&vfs_lock);
 	for(; i < MAX_OPEN; i++)
 		__iob[i] = NULL;
 
@@ -129,8 +265,6 @@ struct vfile * vfs_find(const char *name)
 
 	return NULL;
 }
-
-subsys_init(vfs_init);
 
 /* @} */
 

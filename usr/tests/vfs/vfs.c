@@ -13,13 +13,7 @@
 #include <asm/pgm.h>
 #include <uapi/etaos/test.h>
 
-struct dirent vfs_root = {
-	.name      = "/",
-	.entry     = STATIC_INIT_LIST_HEAD(vfs_root.entry),
-	.children  = STATIC_INIT_LIST_HEAD(vfs_root.children),
-	.file_head = NULL,
-	.fs        = NULL,
-};
+extern struct dirent vfs_root;
 
 int main(void)
 {
@@ -27,14 +21,12 @@ int main(void)
 
 	printf_P(PSTR("Application started!\n"));
 
-	dir = dirent_create("dev");
-	dirent_add_child(&vfs_root, dir);
-	dirent_add_child(dir, dirent_create("tty"));
-	dirent_add_child(dir, dirent_create("block"));
-	dirent_add_child(&vfs_root, dirent_create("sys"));
-	dirent_add_child(&vfs_root, dirent_create("var"));
+	mkdir("/dev");
+	mkdir("/dev/tty");
+	mkdir("/dev/block");
+	mkdir("/sys");
 
-	dir = dirent_find(&vfs_root, "/dev");
+	dir = dirent_find(&vfs_root, "/dev/tty");
 	printf("Found directory: %s\n", dir->name);
 
 	for(;;) {

@@ -54,7 +54,7 @@ typedef enum {
  * Structure describing how a file system operates.
  */
 struct fs_driver {
-	int (*open)(const char *path, int mode); //!< Open a file.
+	struct vfile *(*open)(const char *path, int mode); //!< Open a file.
 	int (*close)(struct vfile*); //!< File close.
 	int (*read)(struct vfile*, void*, size_t); //!< Read from a file.
 	int (*write)(struct vfile*, const void*, size_t); //!< Write to a file.
@@ -85,6 +85,7 @@ extern void vfs_init(void);
 extern void vfs_add(struct vfile * file);
 extern int vfs_delete(struct vfile * f);
 extern struct vfile * vfs_find(const char *name);
+extern struct fs_driver *vfs_path_to_fs(const char *path);
 
 extern int vfs_read(struct vfile *file, void *buff, size_t size);
 extern int vfs_write(struct vfile *file, const void *buff, size_t size);
@@ -92,11 +93,17 @@ extern int vfs_write(struct vfile *file, const void *buff, size_t size);
 extern ssize_t vfs_setoffset(struct vfile *file, ssize_t offset, ssize_t max);
 extern size_t lseek(struct vfile *file, size_t offset, int whence);
 
+extern int mkdir(const char *path);
+extern int mount(struct fs_driver *fs, const char *path);
+
 /* DIRENT functions */
 extern struct dirent *dirent_create(const char *name);
 extern struct dirent *dirent_find(struct dirent *root, const char *path);
 extern struct dirent *dirent_add_child(struct dirent *parent,
 		struct dirent *child);
+extern struct vfile *dirent_add_file(struct dirent *dir, struct vfile *file);
+extern struct vfile *dirent_remove_file(struct dirent *dir, struct vfile *file);
+extern struct vfile *dirent_find_file(struct dirent *dir, const char *filename);
 
 CDECL_END
 

@@ -30,7 +30,7 @@ char *basename(const char *path)
 	int len, idx;
 	char *basename = NULL;
 
-	if(!path || *path == '\0' || *path == '/')
+	if(!path || *path == '\0')
 		return NULL;
 
 	len = strlen(path) - 1;
