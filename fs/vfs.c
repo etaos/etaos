@@ -218,54 +218,5 @@ void vfs_init(void)
 	vfshead = NULL;
 }
 
-/**
- * @brief Add a file to the virtual file system.
- * @param newfile File to add.
- */
-void vfs_add(struct vfile * newfile)
-{
-	newfile->next = vfshead;
-	vfshead = newfile;
-}
-
-/**
- * @brief Delete a file from the virtual filesystem.
- * @param file File which has to be deleted.
- * @retval 0 success.
- * @retval -1 on error.
- */
-int vfs_delete(struct vfile * file)
-{
-	struct vfile **fpp;
-
-	fpp = &file;
-	for(; *fpp; fpp = &(*fpp)->next) {
-		if(*fpp == file) {
-			*fpp = file->next;
-			return 0;
-		}
-	}
-
-	return -1;
-}
-
-/**
- * @brief Find a file in the VFS.
- * @param name Name to look for.
- * @return The file pointer.
- * @retval NULL on error (i.e. file not found).
- */
-struct vfile * vfs_find(const char *name)
-{
-	struct vfile * walker;
-
-	for(walker = vfshead; walker; walker = walker->next) {
-		if(strcmp(walker->name, name) == 0)
-			return walker;
-	}
-
-	return NULL;
-}
-
 /* @} */
 

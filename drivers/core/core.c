@@ -223,7 +223,6 @@ int device_initialize(struct device *dev, struct dev_file_ops *fops)
 	dev->file.index = 0;
 	dev->file.length = 0;
 	atomic_init(&dev->file.uses);
-	//vfs_add(&dev->file);
 	vfs_add_file("/dev", &dev->file);
 	spinlock_init(&dev->file.lock);
 	dev_set_fops(dev, fops);
