@@ -21,7 +21,8 @@ config STACK_SIZE
 
 config IDLE_STACK_SIZE
 	int "Idle stack size"
-	default 128
+	depends on SCHED
+	default 256
 	help
 	  Set the size of the idle stack. The idle stack
 	  takes a seperate number from the main stack, due
