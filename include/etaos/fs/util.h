@@ -20,6 +20,7 @@
 #define __FS_UTIL_H__
 
 extern char **fs_split_path(const char *__path__);
+extern void fs_free_path_split(char **split);
 
 #endif /* __FS_UTIL_H__ */
 

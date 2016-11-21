@@ -23,6 +23,17 @@
 
 #include <etaos/fs/util.h>
 
+void fs_free_path_split(char **split)
+{
+	int idx = 0;
+
+	for(; split[idx]; idx++)
+		kfree(split[idx]);
+
+	kfree(split[idx]);
+	kfree(split);
+}
+
 static char **path_split(char *path, const char _delim)
 {
 	char *tmp = path, *token;

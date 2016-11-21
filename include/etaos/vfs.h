@@ -71,6 +71,7 @@ struct fs_driver {
 struct dirent {
 	char *name;
 
+	struct dirent *parent;
 	struct list_head entry;
 	struct list_head children;
 
@@ -90,6 +91,12 @@ extern int vfs_write(struct vfile *file, const void *buff, size_t size);
 
 extern ssize_t vfs_setoffset(struct vfile *file, ssize_t offset, ssize_t max);
 extern size_t lseek(struct vfile *file, size_t offset, int whence);
+
+/* DIRENT functions */
+extern struct dirent *dirent_create(const char *name);
+extern struct dirent *dirent_find(struct dirent *root, const char *path);
+extern struct dirent *dirent_add_child(struct dirent *parent,
+		struct dirent *child);
 
 CDECL_END
 

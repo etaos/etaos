@@ -62,15 +62,16 @@ struct dirent *dirent_find(struct dirent *root, const char *path)
 		list_for_each(carriage, &search->children) {
 			root = search;
 			search = list_entry(carriage, struct dirent, entry);
-			found = true;
-			break;
+
+			if(!strcmp(search->name, sections[idx])) {
+				found = true;
+				break;
+			}
 		}
 
-		kfree(sections[idx]);
 	}
 
-	kfree(sections);
-
+	fs_free_path_split(sections);
 	if(!found)
 		return NULL;
 
@@ -79,12 +80,21 @@ struct dirent *dirent_find(struct dirent *root, const char *path)
 
 struct dirent *dirent_add_child(struct dirent *parent, struct dirent *child)
 {
+	child->parent = parent;
 	list_add(&child->entry, &parent->children);
 	return child;
 }
 
-int dirent_free(const char *path)
+int dirent_free(struct dirent *dir)
 {
-	return 0;
+	struct dirent *parent;
+
+	if(!dir || !list_empty(&dir->children) || dir->file_head)
+		return -EINVAL;
+
+	kfree(dir->name);
+	kfree(dir);
+
+	return -EOK;
 }
 
