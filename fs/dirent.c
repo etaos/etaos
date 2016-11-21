@@ -85,10 +85,41 @@ struct dirent *dirent_add_child(struct dirent *parent, struct dirent *child)
 	return child;
 }
 
+struct vfile *dirent_add_file(struct dirent *dir, struct vfile *file)
+{
+	if(!dir || !file)
+		return NULL;
+
+	file->next = dir->file_head;
+	dir->file_head = file;
+
+	return file;
+}
+
+struct vfile *dirent_remove_file(struct dirent *dir, struct vfile *file)
+{
+	struct vfile **fpp;
+	struct vfile *carriage;
+
+	if(!dir || !file)
+		return NULL;
+
+	fpp = &dir->file_head;
+	while(*fpp) {
+		carriage = *fpp;
+		if(carriage == file) {
+			*fpp = carriage->next;
+			return file;
+		}
+
+		fpp = &carriage->next;
+	}
+
+	return NULL;
+}
+
 int dirent_free(struct dirent *dir)
 {
-	struct dirent *parent;
-
 	if(!dir || !list_empty(&dir->children) || dir->file_head)
 		return -EINVAL;
 
