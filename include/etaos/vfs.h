@@ -85,7 +85,13 @@ extern void vfs_init(void);
 extern void vfs_add(struct vfile * file);
 extern int vfs_delete(struct vfile * f);
 extern struct vfile * vfs_find(const char *name);
+
+
+extern struct vfile *vfs_find_file(const char *path);
 extern struct fs_driver *vfs_path_to_fs(const char *path);
+extern int vfs_add_file(const char *path, struct vfile *file);
+extern int vfs_open(const char *path, int mode);
+extern int vfs_close(int fd);
 
 extern int vfs_read(struct vfile *file, void *buff, size_t size);
 extern int vfs_write(struct vfile *file, const void *buff, size_t size);
