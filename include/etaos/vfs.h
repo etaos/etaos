@@ -97,6 +97,7 @@ extern size_t lseek(struct vfile *file, size_t offset, int whence);
 
 extern int mkdir(const char *path);
 extern int mount(struct fs_driver *fs, const char *path);
+extern int unlink(const char *path);
 
 /* DIRENT functions */
 extern struct dirent *dirent_create(const char *name);

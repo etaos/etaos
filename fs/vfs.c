@@ -167,6 +167,47 @@ struct vfile *vfs_find_file(const char *path)
 	return file;
 }
 
+int unlink(const char *path)
+{
+	unsigned long flags;
+	struct dirent *dir;
+	char *filepath, *filename;
+	struct vfile *file;
+	int err = -EOK;
+
+	filepath = basepath(path);
+	filename = basename(path);
+
+	if(!filepath || !filename) {
+		if(filename)
+			kfree(filename);
+		if(filepath)
+			kfree(filepath);
+
+		return -EINVAL;
+	}
+
+	spin_lock_irqsave(&vfs_lock, flags);
+	dir = dirent_find(&vfs_root, filepath);
+	/* dirent_find_file handles NULL dirs correctly */
+	file = dirent_find_file(dir, filename);
+
+	if(!file) {
+		err = -EINVAL;
+		goto err_l;
+	}
+
+	if(dirent_remove_file(dir, file) != file)
+		err = -EINVAL;
+
+err_l:
+	spin_unlock_irqrestore(&vfs_lock, flags);
+	kfree(filepath);
+	kfree(filename);
+
+	return err;
+}
+
 /**
  * @brief Add a file to the file descriptor array.
  * @param stream File to add.
