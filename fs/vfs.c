@@ -133,6 +133,7 @@ struct fs_driver *vfs_path_to_fs(const char *path)
 	dir = dirent_find(&vfs_root, path);
 	spin_unlock_irqrestore(&vfs_lock, flags);
 
+
 	return dir ? dir->fs : NULL;
 }
 

@@ -39,7 +39,7 @@ struct dirent *dirent_create(const char *name)
 	list_head_init(&dir->children);
 
 	dir->name = kzalloc(len);
-	memcpy(dir->name, name, len+1);
+	memcpy(dir->name, name, len);
 
 	return dir;
 }

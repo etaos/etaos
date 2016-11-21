@@ -28,6 +28,7 @@
 #include <etaos/error.h>
 #include <etaos/mem.h>
 #include <etaos/vfs.h>
+#include <etaos/devfs.h>
 #include <etaos/evm.h>
 #include <etaos/tick.h>
 #include <etaos/thread.h>
@@ -54,6 +55,8 @@ static DEFINE_THREAD_QUEUE(sync_queue);
 void dev_core_init(void)
 {
 	list_head_init(&dev_root);
+	mkdir("/dev");
+	mount(&devfs, "/dev");
 }
 
 static void dev_release(struct device *dev)
@@ -220,7 +223,8 @@ int device_initialize(struct device *dev, struct dev_file_ops *fops)
 	dev->file.index = 0;
 	dev->file.length = 0;
 	atomic_init(&dev->file.uses);
-	vfs_add(&dev->file);
+	//vfs_add(&dev->file);
+	vfs_add_file("/dev", &dev->file);
 	spinlock_init(&dev->file.lock);
 	dev_set_fops(dev, fops);
 

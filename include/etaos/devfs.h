@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - VFS open
- *  Copyright (C) 2012   Michel Megens
+ *  ETA/OS - VFS driver.
+ *  Copyright (C) 2012, 2014, 2015   Michel Megens
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,26 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @addtogroup vfs
- */
+#ifndef __DEVFS_H__
+#define __DEVFS_H__
 
 #include <etaos/kernel.h>
-#include <etaos/error.h>
-#include <etaos/stdio.h>
 #include <etaos/vfs.h>
 
-/**
- * @ingroup vfs
- * @brief Open a file on the virtual file system.
- * @param name File name to look for.
- * @param flags File flags.
- * @return The file descriptor. If an error occurs -EINVAL is returned.
- */
-int open(const char *name, unsigned long flags)
-{
-	return vfs_open(name, flags);
-}
+extern struct fs_driver devfs;
 
-/** @} */
+CDECL
+extern void devfs_init(void);
+CDECL_END
+
+#endif /* __DEVFS_H__ */
 

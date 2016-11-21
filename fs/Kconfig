@@ -10,6 +10,12 @@ config VFS
 	  here.
 
 if VFS
+config DEVFS
+	tristate
+	depends on VFS
+	help
+	  Device file system. This file system is used by the device
+	  drivers to create a UAPI for applications.
 
 config ROMFS
 	tristate "Micro ROM filesystem"
