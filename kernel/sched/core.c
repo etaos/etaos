@@ -72,8 +72,6 @@ struct rq *sched_get_grq(void)
 #endif
 
 #ifdef CONFIG_IRQ_THREAD
-DEFINE_THREAD_QUEUE(irq_thread_queue);
-
 /**
  * @brief Put an IRQ thread in a waiting state.
  * @note This is a specialised version of #wait.
