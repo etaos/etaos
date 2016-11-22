@@ -24,5 +24,11 @@ config ROMFS
 	  filesystem. This filesystem is stored in program
 	  memory. If you are unsure, say 'n' here.
 
+config RAMFS
+	tristate "Micro RAM filesystem"
+	default n
+	help
+	  Say 'y' or 'm' here to build a small RAM read-write
+	  filesystem. If you are unsure, say 'n' here.
 endif
 endmenu

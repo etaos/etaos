@@ -29,7 +29,7 @@ int vfs_open(const char *path, int mode)
 {
 	struct vfile *file;
 	int err = -EINVAL;
-	char *dir, *filename;
+	char *dir;
 	struct fs_driver *fs;
 
 	file = vfs_find_file(path);
@@ -46,18 +46,20 @@ int vfs_open(const char *path, int mode)
 		}
 	} else {
 		dir = basepath(path);
-		filename = basename(path);
 		err = -EINVAL;
 
 		fs = vfs_path_to_fs(dir);
 
 		if(fs && fs->open) {
 			file = fs->open(path, mode);
-			err = file->fd;
+			if(file) {
+				iob_add(file);
+				file->flags = mode;
+				err = file->fd;
+			}
 		}
 
 		kfree(dir);
-		kfree(filename);
 	}
 
 	return err;
