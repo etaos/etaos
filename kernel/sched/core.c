@@ -1075,7 +1075,10 @@ static void __hot __schedule(int cpu, bool preempt)
 
 /**
  * @brief Check if a reschedule is required.
+ * @see __schedule_need_resched
  * @return true if a reschedule is required, false otherwise.
+ *
+ * For a more extensive check, use #__schedule_need_resched.
  */
 static inline bool need_resched()
 {
@@ -1113,6 +1116,7 @@ void __hot schedule(void)
 /**
  * @brief Preempt a thread from IRQ context.
  * @see __schedule preempt_schedule.
+ * @warning Do not use this function outside of IRQ context.
  *
  * This function is the entry point to the scheduler from locations where
  * the interrupts are already disabled. The most notable use of this function
@@ -1136,6 +1140,7 @@ void __hot preempt_schedule_irq(void)
  * @brief Reschedule the current run queue with preemption in mind.
  * @note Applications generally shouldn't call this function.
  * @see schedule __schedule
+ * @warning Do not use this function in IRQ context.
  *
  * This function is the preemption entry point for in-application preemption
  * (such as preemption from preempt_enable).
