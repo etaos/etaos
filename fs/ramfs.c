@@ -23,13 +23,25 @@
 #include <etaos/init.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
+#include <etaos/spinlock.h>
 
 #include <etaos/fs/basename.h>
+
+static inline void ramfs_lock_file(struct vfile *file)
+{
+	spin_lock(&file->lock);
+}
+
+static inline void ramfs_unlock_file(struct vfile *file)
+{
+	spin_unlock(&file->lock);
+}
 
 static int ramfs_open(struct vfile *file)
 {
 	struct ramfs_file *ramfile;
 
+	ramfs_lock_file(file);
 	ramfile = container_of(file, struct ramfs_file, base);
 	if(test_bit(STREAM_APPEND_FLAG, &file->flags))
 		ramfile->wr_idx = file->index;
@@ -45,6 +57,7 @@ static int ramfs_close(struct vfile *file)
 
 	ramfile->rd_idx = 0UL;
 	ramfile->wr_idx = 0UL;
+	ramfs_unlock_file(file);
 
 	return -EOK;
 }
@@ -119,6 +132,7 @@ static struct vfile *ramfs_create(const char *path, int mode)
 	basep = basepath(path);
 	basen = basename(path);
 
+	spinlock_init(&file->base.lock);
 	file->base.write = ramfs_write;
 	file->base.read  = ramfs_read;
 	file->base.put   = ramfs_putc;
@@ -130,6 +144,7 @@ static struct vfile *ramfs_create(const char *path, int mode)
 	file->base.length = RAMFS_BUFFER_SIZE;
 
 	vfs_add_file(basep, &file->base);
+	kfree(basep);
 
 	return &file->base;
 }
