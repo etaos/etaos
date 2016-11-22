@@ -23,6 +23,7 @@
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
 #include <etaos/spinlock.h>
+#include <etaos/error.h>
 
 /**
  * @addtogroup mm
@@ -40,15 +41,16 @@ void mm_heap_add_block(void *start, size_t size)
 {
 	unsigned long flags;
 
-	spin_lock_irqsave(&mlock, flags);
+	raw_spin_lock_irqsave(&mlock, flags);
 	if(!mm_head) {
 		spin_unlock_irqrestore(&mlock, flags);
 		return;
 	}
 
 	mm_init_node(start, size - sizeof(struct heap_node));
-	spin_unlock_irqrestore(&mlock, flags);
-	kfree(start+sizeof(struct heap_node));
+	raw_spin_unlock_irqrestore(&mlock, flags);
+
+	kfree(start + sizeof(struct heap_node));
 }
 
 /**
@@ -120,7 +122,7 @@ struct heap_node *mm_merge_node(struct heap_node *a,
 #ifdef CONFIG_MM_DEBUG
 		fprintf(stderr, "MM magic mismatch in %p or %p\n", a, b);
 #endif
-		return ERR_PTR;
+		return NULL;
 	}
 
 	alpha = a;
@@ -173,6 +175,19 @@ void mm_split_node(struct heap_node *node, size_t ns)
 	node->size = ns;
 }
 
+static bool mm_node_is_continuous(struct heap_node *a, struct heap_node *b)
+{
+	size_t alpha = (size_t)a;
+
+	if(!a || !b || test_bit(MM_ALLOC_FLAG, &a->flags) || test_bit(MM_ALLOC_FLAG, &b->flags))
+		return false;
+
+	if(alpha + sizeof(*a) + a->size == (size_t)b)
+		return true;
+
+	return false;
+}
+
 /**
  * @brief Return a node into the heap.
  * @param block Node to return.
@@ -189,7 +204,8 @@ int mm_return_node(struct heap_node *block)
 	if(block < mm_head) {
 		block->next = mm_head;
 		mm_head = block;
-		return 0;
+
+		goto done;
 	}
 
 	node = mm_head;
@@ -197,19 +213,35 @@ int mm_return_node(struct heap_node *block)
 		if(block > node && block < node->next) {
 			block->next = node->next;
 			node->next = block;
-			return 0;
+
+			goto done;
 		}
 
 		if(node->next == NULL) {
 			node->next = block;
 			block->next = NULL;
-			return 0;
+
+			goto done;
 		}
 
 		node = node->next;
 	}
 
-	return -1;
+	return -EINVAL;
+
+done:
+	node = mm_head;
+
+	while(node) {
+		if(mm_node_is_continuous(node, node->next)) {
+			node = mm_merge_node(node, node->next);
+			continue;
+		}
+
+		node = node->next;
+	}
+
+	return -EOK;;
 }
 
 /**

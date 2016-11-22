@@ -182,8 +182,6 @@ int main(void)
 	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,
 			test_stack2, 80);
 
-
-
 	read(to_fd(stdin), &buff[0], 10);
 	buff[10] = 0;
 	now = (time_t)atol(buff);
