@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - VFS open
- *  Copyright (C) 2012   Michel Megens
+ *  ETA/OS - String copy
+ *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,26 +16,20 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @addtogroup vfs
- */
-
 #include <etaos/kernel.h>
-#include <etaos/error.h>
-#include <etaos/stdio.h>
-#include <etaos/vfs.h>
+#include <etaos/string.h>
+#include <etaos/types.h>
 
-/**
- * @ingroup vfs
- * @brief Open a file on the virtual file system.
- * @param name File name to look for.
- * @param flags File flags.
- * @return The file descriptor. If an error occurs -EINVAL is returned.
- */
-int open(const char *name, unsigned long flags)
+char *strcpy(char *dst, const char *src)
 {
-	return vfs_open(name, flags);
-}
+	char *rv = dst;
 
-/** @} */
+	while(*src != '\0') {
+		*dst = *src;
+		dst++;
+		src++;
+	}
+
+	return rv;
+}
 

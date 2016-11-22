@@ -27,6 +27,7 @@
 #include <etaos/lm35.h>
 #include <etaos/vfs.h>
 #include <etaos/stdio.h>
+#include <etaos/string.h>
 
 static struct analog_chip *lm35_chip;
 
@@ -40,11 +41,13 @@ float lm35_read(int pin)
 	struct vfile *dev;
 	int fd;
 	float rv;
+	char analog_name[20] = "/dev/";
 
 	if(!lm35_chip)
 		lm35_set_analog_device(NULL);
 
-	fd = open(analog_chip_to_name(lm35_chip), _FDEV_SETUP_RW);
+	strcat(analog_name, analog_chip_to_name(lm35_chip));
+	fd = open(analog_name, _FDEV_SETUP_RW);
 
 	if(fd < 0)
 		return (float)fd;

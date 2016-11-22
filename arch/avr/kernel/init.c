@@ -27,6 +27,7 @@
 #include <etaos/vfs.h>
 #include <etaos/mem.h>
 #include <etaos/init.h>
+#include <etaos/vfs.h>
 
 #include <asm/sched.h>
 #include <asm/timer.h>
@@ -62,6 +63,10 @@ void avr_init(void)
 	mm_heap_add_block((void*)EXTERNAL_RAMSTART, CONFIG_EXT_MEM);
 #endif
 	main_stack_ptr = kzalloc(CONFIG_STACK_SIZE);
+#endif
+
+#ifdef CONFIG_VFS
+	vfs_init();
 #endif
 
 	dev_init();

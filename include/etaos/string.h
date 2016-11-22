@@ -29,6 +29,11 @@ extern int strnlen(const char *str, size_t size);
 extern int strcmp(const char *s1, const char *s2);
 extern void *memset(void *dst, int c, size_t n);
 extern char *strcat(char *src, const char *dst);
+extern char *strcpy(char *dst, const char *src);
+extern char *strncpy(char *dst, const char *src, size_t num);
+extern char *strtok_r(char *s, const char *delimeter, char **last);
+extern char *strtok(char *s, const char *delimeter);
+extern char *strdup(const char *s);
 
 CDECL_END
 

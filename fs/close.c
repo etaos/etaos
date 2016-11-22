@@ -31,15 +31,7 @@
  */
 void close(int fd)
 {
-	struct vfile *file;
-
-	file = __iob[fd];
-	if(file) {
-		if(file->close)
-			file->close(file);
-
-		iob_remove(fd);
-	}
+	vfs_close(fd);
 }
 
 /** @} */

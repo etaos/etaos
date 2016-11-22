@@ -149,10 +149,20 @@ static void romfs_setup_file(struct vfile *file, struct romfs *entry)
 	file->close = &romfs_close;
 }
 
+struct fs_driver romfs = {
+	.write = NULL,
+	.read = &romfs_read,
+	.get = &romfs_getc,
+	.close = &romfs_close,
+};
+
 static void __used romfs_rollout(void)
 {
 	struct romfs *entry;
 	struct vfile *file;
+
+	mkdir("/romfs");
+	mount(&romfs, "/romfs");
 
 	for(entry = romEntryList; entry; entry = entry->next) {
 		file = kzalloc(sizeof(*file));
@@ -160,7 +170,7 @@ static void __used romfs_rollout(void)
 			return;
 
 		romfs_setup_file(file, entry);
-		vfs_add(file);
+		vfs_add_file("/romfs", file);
 	}
 }
 

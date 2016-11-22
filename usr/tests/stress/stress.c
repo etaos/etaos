@@ -22,10 +22,12 @@
 #include <etaos/analog.h>
 #include <etaos/lm35.h>
 #include <etaos/ipm.h>
-#include <asm/pgm.h>
+#include <etaos/panic.h>
 
-#include <asm/io.h>
 #include <etaos/sram/23k256.h>
+
+#include <asm/pgm.h>
+#include <asm/io.h>
 
 static void *test_stack;
 static void *test_stack2;
@@ -41,6 +43,9 @@ static const char ee_test[]   = "ee test";
 
 #define SRAM_BYTE_ADDR 0x100
 #define SRAM_STRING_ADDR 0x200
+
+#define IRQ_THREAD_TEXT "IRQ thread triggerd!"
+#define IRQ_THREAD_FILENAME "/ramfs/irqthread.txt"
 
 extern int ee_stress_read_byte(uint8_t addr, uint8_t *rb);
 extern int ee_stress_write_byte(uint8_t addr, uint8_t byte);
@@ -59,10 +64,19 @@ static char *current_thread_name(void)
 
 static irqreturn_t threaded_irq_handle(struct irq_data *data, void *arg)
 {
-	const char *str = arg;
+	const char *filename = arg;
+	char buffer[32];
+	int fd;
 
-	if(str)
-		printf_P(PSTR("[irq]:       %s\n"), str);
+	fd = open(filename, _FDEV_SETUP_RWA);
+	if(fd > 0) {
+		read(fd, buffer, sizeof(IRQ_THREAD_TEXT));
+		close(fd);
+
+		printf_P(PSTR("[irq]:       %s\n"), buffer);
+	} else {
+		fprintf_P(stderr, PSTR("RAMFS read failed!\n"));
+	}
 
 	return IRQ_HANDLED;
 }
@@ -88,7 +102,7 @@ THREAD(test_th_handle2, arg)
 		printf_P(PSTR("[2][%s]: SRAM: %u :: RAND: %u\n"),
 				current_thread_name(), sram_readback, rand);
 
-		fd = open("test.txt", O_RDONLY);
+		fd = open("/romfs/test.txt", O_RDONLY);
 		if(fd >= 0) {
 			file = filep(fd);
 
@@ -125,9 +139,18 @@ THREAD(test_th_handle, arg)
 	uint8_t readback = 0;
 	float sram_data;
 	char ee_string[sizeof(ee_test)];
+	int fd;
+
+	fd = open(IRQ_THREAD_FILENAME, _FDEV_SETUP_RW);
+	if(fd > 0) {
+		write(fd, IRQ_THREAD_TEXT, sizeof(IRQ_THREAD_TEXT));
+		close(fd);
+	} else {
+		panic_P(PSTR("Couldn't open RAMFS file!\n"));
+	}
 
 	irq_request(EXT_IRQ0_NUM, &threaded_irq_handle, IRQ_FALLING_MASK |
-			IRQ_THREADED_MASK, "threaded IRQ test");
+			IRQ_THREADED_MASK, IRQ_THREAD_FILENAME);
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);

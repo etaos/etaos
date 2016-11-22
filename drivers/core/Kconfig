@@ -2,6 +2,7 @@ menuconfig DRIVER_CORE
 	tristate "Device driver core"
 	select MALLOC
 	select VFS
+	select DEVFS
 	default y
 	help
 	  Enable or disable the device driver core. If you're not

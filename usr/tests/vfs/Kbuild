@@ -1,0 +1,6 @@
+obj-y += vfs.o
+
+ETAOS_LIBS += -lusart-atmega -lusart -ldriver-core -ldevfs -lc
+ETAOS_LIB_DIR := usr/lib/etaos
+APP_TARGET := test-app.img
+clean-files += test-app.img test-app.hex

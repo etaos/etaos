@@ -45,7 +45,7 @@
 #define __SPGM	0x0008 //!< fmt string is in progmem
 #define __SERR	0x0010 //!< found error
 #define __SEOF	0x0020 //!< found EOF
-#define __SUNGET 0x040 //!< ungetc() happened
+#define __SAPP   0x040 //!< Append to end of file
 #define __SMALLOC 0x80 //!< handle is malloc()ed
 /* @} */
 
@@ -59,12 +59,13 @@
 #define STREAM_FMT_PROGMEM_FLAG 3
 #define STREAM_ERROR_FLAG 	4
 #define STREAM_EOF_FLAG 	5
-#define STREAM_UNGETC_FLAG 	6
+#define STREAM_APPEND_FLAG      6
 #define STREAM_MALLOC_FLAG 	7
 
 #define _FDEV_SETUP_READ  __SRD	/**< fdev_setup_stream() with read intent */
 #define _FDEV_SETUP_WRITE __SWR	/**< fdev_setup_stream() with write intent */
 #define _FDEV_SETUP_RW    (__SRD|__SWR)	/**< fdev_setup_stream() with read/write intent */
+#define _FDEV_SETUP_RWA   (_FDEV_SETUP_RW | __SAPP) //!< R/W stream while appending
 #define _FDEV_SETUP_RWB   __SRWB /**< Read/write from buffers */
 
 struct vfile;
@@ -138,6 +139,9 @@ extern struct vfile * __iob[];
 #define stderr 	__iob[2]
 
 #define to_fd(__f) (__f)->fd
+
+#define DIR struct dirent //!< Directory descriptor
+#define FILE struct vfile //!< File descriptor
 
 #define filep(__idx) __iob[__idx]
 extern int putc(int c, struct vfile * stream);
