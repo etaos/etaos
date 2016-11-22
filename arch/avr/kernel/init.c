@@ -42,6 +42,10 @@ extern char __heap_start;
 void *main_stack_ptr = NULL;
 static const char *mm_heap_start = &__heap_start;
 
+#ifndef CONFIG_EXT_MEM
+#define CONFIG_EXT_MEM_SIZE 0
+#endif
+
 extern void __attribute__((noinline)) dev_init(void);
 
 /**
