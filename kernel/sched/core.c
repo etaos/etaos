@@ -72,8 +72,6 @@ struct rq *sched_get_grq(void)
 #endif
 
 #ifdef CONFIG_IRQ_THREAD
-DEFINE_THREAD_QUEUE(irq_thread_queue);
-
 /**
  * @brief Put an IRQ thread in a waiting state.
  * @note This is a specialised version of #wait.
@@ -119,14 +117,22 @@ void irq_thread_signal(struct irq_thread_data *data)
 void irq_handle_fn(void *data)
 {
 	struct irq_data *irq = data;
+	struct irq_thread_data *threaded_irq;
+
+	threaded_irq = container_of(data, struct irq_thread_data, idata);
 
 	while(true) {
-		irq_thread_wait();
+		/* Only sleep if there are no events waiting */
+		if(threaded_irq->event_cnt == 0)
+			irq_thread_wait();
+
 		if(test_bit(THREAD_EXIT_FLAG, &current_thread()->flags))
 			kill();
 
-		if(irq->handler(irq, irq->private_data) == IRQ_HANDLED)
+		if(irq->handler(irq, irq->private_data) == IRQ_HANDLED) {
 			clear_bit(IRQ_THREADED_TRIGGERED_FLAG, &irq->flags);
+			threaded_irq->event_cnt--;
+		}
 	}
 }
 #endif

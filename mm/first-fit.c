@@ -22,6 +22,7 @@
 #include <etaos/types.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
+#include <etaos/error.h>
 
 /**
  * @addtogroup ff
@@ -96,37 +97,20 @@ err_l:
  */
 int mm_kfree(void *ptr)
 {
-	struct heap_node *node, *c;
+	struct heap_node *node;
 	unsigned long flags;
-	int err = -1;
+	int err = -EINVAL;
 
-	spin_lock_irqsave(&mlock, flags);
+	raw_spin_lock_irqsave(&mlock, flags);
 	node = ptr - sizeof(*node);
-	/*if(!test_bit(MM_ALLOC_FLAG, &node->flags))
-		goto err_l;*/
 
 	if(node->magic != MM_MAGIC_BYTE)
 		goto err_l;
 
-	c = mm_head;
-	mm_return_node(node);
-
-	while(c) {
-		if(((void*)c) + c->size + sizeof(*c) == node || ((void*)node) +
-				node->size + sizeof(*node) == c) {
-			node = mm_merge_node(c, node);
-			if(node == NULL)
-				goto err_l;
-			else
-				c = node;
-		}
-		c = c->next;
-	}
-
-	err = 0;
+	err = mm_return_node(node);
 
 err_l:
-	spin_unlock_irqrestore(&mlock, flags);
+	raw_spin_unlock_irqrestore(&mlock, flags);
 	return err;
 }
 

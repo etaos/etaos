@@ -47,8 +47,6 @@
 #include <asm/iom1280.h>
 #endif
 
-#define INIT_STACK_SIZE 350
-
 #define irq_enter_critical() __asm__ __volatile__( \
 		"in __tmp_reg__, __SREG__" "\n\t" \
 		"cli"			   "\n\t" \

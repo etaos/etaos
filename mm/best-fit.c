@@ -22,6 +22,7 @@
 #include <etaos/types.h>
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
+#include <etaos/error.h>
 
 /**
  * @addtogroup bf
@@ -68,11 +69,14 @@ MEM void *mm_alloc(size_t size)
 	struct heap_node *c, *bf, *bf_prev, *prev;
 	unsigned long flags;
 
-	spin_lock_irqsave(&mlock, flags);
+	raw_spin_lock_irqsave(&mlock, flags);
 	c = mm_head;
 	prev = NULL;
 	bf = NULL;
 	bf_prev = NULL;
+
+	if(size < 4)
+		size = 4;
 
 	while(c) {
 		if(c->size == size)
@@ -106,7 +110,7 @@ done_l:
 	rval += sizeof(*c);
 
 err_l:
-	spin_unlock_irqrestore(&mlock, flags);
+	raw_spin_unlock_irqrestore(&mlock, flags);
 	return rval;
 }
 
@@ -119,35 +123,20 @@ err_l:
  */
 int mm_kfree(void *ptr)
 {
-	struct heap_node *node, *c;
+	struct heap_node *node;
 	unsigned long flags;
-	int err = -1;
+	int err = -EINVAL;
 
-	spin_lock_irqsave(&mlock, flags);
+	raw_spin_lock_irqsave(&mlock, flags);
 	node = ptr - sizeof(*node);
 
 	if(node->magic != MM_MAGIC_BYTE)
 		goto err_l;
 
-	c = mm_head;
-	mm_return_node(node);
-
-	while(c) {
-		if(((void*)c) + c->size + sizeof(*c) == node || ((void*)node) +
-				node->size + sizeof(*node) == c) {
-			node = mm_merge_node(c, node);
-			if(node == NULL)
-				goto err_l;
-			else
-				c = node;
-		}
-		c = c->next;
-	}
-
-	err = 0;
+	err = mm_return_node(node);
 
 err_l:
-	spin_unlock_irqrestore(&mlock, flags);
+	raw_spin_unlock_irqrestore(&mlock, flags);
 	return err;
 }
 

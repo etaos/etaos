@@ -43,6 +43,10 @@ extern char __heap_start;
 void *main_stack_ptr = NULL;
 static const char *mm_heap_start = &__heap_start;
 
+#ifndef CONFIG_EXT_MEM
+#define CONFIG_EXT_MEM_SIZE 0
+#endif
+
 extern void __attribute__((noinline)) dev_init(void);
 
 /**
@@ -53,22 +57,40 @@ extern void __attribute__((noinline)) dev_init(void);
  */
 void avr_init(void)
 {
-#ifdef CONFIG_MALLOC
-	size_t hsize = INTERNAL_RAMEND - INIT_STACK_SIZE -
-		((size_t)mm_heap_start);
+#ifdef CONFIG_SCHED
+	unsigned char stack_addr_low, stack_addr_hi;
+#endif
 
-	mm_init((void*)mm_heap_start, hsize);
-#if CONFIG_EXT_MEM > 0
+#ifdef CONFIG_MALLOC
+#ifdef CONFIG_EXT_MEM
 	avr_sre();
-	mm_heap_add_block((void*)EXTERNAL_RAMSTART, CONFIG_EXT_MEM);
 #endif
-	main_stack_ptr = kzalloc(CONFIG_STACK_SIZE);
-#endif
+
+#ifdef CONFIG_SCHED
+	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM_SIZE -
+			((size_t)mm_heap_start));
+
+	main_stack_ptr = kmalloc(CONFIG_STACK_SIZE);
+	stack_addr_low = ((size_t)main_stack_ptr + (CONFIG_STACK_SIZE - 1)) & 0xFF;
+	stack_addr_hi = ((size_t)main_stack_ptr + (CONFIG_STACK_SIZE - 1)) >> 8;
+
+	__asm__ __volatile__(
+			"out %0, %2" 	"\n\t"
+			"out %1, %3"	"\n\t"
+			:
+			: "I" (AVR_STACK_LOW_ADDR), "I" (AVR_STACK_HI_ADDR),
+			  "r" (stack_addr_low), "r" (stack_addr_hi)
+			: "memory"
+			);
+#else
+	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM_SIZE -
+			((size_t)mm_heap_start) - CONFIG_STACK_SIZE);
+#endif /* CONFIG_SCHED */
+#endif /* CONFIG_MALLOC */
 
 #ifdef CONFIG_VFS
 	vfs_init();
 #endif
-
 	dev_init();
 	kinit();
 	while(1);
@@ -76,9 +98,6 @@ void avr_init(void)
 
 void finalize_init(void)
 {
-	void *old_stack = (void*)(INTERNAL_RAMEND - INIT_STACK_SIZE);
-
-	mm_heap_add_block(old_stack, INIT_STACK_SIZE);
 }
 
 /* @} */

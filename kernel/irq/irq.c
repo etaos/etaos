@@ -102,7 +102,8 @@ static int irq_request_threaded_irq(struct irq_thread_data *data)
 		return -ENOMEM;
 
 	data->owner = thread_create("ithread", &irq_handle_fn, &data->idata,
-			CONFIG_STACK_SIZE, stack, IRQ_THREAD_PRIO);
+			CONFIG_IRQ_STACK_SIZE, stack, IRQ_THREAD_PRIO);
+	data->event_cnt = 0;
 
 	if(!data->owner)
 		return -ENOMEM;

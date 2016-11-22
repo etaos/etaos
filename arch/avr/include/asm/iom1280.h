@@ -57,6 +57,9 @@
 #define AVR_STACK_HI_ADDR 0x3E
 #define AVR_STATUS_ADDR 0x3F
 
+#define SPL MEM_IO8(0x3D)
+#define SPH MEM_IO8(0x3E)
+
 #define AVR_INTERRUPT_FLAG 7
 
 #define AVR_HAVE_RAMPD 1
