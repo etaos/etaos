@@ -37,14 +37,6 @@ config IRQ_STACK_SIZE
 	  note that the stacks of threaded IRQ's are generally
 	  a tad bigger than normal threads.
 
-config INIT_STACK_SIZE
-	int "Init stack size"
-	depends on SCHED
-	default 256
-	help
-	  The size of the stack that is used to initialise the
-	  system (i.e. the pre main thread stack).
-
 config FCPU
 	int "CPU frequency"
 	default 8000000
