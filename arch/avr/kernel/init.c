@@ -53,16 +53,23 @@ extern void __attribute__((noinline)) dev_init(void);
 void avr_init(void)
 {
 #ifdef CONFIG_MALLOC
-	size_t hsize = INTERNAL_RAMEND - INIT_STACK_SIZE -
-		((size_t)mm_heap_start);
+	size_t hsize = INTERNAL_RAMEND - ((size_t)mm_heap_start);
+#ifdef CONFIG_SCHED
+	hsize -= INIT_STACK_SIZE;
+#else
+	hsize -= CONFIG_STACK_SIZE;
+#endif /* CONFIG_SCHED */
 
 	mm_init((void*)mm_heap_start, hsize);
 #if CONFIG_EXT_MEM > 0
 	avr_sre();
 	mm_heap_add_block((void*)EXTERNAL_RAMSTART, CONFIG_EXT_MEM);
 #endif
-	main_stack_ptr = kzalloc(CONFIG_STACK_SIZE);
-#endif
+
+#ifdef CONFIG_SCHED
+	main_stack_ptr = kmalloc(CONFIG_STACK_SIZE);
+#endif /* CONFIG_SCHED */
+#endif /* CONFIG_MALLOC */
 
 	dev_init();
 	kinit();
@@ -71,9 +78,11 @@ void avr_init(void)
 
 void finalize_init(void)
 {
+#ifdef CONFIG_SCHED
 	void *old_stack = (void*)(INTERNAL_RAMEND - INIT_STACK_SIZE+1);
 
 	mm_heap_add_block(old_stack, INIT_STACK_SIZE);
+#endif
 }
 
 /* @} */

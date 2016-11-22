@@ -56,7 +56,7 @@ void *kzalloc(size_t size)
 			*ptr++ = 0;
 		} while(--size);
 	}
-	
+
 	return data;
 }
 #endif
