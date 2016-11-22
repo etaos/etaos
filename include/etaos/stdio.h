@@ -139,6 +139,9 @@ extern struct vfile * __iob[];
 
 #define to_fd(__f) (__f)->fd
 
+#define DIR struct dirent //!< Directory descriptor
+#define FILE struct vfile //!< File descriptor
+
 #define filep(__idx) __iob[__idx]
 extern int putc(int c, struct vfile * stream);
 extern int fputc(int c, struct vfile * stream);
