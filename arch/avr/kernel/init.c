@@ -57,12 +57,12 @@ void avr_init(void)
 #endif
 
 #ifdef CONFIG_MALLOC
-#if CONFIG_EXT_MEM > 0
+#ifdef CONFIG_EXT_MEM
 	avr_sre();
 #endif
 
 #ifdef CONFIG_SCHED
-	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM -
+	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM_SIZE -
 			((size_t)mm_heap_start));
 
 	main_stack_ptr = kmalloc(CONFIG_STACK_SIZE);
@@ -78,7 +78,7 @@ void avr_init(void)
 			: "memory"
 			);
 #else
-	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM -
+	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM_SIZE -
 			((size_t)mm_heap_start) - CONFIG_STACK_SIZE);
 #endif /* CONFIG_SCHED */
 #endif /* CONFIG_MALLOC */

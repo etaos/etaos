@@ -4,10 +4,25 @@ config ARCH_EXT_MEM
 	bool
 
 config EXT_MEM
+	bool "External memory interface"
+	default n
+	help
+	  Say 'y' here to build support for the external
+	  memory interface.
+
+if EXT_MEM
+config EXT_MEM_SIZE
 	int "External memory"
 	help
 	  If you connected external memory to your AVR core,
 	  enter the amount of bytes you connected here.
+
+config EXT_MEM_ENABLE_PIN
+	int "External memory enable pin"
+	help
+	  The pin that enables the external memory interface.
+	  Note that this pin is _not_ a platform pin!
+endif
 
 config STACK_SIZE
 	int "Stack size"

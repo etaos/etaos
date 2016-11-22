@@ -27,6 +27,58 @@
 
 #include <asm/io.h>
 
+static void avr_sre_enable(char reg, char idx)
+{
+	switch(reg) {
+	case 0:
+		DDRA |= BIT(idx);
+		PORTA &= ~BIT(idx);
+		break;
+	case 1:
+		DDRB |= BIT(idx);
+		PORTB &= ~BIT(idx);
+		break;
+	case 2:
+		DDRC |= BIT(idx);
+		PORTC &= ~BIT(idx);
+		break;
+	case 3:
+		DDRD |= BIT(idx);
+		PORTD &= ~BIT(idx);
+		break;
+	case 4:
+		DDRE |= BIT(idx);
+		PORTE &= ~BIT(idx);
+		break;
+	case 5:
+		DDRF |= BIT(idx);
+		PORTF &= ~BIT(idx);
+		break;
+	case 6:
+		DDRG |= BIT(idx);
+		PORTG &= ~BIT(idx);
+		break;
+	case 7:
+		DDRH |= BIT(idx);
+		PORTH &= ~BIT(idx);
+		break;
+	case 8:
+		DDRJ |= BIT(idx);
+		PORTJ &= ~BIT(idx);
+		break;
+	case 9:
+		DDRK |= BIT(idx);
+		PORTK &= ~BIT(idx);
+		break;
+	case 10:
+		DDRL |= BIT(idx);
+		PORTL &= ~BIT(idx);
+		break;
+	default:
+		break;
+	}
+}
+
 /**
  * @brief Enable the external SRAM interface.
  *
@@ -34,12 +86,16 @@
  */
 void avr_sre(void)
 {
+	char idx,
+	     pin = CONFIG_EXT_MEM_ENABLE_PIN;
+
 	/* Enable the external memory interface */
 	XMCRA = BIT(SRE);
 
-	/* Enable the RAM device */
-	DDRD |= BIT(P7);
-	PORTD &= ~BIT(P7);
+	idx = pin % 8;
+	pin = pin / 8;
+
+	avr_sre_enable(pin, idx);
 
 	/* Set bank selection pins to output */
 	DDRL |= BIT(P5) | BIT(P6) | BIT(P7);
