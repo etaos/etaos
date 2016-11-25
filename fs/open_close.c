@@ -71,10 +71,10 @@ int vfs_close(int fd)
 
 	file = __iob[fd];
 	if(file) {
+		iob_remove(fd);
 		if(file->close)
 			file->close(file);
 
-		iob_remove(fd);
 	}
 
 	return -EOK;
