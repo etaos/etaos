@@ -72,6 +72,8 @@ struct rq *sched_get_grq(void)
 #endif
 
 #ifdef CONFIG_IRQ_THREAD
+static DEFINE_THREAD_QUEUE(irqtq);
+
 /**
  * @brief Put an IRQ thread in a waiting state.
  * @note This is a specialised version of #wait.
@@ -81,9 +83,14 @@ static void irq_thread_wait(void)
 {
 	struct thread *tp = current_thread();
 
-	set_bit(THREAD_WAITING_FLAG, &tp->flags);
-	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
-	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	preempt_disable();
+	if(irqtq.qhead == SIGNALED)
+		irqtq.qhead = NULL;
+
+	thread_add_to_wake_q(tp);
+	queue_add_thread(&irqtq, tp);
+
+	preempt_enable_no_resched();
 	schedule();
 }
 
@@ -94,16 +101,10 @@ static void irq_thread_wait(void)
  */
 void irq_thread_signal(struct irq_thread_data *data)
 {
-	struct thread *tp = data->owner;
+	struct thread *tp;
 
-	if(!tp)
-		return;
-
-	if(test_and_clear_bit(THREAD_WAITING_FLAG, &tp->flags))
-	{
-		set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-		rq_add_thread_no_lock(tp);
-	}
+	tp = data->owner;
+	tp->ec++;
 }
 
 /**
@@ -204,8 +205,7 @@ void thread_queue_init(struct thread_queue *qp)
  * @param qp Queue to add to.
  * @param tp Thread to add.
  */
-static void raw_queue_add_thread(struct thread_queue *qp,
-					struct thread *tp)
+void raw_queue_add_thread(struct thread_queue *qp, struct thread *tp)
 {
 	struct sched_class *cp;
 	unsigned long flags;
@@ -228,8 +228,7 @@ static void raw_queue_add_thread(struct thread_queue *qp,
  * @param tp Thread which has to be removed.
  * @note No queue locks are aquired.
  */
-static void raw_queue_remove_thread(struct thread_queue *qp,
-						struct thread *tp)
+void raw_queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 {
 	struct sched_class *cp;
 

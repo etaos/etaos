@@ -83,7 +83,7 @@ static void event_tmo(struct timer *timer, void *arg)
 			if(walker->timer == timer) {
 				raw_rq_remove_wake_thread(sched_get_cpu_rq(), 
 							  walker);
-				queue_remove_thread(qp, walker);
+				raw_queue_remove_thread(qp, walker);
 				if(!qp->qhead)
 					qp->qhead = SIGNALED;
 
