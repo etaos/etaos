@@ -338,9 +338,9 @@ void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
  */
 void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 {
-	raw_spin_lock(&rq->lock);
+	_raw_spin_lock(&rq->lock);
 	raw_rq_remove_wake_thread(rq, tp);
-	raw_spin_unlock(&rq->lock);
+	_raw_spin_unlock(&rq->lock);
 }
 
 /**
@@ -352,9 +352,9 @@ void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
  */
 void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 {
-	raw_spin_lock(&rq->lock);
+	_raw_spin_lock(&rq->lock);
 	raw_rq_remove_kill_thread(rq, tp);
-	raw_spin_unlock(&rq->lock);
+	_raw_spin_unlock(&rq->lock);
 }
 
 /**
