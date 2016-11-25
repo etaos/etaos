@@ -27,15 +27,23 @@ __zero_reg__ = 1
 
 .extern timer0_isr
 .extern preempt_schedule_irq
-.extern asm_preempt_schedule_irq
 
 .section .text
+
+.type asm_preempt_timer_irq, @function
+asm_preempt_timer_irq:
+#ifdef CONFIG_PREEMPT
+	irq_return_save
+	XCALL preempt_schedule_irq
+	irq_return_restore
+#endif
+	reti
 
 .global TIMER0_OVERFLOW_VECTOR
 .type TIMER0_OVERFLOW_VECTOR, @function
 TIMER0_OVERFLOW_VECTOR:
 	__irq_save__
 	XCALL timer0_isr
-	__irq_restore__ asm_preempt_schedule_irq
-	reti
+	__irq_restore__ asm_preempt_timer_irq
+	ret
 

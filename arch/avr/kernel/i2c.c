@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
@@ -22,7 +23,7 @@
 #include <asm/io.h>
 #include <asm/irq.h>
 
-void i2c_stc_irq(void)
+void __isr i2c_stc_irq(void)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 	chip->chip_handle(TWI_STC_VECTOR_NUM);

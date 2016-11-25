@@ -30,8 +30,7 @@
 asm_preempt_schedule_irq:
 #ifdef CONFIG_PREEMPT
 	irq_return_save
-	cli
-	XCALL preempt_schedule_irq
+	XCALL preempt_schedule
 	irq_return_restore
 #endif
 	ret
