@@ -1,4 +1,5 @@
 obj-n += dummy.o
+obj-y = spin.o
 obj-$(CONFIG_EXT_MEM) += mem.o
 obj-$(CONFIG_DELAY_US) += delay.o
 obj-$(CONFIG_ATMEGA_ANALOG:m=y) += adc.o

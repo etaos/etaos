@@ -32,6 +32,10 @@
 avr_switch_context:
 	cli
 	push r0
+
+	in r0, AVR_RAMPD_ADDR
+	push r0
+
 	in r0, AVR_STATUS_ADDR
 	push r0
 	push r1
@@ -111,9 +115,13 @@ avr_switch_context:
 	pop r3
 	pop r2
 	pop r1
-	pop r0
 
+	pop r0
 	out AVR_STATUS_ADDR, r0
+
+	pop r0
+	out AVR_RAMPD_ADDR, r0
+
 	pop r0
 	ret
 

@@ -29,7 +29,12 @@
 #define __AVR_SPINLOCK_H__
 
 typedef struct spinlock {
-	uint8_t lock;
+	volatile uint8_t lock;
+#ifdef CONFIG_SPINLOCK_DEBUG
+	int prev_line;
+	char *prev_file;
+	struct thread *prev;
+#endif
 } spinlock_t;
 
 CDECL
@@ -53,25 +58,13 @@ static inline void arch_spin_wait(spinlock_t *spin)
 	avr_spin_wait((unsigned char*)&spin->lock);
 }
 
-/**
- * @ingroup archAPI
- * @brief Raw version of spin_lock.
- * @param spin Spin lock to lock.
- */
-static inline void arch_spin_lock(spinlock_t *spin)
-{
-	avr_spin_lock((unsigned char*)&spin->lock);
-}
-
-/**
- * @ingroup archAPI
- * @brief Raw version of spin_unlock
- * @param spin Spin lock to unlock.
- */
-static inline void arch_spin_unlock(spinlock_t *spin)
-{
-	avr_spin_unlock((unsigned char*)&spin->lock);
-}
+#ifdef CONFIG_SPINLOCK_DEBUG
+extern void arch_spin_unlock(spinlock_t *spin, const char *file, int line);
+extern void arch_spin_lock(spinlock_t *spin, const char *file, int line);
+#else
+extern void arch_spin_unlock(spinlock_t *spin);
+extern void arch_spin_lock(spinlock_t *spin);
+#endif
 CDECL_END
 
 #endif

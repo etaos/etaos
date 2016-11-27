@@ -102,6 +102,7 @@ void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 
 	/* add the SREG register */
 	*(tp->sp--) = 0x0; // location of r0 normally
+	*(tp->sp--) = 0x0;
 	*(tp->sp--) = SREG;
 
 	i = 0;

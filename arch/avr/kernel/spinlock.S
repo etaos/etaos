@@ -35,15 +35,34 @@ avr_spin_lock:
 	push r28 /* Lock value */
 	push r27
 
+	in r27, AVR_STATUS_ADDR
+	push r27
+
 	mov r30, r24
 	mov r31, r25
+	brbc AVR_IRQ_FLAG, .L_spin_lock_noirq
 .L_spin_lock:
-	ld r27, Z
 	ldi r28, 1
+	cli
+	ld r27, Z
+	EXCH r27, r28
+	st Z, r27
+	sei
+	tst r28
+	brne .L_spin_lock
+	XJMP .L_spin_lock_done
+
+.L_spin_lock_noirq:
+	ldi r28, 1
+	ld r27, Z
 	EXCH r27, r28
 	st Z, r27
 	tst r28
-	brne .L_spin_lock
+	brne .L_spin_lock_noirq
+
+.L_spin_lock_done:
+	pop r27
+	out AVR_STATUS_ADDR, r27
 
 	/* restore clobbers */
 	pop r27
@@ -60,12 +79,18 @@ avr_spin_wait:
 	push r31
 	push r20
 
+	in r20, AVR_STATUS_ADDR
+	push r20
+
 	mov r30, r24
 	mov r31, r25
 .L_spin_wait:
 	ld r20, Z
 	tst r20
 	brne .L_spin_wait
+
+	pop r20
+	out AVR_STATUS_ADDR, r20
 
 	pop r20
 	pop r31
@@ -79,11 +104,19 @@ avr_spin_unlock:
 	/* push clobbers */
 	push r30
 	push r31
+	push r27
+
+	in r27, AVR_STATUS_ADDR
+	push r27
 
 	mov r30, r24
 	mov r31, r25
 	st Z, __zero_reg__
 
+	pop r27
+	out AVR_STATUS_ADDR, r27
+
+	pop r27
 	pop r31
 	pop r30
 	ret
