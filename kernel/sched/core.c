@@ -800,9 +800,7 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 {
 	struct thread_queue *qp;
-	unsigned long flags;
 
-	irq_save_and_disable(&flags);
 	qp = thread_to_queue(tp);
 	tp = *tp->queue;
 
@@ -825,7 +823,6 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		tp->on_rq = true;
 		tp->rq = rq;
 	}
-	irq_restore(&flags);
 }
 #endif
 
