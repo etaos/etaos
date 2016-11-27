@@ -171,6 +171,8 @@ static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
 	return rv;
 }
 
+#define ATMEGA_SPI_TMO 500
+
 /**
  * @brief Start a transmission over the ATmega SPI bus.
  * @param dev Device in control of the transfer.
@@ -188,7 +190,8 @@ static int atmega_spi_xfer(struct spidev *dev, struct spi_msg *msg)
 	master_index = 1;
 
 	SPDR = master_tx_buff[0];
-	mutex_wait(&master_xfer_mutex);
+	if(mutex_wait_tmo(&master_xfer_mutex, ATMEGA_SPI_TMO))
+		return -EAGAIN;
 
 	return msg->len;
 }

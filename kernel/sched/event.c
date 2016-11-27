@@ -202,10 +202,10 @@ int raw_event_wait(struct thread_queue *qp, unsigned ms)
 	tp = current_thread();
 	if(tp->timer == SIGNALED) {
 		tp->timer = NULL;
-		return -1;
+		return -EINVAL;
 	}
 
-	return 0;
+	return -EOK;
 }
 
 /**

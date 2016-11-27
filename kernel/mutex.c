@@ -17,6 +17,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/error.h>
 #include <etaos/types.h>
 #include <etaos/thread.h>
 #include <etaos/event.h>
@@ -28,6 +29,15 @@ void mutex_wait(mutex_t *mutex)
 
 	if(mutex->owner != tp)
 		event_wait(&mutex->qp, EVENT_WAIT_INFINITE);
+}
+
+int mutex_wait_tmo(mutex_t *mutex, unsigned int tmo)
+{
+	struct thread *tp = current_thread();
+
+	if(mutex->owner != tp)
+		return event_wait(&mutex->qp, tmo);
+	return -EINVAL;
 }
 
 void mutex_lock(mutex_t *mutex)

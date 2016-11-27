@@ -202,6 +202,8 @@ static irqreturn_t atmega_i2c_stc_irq(struct irq_data *irq, void *data)
 	return IRQ_HANDLED;
 }
 
+#define ATMEGA_I2C_TMO 500
+
 static int atmega_i2c_xfer(struct i2c_bus *bus, struct i2c_msg *msgs, int num)
 {
 	int ret;
@@ -226,7 +228,9 @@ static int atmega_i2c_xfer(struct i2c_bus *bus, struct i2c_msg *msgs, int num)
 	}
 	irq_exit_critical();
 
-	mutex_wait(&mtr_xfer_mutex);
+	if(mutex_wait_tmo(&mtr_xfer_mutex, ATMEGA_I2C_TMO))
+		return -EAGAIN;
+
 	if(tw_mm_error)
 		ret = tw_mm_error;
 	else

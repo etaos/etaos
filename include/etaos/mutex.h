@@ -45,6 +45,7 @@ typedef struct mutex {
 
 CDECL
 
+extern int mutex_wait_tmo(mutex_t *mutex, unsigned int tmo);
 extern void mutex_wait(mutex_t *mutex);
 extern void mutex_lock(mutex_t *mutex);
 extern void mutex_unlock(mutex_t *mutex);
@@ -65,6 +66,11 @@ CDECL_END
 #define DEFINE_MUTEX(__n) mutex_t __n = { .lock = 0, }
 
 CDECL
+static inline int mutex_wait_tmo(mutex_t *mutex)
+{
+	mutex_wait(mutex);
+	return 0;
+}
 static inline void mutex_init(mutex_t *mutex)
 {
 	mutex->lock = 0;
