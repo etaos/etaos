@@ -32,7 +32,7 @@ config MM_BEST_FIT
 
 endchoice
 
-config MMDEBUG
+config MM_DEBUG
 	bool "Memory debugger"
 	help
 	  Say 'Y' here if you want to enable the memory

@@ -29,10 +29,12 @@
  * @brief Free an allocated memory region.
  * @param ptr Memory region to free.
  */
+#ifndef CONFIG_MM_DEBUG
 void kfree(void *ptr)
 {
 	mm_kfree(ptr);
 }
+#endif
 
 /** @} */
 
