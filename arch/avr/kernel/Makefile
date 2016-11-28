@@ -1,5 +1,4 @@
 obj-n += dummy.o
-obj-y = spin.o
 obj-$(CONFIG_EXT_MEM) += mem.o
 obj-$(CONFIG_DELAY_US) += delay.o
 obj-$(CONFIG_ATMEGA_ANALOG:m=y) += adc.o
@@ -12,5 +11,5 @@ obj-$(CONFIG_TIMER) += timer.o timer-irq.o
 obj-$(CONFIG_SCHED) += sched.o context.o asm-sched.o
 obj-$(CONFIG_ARCH_POWER_SAVE) += power.o
 obj-$(CONFIG_HRTIMER) += hrtimer.o
-obj-y += spinlock.o cpu.o
+obj-y += cpu.o
 extra-y += start.o devinit.o init.o

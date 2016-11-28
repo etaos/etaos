@@ -54,7 +54,7 @@ int gpio_chip_init(struct gpio_chip *chip, uint16_t pins)
 	else
 		err = -EOK;
 
-	spin_lock_init(&chip->lock);
+	spinlock_init(&chip->lock);
 
 	return err;
 }
