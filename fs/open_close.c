@@ -53,6 +53,8 @@ int vfs_open(const char *path, int mode)
 		if(fs && fs->open) {
 			file = fs->open(path, mode);
 			if(file) {
+				if(file->open)
+					file->open(file);
 				iob_add(file);
 				file->flags = mode;
 				err = file->fd;
@@ -71,10 +73,10 @@ int vfs_close(int fd)
 
 	file = __iob[fd];
 	if(file) {
-		iob_remove(fd);
 		if(file->close)
 			file->close(file);
 
+		iob_remove(fd);
 	}
 
 	return -EOK;
