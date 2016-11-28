@@ -39,6 +39,8 @@ __zero_reg__ = 1
 	push r25
 	push r26
 	push r27
+	push r28
+	push r29
 	push r30
 	push r31
 
@@ -71,6 +73,8 @@ __zero_reg__ = 1
 
 	pop r31
 	pop r30
+	pop r29
+	pop r28
 	pop r27
 	pop r26
 	pop r25
@@ -95,6 +99,8 @@ __zero_reg__ = 1
 	push r25
 	push r26
 	push r27
+	push r28
+	push r29
 	push r30
 	push r31
 
@@ -109,7 +115,7 @@ __zero_reg__ = 1
 	in __tmp_reg__, AVR_STATUS_ADDR
 	push __tmp_reg__
 
-	eor __zero_reg__, __zero_reg__
+	clr __zero_reg__
 .endm
 
 /* Restore state before leaving the IRQ */
@@ -127,6 +133,8 @@ __zero_reg__ = 1
 
 	pop r31
 	pop r30
+	pop r29
+	pop r28
 	pop r27
 	pop r26
 	pop r25

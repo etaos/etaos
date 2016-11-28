@@ -174,6 +174,28 @@ THREAD(test_th_handle, arg)
 	}
 }
 
+#define PREEMPT_PIN 11
+static void *preempt_stack;
+static volatile unsigned long preempt_counter;
+THREAD(preempt_thread, arg)
+{
+	int value = 0;
+	struct gpio_pin *pin;
+
+	pgpio_pin_request(PREEMPT_PIN);
+	pgpio_direction_output(PREEMPT_PIN, value);
+	pgpio_pin_release(PREEMPT_PIN);
+
+	pin = platform_pin_to_gpio(PREEMPT_PIN);
+	preempt_counter = 0UL;
+
+	while(true) {
+		__raw_gpio_pin_write(pin, value);
+		value = !value;
+		preempt_counter++;
+	}
+}
+
 static struct gpio_pin *led_pin;
 
 static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
@@ -184,6 +206,7 @@ static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
 	value = !value;
 }
 
+extern void *avr_heap_start_addr(void);
 int main(void)
 {
 	const char * ip_msg = "IPM message\n";
@@ -200,10 +223,13 @@ int main(void)
 
 	test_stack = kzalloc(CONFIG_STACK_SIZE);
 	test_stack2 = kzalloc(CONFIG_STACK_SIZE);
+	preempt_stack = kzalloc(CONFIG_STACK_SIZE);
 	thread_create("test-1", &test_th_handle, NULL,
 			CONFIG_STACK_SIZE, test_stack, 150);
 	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,
 			test_stack2, 80);
+	thread_create("preempt", &preempt_thread, NULL, CONFIG_STACK_SIZE,
+			preempt_stack, SCHED_DEFAULT_PRIO);
 
 	read(to_fd(stdin), &buff[0], 10);
 	buff[10] = 0;
@@ -227,10 +253,11 @@ int main(void)
 				current_thread_name(), readback);
 
 		temperature = lm35_read(PIN_A0);
-		printf_P(PSTR("[0][%s]:   Memory available: %u :: Temperature: %f\n"),
+		printf_P(PSTR("[0][%s]:   Memory available: %u :: "
+					"Temperature: %f :: Preempt count: %lu\n"),
 				current_thread_name(),
 				mm_heap_available(),
-				temperature);
+				temperature, preempt_counter);
 
 		sleep(500);
 	}

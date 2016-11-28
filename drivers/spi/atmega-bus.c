@@ -192,11 +192,12 @@ static int atmega_spi_xfer(struct spidev *dev, struct spi_msg *msg)
 	   initialise the transfer. */
 	master_index = 1;
 
+	SPCR |= SPE | SPIE;
 	SPDR = master_tx_buff[0];
 	irq_exit_critical();
 
 	if(mutex_wait_tmo(&master_xfer_mutex, ATMEGA_SPI_TMO))
-		return -EAGAIN;
+		return -EINVAL;
 
 	return msg->len;
 }
@@ -248,7 +249,7 @@ static void __used atmega_spi_init(void)
 	gpio_pin_release(cs);
 
 	SPCR |= SPR1;
-	SPCR |= SPE | MSTR | SPIE;
+	SPCR |= MSTR;
 	spi_sysbus = &atmega_spi_driver;
 }
 

@@ -33,7 +33,7 @@
 #include <asm/io.h>
 
 static mutex_t avr_adc_conversion_mtx;
-static bool avr_analog_conversion_done;
+static volatile bool avr_analog_conversion_done;
 
 static int avr_adc_get(struct analog_pin *pin)
 {

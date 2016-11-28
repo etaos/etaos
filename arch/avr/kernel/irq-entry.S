@@ -31,7 +31,7 @@ TWI_STC_VECTOR:
 	__irq_save__
 	XCALL i2c_stc_irq
 	__irq_restore__ asm_preempt_schedule_irq
-	reti
+	ret
 #endif
 
 #if defined(CONFIG_ATMEGA_SPI) || defined(CONFIG_ATMEGA_SPI_MODULE)
@@ -41,6 +41,6 @@ SPI_STC_VECTOR:
 	__irq_save__
 	XCALL spi_stc_irq
 	__irq_restore__ asm_preempt_schedule_irq
-	reti
+	ret
 #endif
 

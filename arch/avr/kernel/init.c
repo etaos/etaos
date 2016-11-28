@@ -41,7 +41,7 @@ extern void avr_install_irqs(void);
 extern char __heap_start;
 
 void *main_stack_ptr = NULL;
-static const char *mm_heap_start = &__heap_start;
+static void *mm_heap_start = &__heap_start;
 
 #ifndef CONFIG_EXT_MEM
 #define CONFIG_EXT_MEM_SIZE 0
@@ -67,7 +67,7 @@ void avr_init(void)
 #endif
 
 #ifdef CONFIG_SCHED
-	raw_mm_heap_add_block((void*)mm_heap_start, INTERNAL_RAMEND +
+	raw_mm_heap_add_block(mm_heap_start, INTERNAL_RAMEND +
 			CONFIG_EXT_MEM_SIZE -
 			((size_t)mm_heap_start));
 
