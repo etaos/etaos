@@ -44,9 +44,11 @@ static int atmega_usart_putc(struct usart *usart, int c)
 	if(c == '\n')
 		atmega_usart_putc(usart, '\r');
 
+	irq_enter_critical();
 	while(( UCSR0A & BIT(UDRE0) ) == 0);
 	UCSR0A |= BIT(TXCn);
 	UDR0 = c;
+	irq_exit_critical();
 
 	return c;
 }

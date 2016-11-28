@@ -72,6 +72,7 @@ struct rq *sched_get_grq(void)
 #endif
 
 #ifdef CONFIG_IRQ_THREAD
+#include <etaos/event.h>
 static DEFINE_THREAD_QUEUE(irqtq);
 
 /**
@@ -81,17 +82,7 @@ static DEFINE_THREAD_QUEUE(irqtq);
  */
 static void irq_thread_wait(void)
 {
-	struct thread *tp = current_thread();
-
-	preempt_disable();
-	if(irqtq.qhead == SIGNALED)
-		irqtq.qhead = NULL;
-
-	thread_add_to_wake_q(tp);
-	queue_add_thread(&irqtq, tp);
-
-	preempt_enable_no_resched();
-	schedule();
+	event_wait(&irqtq, EVENT_WAIT_INFINITE);
 }
 
 /**
@@ -101,10 +92,7 @@ static void irq_thread_wait(void)
  */
 void irq_thread_signal(struct irq_thread_data *data)
 {
-	struct thread *tp;
-
-	tp = data->owner;
-	tp->ec++;
+	event_notify_irq(&irqtq);
 }
 
 /**

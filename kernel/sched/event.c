@@ -72,11 +72,9 @@ static void __raw_event_notify(struct rq *rq, struct thread_queue *qp)
 static void event_tmo(struct timer *timer, void *arg)
 {
 	struct thread *walker, *curr;
-	struct thread_queue *qp;
-	struct thread *volatile*tpp = arg;
+	struct thread_queue *qp = arg;
 
-	qp = container_of((struct thread**)tpp, struct thread_queue, qhead);
-	walker = *tpp;
+	walker = qp->qhead;
 
 	if(walker != SIGNALED) {
 		while(walker) {
@@ -190,7 +188,7 @@ int raw_event_wait(struct thread_queue *qp, unsigned ms)
 
 	if(ms)
 		tp->timer = timer_create_timer(cs, ms, &event_tmo,
-				(void*)&qp->qhead, TIMER_ONESHOT_MASK);
+				(void*)qp, TIMER_ONESHOT_MASK);
 	else
 		tp->timer = NULL;
 
