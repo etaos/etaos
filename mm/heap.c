@@ -37,7 +37,7 @@ typedef size_t uintptr_t;
 #define MM_GUARD_BYTES   0
 #endif
 
-#define MM_ALIGNMENT          sizeof(char)
+#define MM_ALIGNMENT          1
 #define MM_BOTTOM_ALIGN(s)    ((s) & ~(MM_ALIGNMENT - 1))
 #define MM_TOP_ALIGN(s)	      MM_BOTTOM_ALIGN((s + (MM_ALIGNMENT - 1)))
 
@@ -273,6 +273,13 @@ static size_t raw_mm_heap_available(struct heap_node **root)
 
 size_t mm_heap_available(void)
 {
-	return raw_mm_heap_available(&mm_free_list);
+	size_t rv;
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&mlock, flags);
+	rv = raw_mm_heap_available(&mm_free_list);
+	raw_spin_unlock_irqrestore(&mlock, flags);
+
+	return rv;
 }
 
