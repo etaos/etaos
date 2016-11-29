@@ -83,10 +83,24 @@ struct clocksource *sched_get_clock(void)
 	return avr_get_sys_clk();
 }
 
+struct avr_stack_frame {
+	uint8_t r31, r30,
+		r29, r28, r27, r26, r25, r24, r23, r22, r21, r20,
+		r19, r18, r17, r16, r15, r14, r13, r12, r11, r10,
+		r9, r8, r7, r6, r5, r4, r3, r2, r1, status, rampd, r0;
+
+#ifdef AVR_22BIT_PC
+	uint8_t handle_ext;
+#endif
+	uint8_t handle_hi, handle_lo;
+};
+
+#include <etaos/string.h>
+
 void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 				size_t stack_size, thread_handle_t handle)
 {
-	char i;
+	struct avr_stack_frame *frame;
 
 	if(!stack || !stack_size)
 		return;
@@ -94,23 +108,17 @@ void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 	tp->stack = stack;
 	tp->stack_size = stack_size;
 	tp->sp = &stack[stack_size-1];
-	*(tp->sp--) = (unsigned short)handle & 0xff;
-	*(tp->sp--) = ((unsigned short)handle >> 8) & 0xff;
-#ifdef AVR_22BIT_PC
-	*(tp->sp--) = 0;
-#endif
+	tp->sp -= sizeof(*frame);
+	frame = (struct avr_stack_frame *) tp->sp;
+	memset(frame, 0, sizeof(*frame));
 
-	/* add the SREG register */
-	*(tp->sp--) = 0x0; // location of r0 normally
-	*(tp->sp--) = 0x0;
-	*(tp->sp--) = SREG;
+	frame->handle_lo = (unsigned short)handle & 0xff;
+	frame->handle_hi = ((unsigned short)handle >> 8) & 0xff;
 
-	i = 0;
-	for(; i < 31; i++)
-		*(tp->sp--) = 0;
-
-	tp->sp[8] = ((unsigned short)tp->param) & 0xFF; /* r24 */
-	tp->sp[7] = (((unsigned short)tp->param) >> 8) & 0xFF; /* r25 */
+	frame->status = SREG;
+	frame->r24 = ((unsigned short)tp->param) & 0xFF; /* r24 */
+	frame->r25 = (((unsigned short)tp->param) >> 8) & 0xFF; /* r25 */
+	tp->sp--;
 }
 
 void sched_free_stack_frame(struct thread *tp)

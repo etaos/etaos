@@ -62,6 +62,7 @@ void avr_init(void)
 #endif
 
 #ifdef CONFIG_SCHED
+	mm_init();
 	raw_mm_heap_add_block(mm_heap_start, INTERNAL_RAMEND -
 			CONFIG_INIT_STACK_SIZE -
 			((size_t)mm_heap_start));

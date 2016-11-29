@@ -38,6 +38,8 @@ avr_switch_context:
 
 	in r0, AVR_STATUS_ADDR
 	push r0
+
+
 	push r1
 	push r2
 	push r3
