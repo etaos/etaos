@@ -40,7 +40,6 @@ extern void avr_init(void);
 extern void avr_install_irqs(void);
 extern char __heap_start;
 
-void *main_stack_ptr = NULL;
 static void *mm_heap_start = &__heap_start;
 
 #ifndef CONFIG_EXT_MEM
@@ -70,7 +69,7 @@ void avr_init(void)
 	raw_mm_heap_add_block((void*)(INTERNAL_RAMEND + 1), CONFIG_EXT_MEM_SIZE);
 #endif
 
-	main_stack_ptr = kzalloc(CONFIG_STACK_SIZE);
+	idle_stack_ptr = kzalloc(CONFIG_IDLE_STACK_SIZE);
 #else
 	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM_SIZE -
 			((size_t)mm_heap_start) - CONFIG_STACK_SIZE);

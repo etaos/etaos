@@ -66,8 +66,8 @@ extern void raw_mm_heap_add_block(void *start, size_t size);
 
 extern MEM void* mm_alloc(size_t);
 
-extern void *kzalloc(size_t);
-extern void *kmalloc(size_t);
+extern void *kzalloc(size_t num);
+extern void *kmalloc(size_t num);
 extern void *kcalloc(size_t, size_t);
 
 extern size_t mm_heap_available(void);

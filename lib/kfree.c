@@ -32,7 +32,7 @@
 #ifndef CONFIG_MM_DEBUG
 void kfree(void *ptr)
 {
-	mm_kfree(ptr);
+	mm_free(ptr);
 }
 #endif
 

@@ -29,7 +29,7 @@ extern void avr_save_stack(stack_t *stack, struct thread *current);
 extern void avr_switch_context(stack_t *s, struct thread *tp);
 
 CDECL_END
-extern void *main_stack_ptr;
+extern void *idle_stack_ptr;
 
 #endif
 

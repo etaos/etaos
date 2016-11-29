@@ -241,6 +241,7 @@ static inline void spin_unlock_irqrestore_nosched(spinlock_t *lock,
 	spinlock_release(lock);
 	irq_restore(flags);
 }
+CDECL_END
 #endif /* CONFIG_SPINLOCK_DEBUG */
 
 #endif /* __SPINLOCK_H__ */
