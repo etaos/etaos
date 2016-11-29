@@ -72,9 +72,6 @@ struct rq *sched_get_grq(void)
 #endif
 
 #ifdef CONFIG_IRQ_THREAD
-#include <etaos/event.h>
-static DEFINE_THREAD_QUEUE(irqtq);
-
 /**
  * @brief Put an IRQ thread in a waiting state.
  * @note This is a specialised version of #wait.
@@ -82,7 +79,13 @@ static DEFINE_THREAD_QUEUE(irqtq);
  */
 static void irq_thread_wait(void)
 {
-	event_wait(&irqtq, EVENT_WAIT_INFINITE);
+	struct thread *tp;
+
+	tp = current_thread();
+	set_bit(THREAD_WAITING_FLAG, &tp->flags);
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	schedule();
 }
 
 /**
@@ -92,7 +95,16 @@ static void irq_thread_wait(void)
  */
 void irq_thread_signal(struct irq_thread_data *data)
 {
-	event_notify_irq(&irqtq);
+	struct thread *tp, *current;
+
+	tp = data->owner;
+	current = current_thread();
+
+	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	clear_bit(THREAD_WAITING_FLAG, &tp->flags);
+	rq_add_thread_no_lock(tp);
+
+	set_bit(THREAD_NEED_RESCHED_FLAG, &current->flags);
 }
 
 /**
@@ -112,8 +124,7 @@ void irq_handle_fn(void *data)
 
 	while(true) {
 		/* Only sleep if there are no events waiting */
-		if(threaded_irq->event_cnt == 0)
-			irq_thread_wait();
+		irq_thread_wait();
 
 		if(test_bit(THREAD_EXIT_FLAG, &current_thread()->flags))
 			kill();
