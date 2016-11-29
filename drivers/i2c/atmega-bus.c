@@ -229,7 +229,7 @@ static int atmega_i2c_xfer(struct i2c_bus *bus, struct i2c_msg *msgs, int num)
 	irq_exit_critical();
 
 	if(mutex_wait_tmo(&mtr_xfer_mutex, ATMEGA_I2C_TMO))
-		return -EINVAL;
+		return -EAGAIN;
 
 	if(tw_mm_error)
 		ret = tw_mm_error;

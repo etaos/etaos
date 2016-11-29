@@ -197,7 +197,7 @@ static int atmega_spi_xfer(struct spidev *dev, struct spi_msg *msg)
 	irq_exit_critical();
 
 	if(mutex_wait_tmo(&master_xfer_mutex, ATMEGA_SPI_TMO))
-		return -EINVAL;
+		return -EAGAIN;
 
 	return msg->len;
 }
