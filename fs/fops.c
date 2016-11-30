@@ -69,6 +69,9 @@ static size_t vfs_setindex(struct vfile *file, size_t index, size_t max)
  */
 size_t ftell(struct vfile *file)
 {
+	if(file->ftell)
+		return file->ftell(file);
+
 	return file->index;
 }
 
@@ -93,6 +96,9 @@ size_t ftell(struct vfile *file)
  */
 size_t lseek(struct vfile *file, size_t offset, int whence)
 {
+	if(file->lseek)
+		return file->lseek(file, offset, whence);
+
 	switch(whence) {
 	case SEEK_END:
 		offset += file->length;

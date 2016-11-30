@@ -121,6 +121,8 @@ struct vfile {
 	int (*put)(int c, struct vfile*); //!< Write 1 byte to a file.
 	int (*get)(struct vfile*); //!< Read 1 byte from a file.
 	int (*ioctl)(struct vfile*, unsigned long reg, void *buf);
+	size_t (*ftell)(struct vfile *); //!< Get the file length.
+	size_t (*lseek)(struct vfile *, size_t, int); //!< Seek into the file.
 
 	void *fs_data; //!< File system info.
 	void *data; //!< Private file data.
