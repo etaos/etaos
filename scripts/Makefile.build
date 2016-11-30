@@ -12,6 +12,7 @@ __build:
 # 2) they do not inherit any value from the environment
 crurom-y :=
 crurom-obj :=
+ldscripts-y :=
 obj-y :=
 obj-m :=
 lib-y :=
@@ -188,6 +189,7 @@ endef
 
 quiet_cmd_link_single-m = CC [M]  $@
 cmd_link_single-m = $(CC) $(c_flags) -c -o $@ $<
+
 
 quiet_cmd_gen_romfs = CRUROM  $(crurom-obj:.o=.c)
       cmd_gen_romfs = $(CRUROM) $(CRUROMFLAGS) -o $(@:.o=.c) $(crurom-y)

@@ -1,11 +1,13 @@
 /* Script for -n: mix text and data on same page */
+
+#include <generated/autoconf.h>
+
 OUTPUT_FORMAT("elf32-avr","elf32-avr","elf32-avr")
-OUTPUT_ARCH(avr:5)
-ENTRY(__vectors)
+OUTPUT_ARCH(avr:6)
 MEMORY
 {
-  text   (rx)   : ORIGIN = 0, LENGTH = 128K
-  data   (rw!x) : ORIGIN = 0x800060, LENGTH = 0xffa0
+  text   (rx)   : ORIGIN = 0, LENGTH = 1024K
+  data   (rw!x) : ORIGIN = 0x800200, LENGTH = 0xfe00
   eeprom (rw!x) : ORIGIN = 0x810000, LENGTH = 64K
   fuse      (rw!x) : ORIGIN = 0x820000, LENGTH = 1K
   lock      (rw!x) : ORIGIN = 0x830000, LENGTH = 1K
@@ -175,6 +177,7 @@ SECTIONS
     *(.rodata)  /* We need to include .rodata here if gcc is used */
     *(.rodata*) /* with -fdata-sections.  */
     *(.gnu.linkonce.d*)
+    . = ALIGN(2);
      _edata = . ;
      PROVIDE (__data_end = .) ;
   }  > data
@@ -189,11 +192,22 @@ SECTIONS
    __data_load_start = LOADADDR(.data);
    __data_load_end = __data_load_start + SIZEOF(.data);
   /* Global data not cleared after reset.  */
-  .noinit ALIGN(2)  :
+  .noinit ALIGN(2) :
   {
      PROVIDE (__noinit_start = .) ;
     *(.noinit*)
      PROVIDE (__noinit_end = .) ;
+
+     PROVIDE ( main_stack_ptr_start = . ) ;
+     . += CONFIG_STACK_SIZE ;
+     PROVIDE ( main_stack_ptr_end   = . ) ;
+
+     PROVIDE( init_stack_ptr = main_stack_ptr_start + CONFIG_INIT_STACK_SIZE ) ;
+
+     PROVIDE ( idle_stack_ptr_start = . ) ;
+     . += CONFIG_IDLE_STACK_SIZE;
+     PROVIDE ( idle_stack_ptr_end   = . ) ;
+
      _end = . ;
      PROVIDE (__heap_start = .) ;
   }  > data

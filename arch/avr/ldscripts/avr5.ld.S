@@ -1,10 +1,11 @@
 /* Script for -n: mix text and data on same page */
 OUTPUT_FORMAT("elf32-avr","elf32-avr","elf32-avr")
-OUTPUT_ARCH(avr:51)
+OUTPUT_ARCH(avr:5)
+ENTRY(__vectors)
 MEMORY
 {
   text   (rx)   : ORIGIN = 0, LENGTH = 128K
-  data   (rw!x) : ORIGIN = 0x800100, LENGTH = 0xff00
+  data   (rw!x) : ORIGIN = 0x800060, LENGTH = 0xffa0
   eeprom (rw!x) : ORIGIN = 0x810000, LENGTH = 64K
   fuse      (rw!x) : ORIGIN = 0x820000, LENGTH = 1K
   lock      (rw!x) : ORIGIN = 0x830000, LENGTH = 1K
@@ -193,6 +194,17 @@ SECTIONS
      PROVIDE (__noinit_start = .) ;
     *(.noinit*)
      PROVIDE (__noinit_end = .) ;
+
+     PROVIDE ( main_stack_ptr_start = . ) ;
+     . += CONFIG_STACK_SIZE ;
+     PROVIDE ( main_stack_ptr_end   = . ) ;
+
+     PROVIDE( init_stack_ptr = main_stack_ptr_start + CONFIG_INIT_STACK_SIZE ) ;
+
+     PROVIDE ( idle_stack_ptr_start = . ) ;
+     . += CONFIG_IDLE_STACK_SIZE;
+     PROVIDE ( idle_stack_ptr_end   = . ) ;
+
      _end = . ;
      PROVIDE (__heap_start = .) ;
   }  > data

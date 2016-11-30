@@ -1162,13 +1162,19 @@ void __hot preempt_schedule(void)
 
 static struct thread idle_thread, main_thread;
 static void *main_stack_ptr;
-void *idle_stack_ptr;
+static void *idle_stack_ptr;
+
+extern void *main_stack_ptr_end;
+extern void *main_stack_ptr_start;
+
+extern void *idle_stack_ptr_end;
+extern void *idle_stack_ptr_start;
 
 THREAD(idle_thread_func, arg)
 {
 	struct thread *tp = arg;
 
-	main_stack_ptr = kzalloc(CONFIG_STACK_SIZE);
+	main_stack_ptr = &main_stack_ptr_start;
 	irq_enable();
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack_ptr, SCHED_DEFAULT_PRIO);
@@ -1364,6 +1370,7 @@ static void __used sched_init(void)
 	if(sys_sched_class.init)
 		sys_sched_class.init();
 
+	idle_stack_ptr = &idle_stack_ptr_start;
 	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
 			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack_ptr);
 }

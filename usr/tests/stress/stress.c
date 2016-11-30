@@ -206,7 +206,6 @@ static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
 	value = !value;
 }
 
-extern void *avr_heap_start_addr(void);
 int main(void)
 {
 	const char * ip_msg = "IPM message\n";

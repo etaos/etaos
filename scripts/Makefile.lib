@@ -49,6 +49,10 @@ ifneq ($(crurom-y),)
 crurom-y   := $(addprefix $(obj)/, $(crurom-y))
 endif
 
+ifneq ($(ldscripts-y),)
+ldscripts-y := $(addprefix $(obj)/, $(ldscripts-y))
+endif
+
 # Subdirectories we need to descend into
 
 subdir-ym	:= $(sort $(subdir-y) $(subdir-m))

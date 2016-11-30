@@ -63,14 +63,12 @@ void avr_init(void)
 
 #ifdef CONFIG_SCHED
 	mm_init();
-	raw_mm_heap_add_block(mm_heap_start, INTERNAL_RAMEND -
-			CONFIG_INIT_STACK_SIZE -
+	raw_mm_heap_add_block(mm_heap_start, INTERNAL_RAMEND +
+			CONFIG_EXT_MEM_SIZE -
 			((size_t)mm_heap_start));
 #ifdef CONFIG_EXT_MEM
-	raw_mm_heap_add_block((void*)(INTERNAL_RAMEND + 1), CONFIG_EXT_MEM_SIZE);
 #endif
 
-	idle_stack_ptr = kzalloc(CONFIG_IDLE_STACK_SIZE);
 #else
 	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM_SIZE -
 			((size_t)mm_heap_start) - CONFIG_STACK_SIZE);
@@ -87,8 +85,8 @@ void avr_init(void)
 
 void finalize_init(void)
 {
-	mm_heap_add_block((void*)(INTERNAL_RAMEND - CONFIG_INIT_STACK_SIZE),
-			CONFIG_INIT_STACK_SIZE);
+	//raw_mm_heap_add_block((void*)(INTERNAL_RAMEND - CONFIG_INIT_STACK_SIZE),
+			//CONFIG_INIT_STACK_SIZE);
 }
 
 /* @} */
