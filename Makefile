@@ -58,6 +58,7 @@ HOSTCFLAGS   = -Wall -Wno-char-subscripts -Wmissing-prototypes -Wstrict-prototyp
 HOSTCXXFLAGS = -O2
 DOXYGEN      = doxygen
 GIT          = git
+SED          = sed
 
 KBUILD_CFLAGS := -Wall -Iinclude
 KBUILD_CXXFLAGS := -Wall -Iinclude
@@ -260,7 +261,7 @@ quiet_cmd_gen_ldscript  = SHIPPED $@
       cmd_gen_ldscript  =
 
 $(etaos-ldscripts): FORCE
-	@$(CC) $(KBUILD_CFLAGS) -E -x c $(@:.ld=.ld.S) | sed '/^#/ d' > $@
+	@$(CC) $(KBUILD_CFLAGS) -E -x c $(@:.ld=.ld.S) | $(SED) '/^#/ d' > $@
 	$(call cmd,gen_ldscript)
 
 quiet_cmd_link_etaos = LD      $@
