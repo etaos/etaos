@@ -194,6 +194,7 @@ SECTIONS
     *(.noinit*)
      PROVIDE (__noinit_end = .) ;
 
+#ifdef CONFIG_SCHED
      PROVIDE ( main_stack_ptr_start = . ) ;
      . += CONFIG_STACK_SIZE ;
      PROVIDE ( main_stack_ptr_end   = . ) ;
@@ -203,6 +204,12 @@ SECTIONS
      PROVIDE ( idle_stack_ptr_start = . ) ;
      . += CONFIG_IDLE_STACK_SIZE;
      PROVIDE ( idle_stack_ptr_end   = . ) ;
+#else
+     . += CONFIG_STACK_SIZE ;
+     PROVIDE ( init_stack_ptr = . ) ;
+     /* Add padding */
+     . += 0x2 ;
+#endif
 
      _end = . ;
      PROVIDE (__heap_start = .) ;
