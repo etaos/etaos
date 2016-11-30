@@ -36,7 +36,7 @@
 #include <asm/irq.h>
 
 typedef struct spinlock {
-	unsigned long lock;
+	uint8_t lock;
 #ifdef CONFIG_SPINLOCK_DEBUG
 	struct thread *owner;
 	char *acquire_file;
@@ -44,10 +44,10 @@ typedef struct spinlock {
 #endif
 } spinlock_t;
 
-#define DEFINE_SPINLOCK(__n) spinlock_t __n = { .lock = 0UL, }
-#define SPIN_LOCK_INIT(__n) { .lock = 0UL,}
+#define DEFINE_SPINLOCK(__n) spinlock_t __n = { .lock = 0, }
+#define SPIN_LOCK_INIT(__n) { .lock = 0,}
 
-#define STATIC_SPIN_LOCK_INIT { .lock = 0UL,}
+#define STATIC_SPIN_LOCK_INIT { .lock = 0,}
 
 CDECL
 extern void spinlock_init(spinlock_t *lock);

@@ -20,21 +20,23 @@
 #include <etaos/error.h>
 #include <etaos/types.h>
 #include <etaos/spinlock.h>
-#include <etaos/bitops.h>
-#include <etaos/stdio.h>
 
-#define SPINLOCK_LOCK_BIT 0
+#define LOCK_IDX 0
 
-unsigned long __sync_lock_test_and_set_4(volatile unsigned long *lock,
-		                                unsigned long value)
+static uint8_t lock_test_and_set(volatile uint8_t *lock,
+		                                uint8_t value)
 {
-	__sync_synchronize();
-	return test_and_set_bit(SPINLOCK_LOCK_BIT, lock);
+	uint8_t lockval;
+
+	barrier();
+	lockval = lock[LOCK_IDX];
+	lock[LOCK_IDX] = value;
+	return lockval;
 }
 
 void spinlock_init(spinlock_t *lock)
 {
-	lock->lock = 0UL;
+	lock->lock = 0;
 #ifdef CONFIG_SPINLOCK_DEBUG
 	lock->owner = NULL;
 	lock->acquire_file = NULL;
@@ -48,11 +50,11 @@ void spinlock_acquire(spinlock_t *lock, const char *file, int line)
 void spinlock_acquire(spinlock_t *lock)
 #endif
 {
-	volatile unsigned long *lock_ptr;
+	volatile uint8_t *lock_ptr;
 
 	lock_ptr = &lock->lock;
-	while(__sync_lock_test_and_set(lock_ptr, 1))
-		while(*lock_ptr);
+	while(lock_test_and_set(lock_ptr, 1))
+		while(lock_ptr[LOCK_IDX]);
 }
 
 #ifdef CONFIG_SPINLOCK_DEBUG
@@ -61,10 +63,10 @@ void spinlock_release(spinlock_t *lock, const char *file, int line)
 void spinlock_release(spinlock_t *lock)
 #endif
 {
-	unsigned long *lock_ptr;
+	volatile uint8_t *lock_ptr;
 
 	lock_ptr = &lock->lock;
-	__sync_synchronize();
-	clear_bit(SPINLOCK_LOCK_BIT, lock_ptr);
+	barrier();
+	lock_ptr[LOCK_IDX] = 0;
 }
 
