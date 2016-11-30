@@ -21,7 +21,7 @@
 #include <etaos/error.h>
 #include <etaos/mem.h>
 #include <etaos/spinlock.h>
-#include <etaos/panic.h>
+#include <etaos/stdio.h>
 
 #include <asm/pgm.h>
 
@@ -185,11 +185,9 @@ static int raw_mm_heap_free(struct heap_node **root, void *block)
 		 */
 		if(((uintptr_t)node + node->size) > (uintptr_t)fnode) {
 #ifdef CONFIG_MM_DEBUG
-			panic("Trying to release free heap memory [%p] from %s:%i\n",
+			fprintf(stderr, "Trying to release free heap memory "
+					"[%p] from %s:%i\n",
 					block, file, line);
-#else
-			panic_P(PSTR("Trying to release free heap memory [%p]\n"),
-					block);
 #endif
 			return -EINVAL;
 		}
