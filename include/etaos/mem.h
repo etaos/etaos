@@ -44,7 +44,7 @@ struct heap_node {
 #ifdef CONFIG_MM_TRACE_OWNER
 	struct thread *owner; //!< Owner of the memory region.
 #endif
-	struct heap_node *next;
+	struct heap_node *next; //!< Heap node list pointer.
 };
 
 #define MM_ALLOC_FLAG 0 //!< This bit becomes set after allocation
@@ -63,12 +63,14 @@ extern void kfree(void *);
 extern void mm_init(void);
 extern void mm_heap_add_block(void *start, size_t size);
 extern void raw_mm_heap_add_block(void *start, size_t size);
+extern size_t mm_node_size(void *ptr);
 
 extern MEM void* mm_alloc(size_t);
 
 extern void *kzalloc(size_t num);
 extern void *kmalloc(size_t num);
 extern void *kcalloc(size_t, size_t);
+extern void *realloc(void *old, size_t newsize);
 
 extern size_t mm_heap_available(void);
 CDECL_END

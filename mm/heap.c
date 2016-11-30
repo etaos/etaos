@@ -127,6 +127,26 @@ static void *raw_mm_heap_alloc(struct heap_node **root, size_t size)
 	return fit;
 }
 
+static inline struct heap_node *mm_region_to_node(void *ptr)
+{
+	return (struct heap_node *)
+		((uintptr_t)ptr - (HEAP_OVERHEAD + MM_GUARD_BYTES));
+}
+
+size_t mm_node_size(void *ptr)
+{
+	struct heap_node *node;
+	size_t size;
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&mlock, flags);
+	node = mm_region_to_node(ptr);
+	size = node->size;
+	raw_spin_unlock_irqrestore(&mlock, flags);
+
+	return size;
+}
+
 #ifdef CONFIG_MM_DEBUG
 static int raw_mm_heap_free(struct heap_node **root, void *block,
 		const char *file, int line)
@@ -141,8 +161,7 @@ static int raw_mm_heap_free(struct heap_node **root, void *block)
 	if(!block)
 		return -EINVAL;
 
-	fnode = (struct heap_node*)
-		((uintptr_t)block - (HEAP_OVERHEAD + MM_GUARD_BYTES));
+	fnode = mm_region_to_node(block);
 
 	if(mm_validate_user_area(fnode))
 		return -EINVAL;

@@ -3,6 +3,7 @@ libc-files-$(CONFIG_CRT) += stdlib/strtol.o stdlib/ctype.o stdlib/atoi.o
 libc-files-$(CONFIG_CRT) += stdlib/abs.o stdlib/labs.o
 libc-files-$(CONFIG_CRT) += stdlib/itoa.o stdlib/ltoa.o
 libc-files-$(CONFIG_CRT) += kmalloc.o kzalloc.o kfree.o kcalloc.o
+libc-files-$(CONFIG_CRT) += krealloc.o
 
 libc-files-$(CONFIG_CRT) += time/gmtime.o time/localtime.o time/mktime.o
 
