@@ -1,6 +1,6 @@
 /*
  *  Eta/OS - AVR5 device init
- *  Copyright (C) 2014   Michel Megens <dev@bietje.net>
+ *  Copyright (C) 2014, 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -18,6 +18,17 @@
 
 #include <asm/config.h>
 #include <asm/io.h>
+
+#ifdef CONFIG_VFS_MODULE
+#define CONFIG_VFS
+#endif
+
+#ifdef CONFIG_DRIVER_CORE_MODULE
+#define CONFIG_DRIVER_CORE
+#endif
+
+.extern dev_core_init
+.extern vfs_init
 
 .section .devinit0
 .global dev_init
@@ -58,7 +69,10 @@ dev_init:
 	push r29
 	push r30
 	push r31
-#if defined(CONFIG_DRIVER_CORE) || defined(CONFIG_DRIVER_CORE_MODULE)
+#ifdef CONFIG_DRIVER_CORE
+#ifdef CONFIG_VFS
+	call vfs_init
+#endif
 	call dev_core_init
 #else
 	mov r1, r1

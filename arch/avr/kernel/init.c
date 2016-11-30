@@ -75,9 +75,6 @@ void avr_init(void)
 #endif /* CONFIG_SCHED */
 #endif /* CONFIG_MALLOC */
 
-#ifdef CONFIG_VFS
-	vfs_init();
-#endif
 	dev_init();
 	kinit();
 	while(1);
