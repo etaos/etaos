@@ -25,7 +25,7 @@
 #include <etaos/stdlib.h>
 #include <etaos/mem.h>
 
-#if defined(CONFIG_STRING) || defined(CONFIG_STRING_MODULE)
+#if defined(CONFIG_CRT) || defined(CONFIG_CRT_MODULE)
 #include <etaos/string.h>
 /**
  * @brief Allocate a memory regeion.
