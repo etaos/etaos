@@ -908,8 +908,11 @@ static void __rq_update_clock(struct rq *rq)
  */
 void rq_update_clock(void)
 {
-	struct rq *rq = &grq;
+	int cpu;
+	struct rq *rq;
 
+	cpu = cpu_get_id();
+	rq = cpu_to_rq(cpu);
 	__rq_update_clock(rq);
 }
 
