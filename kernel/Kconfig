@@ -68,6 +68,7 @@ config SEM
 	  Say 'y' here if you want to build support for semaphore's.
 
 config SPINLOCK_DEBUG
+	depends on CRT
 	bool "Spinlock tracing"
 	help
 	  Say 'y' here to built support for spinlock tracing.

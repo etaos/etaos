@@ -38,8 +38,10 @@
 typedef struct spinlock {
 	uint8_t lock;
 #ifdef CONFIG_SPINLOCK_DEBUG
+#ifdef CONFIG_SCHED
 	struct thread *owner;
-	char *acquire_file;
+#endif
+	const char *acquire_file;
 	int   acquire_line;
 #endif
 } spinlock_t;

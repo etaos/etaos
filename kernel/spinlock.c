@@ -21,6 +21,12 @@
 #include <etaos/types.h>
 #include <etaos/spinlock.h>
 
+#ifdef CONFIG_SPINLOCK_DEBUG
+#include <etaos/stdio.h>
+#include <etaos/thread.h>
+#include <etaos/mem.h>
+#endif
+
 #define LOCK_IDX 0
 
 static uint8_t lock_test_and_set(volatile uint8_t *lock,
@@ -50,11 +56,35 @@ void spinlock_acquire(spinlock_t *lock, const char *file, int line)
 void spinlock_acquire(spinlock_t *lock)
 #endif
 {
+#ifdef CONFIG_SPINLOCK_DEBUG
+	bool notified = false;
+#ifdef CONFIG_SCHED
+	const char *msg = "Spinlock locked! Lock was previously acquired from: "
+		"%s:%i by %s\n";
+#else
+	const char *msg = "Spinlock locked! Lock was previously acquired from: "
+		"%s:%i";
+#endif
+#endif /* CONFIG_SPINLOCK_DEBUG */
 	volatile uint8_t *lock_ptr;
 
 	lock_ptr = &lock->lock;
-	while(lock_test_and_set(lock_ptr, 1))
+	while(lock_test_and_set(lock_ptr, 1)) {
+#ifdef CONFIG_SPINLOCK_DEBUG
+		if(!notified)
+			printf(msg, lock->acquire_file, lock->acquire_line,
+					lock->owner->name);
+#endif
+
 		while(lock_ptr[LOCK_IDX]);
+	}
+#ifdef CONFIG_SPINLOCK_DEBUG
+	lock->acquire_file = file;
+	lock->acquire_line = line;
+#ifdef CONFIG_SCHED
+	lock->owner = current_thread();
+#endif
+#endif /* CONFIG_SPINLOCK_DEBUG */
 }
 
 #ifdef CONFIG_SPINLOCK_DEBUG
@@ -67,6 +97,13 @@ void spinlock_release(spinlock_t *lock)
 
 	lock_ptr = &lock->lock;
 	barrier();
+#ifdef CONFIG_SPINLOCK_DEBUG
+	lock->acquire_file = NULL;
+	lock->acquire_line = 0;
+#ifdef CONFIG_SCHED
+	lock->owner = NULL;
+#endif
+#endif /* CONFIG_SPINLOCK_DEBUG */
 	lock_ptr[LOCK_IDX] = 0;
 }
 
