@@ -256,7 +256,7 @@ $(etaos-dirs): scripts
 $(sort $(etaos-deps)): $(etaos-dirs) ;
 
 # Generate linker scripts, if needed
-quiet_cmd_gen_ldscript  = GEN     $@
+quiet_cmd_gen_ldscript  = SHIPPED $@
       cmd_gen_ldscript  =
 
 $(etaos-ldscripts): FORCE
