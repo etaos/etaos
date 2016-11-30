@@ -22,22 +22,14 @@
 #include <etaos/spinlock.h>
 #include <etaos/bitops.h>
 #include <etaos/stdio.h>
-#include <etaos/irq.h>
 
 #define SPINLOCK_LOCK_BIT 0
 
 unsigned long __sync_lock_test_and_set_4(volatile unsigned long *lock,
 		                                unsigned long value)
 {
-	unsigned long flags;
-	unsigned long rv;
-
 	__sync_synchronize();
-	irq_save_and_disable(&flags);
-	rv = test_and_set_bit(SPINLOCK_LOCK_BIT, lock);
-	irq_restore(&flags);
-
-	return rv;
+	return test_and_set_bit(SPINLOCK_LOCK_BIT, lock);
 }
 
 void spinlock_init(spinlock_t *lock)
@@ -69,12 +61,10 @@ void spinlock_release(spinlock_t *lock, const char *file, int line)
 void spinlock_release(spinlock_t *lock)
 #endif
 {
-	unsigned long *lock_ptr, flags;
+	unsigned long *lock_ptr;
 
 	lock_ptr = &lock->lock;
 	__sync_synchronize();
-	irq_save_and_disable(&flags);
 	clear_bit(SPINLOCK_LOCK_BIT, lock_ptr);
-	irq_restore(&flags);
 }
 
