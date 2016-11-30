@@ -30,6 +30,38 @@ config DYN_PRIO
 	  dead swap the entire scheduling system. If you are
 	  unsure say 'y' here.
 
+choice
+	prompt "Mutex lock mechanism"
+
+config MUTEX_TRADITIONAL
+	bool "Traditional mutexes"
+	help
+	  Say 'y' here to use the traditional mutex
+	  locking mechanism.
+	  This mechanism is a bit more sensitive to
+	  deadlocks then the event queue mechanism.
+
+config MUTEX_EVENT_QUEUE
+	bool "Event queue mutex"
+	depends on EVENT_MUTEX
+	help
+	  Say 'y' if you are interrested in using
+	  event queue's as the backend for mutex
+	  locks. These mechanism provides better
+	  use of the CPU time, by using the scheduler
+	  to run other threads when waiting for a lock.
+	  The downside is, that the memory usage is
+	  slightly higher and a bit more overhead when
+	  locking/unlocking.
+
+endchoice
+
+config SEM
+	bool "Semaphores"
+	depends on EVENT_MUTEX
+	help
+	  Say 'y' here if you want to build support for semaphore's.
+
 config PREEMPT
 	bool "CPU preemption"
 	depends on SYS_RR || SYS_EDF
