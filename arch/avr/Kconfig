@@ -23,6 +23,7 @@ endif
 
 config INIT_STACK_SIZE
 	int "Init stack size"
+	depends on SCHED
 	help
 	  The size of the the stack that is used during the
 	  system initialisation process.
