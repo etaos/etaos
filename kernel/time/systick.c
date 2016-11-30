@@ -54,7 +54,9 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 		tp->slice = CONFIG_TIME_SLICE;
 	}
 #endif
-	timer_source_inc(cs);
+
+	time_inc(); /* Handle system time */
+	timer_source_inc(cs); /* Increase the system / sched clock */
 	return IRQ_HANDLED;
 }
 
