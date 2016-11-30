@@ -1370,7 +1370,7 @@ static void __used sched_init(void)
 	if(sys_sched_class.init)
 		sys_sched_class.init();
 
-	idle_stack_ptr = &idle_stack_ptr_start;
+	idle_stack_ptr = kzalloc(CONFIG_IDLE_STACK_SIZE);
 	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
 			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack_ptr);
 }

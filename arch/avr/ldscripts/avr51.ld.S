@@ -200,10 +200,6 @@ SECTIONS
      PROVIDE ( main_stack_ptr_end   = . ) ;
 
      PROVIDE( init_stack_ptr = main_stack_ptr_start + CONFIG_INIT_STACK_SIZE ) ;
-
-     PROVIDE ( idle_stack_ptr_start = . ) ;
-     . += CONFIG_IDLE_STACK_SIZE;
-     PROVIDE ( idle_stack_ptr_end   = . ) ;
 #else
      . += CONFIG_STACK_SIZE ;
      PROVIDE ( init_stack_ptr = . ) ;
