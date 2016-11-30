@@ -606,6 +606,14 @@ static void rq_update(struct rq *rq)
 	class = rq->sched_class;
 	if(class->post_schedule)
 		class->post_schedule(rq);
+
+	/*
+	 * Last but not least, restore the interrupt state. Note that
+	 * this is the last operation and it is the last operation for
+	 * a reason. Therefore, rq_update must also be the last scheduling
+	 * operation in the __schedule function.
+	 */
+	irq_restore(&tp->irq_state);
 }
 
 /**
@@ -764,8 +772,7 @@ static inline void dyn_prio_update(struct rq *rq)
  * @see __schedule
  */
 static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
-						struct thread *new,
-						unsigned long *flags)
+				    struct thread *new)
 {
 	struct sched_class *class = rq->sched_class;
 
@@ -782,7 +789,7 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 
 	/* prev != new (this condition is ensured by __schedule) */
 	class->rm_thread(rq, new);
-	raw_spin_unlock_irq(&rq->lock, flags);
+	raw_spin_unlock(&rq->lock);
 	cpu_switch_context(rq, prev, new);
 }
 
@@ -924,7 +931,9 @@ void rq_update_clock(void)
  * This function is responsible for handling the dynamic priority and time
  * slice resets/updates.
  */
-static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
+static inline void __schedule_prepare(struct rq *rq,
+				      struct thread *prev,
+				      unsigned long *irqs)
 {
 	struct thread *next = rq->current;
 	unsigned long flags = 0UL;
@@ -949,6 +958,7 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 	preempt_reset_slice(prev);
 	cpu_get_state(&flags);
 	prev->cpu_state = flags;
+	prev->irq_state = *irqs;
 }
 
 /**
@@ -1064,9 +1074,9 @@ static void __hot __schedule(int cpu, bool preempt)
 		rq->current = next;
 		rq->switch_count++;
 
-		__schedule_prepare(rq, prev);
-		rq_switch_context(rq, prev, next, &flags);
-		rq_update(rq);
+		__schedule_prepare(rq, prev, &flags);
+		rq_switch_context(rq, prev, next);
+		rq_update(rq); /* restores CPU / IRQ states */
 
 	} else {
 		raw_spin_unlock_irq(&rq->lock, &flags);
@@ -1179,6 +1189,7 @@ THREAD(idle_thread_func, arg)
 
 	main_stack_ptr = &main_stack_ptr_start;
 	irq_enable();
+
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack_ptr, SCHED_DEFAULT_PRIO);
 	preempt_disable();

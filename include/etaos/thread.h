@@ -146,6 +146,7 @@ struct thread {
 #endif
 
 	unsigned long cpu_state; //!< CPU flags for this thread.
+	unsigned long irq_state; //!< IRQ state of this thread.
 
 	bool on_rq; //!< Run queue enable.
 	struct rq *rq; //!< Run queue pointer.

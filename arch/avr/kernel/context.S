@@ -30,7 +30,6 @@
 .global avr_switch_context
 .extern avr_save_stack
 avr_switch_context:
-	cli
 	push r0
 
 	in r0, AVR_RAMPD_ADDR

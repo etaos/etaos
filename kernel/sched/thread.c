@@ -52,7 +52,7 @@ static void raw_thread_init(struct thread *tp, const char *name,
 
 	tp->param = arg;
 	tp->prio = prio;
-	tp->flags = 0;
+	tp->flags = 0UL;
 	tp->rq = NULL;
 	tp->on_rq = false;
 #ifdef CONFIG_EVENT_MUTEX
@@ -73,6 +73,7 @@ static void raw_thread_init(struct thread *tp, const char *name,
 	list_head_init(&tp->se.tickets);
 #endif
 
+	irq_store_flags(&tp->irq_state);
 	sched_create_stack_frame(tp, stack, stack_size, handle);
 
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);

@@ -261,6 +261,15 @@ static inline void irq_chip_set_resume(struct irq_chip *chip,
 	chip->resume = resume;
 }
 
+/**
+ * @brief Store the IRQ flags.
+ * @param flags Variable to store the flags into.
+ */
+static inline void irq_store_flags(unsigned long *flags)
+{
+	*flags = arch_irq_get_flags();
+}
+
 CDECL_END
 #endif
 
