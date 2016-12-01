@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Memory module
- *  Copyright (C) 2014   Michel Megens
+ *  Copyright (C) 2014, 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -35,7 +35,6 @@
 
 #define MM_MAGIC_BYTE 0x99
 
-typedef struct heap_node HEAPNODE;
 /**
  * @brief Heap node structure
  */

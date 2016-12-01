@@ -21,6 +21,15 @@
 #include <etaos/mem.h>
 #include <etaos/stdlib.h>
 
+/**
+ * @brief Expand or shrink an allocated memory region.
+ * @param old Memory region that needs shrinking or expansion.
+ * @param newsize Desired size.
+ * @return The reallocated memory of size \p newsize.
+ *
+ * All data that is already stored in \p old will be copied to the new buffer
+ * by realloc, up to a maximum of \p newsize bytes.
+ */
 void *realloc(void *old, size_t newsize)
 {
 	void *new;

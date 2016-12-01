@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup bf
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -44,6 +49,9 @@ typedef size_t uintptr_t;
 #define HEAP_OVERHEAD (sizeof(struct heap_node) - sizeof(struct heap_node*))
 #define HEAP_MIN (sizeof(struct heap_node) + (2 * MM_GUARD_BYTES))
 
+/**
+ * @brief Initialise the memory allocator.
+ */
 void mm_init(void)
 {
 }
@@ -133,6 +141,12 @@ static inline struct heap_node *mm_region_to_node(void *ptr)
 		((uintptr_t)ptr - (HEAP_OVERHEAD + MM_GUARD_BYTES));
 }
 
+/**
+ * @brief Get the size of a memory region.
+ * @param ptr Memory region to get the size of.
+ * @return The size of the memory region pointed to by \p ptr.
+ * @note This function will acquire the memory lock.
+ */
 size_t mm_node_size(void *ptr)
 {
 	struct heap_node *node;
@@ -223,6 +237,11 @@ static int raw_mm_heap_free(struct heap_node **root, void *block)
 	return -EOK;
 }
 
+/**
+ * @brief Allocate a new memory region.
+ * @param size Number of bytes to allocate.
+ * @return The allocated memory region of size \p size or \p NULL.
+ */
 MEM void *mm_alloc(size_t size)
 {
 	unsigned long flags;
@@ -235,6 +254,13 @@ MEM void *mm_alloc(size_t size)
 	return rv;
 }
 
+/**
+ * @brief Free a previously allocated memory region.
+ * @param block Memory block to free.
+ * @return An error code.
+ * @retval -EOK on success.
+ * @retval -EINVAL on failure.
+ */
 #ifdef CONFIG_MM_DEBUG
 int mm_free(void *block, const char *file, int line)
 #else
@@ -255,6 +281,12 @@ int mm_free(void *block)
 	return rv;
 }
 
+/**
+ * @brief Add a new memory region to the allocator.
+ * @param addr Start of the memory region.
+ * @param size Seize of the region pointed to by \p addr.
+ * @note This function does not acquire the global memory lock.
+ */
 void raw_mm_heap_add_block(void *addr, size_t size)
 {
 	struct heap_node *node = (struct heap_node*)MM_TOP_ALIGN((uintptr_t)addr);
@@ -267,6 +299,12 @@ void raw_mm_heap_add_block(void *addr, size_t size)
 #endif
 }
 
+/**
+ * @brief Add a new memory region to the allocator.
+ * @param addr Start of the memory region.
+ * @param size Seize of the region pointed to by \p addr.
+ * @note This function acquires the global memory lock.
+ */
 void mm_heap_add_block(void *addr, size_t size)
 {
 	unsigned long flags;
@@ -288,6 +326,10 @@ static size_t raw_mm_heap_available(struct heap_node **root)
 	return rv;
 }
 
+/**
+ * @brief Get the total number of bytes available in the allocator.
+ * @return The number of free bytes available in the allocator.
+ */
 size_t mm_heap_available(void)
 {
 	size_t rv;
@@ -299,4 +341,6 @@ size_t mm_heap_available(void)
 
 	return rv;
 }
+
+/** @} */
 
