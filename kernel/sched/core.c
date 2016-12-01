@@ -64,6 +64,10 @@ static DEFINE_RQ(grq, &sys_sched_class);
 /**
  * @brief Get the global run queue
  * @return The global run queue.
+ *
+ * The most notable use of this function is in #sched_get_cpu_rq. This way
+ * the scheduling core always gets the correct run queue independant of the
+ * Kconfig configuration options.
  */
 struct rq *sched_get_grq(void)
 {
@@ -92,6 +96,8 @@ static void irq_thread_wait(void)
  * @brief Wake an IRQ thread up.
  * @param data Threaded IRQ to wake up.
  * @see signal wait irq_thread_wait
+ * @note This thread will attempt to preempt the currently running thread as
+ *       early as possible by setting the `THREAD_NEED_RESCHED_FLAG`.
  */
 void irq_thread_signal(struct irq_thread_data *data)
 {
@@ -772,7 +778,6 @@ static inline void dyn_prio_update(struct rq *rq)
  * @param rq Run queue to use for the context.
  * @param prev Previous thread.
  * @param new New thread to replace \p prev.
- * @param flags IRQ flags stored by __schedule
  * @see __schedule
  */
 static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
@@ -931,6 +936,7 @@ void rq_update_clock(void)
  * @brief Prepare the a reschedule.
  * @param rq Runqueue that is about to be rescheduled.
  * @param prev Thread that lost the CPU.
+ * @param irqs IRQ flags of the thread that is being scheduled out.
  *
  * This function is responsible for handling the dynamic priority and time
  * slice resets/updates.
