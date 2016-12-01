@@ -1,0 +1,7 @@
+/**
+ * @defgroup tmp36 TMP36 temperature sensor
+ * @ingroup analog
+ * @brief Basic driver module for the `TMP36` analog temperature sensor. For
+ *        wiring information, check the datasheets on the website.
+ * @note This driver assumes that V<sub>in</sub> is connected to 5V.
+ */

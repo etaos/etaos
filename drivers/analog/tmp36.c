@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup tmp36
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -29,6 +34,12 @@
 
 static struct analog_chip *tmp36_chip;
 
+/**
+ * @brief Read the TMP36 sensor.
+ * @param pin Analog pin which is connected to the TMP36.
+ * @return The temperature value read.
+ * @retval -9999.9999 in case of an error.
+ */
 float tmp36_read(int pin)
 {
 	struct vfile *file;
@@ -57,6 +68,11 @@ float tmp36_read(int pin)
 	return temperature;
 }
 
+/**
+ * @brief Set the analog device for the TMP36.
+ * @param chip Analog chip to which the TMP36 is connected.
+ * @note The TMP36 driver defaults to the #analog_syschip.
+ */
 void tmp36_set_analog_device(struct analog_chip *chip)
 {
 	if(!chip)
@@ -64,4 +80,6 @@ void tmp36_set_analog_device(struct analog_chip *chip)
 	else
 		tmp36_chip = chip;
 }
+
+/** @} */
 

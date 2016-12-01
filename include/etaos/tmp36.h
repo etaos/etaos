@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup tmp36
+ * @{
+ */
 #ifndef __TMP36GZ_H__
 #define __TMP36GZ_H__
 
@@ -28,4 +32,5 @@ extern void tmp36_set_analog_device(struct analog_chip *chip);
 CDECL_END
 
 #endif
+/** @} */
 
