@@ -61,19 +61,11 @@ void avr_init(void)
 	avr_sre();
 #endif
 
-#ifdef CONFIG_SCHED
 	mm_init();
 	raw_mm_heap_add_block(mm_heap_start, INTERNAL_RAMEND +
 			CONFIG_EXT_MEM_SIZE -
 			((size_t)mm_heap_start));
-#ifdef CONFIG_EXT_MEM
 #endif
-
-#else
-	mm_init((void*)mm_heap_start, INTERNAL_RAMEND + CONFIG_EXT_MEM_SIZE -
-			((size_t)mm_heap_start) - CONFIG_STACK_SIZE);
-#endif /* CONFIG_SCHED */
-#endif /* CONFIG_MALLOC */
 
 	dev_init();
 	kinit();
