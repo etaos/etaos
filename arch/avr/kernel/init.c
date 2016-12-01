@@ -74,8 +74,6 @@ void avr_init(void)
 
 void finalize_init(void)
 {
-	//raw_mm_heap_add_block((void*)(INTERNAL_RAMEND - CONFIG_INIT_STACK_SIZE),
-			//CONFIG_INIT_STACK_SIZE);
 }
 
 /* @} */
