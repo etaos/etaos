@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup fops
+ * @{
+ */
+
 #ifndef __FSBASENAME_H__
 #define __FSBASENAME_H__
 
@@ -27,4 +32,6 @@ extern char *basepath(const char *path);
 CDECL_END
 
 #endif /* __FSBASENAME_H__ */
+
+/** @} */
 

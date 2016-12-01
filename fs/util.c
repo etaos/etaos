@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup fops
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/string.h>
 #include <etaos/types.h>
@@ -23,6 +28,10 @@
 
 #include <etaos/fs/util.h>
 
+/**
+ * @brief Free the result of #fs_split_path
+ * @param split String array allocated by #fs_split_path.
+ */
 void fs_free_path_split(char **split)
 {
 	int idx = 0;
@@ -75,15 +84,25 @@ static char **path_split(char *path, const char _delim)
 	return result;
 }
 
-char **fs_split_path(const char *__path__)
+/**
+ * @brief Split a path into an array.
+ * @param path0 Path to split.
+ * @return A two dimensional array with the result.
+ *
+ * This functions splits a path into an array of strings based on the
+ * \p / character.
+ */
+char **fs_split_path(const char *path0)
 {
 	char *path;
 	char **result = NULL;
 
-	path = strdup(__path__);
+	path = strdup(path0);
 	result = path_split(path, '/');
 	kfree(path);
 
 	return result;
 }
+
+/** @} */
 

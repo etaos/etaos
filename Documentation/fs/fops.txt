@@ -1,0 +1,6 @@
+/* ================ File systems ================ */
+
+/**
+ * @defgroup fops FS utility functions
+ * @ingroup fs
+ */

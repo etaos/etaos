@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup fops
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/string.h>
@@ -25,6 +30,13 @@
 #include <etaos/mem.h>
 #include <etaos/list.h>
 
+/**
+ * @brief Return the base name of a path.
+ * @param path Path to get the base name of.
+ * @note The return value is a newly allocated string.
+ * @note The base name of the path \p /var/www/html would be \p html.
+ * @return The base name \p path.
+ */
 char *basename(const char *path)
 {
 	int len, idx;
@@ -51,6 +63,13 @@ char *basename(const char *path)
 	return basename;
 }
 
+/**
+ * @brief Return the base path of a path.
+ * @param path Path to get the base path of.
+ * @return The base path of \p path.
+ * @note The return value is an allocated string.
+ * @note The base path of \p /var/www/html would be \p /var/www.
+ */
 char *basepath(const char *path)
 {
 	int len, idx;
@@ -77,4 +96,6 @@ char *basepath(const char *path)
 
 	return basepath;
 }
+
+/** @} */
 

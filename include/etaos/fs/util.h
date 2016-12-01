@@ -16,6 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup fops
+ * @{
+ */
 #ifndef __FS_UTIL_H__
 #define __FS_UTIL_H__
 
@@ -23,4 +27,5 @@ extern char **fs_split_path(const char *__path__);
 extern void fs_free_path_split(char **split);
 
 #endif /* __FS_UTIL_H__ */
+/** @} */
 
