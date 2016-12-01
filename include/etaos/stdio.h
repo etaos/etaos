@@ -143,7 +143,12 @@ extern struct vfile * __iob[];
 #define DIR struct dirent //!< Directory descriptor
 #define FILE struct vfile //!< File descriptor
 
+/**
+ * @brief Convert a file pointer to a file structure.
+ * @param __idx File pointer to get the struct file for.
+ */
 #define filep(__idx) __iob[__idx]
+
 extern int putc(int c, struct vfile * stream);
 extern int fputc(int c, struct vfile * stream);
 extern int fputs(char *c, struct vfile * stream);
