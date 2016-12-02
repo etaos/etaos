@@ -17,5 +17,11 @@ config LM35
 	depends on ANALOG
 	help
 	  Say 'y' or 'm' here to build the LM35 temperature sensor driver.
+
+config TMP36
+	tristate "TMP36 temperature sensor"
+	depends on ANALOG
+	help
+	  Say 'y' or 'm' here to build the TMP36 temperature sensor driver.
 endif
 
