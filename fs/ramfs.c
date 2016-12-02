@@ -77,6 +77,61 @@ static int ramfs_write(struct vfile *file, const void *buff, size_t size)
 	return size;
 }
 
+/**
+ * @brief Get the currenct index of a RAMFS file.
+ * @param file File to get the current index of.
+ * @return The current index of \p file.
+ */
+static size_t ramfs_ftell(struct vfile *file)
+{
+	struct ramfs_file *ramfile;
+
+	ramfile = container_of(file, struct ramfs_file, base);
+	return ramfile->wr_idx;
+}
+
+static size_t ramfs_setindex(struct vfile *file, size_t index, size_t max)
+{
+	struct ramfs_file *ramfile;
+
+	if(index > max && max)
+		return -EINVAL;
+
+	if(index != file->index) {
+		ramfile = container_of(file, struct ramfs_file, base);
+		file->index = index;
+		ramfile->rd_idx = 0;
+		ramfile->wr_idx = 0;
+	}
+
+	return index;
+}
+
+/**
+ * @brief Set the index to a specific position.
+ * @param file RAMFS file.
+ * @param offset Offset to set in \p file.
+ * @param whence Operation type.
+ */
+static size_t ramfs_lseek(struct vfile *file, size_t offset, int whence)
+{
+	switch(whence) {
+	case SEEK_END:
+		offset += file->length;
+		break;
+
+	case SEEK_CUR:
+		if(!offset)
+			return file->index;
+
+		return ramfs_setindex(file, file->index + offset, 0);
+	default:
+		break;
+	}
+
+	return ramfs_setindex(file, offset, 0);
+}
+
 static int ramfs_read(struct vfile *file, void *buff, size_t size)
 {
 	struct ramfs_file *ramfile;
@@ -139,6 +194,8 @@ static struct vfile *ramfs_create(const char *path, int mode)
 	file->base.get   = ramfs_getc;
 	file->base.close = ramfs_close;
 	file->base.open  = ramfs_open;
+	file->base.ftell = ramfs_ftell;
+	file->base.lseek = ramfs_lseek;
 	file->base.name  = basen;
 	file->base.buff  = kzalloc(RAMFS_BUFFER_SIZE);
 	file->base.length = RAMFS_BUFFER_SIZE;
