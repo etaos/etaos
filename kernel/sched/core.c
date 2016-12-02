@@ -91,6 +91,7 @@ static void irq_thread_wait(void)
  * @brief Wake an IRQ thread up.
  * @param data Threaded IRQ to wake up.
  * @see signal wait irq_thread_wait
+ * @note This function alters the run queue's.
  */
 void irq_thread_signal(struct irq_thread_data *data)
 {
@@ -144,6 +145,7 @@ void irq_handle_fn(void *data)
  * @note You have to be sure that the thread is on one. If its not, a false
  *       thread queue is returned.
  * @return The run queue \p tp is on.
+ * @see container_of
  */
 static inline struct thread_queue *thread_to_queue(struct thread *tp)
 {
@@ -191,6 +193,8 @@ void thread_queue_wait(struct thread_queue *qp, unsigned int ms)
 /**
  * @brief Initialise a thread queue during run time.
  * @param qp Thread queue which has to be initialised.
+ *
+ * Initialise the thread queue to a signaled state.
  */
 void thread_queue_init(struct thread_queue *qp)
 {
