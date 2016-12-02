@@ -100,6 +100,9 @@ void irq_thread_signal(struct irq_thread_data *data)
 	tp = data->owner;
 	current = current_thread();
 
+	if(tp->on_rq)
+		return;
+
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	clear_bit(THREAD_WAITING_FLAG, &tp->flags);
 	rq_add_thread_no_lock(tp);
@@ -124,7 +127,8 @@ void irq_handle_fn(void *data)
 
 	while(true) {
 		/* Only sleep if there are no events waiting */
-		irq_thread_wait();
+		if(!threaded_irq->event_cnt)
+			irq_thread_wait();
 
 		if(test_bit(THREAD_EXIT_FLAG, &current_thread()->flags))
 			kill();
