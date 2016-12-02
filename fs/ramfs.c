@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup ramfs
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/vfs.h>
@@ -37,6 +42,12 @@ static inline void ramfs_unlock_file(struct vfile *file)
 	spin_unlock(&file->lock);
 }
 
+/**
+ * @brief Open a RAMFS file.
+ * @param file File to open.
+ * @return An exit code.
+ * @retval -EOK on success.
+ */
 static int ramfs_open(struct vfile *file)
 {
 	struct ramfs_file *ramfile;
@@ -51,6 +62,12 @@ static int ramfs_open(struct vfile *file)
 	return -EOK;
 }
 
+/**
+ * @brief Close RAMFS file.
+ * @param file File to close.
+ * @return Exit code.
+ * @retval -EOK on success.
+ */
 static int ramfs_close(struct vfile *file)
 {
 	struct ramfs_file *ramfile = container_of(file, struct ramfs_file, base);
@@ -95,6 +112,13 @@ static int ramfs_expand(struct vfile *file, size_t required)
 	return -EOK;
 }
 
+/**
+ * @brief Write to a RAMFS file.
+ * @param file File to write to.
+ * @param buff Buffer containing data to write to \p file.
+ * @param size Length of \p buff.
+ * @return The number of bytes written.
+ */
 static int ramfs_write(struct vfile *file, const void *buff, size_t size)
 {
 	struct ramfs_file *ramfile;
@@ -113,6 +137,13 @@ static int ramfs_write(struct vfile *file, const void *buff, size_t size)
 	return size;
 }
 
+/**
+ * @brief Read from a RAMFS file.
+ * @param file File to read from.
+ * @param buff Buffer to store the read data into.
+ * @param size Number of bytes to read.
+ * @return The number of bytes read.
+ */
 static int ramfs_read(struct vfile *file, void *buff, size_t size)
 {
 	struct ramfs_file *ramfile;
@@ -127,6 +158,11 @@ static int ramfs_read(struct vfile *file, void *buff, size_t size)
 	return size;
 }
 
+/**
+ * @brief Read a single byte from a RAMFS file.
+ * @param file File to read from.
+ * @return The character read.
+ */
 static int ramfs_getc(struct vfile *file)
 {
 	struct ramfs_file *ramfile;
@@ -135,6 +171,12 @@ static int ramfs_getc(struct vfile *file)
 	return file->buff[ramfile->rd_idx++];
 }
 
+/**
+ * @brief Write a single character to a RAMFS file.
+ * @param c Character to write.
+ * @param file File to write to.
+ * @return The character written, \p c.
+ */
 static int ramfs_putc(int c, struct vfile *file)
 {
 	struct ramfs_file *ramfile;
@@ -188,6 +230,9 @@ static struct vfile *ramfs_create(const char *path, int mode)
 	return &file->base;
 }
 
+/**
+ * @brief RAMFS driver.
+ */
 struct fs_driver ramfs = {
 	.open = ramfs_create,
 	.close = ramfs_close,
@@ -207,4 +252,6 @@ void __used ramfs_init(void)
 }
 
 module_init(ramfs_init);
+
+/** @} */
 

@@ -16,17 +16,34 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup devfs
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 #include <etaos/devfs.h>
 
+/**
+ * @brief Send an IOCTL to the device file system.
+ * @param file Device file.
+ * @param reg IOCTL register.
+ * @param arg Argument to \p reg.
+ * @return An error code.
+ * @retval -EINVAL when an error has occurred.
+ * @retval -EOK on success.
+ */
 static int devfs_ioctl(struct vfile *file, unsigned long reg, void *arg)
 {
 	return -EINVAL;
 }
 
+/**
+ * @brief Device file system driver.
+ */
 struct fs_driver devfs = {
 	.ioctl = devfs_ioctl,
 };
@@ -34,4 +51,8 @@ struct fs_driver devfs = {
 void devfs_init(void)
 {
 }
+
+/**
+ * @}
+ */
 

@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup vfs
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/error.h>
@@ -25,6 +30,12 @@
 #include <etaos/fs/util.h>
 #include <etaos/fs/basename.h>
 
+/**
+ * @brief Open a file.
+ * @param path Path to the file to open.
+ * @param mode File modes.
+ * @return The file descriptor for \p path.
+ */
 int vfs_open(const char *path, int mode)
 {
 	struct vfile *file;
@@ -67,6 +78,12 @@ int vfs_open(const char *path, int mode)
 	return err;
 }
 
+/**
+ * @brief Close an open file.
+ * @param fd File descriptor to close.
+ * @return An error code.
+ * @retval -EOK on success..
+ */
 int vfs_close(int fd)
 {
 	struct vfile *file;
@@ -82,4 +99,6 @@ int vfs_close(int fd)
 
 	return -EOK;
 }
+
+/** @} */
 

@@ -149,6 +149,9 @@ static void romfs_setup_file(struct vfile *file, struct romfs *entry)
 	file->close = &romfs_close;
 }
 
+/**
+ * @brief The ROMFS file system driver.
+ */
 struct fs_driver romfs = {
 	.write = NULL,
 	.read = &romfs_read,

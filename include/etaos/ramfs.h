@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup ramfs
+ * @{
+ */
+
 #ifndef __RAMFS_H__
 #define __RAMFS_H__
 
@@ -24,10 +29,16 @@
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 
+/**
+ * @brief RAMFS file descriptor.
+ */
 struct ramfs_file {
-	FILE base;
-	size_t rd_idx,
-	       wr_idx;
+	FILE base; //!< Base file.
+	size_t rd_idx, //!< Read index.
+	       wr_idx; //!< Write index.
 };
 
 #endif /* __RAMFS_H__ */
+
+/** @} */
+

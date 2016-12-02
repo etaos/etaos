@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup vfs
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/string.h>
@@ -27,6 +32,12 @@
 
 #include <etaos/fs/util.h>
 
+/**
+ * @brief Create a new directory entry.
+ * @param name Name of the directory.
+ * @return The created directory.
+ * @retval NULL if the drectory could not be created.
+ */
 struct dirent *dirent_create(const char *name)
 {
 	struct dirent *dir;
@@ -44,6 +55,13 @@ struct dirent *dirent_create(const char *name)
 	return dir;
 }
 
+/**
+ * @brief Find a directory entry.
+ * @param root File system tree to search in.
+ * @param path Path to the directory.
+ * @return The directory pointed to by \p path.
+ * @retval NULL if the directory could not be found.
+ */
 struct dirent *dirent_find(struct dirent *root, const char *path)
 {
 	int idx;
@@ -81,6 +99,12 @@ struct dirent *dirent_find(struct dirent *root, const char *path)
 	return search;
 }
 
+/**
+ * @brief Add a directory as a child to another directory.
+ * @param parent Directory to add \p child to.
+ * @param child Directory to add to \p parent.
+ * @return \p child is returned on success.
+ */
 struct dirent *dirent_add_child(struct dirent *parent, struct dirent *child)
 {
 	if(!parent || !child)
@@ -92,6 +116,12 @@ struct dirent *dirent_add_child(struct dirent *parent, struct dirent *child)
 	return child;
 }
 
+/**
+ * @brief Add a file to a directory entry.
+ * @param dir Directory to add \p file to..
+ * @param file File to add to \p dir.
+ * @return The added file.
+ */
 struct vfile *dirent_add_file(struct dirent *dir, struct vfile *file)
 {
 	if(!dir || !file)
@@ -103,6 +133,13 @@ struct vfile *dirent_add_file(struct dirent *dir, struct vfile *file)
 	return file;
 }
 
+/**
+ * @brief Find a file in a directory.
+ * @param dir Directory to search.
+ * @param filename Filename to search for in \p dir.
+ * @return The found file or \p NULL.
+ * @note This function doesn't search recursively.
+ */
 struct vfile *dirent_find_file(struct dirent *dir, const char *filename)
 {
 	struct vfile *carriage;
@@ -121,6 +158,13 @@ struct vfile *dirent_find_file(struct dirent *dir, const char *filename)
 	return NULL;
 }
 
+/**
+ * @brief Remove a file from directory.
+ * @param dir Directory to remove from.
+ * @param file File to remove.
+ * @return The removed file or \p NULL.
+ * @note This function doesn't search recursively.
+ */
 struct vfile *dirent_remove_file(struct dirent *dir, struct vfile *file)
 {
 	struct vfile **fpp;
@@ -143,6 +187,13 @@ struct vfile *dirent_remove_file(struct dirent *dir, struct vfile *file)
 	return NULL;
 }
 
+/**
+ * @brief Free an empty directory.
+ * @param dir Directory to free.
+ * @return An error code.
+ * @retval -EINVAL if directory wasn't empty.
+ * @retval -EOK if the directory was succesfully deleted.
+ */
 int dirent_free(struct dirent *dir)
 {
 	if(!dir || !list_empty(&dir->children) || dir->file_head)
@@ -153,4 +204,6 @@ int dirent_free(struct dirent *dir)
 
 	return -EOK;
 }
+
+/** @} */
 
