@@ -103,7 +103,7 @@ static int ramfs_write(struct vfile *file, const void *buff, size_t size)
 
 	ramfile = container_of(file, struct ramfs_file, base);
 
-	if(unlikely(!ramfs_expand(file, size)))
+	if(unlikely(ramfs_expand(file, size)))
 		return 0;
 
 	while(idx < size && ramfile->wr_idx < file->length)
@@ -139,8 +139,8 @@ static int ramfs_putc(int c, struct vfile *file)
 {
 	struct ramfs_file *ramfile;
 
-	if(unlikely(!ramfs_expand(file, 1)))
-		return -EINVAL;
+	if(unlikely(ramfs_expand(file, 1)))
+		return 0;
 
 	ramfile = container_of(file, struct ramfs_file, base);
 	file->buff[ramfile->wr_idx++] = c;
