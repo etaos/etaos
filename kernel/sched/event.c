@@ -72,18 +72,16 @@ static void __raw_event_notify(struct rq *rq, struct thread_queue *qp)
 static void event_tmo(struct timer *timer, void *arg)
 {
 	struct thread *walker, *curr;
-	struct thread_queue *qp;
-	struct thread *volatile*tpp = arg;
+	struct thread_queue *qp = arg;
 
-	qp = container_of((struct thread**)tpp, struct thread_queue, qhead);
-	walker = *tpp;
+	walker = qp->qhead;
 
 	if(walker != SIGNALED) {
 		while(walker) {
 			if(walker->timer == timer) {
 				raw_rq_remove_wake_thread(sched_get_cpu_rq(), 
 							  walker);
-				queue_remove_thread(qp, walker);
+				raw_queue_remove_thread(qp, walker);
 				if(!qp->qhead)
 					qp->qhead = SIGNALED;
 
@@ -190,7 +188,7 @@ int raw_event_wait(struct thread_queue *qp, unsigned ms)
 
 	if(ms)
 		tp->timer = timer_create_timer(cs, ms, &event_tmo,
-				(void*)&qp->qhead, TIMER_ONESHOT_MASK);
+				(void*)qp, TIMER_ONESHOT_MASK);
 	else
 		tp->timer = NULL;
 
@@ -202,10 +200,10 @@ int raw_event_wait(struct thread_queue *qp, unsigned ms)
 	tp = current_thread();
 	if(tp->timer == SIGNALED) {
 		tp->timer = NULL;
-		return -1;
+		return -EINVAL;
 	}
 
-	return 0;
+	return -EOK;
 }
 
 /**

@@ -67,11 +67,27 @@ void main(void)
  *
  * All architectures have to implement atleast this API to compile
  * the rest of ETA/OS succesfully.
+ *
+ * @section Stacks
+ *
+ * Stacks are generally allocated by the responsible subsystem. This can be
+ * a device driver, the application or in the case of the idle stack the
+ * scheduling core. This is not true for the main stack. The main stack is
+ * the stack that is used to run the thread that eventually calls the
+ * `main()` function. The architecture API is responsible for the provision of
+ * pointer to the starting address of the main stack called `main_stack_ptr_start`.
+ * The end address of this memory region should be
+ * `main_stack_ptr_start + CONFIG_STACK_SIZE`. How this stack is allocated is
+ * entirely up to the implementation of the architecture.
  */
 
 /**
  * @defgroup arch Architectures
- * @brief Supported architectures
+ * @brief Supported architectures.
+ *
+ * ETA/OS is capable of supporting a wide variety of architectures. For more
+ * implementation specific details (i.e. the API an architecture needs to
+ * provide), see the Architecture API module.
  */
 
 /**

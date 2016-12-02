@@ -11,7 +11,7 @@ config VFS
 
 if VFS
 config DEVFS
-	tristate
+	tristate "Device file system"
 	depends on VFS
 	help
 	  Device file system. This file system is used by the device

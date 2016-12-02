@@ -27,13 +27,13 @@
 #include <etaos/clocksource.h>
 #include <etaos/tick.h>
 
-static struct clocksource *time_src = NULL;
-
 struct transitiondate {
 	int yr,
 	    yd;
 	long ms;
 };
+
+static time_t sys_time = 0ULL;
 
 #define DAY_MILLISEC    (24L * 60L * 60L * 1000L)
 
@@ -218,27 +218,38 @@ int time_isindst(struct tm * tb)
 time_t time(time_t *now)
 {
 	time_t n;
+	unsigned long flags;
 
-	if(unlikely(!time_src))
-		time_src = sys_clk;
+	irq_save_and_disable(&flags);
+	n = sys_time;
+	irq_restore(&flags);
 
-	n = clocksource_get_seconds(time_src);
 	if(now)
-		now[0] = n;
+		*now = n;
 
 	return n;
 }
 
 /**
- * @brief Set the clock source to use for the time API.
- * @param src Clock source to set.
+ * @brief Increase the system time by one second.
+ * @note This function is generally called from IRQ handlers.
+ *
+ * This function should be called every milisecond by the system to keep
+ * track of time.
  */
-void time_set_clocksource(struct clocksource *src)
+void time_inc(void)
 {
-	if(!src)
-		src = sys_clk;
+	static unsigned short milis = 0;
 
-	time_src = src;
+	milis++;
+	if(milis == 1000) {
+		/*
+		 * A second has passed, increase system time
+		 * by one second and reset the milis timer.
+		 */
+		sys_time += 1ULL;
+		milis = 0;
+	}
 }
 
 /**
@@ -250,13 +261,11 @@ void time_set_clocksource(struct clocksource *src)
  */
 int stime(time_t time)
 {
-	struct clocksource *cs = sys_clk;
 	unsigned long flags;
 
-	time *= 1000;
-	spin_lock_irqsave(&cs->lock, flags);
-	cs->count = time;
-	spin_unlock_irqrestore(&cs->lock, flags);
+	irq_save_and_disable(&flags);
+	sys_time = time;
+	irq_restore(&flags);
 
 	return 0;
 }

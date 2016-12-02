@@ -12,17 +12,6 @@
  */
 
 /**
- * @defgroup ff First fit allocator
- * @ingroup mm
- * @brief First fit memeory allocation algorithm.
- * 
- * The first fit allocator is the most simple allocator out there. It maintains
- * a list of available memory and removes an entry whenever it gets allocated.
- * If a memeory region gets free'd up, the region is added back into the list
- * of available memory.
- */
-
-/**
  * @defgroup bf Best fit allocator
  * @ingroup mm
  * @brief Best fit memeory allocation algorithm.
@@ -33,6 +22,7 @@
  * whenever it gets allocated. However, in contrast to first-fit, best-fit will
  * search the entire free-list to find the best fitting block for the
  * allocation.
+ *
  * If a memeory region gets free'd up, the region is added back into the list
  * of available memory.
  */

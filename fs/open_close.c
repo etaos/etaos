@@ -34,6 +34,7 @@ int vfs_open(const char *path, int mode)
 
 	file = vfs_find_file(path);
 	if(file) {
+		file->flags = mode;
 		if(file->open)
 			err = file->open(file);
 		else
@@ -41,7 +42,6 @@ int vfs_open(const char *path, int mode)
 
 		if(!err) {
 			iob_add(file);
-			file->flags = mode;
 			err = file->fd;
 		}
 	} else {
@@ -53,8 +53,10 @@ int vfs_open(const char *path, int mode)
 		if(fs && fs->open) {
 			file = fs->open(path, mode);
 			if(file) {
-				iob_add(file);
 				file->flags = mode;
+				if(file->open)
+					file->open(file);
+				iob_add(file);
 				err = file->fd;
 			}
 		}
@@ -75,6 +77,7 @@ int vfs_close(int fd)
 			file->close(file);
 
 		iob_remove(fd);
+		file->flags = 0UL;
 	}
 
 	return -EOK;

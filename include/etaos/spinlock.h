@@ -33,180 +33,218 @@
 #include <etaos/irq.h>
 #include <etaos/preempt.h>
 
-#include <asm/spinlock.h>
 #include <asm/irq.h>
+
+typedef struct spinlock {
+	uint8_t lock;
+#ifdef CONFIG_SPINLOCK_DEBUG
+#ifdef CONFIG_SCHED
+	struct thread *owner;
+#endif
+	const char *acquire_file;
+	int   acquire_line;
+#endif
+} spinlock_t;
 
 #define DEFINE_SPINLOCK(__n) spinlock_t __n = { .lock = 0, }
 #define SPIN_LOCK_INIT(__n) { .lock = 0,}
 
 #define STATIC_SPIN_LOCK_INIT { .lock = 0,}
 
-#define spinlock_init(__l) ((__l)->lock = 0)
-
-#define raw_spin_lock(__l) arch_spin_lock(__l)
-#define raw_spin_unlock(__l) arch_spin_unlock(__l)
-
 CDECL
-/**
- * @brief Lock the given spinlock.
- * @param lock Spin lock which has to be locked.
- */
-static inline void spin_lock(spinlock_t *lock)
-{
-#ifdef CONFIG_PREEMPT
-	preempt_disable();
-#endif
-	raw_spin_lock(lock);
-}
-
-/**
- * @brief Unlock a given spin lock.
- * @param lock Lock which has to be unlocked.
- */
-static inline void spin_unlock(spinlock_t *lock)
-{
-	raw_spin_unlock(lock);
-#ifdef CONFIG_PREEMPT
-	preempt_enable();
-#endif
-}
-
-/**
- * @brief Lock a spin lock.
- * @param lock Spin lock to lock.
- * @note This function has the same behaviour as #spin_lock, but it
- *       is defined to provide naming compatibility with #_raw_spin_unlock.
- */
-static inline void _raw_spin_lock(spinlock_t *lock)
-{
-	preempt_disable();
-	raw_spin_lock(lock);
-}
-
-/**
- * @brief Unlock a spin lock.
- * @param lock Spin lock to unlock..
- *
- * After the lock has been released, preemption will be reenabled, but
- * an immediate resched will be avoided by using preempt_enable_no_resched.
- */
-static inline void _raw_spin_unlock(spinlock_t *lock)
-{
-	raw_spin_unlock(lock);
-	preempt_enable_no_resched();
-}
-
-/**
- * @brief Lock a spin lock and disable the interrupts.
- * @param lock Lock which needs to be locked.
- * @param flags Variable to store the interrupt flags in.
- */
-static inline void _spin_lock_irqsave(spinlock_t *lock, unsigned long *flags)
-{
-	preempt_disable();
-	irq_save_and_disable(flags);
-	raw_spin_lock(lock);
-}
-
-/**
- * @brief Unlock a spin lock and restore the interrupt flags.
- * @param lock Lock which needs to be unlocked.
- * @param flags The interrupt flags which need to be restored.
- */
-static inline void _spin_unlock_irqrestore(spinlock_t *lock, 
-					   unsigned long *flags)
-{
-	raw_spin_unlock(lock);
-	irq_restore(flags);
-	preempt_enable();
-}
-
-/**
- * @brief Lock a spin lock and disable the interrupts.
- * @param lock Lock which needs to be locked.
- * @param flags Variable to store the interrupt flags in.
- */
-static inline void _raw_spin_lock_irqsave(spinlock_t *lock, unsigned long *flags)
-{
-	preempt_disable();
-	irq_save_and_disable(flags);
-	raw_spin_lock(lock);
-}
-
-/**
- * @brief Unlock a spin lock and restore the interrupt flags.
- * @param lock Lock which needs to be unlocked.
- * @param flags The interrupt flags which need to be restored.
- */
-static inline void _raw_spin_unlock_irqrestore(spinlock_t *lock, 
-					   unsigned long *flags)
-{
-	raw_spin_unlock(lock);
-	irq_restore(flags);
-	preempt_enable_no_resched();
-}
-
-/**
- * @brief Lock a spin lock without touching the preemption settings.
- * @param lock Spin lock that has to be locked.
- * @param flags Variable to save the interrupt flags.
- * @note The local interrupts will also be disabled.
- */
-static inline void raw_spin_lock_irq(spinlock_t *lock, unsigned long *flags)
-{
-	irq_save_and_disable(flags);
-	arch_spin_lock(lock);
-}
-
-/**
- * @brief Unlock a spin lock without touching the preemption settings.
- * @param lock Spin lock that has to be unlocked.
- * @param flags Variable containing the IRQ's that need to be restored.
- * @note The local interrupts will also be enabled.
- */
-static inline void raw_spin_unlock_irq(spinlock_t *lock, unsigned long *flags)
-{
-	arch_spin_unlock(lock);
-	irq_restore(flags);
-}
-
-/**
- * @brief Attempt to aquire a spin lock.
- * @param lock Lock to attempt.
- * @note If the lock cannot be aquired nothing will be done.
- * @retval 1 If the lock cannot be aquired.
- * @retval 0 If the lock has been aquired.
- */
-static inline int spin_try_lock(spinlock_t *lock)
-{
-	if(lock->lock) {
-		return 1;
-	} else {
-		spin_lock(lock);
-		return 0;
-	}
-}
-
+extern void spinlock_init(spinlock_t *lock);
 CDECL_END
 
-/**
- * @brief Lock a spin lock and disable the interrupts.
- * @param _l Lock which needs to be locked.
- * @param _f Variable to store the interrupt flags in.
- */
-#define spin_lock_irqsave(_l, _f) _spin_lock_irqsave(_l, &_f)
+#ifdef CONFIG_SPINLOCK_DEBUG
+#define raw_spin_lock(__l) spinlock_acquire(__l, __FILE__, __LINE__)
+#define raw_spin_unlock(__l) spinlock_release(__l, __FILE__, __LINE__)
 
-/**
- * @brief Unlock a spin lock and restore the interrupt flags.
- * @param _l Lock which needs to be unlocked.
- * @param _f The interrupt flags which need to be restored.
- */
-#define spin_unlock_irqrestore(_l, _f) _spin_unlock_irqrestore(_l, &_f)
+/* Preempt, but no resched */
+#define _raw_spin_lock(__l) spin_lock_noresched(__l, __FILE__, __LINE__)
+#define _raw_spin_unlock(__l) spin_unlock_noresched(__l, __FILE__, __LINE__)
 
-#define raw_spin_lock_irqsave(__l, __f) _raw_spin_lock_irqsave(__l, &__f)
-#define raw_spin_unlock_irqrestore(__l, __f) \
-	_raw_spin_unlock_irqrestore(__l, &__f)
+#define raw_spin_lock_irq(__l, __f) spin_lock_irqsave_nosched(__l, __f, __FILE__, __LINE__)
+#define raw_spin_unlock_irq(__l, __f) spin_unlock_irqrestore_nosched(__l, __f, __FILE__, __LINE__)
 
+#define raw_spin_lock_irqsave(__l, __f) spin_lock_irqsave_noresched(__l, &__f, __FILE__, __LINE__)
+#define raw_spin_unlock_irqrestore(__l, __f) spin_unlock_irqrestore_noresched(__l, &__f, __FILE__, __LINE__)
+
+#define spin_lock_irqsave(__l, __f) spin_lock_irqsave_resched(__l, &__f, __FILE__, __LINE__)
+#define spin_unlock_irqrestore(__l, __f) spin_unlock_irqrestore_resched(__l, &__f, __FILE__, __LINE__)
+
+#define spin_lock(__l) spin_lock_resched(__l, __FILE__, __LINE__)
+#define spin_unlock(__l) spin_unlock_resched(__l, __FILE__, __LINE__)
+
+CDECL
+extern void spinlock_acquire(spinlock_t *lock, const char *file, int line);
+extern void spinlock_release(spinlock_t *lock, const char *file, int line);
+
+static inline void spin_lock_resched(spinlock_t *lock, const char *file, int line)
+{
+	preempt_disable();
+	spinlock_acquire(lock, file, line);
+}
+
+static inline void spin_unlock_resched(spinlock_t *lock, const char *file, int line)
+{
+	spinlock_release(lock, file, line);
+	preempt_enable();
+}
+
+static inline void spin_lock_noresched(spinlock_t *lock, const char *file, int line)
+{
+	preempt_disable();
+	spinlock_acquire(lock, file, line);
+}
+
+static inline void spin_unlock_noresched(spinlock_t *lock, const char *file, int line)
+{
+	spinlock_release(lock, file, line);
+	preempt_enable_no_resched();
+}
+
+static inline void spin_lock_irqsave_noresched(spinlock_t *lock, unsigned long *flags,
+		const char *file, int line)
+{
+	preempt_disable();
+	irq_save_and_disable(flags);
+	spinlock_acquire(lock, file, line);
+}
+
+static inline void spin_unlock_irqrestore_noresched(spinlock_t *lock, unsigned long *flags,
+		const char *file, int line)
+{
+	spinlock_release(lock, file, line);
+	irq_restore(flags);
+	preempt_enable_no_resched();
+}
+
+static inline void spin_lock_irqsave_resched(spinlock_t *lock, unsigned long *flags,
+		const char *file, int line)
+{
+	preempt_disable();
+	irq_save_and_disable(flags);
+	spinlock_acquire(lock, file, line);
+}
+
+static inline void spin_unlock_irqrestore_resched(spinlock_t *lock, unsigned long *flags,
+		const char *file, int line)
+{
+	spinlock_release(lock, file, line);
+	irq_restore(flags);
+	preempt_enable();
+}
+
+static inline void spin_lock_irqsave_nosched(spinlock_t *lock, unsigned long *flags,
+		const char *file, int line)
+{
+	irq_save_and_disable(flags);
+	spinlock_acquire(lock, file, line);
+}
+
+static inline void spin_unlock_irqrestore_nosched(spinlock_t *lock, unsigned long *flags,
+		const char *file, int line)
+{
+	spinlock_release(lock, file, line);
+	irq_restore(flags);
+}
+CDECL_END
+
+#else
+#define raw_spin_lock(__l) spinlock_acquire(__l)
+#define raw_spin_unlock(__l) spinlock_release(__l)
+
+/* Preempt, but no resched */
+#define _raw_spin_lock(__l) spin_lock_noresched(__l)
+#define _raw_spin_unlock(__l) spin_unlock_noresched(__l)
+
+#define raw_spin_lock_irq(__l, __f) spin_lock_irqsave_nosched(__l, __f)
+#define raw_spin_unlock_irq(__l, __f) spin_unlock_irqrestore_nosched(__l, __f)
+
+#define raw_spin_lock_irqsave(__l, __f) spin_lock_irqsave_noresched(__l, &__f)
+#define raw_spin_unlock_irqrestore(__l, __f) spin_unlock_irqrestore_noresched(__l, &__f)
+
+#define spin_lock_irqsave(__l, __f) spin_lock_irqsave_resched(__l, &__f)
+#define spin_unlock_irqrestore(__l, __f) spin_unlock_irqrestore_resched(__l, &__f)
+
+#define spin_lock(__l) spin_lock_resched(__l)
+#define spin_unlock(__l) spin_unlock_resched(__l)
+
+CDECL
+extern void spinlock_acquire(spinlock_t *lock);
+extern void spinlock_release(spinlock_t *lock);
+
+static inline void spin_lock_resched(spinlock_t *lock)
+{
+	preempt_disable();
+	spinlock_acquire(lock);
+}
+
+static inline void spin_unlock_resched(spinlock_t *lock)
+{
+	spinlock_release(lock);
+	preempt_enable();
+}
+
+static inline void spin_lock_noresched(spinlock_t *lock)
+{
+	preempt_disable();
+	spinlock_acquire(lock);
+}
+
+static inline void spin_unlock_noresched(spinlock_t *lock)
+{
+	spinlock_release(lock);
+	preempt_enable_no_resched();
+}
+
+static inline void spin_lock_irqsave_noresched(spinlock_t *lock,
+		unsigned long *flags)
+{
+	preempt_disable();
+	irq_save_and_disable(flags);
+	spinlock_acquire(lock);
+}
+
+static inline void spin_unlock_irqrestore_noresched(spinlock_t *lock,
+		unsigned long *flags)
+{
+	spinlock_release(lock);
+	irq_restore(flags);
+	preempt_enable_no_resched();
+}
+
+static inline void spin_lock_irqsave_resched(spinlock_t *lock,
+		unsigned long *flags)
+{
+	preempt_disable();
+	irq_save_and_disable(flags);
+	spinlock_acquire(lock);
+}
+
+static inline void spin_unlock_irqrestore_resched(spinlock_t *lock,
+		unsigned long *flags)
+{
+	spinlock_release(lock);
+	irq_restore(flags);
+	preempt_enable();
+}
+
+static inline void spin_lock_irqsave_nosched(spinlock_t *lock,
+		unsigned long *flags)
+{
+	irq_save_and_disable(flags);
+	spinlock_acquire(lock);
+}
+
+static inline void spin_unlock_irqrestore_nosched(spinlock_t *lock,
+		unsigned long *flags)
+{
+	spinlock_release(lock);
+	irq_restore(flags);
+}
+CDECL_END
+#endif /* CONFIG_SPINLOCK_DEBUG */
 
 #endif /* __SPINLOCK_H__ */
 

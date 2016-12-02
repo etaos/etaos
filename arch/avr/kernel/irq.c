@@ -49,7 +49,17 @@ void arch_local_irq_disable(void)
 
 unsigned long arch_irq_get_flags(void)
 {
-	return ((unsigned long) (SREG & AVR_IRQ_BITS));
+	unsigned char flags;
+
+	__asm__ __volatile__(
+			"in %0, %1"	"\n\t"
+			"andi %0, %2"
+			: "=&r" (flags)
+			: "I" (AVR_STATUS_ADDR), "M" (AVR_IRQ_BITS)
+			: "memory"
+			);
+
+	return (unsigned long)flags;
 }
 
 void arch_irq_restore_flags(unsigned long *flags)

@@ -23,7 +23,7 @@ int main(void)
 	irq_enable();
 	printf_P(PSTR("Application started!\n"));
 
-	fd = open("24C02", _FDEV_SETUP_RW);
+	fd = open("/dev/24C02", _FDEV_SETUP_RW);
 	if(fd >= 0) {
 		file = filep(fd);
 		lseek(file, EEPROM_WRITE_ADDR, SEEK_SET);

@@ -47,6 +47,8 @@ init-y += arch/avr/kernel/devinit.o arch/avr/kernel/init.o
 core-y += arch/avr/kernel/
 libs-y += arch/avr/libflt/
 
+ldscripts-y += $(lscript-y)
+
 define archhelp
   @echo '*  etaos.elf       - ELF image using load address 0x0'
 endef

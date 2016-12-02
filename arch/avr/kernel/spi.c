@@ -19,13 +19,15 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
+#include <etaos/sched.h>
 
 #include <asm/io.h>
 #include <asm/irq.h>
 
-void __isr spi_stc_irq(void)
+SIGNAL(SPI_STC_VECTOR)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 	chip->chip_handle(SPI_STC_VECTOR_NUM);
+	preempt_schedule_irq();
 }
 

@@ -178,6 +178,7 @@ static int atmega_set_pin(struct gpio_chip *chip, int val, uint16_t nr)
 	volatile uint8_t *idx;
 	struct gpio_pin *pin;
 
+	irq_enter_critical();
 	pin = &chip->pins[nr];
 	idx = atmega_pin_to_port(pin);
 	bit = atmega_pin_index(pin);
@@ -186,6 +187,7 @@ static int atmega_set_pin(struct gpio_chip *chip, int val, uint16_t nr)
 		*idx |= 1 << bit;
 	else
 		*idx &= ~(1 << bit);
+	irq_exit_critical();
 
 	return 0;
 }
@@ -197,12 +199,14 @@ static int atmega_get_pin(struct gpio_chip *chip, uint16_t nr)
 	struct gpio_pin *pin;
 	int retval;
 
+	irq_enter_critical();
 	pin = &chip->pins[nr];
 	idx = atmega_pin_to_pin_addr(pin);
 	bit = atmega_pin_index(pin);
 
 	retval = *idx;
 	retval &= (1<<bit);
+	irq_exit_critical();
 
 	return !!retval;
 }
@@ -213,11 +217,14 @@ static int atmega_dir_out(struct gpio_chip *chip, int val, uint16_t nr)
 	volatile uint8_t *idx;
 	struct gpio_pin *pin;
 
+	irq_enter_critical();
 	pin = &chip->pins[nr];
 	idx = atmega_pin_to_ddr(pin);
 	bit = atmega_pin_index(pin);
 
 	*idx |= 1 << bit;
+	irq_exit_critical();
+
 	return atmega_set_pin(chip, val, nr);
 }
 
@@ -227,11 +234,13 @@ static int atmega_dir_in(struct gpio_chip *chip, uint16_t nr)
 	volatile uint8_t *idx;
 	struct gpio_pin *pin;
 
+	irq_enter_critical();
 	pin = &chip->pins[nr];
 	idx = atmega_pin_to_ddr(pin);
 	bit = atmega_pin_index(pin);
 
 	*idx &= ~(1 << bit);
+	irq_exit_critical();
 
 	return 0;
 }
@@ -243,12 +252,15 @@ static int atmega_get_dir(struct gpio_chip *chip, uint16_t nr)
 	struct gpio_pin *pin;
 	int dir;
 
+	irq_enter_critical();
 	pin = &chip->pins[nr];
 	idx = atmega_pin_to_ddr(pin);
 	bit = atmega_pin_index(pin);
 
 	dir = *idx;
 	dir &= 1 << bit;
+	irq_exit_critical();
+
 	return !dir;
 }
 

@@ -58,6 +58,7 @@ HOSTCFLAGS   = -Wall -Wno-char-subscripts -Wmissing-prototypes -Wstrict-prototyp
 HOSTCXXFLAGS = -O2
 DOXYGEN      = doxygen
 GIT          = git
+SED          = sed
 
 KBUILD_CFLAGS := -Wall -Iinclude
 KBUILD_CXXFLAGS := -Wall -Iinclude
@@ -228,7 +229,9 @@ libs-y		:= $(patsubst %/, %/built-in.o, $(libs-y))
 etaos-deps := $(head-y) $(init-y) $(core-y) $(drivers-y) $(libs-y)
 etaos-link := $(init-y) $(core-y) $(drivers-y) $(libs-y)
 etaos-head := $(head-y)
+etaos-ldscripts := $(ldscripts-y)
 export etaos-deps etaos-head
+export etaos-ldscripts
 
 doc:
 	$(Q)$(DOXYGEN)
@@ -253,9 +256,17 @@ $(etaos-dirs): scripts
 # build objects with decending
 $(sort $(etaos-deps)): $(etaos-dirs) ;
 
+# Generate linker scripts, if needed
+quiet_cmd_gen_ldscript  = SHIPPED $@
+      cmd_gen_ldscript  =
+
+$(etaos-ldscripts): FORCE
+	@$(CC) $(KBUILD_CFLAGS) -E -x c $(@:.ld=.ld.S) | $(SED) '/^#/ d' > $@
+	$(call cmd,gen_ldscript)
+
 quiet_cmd_link_etaos = LD      $@
 cmd_link_etaos = $(LD) $(LDFLAGS) -r -o $@ $(etaos-link)
-$(etaos-img): $(etaos-deps)
+$(etaos-img): $(etaos-deps) $(etaos-ldscripts)
 	$(call if_changed,link_etaos)
 
 quiet_cmd_link_app = LD      $@
@@ -358,7 +369,7 @@ ifeq ($(KBUILD_EXTMOD),)
 # clean - Delete most, but leave enough to build external modules
 #
 CLEAN_DIRS  += $(MODVERDIR)
-CLEAN_FILES += etaos.elf etaos.img
+CLEAN_FILES += etaos.elf etaos.img $(etaos-ldscripts)
 clean		:= -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.clean obj
 clean: rm-dirs  := $(CLEAN_DIRS)
 clean: rm-files := $(CLEAN_FILES)

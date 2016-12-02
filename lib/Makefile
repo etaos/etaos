@@ -3,6 +3,7 @@ libc-files-$(CONFIG_CRT) += stdlib/strtol.o stdlib/ctype.o stdlib/atoi.o
 libc-files-$(CONFIG_CRT) += stdlib/abs.o stdlib/labs.o
 libc-files-$(CONFIG_CRT) += stdlib/itoa.o stdlib/ltoa.o
 libc-files-$(CONFIG_CRT) += kmalloc.o kzalloc.o kfree.o kcalloc.o
+libc-files-$(CONFIG_CRT) += krealloc.o
 
 libc-files-$(CONFIG_CRT) += time/gmtime.o time/localtime.o time/mktime.o
 
@@ -10,6 +11,7 @@ libc-files-$(CONFIG_CRT) += stdio/putc.o stdio/printf.o stdio/vfprintf.o
 libc-files-$(CONFIG_CRT) += stdio/fputs.o stdio/fputc.o stdio/fprintf.o
 libc-files-$(CONFIG_CRT) += stdio/read.o stdio/write.o stdio/fgets.o
 libc-files-$(CONFIG_CRT) += stdio/ioctl.o stdio/getc.o stdio/fgetc.o
+libc-files-$(CONFIG_CRT) += stdio/open.o stdio/close.o
 
 libc-files-$(CONFIG_CRT) += string/strlen.o string/strchr.o
 libc-files-$(CONFIG_CRT) += string/strcmp.o string/strnlen.o 

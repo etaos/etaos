@@ -33,6 +33,7 @@
 #include <asm/io.h>
 
 static mutex_t avr_adc_conversion_mtx;
+static volatile bool avr_analog_conversion_done;
 
 static int avr_adc_get(struct analog_pin *pin)
 {
@@ -53,9 +54,11 @@ static int avr_adc_get(struct analog_pin *pin)
 	}
 #endif
 
+	avr_analog_conversion_done = false;
 	ADMUX = (num & 0x7) | BIT(REFS0);
 	ADCSRA |= BIT(ADSC);
 	mutex_wait(&avr_adc_conversion_mtx);
+	avr_analog_conversion_done = true;
 
 	low = ADCL;
 	high = ADCH;
@@ -71,6 +74,9 @@ static int avr_adc_ioctl(struct analog_chip *chip, unsigned long reg, void *arg)
 static irqreturn_t avr_adc_irq(struct irq_data *irq, void *data)
 {
 	mutex_unlock_from_irq(&avr_adc_conversion_mtx);
+	if(!avr_analog_conversion_done)
+		ADCSRA |= BIT(ADSC);
+
 	return IRQ_HANDLED;
 }
 
@@ -86,6 +92,7 @@ static void __used avr_adc_init(void)
 	mutex_init(&avr_adc_conversion_mtx);
 	analog_chip_init(&avr_adc_chip);
 	analog_syschip = &avr_adc_chip;
+	avr_analog_conversion_done = false;
 
 	irq_request(ADC_COMPLETED_NUM, &avr_adc_irq, IRQ_FALLING_MASK, NULL);
 	/* set the prescaler to 128 */

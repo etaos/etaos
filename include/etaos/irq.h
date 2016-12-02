@@ -170,7 +170,7 @@ struct irq_data {
 struct irq_thread_data {
 	struct thread *owner; //!< IRQ owner.
 	struct irq_data idata; //!< IRQ data.
-	volatile unsigned char *event_cnt; //!< Event counter;
+	volatile unsigned char event_cnt; //!< Event counter;
 };
 #endif
 
@@ -259,6 +259,15 @@ static inline void irq_chip_set_resume(struct irq_chip *chip,
 				      void (*resume)(struct irq_chip *))
 {
 	chip->resume = resume;
+}
+
+/**
+ * @brief Store the IRQ flags.
+ * @param flags Variable to store the flags into.
+ */
+static inline void irq_store_flags(unsigned long *flags)
+{
+	*flags = arch_irq_get_flags();
 }
 
 CDECL_END

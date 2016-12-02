@@ -64,6 +64,10 @@ static DEFINE_RQ(grq, &sys_sched_class);
 /**
  * @brief Get the global run queue
  * @return The global run queue.
+ *
+ * The most notable use of this function is in #sched_get_cpu_rq. This way
+ * the scheduling core always gets the correct run queue independant of the
+ * Kconfig configuration options.
  */
 struct rq *sched_get_grq(void)
 {
@@ -79,8 +83,9 @@ struct rq *sched_get_grq(void)
  */
 static void irq_thread_wait(void)
 {
-	struct thread *tp = current_thread();
+	struct thread *tp;
 
+	tp = current_thread();
 	set_bit(THREAD_WAITING_FLAG, &tp->flags);
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
@@ -92,19 +97,24 @@ static void irq_thread_wait(void)
  * @param data Threaded IRQ to wake up.
  * @see signal wait irq_thread_wait
  * @note This function alters the run queue's.
+ * @note This thread will attempt to preempt the currently running thread as
+ *       early as possible by setting the `THREAD_NEED_RESCHED_FLAG`.
  */
 void irq_thread_signal(struct irq_thread_data *data)
 {
-	struct thread *tp = data->owner;
+	struct thread *tp, *current;
 
-	if(!tp)
+	tp = data->owner;
+	current = current_thread();
+
+	if(tp->on_rq)
 		return;
 
-	if(test_and_clear_bit(THREAD_WAITING_FLAG, &tp->flags))
-	{
-		set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-		rq_add_thread_no_lock(tp);
-	}
+	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
+	clear_bit(THREAD_WAITING_FLAG, &tp->flags);
+	rq_add_thread_no_lock(tp);
+
+	set_bit(THREAD_NEED_RESCHED_FLAG, &current->flags);
 }
 
 /**
@@ -124,7 +134,7 @@ void irq_handle_fn(void *data)
 
 	while(true) {
 		/* Only sleep if there are no events waiting */
-		if(threaded_irq->event_cnt == 0)
+		if(!threaded_irq->event_cnt)
 			irq_thread_wait();
 
 		if(test_bit(THREAD_EXIT_FLAG, &current_thread()->flags))
@@ -208,8 +218,7 @@ void thread_queue_init(struct thread_queue *qp)
  * @param qp Queue to add to.
  * @param tp Thread to add.
  */
-static void raw_queue_add_thread(struct thread_queue *qp,
-					struct thread *tp)
+void raw_queue_add_thread(struct thread_queue *qp, struct thread *tp)
 {
 	struct sched_class *cp;
 	unsigned long flags;
@@ -232,8 +241,7 @@ static void raw_queue_add_thread(struct thread_queue *qp,
  * @param tp Thread which has to be removed.
  * @note No queue locks are aquired.
  */
-static void raw_queue_remove_thread(struct thread_queue *qp,
-						struct thread *tp)
+void raw_queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 {
 	struct sched_class *cp;
 
@@ -342,9 +350,9 @@ void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
  */
 void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 {
-	raw_spin_lock(&rq->lock);
+	_raw_spin_lock(&rq->lock);
 	raw_rq_remove_wake_thread(rq, tp);
-	raw_spin_unlock(&rq->lock);
+	_raw_spin_unlock(&rq->lock);
 }
 
 /**
@@ -356,9 +364,9 @@ void rq_remove_wake_thread(struct rq *rq, struct thread *tp)
  */
 void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 {
-	raw_spin_lock(&rq->lock);
+	_raw_spin_lock(&rq->lock);
 	raw_rq_remove_kill_thread(rq, tp);
-	raw_spin_unlock(&rq->lock);
+	_raw_spin_unlock(&rq->lock);
 }
 
 /**
@@ -612,6 +620,14 @@ static void rq_update(struct rq *rq)
 	class = rq->sched_class;
 	if(class->post_schedule)
 		class->post_schedule(rq);
+
+	/*
+	 * Last but not least, restore the interrupt state. Note that
+	 * this is the last operation and it is the last operation for
+	 * a reason. Therefore, rq_update must also be the last scheduling
+	 * operation in the __schedule function.
+	 */
+	irq_restore(&tp->irq_state);
 }
 
 /**
@@ -766,12 +782,10 @@ static inline void dyn_prio_update(struct rq *rq)
  * @param rq Run queue to use for the context.
  * @param prev Previous thread.
  * @param new New thread to replace \p prev.
- * @param flags IRQ flags stored by __schedule
  * @see __schedule
  */
 static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
-						struct thread *new,
-						unsigned long *flags)
+				    struct thread *new)
 {
 	struct sched_class *class = rq->sched_class;
 
@@ -788,7 +802,7 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 
 	/* prev != new (this condition is ensured by __schedule) */
 	class->rm_thread(rq, new);
-	raw_spin_unlock_irq(&rq->lock, flags);
+	raw_spin_unlock(&rq->lock);
 	cpu_switch_context(rq, prev, new);
 }
 
@@ -805,9 +819,7 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 {
 	struct thread_queue *qp;
-	unsigned long flags;
 
-	irq_save_and_disable(&flags);
 	qp = thread_to_queue(tp);
 	tp = *tp->queue;
 
@@ -830,7 +842,6 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		tp->on_rq = true;
 		tp->rq = rq;
 	}
-	irq_restore(&flags);
 }
 #endif
 
@@ -917,8 +928,11 @@ static void __rq_update_clock(struct rq *rq)
  */
 void rq_update_clock(void)
 {
-	struct rq *rq = &grq;
+	int cpu;
+	struct rq *rq;
 
+	cpu = cpu_get_id();
+	rq = cpu_to_rq(cpu);
 	__rq_update_clock(rq);
 }
 
@@ -926,11 +940,14 @@ void rq_update_clock(void)
  * @brief Prepare the a reschedule.
  * @param rq Runqueue that is about to be rescheduled.
  * @param prev Thread that lost the CPU.
+ * @param irqs IRQ flags of the thread that is being scheduled out.
  *
  * This function is responsible for handling the dynamic priority and time
  * slice resets/updates.
  */
-static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
+static inline void __schedule_prepare(struct rq *rq,
+				      struct thread *prev,
+				      unsigned long *irqs)
 {
 	struct thread *next = rq->current;
 	unsigned long flags = 0UL;
@@ -955,6 +972,7 @@ static inline void __schedule_prepare(struct rq *rq, struct thread *prev)
 	preempt_reset_slice(prev);
 	cpu_get_state(&flags);
 	prev->cpu_state = flags;
+	prev->irq_state = *irqs;
 }
 
 /**
@@ -1070,9 +1088,9 @@ static void __hot __schedule(int cpu, bool preempt)
 		rq->current = next;
 		rq->switch_count++;
 
-		__schedule_prepare(rq, prev);
-		rq_switch_context(rq, prev, next, &flags);
-		rq_update(rq);
+		__schedule_prepare(rq, prev, &flags);
+		rq_switch_context(rq, prev, next);
+		rq_update(rq); /* restores CPU / IRQ states */
 
 	} else {
 		raw_spin_unlock_irq(&rq->lock, &flags);
@@ -1170,13 +1188,22 @@ void __hot preempt_schedule(void)
 #endif
 
 static struct thread idle_thread, main_thread;
-static uint8_t idle_stack[CONFIG_IDLE_STACK_SIZE];
+static void *main_stack_ptr;
+static void *idle_stack_ptr;
+
+extern void *main_stack_ptr_end;
+extern void *main_stack_ptr_start;
+
+extern void *idle_stack_ptr_end;
+extern void *idle_stack_ptr_start;
 
 THREAD(idle_thread_func, arg)
 {
 	struct thread *tp = arg;
 
+	main_stack_ptr = &main_stack_ptr_start;
 	irq_enable();
+
 	thread_initialise(&main_thread, "main", &main_thread_func, &main_thread,
 			CONFIG_STACK_SIZE, main_stack_ptr, SCHED_DEFAULT_PRIO);
 	preempt_disable();
@@ -1361,6 +1388,12 @@ unsigned char prio(struct thread *tp)
 }
 #endif
 
+/**
+ * @brief Initialise the scheduling core.
+ * @note This function is automatically called during the sysinit.
+ *
+ * This function initialises, but not starts, the scheduler.
+ */
 static void __used sched_init(void)
 {
 	struct rq *rq;
@@ -1371,8 +1404,9 @@ static void __used sched_init(void)
 	if(sys_sched_class.init)
 		sys_sched_class.init();
 
+	idle_stack_ptr = kzalloc(CONFIG_IDLE_STACK_SIZE);
 	sched_init_idle(&idle_thread, "idle", &idle_thread_func,
-			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack);
+			&idle_thread, CONFIG_IDLE_STACK_SIZE, idle_stack_ptr);
 }
 
 subsys_init(sched_init);

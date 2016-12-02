@@ -21,6 +21,13 @@ config EXT_MEM_ENABLE_PIN
 	  Note that this pin is _not_ a platform pin!
 endif
 
+config INIT_STACK_SIZE
+	int "Init stack size"
+	depends on SCHED
+	help
+	  The size of the the stack that is used during the
+	  system initialisation process.
+
 config STACK_SIZE
 	int "Stack size"
 	help

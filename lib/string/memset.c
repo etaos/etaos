@@ -23,14 +23,13 @@
 void *memset(void *dst, int c, size_t n)
 {
 	volatile unsigned char *data;
+	size_t idx;
 
-	if(dst && n) {
-		data = dst;
+	if((data = dst) == NULL)
+		return NULL;
 
-		do {
-			*data++ = c;
-		} while(--n);
-	}
+	for(idx = 0; idx < n; idx++)
+		data[idx] = (unsigned char)c;
 
 	return dst;
 }

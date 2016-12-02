@@ -5,5 +5,5 @@ mcu-$(CONFIG_ATMEGA328) = atmega328
 aflags-$(CONFIG_ATMEGA328) += -mmcu=avr5
 lflags-$(CONFIG_ATMEGA328) += -mavr5 -nostdlib -nostdinc
 
-lscript-$(CONFIG_ATMEGA328) += arch/avr/ldscripts/avr5.xn
+lscript-$(CONFIG_ATMEGA328) += arch/avr/ldscripts/avr5.ld
 lscript-r-$(CONFIG_ATMEGA328) += arch/avr/ldscripts/avr5.xr

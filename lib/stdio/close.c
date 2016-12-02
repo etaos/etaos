@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR scheduling
- *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
+ *  ETA/OS - VFS close
+ *  Copyright (C) 2012, 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,23 +16,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <asm/asmdef.h>
-#include <asm/io.h>
-#include <asm/init.h>
+/**
+ * @addtogroup libcio
+ * @{
+ */
 
-.extern preempt_schedule_irq
+#include <etaos/kernel.h>
+#include <etaos/stdio.h>
+#include <etaos/vfs.h>
 
-.section .text
+/**
+ * @brief Close a file.
+ * @param fd File descriptor to close.
+ */
+void close(int fd)
+{
+	vfs_close(fd);
+}
 
-/* void asm_sched_preempt_schedule(void); */
-.global asm_preempt_schedule_irq
-.type asm_preempt_schedule_irq, @function
-asm_preempt_schedule_irq:
-#ifdef CONFIG_PREEMPT
-	irq_return_save
-	cli
-	XCALL preempt_schedule_irq
-	irq_return_restore
-#endif
-	ret
+/** @} */
 

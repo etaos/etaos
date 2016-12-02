@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Memory module
- *  Copyright (C) 2014   Michel Megens
+ *  Copyright (C) 2014, 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -39,14 +39,11 @@
  * @brief Heap node structure
  */
 struct heap_node {
-	struct heap_node *next; //!< Pointer to the next node.
-	uint8_t magic; //!< Verfication byte for the freeing process.
-	
 	size_t size; //!< Size of the node.
-	unsigned long flags; //!< Configuration flags.
 #ifdef CONFIG_MM_TRACE_OWNER
 	struct thread *owner; //!< Owner of the memory region.
 #endif
+	struct heap_node *next; //!< Heap node list pointer.
 };
 
 #define MM_ALLOC_FLAG 0 //!< This bit becomes set after allocation
@@ -54,28 +51,27 @@ struct heap_node {
 #define MEM __attribute__((malloc))
 
 CDECL
-extern struct heap_node *mm_head;
-extern spinlock_t mlock;
+#ifdef CONFIG_MM_DEBUG
+extern int mm_free(void*, const char *, int);
+#define kfree(__p) mm_free(__p, __FILE__, __LINE__)
+#else
+extern int mm_free(void*);
+extern void kfree(void *);
+#endif
+
+extern void mm_init(void);
+extern void mm_heap_add_block(void *start, size_t size);
+extern void raw_mm_heap_add_block(void *start, size_t size);
+extern size_t mm_node_size(void *ptr);
 
 extern MEM void* mm_alloc(size_t);
 
-extern void mm_init_node(struct heap_node *node, size_t size);
-extern int mm_use_node(struct heap_node *node);
-extern void mm_split_node(struct heap_node *node, size_t ns);
-extern struct heap_node *mm_merge_node(struct heap_node *a, 
-		struct heap_node *b);
-extern int mm_return_node(struct heap_node *node);
-extern void mm_use_block(struct heap_node *node, struct heap_node *prev);
-extern int mm_kfree(void *ptr);
-extern void mm_heap_add_block(void *start, size_t size);
-extern size_t mm_heap_available(void);
-extern void mm_init(void *start, size_t size);
-
-extern void kfree(void *);
-extern void *kzalloc(size_t);
-extern void *kmalloc(size_t);
+extern void *kzalloc(size_t num);
+extern void *kmalloc(size_t num);
 extern void *kcalloc(size_t, size_t);
+extern void *krealloc(void *old, size_t newsize);
 
+extern size_t mm_heap_available(void);
 CDECL_END
 
 /** @} */

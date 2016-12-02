@@ -20,7 +20,7 @@ static int test_sram_read(uint16_t addr, void *buff, size_t len)
 	int rc, fd;
 	struct vfile *stream;
 
-	fd = open("23K256", _FDEV_SETUP_RW);
+	fd = open("/dev/23K256", _FDEV_SETUP_RW);
 
 	if(fd >= 0) {
 		stream = filep(fd);
@@ -39,7 +39,7 @@ static int test_sram_write(uint16_t addr, const void *buff, size_t len)
 	int fd, rc;
 	struct vfile *stream;
 
-	fd = open("23K256", _FDEV_SETUP_RW);
+	fd = open("/dev/23K256", _FDEV_SETUP_RW);
 
 	if(fd >= 0) {
 		stream = filep(fd);

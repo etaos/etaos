@@ -217,7 +217,7 @@
 #define DDRL MEM_IO8(0x10A)
 #define PORTL MEM_IO8(0x10B)
 
-#define GPIO_PINS 54
+#define GPIO_PINS 87
 
 /* USART defs */
 #define UBRR0L MEM_IO8(0xC4)

@@ -1,6 +1,6 @@
 config CRT
 	tristate "C runtime library"
-	depends on m
+	depends on m && VFS
 	default m
 	help
 	  Say 'y' here to build the standard C library. If unsure,

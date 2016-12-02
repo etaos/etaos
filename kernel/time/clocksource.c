@@ -55,7 +55,7 @@ int clocksource_init(const char *name, struct clocksource *cs,
 	cs->disable = disable;
 	cs->count = 0UL;
 	cs->tc_update = 0UL;
-	spin_lock_init(&cs->lock);
+	spinlock_init(&cs->lock);
 	list_add(&cs->list, &sources);
 	return -EOK;
 }

@@ -23,12 +23,13 @@
 #include <etaos/types.h>
 #include <etaos/irq.h>
 #include <etaos/thread.h>
+#include <etaos/spinlock.h>
 
 typedef struct mutex {
 #ifdef CONFIG_MUTEX_EVENT_QUEUE
 	struct thread_queue qp;
 #else
-	uint8_t lock;
+	spinlock_t lock;
 #endif
 #ifdef CONFIG_SCHED
 	struct thread *owner;
@@ -45,6 +46,7 @@ typedef struct mutex {
 
 CDECL
 
+extern int mutex_wait_tmo(mutex_t *mutex, unsigned int tmo);
 extern void mutex_wait(mutex_t *mutex);
 extern void mutex_lock(mutex_t *mutex);
 extern void mutex_unlock(mutex_t *mutex);
@@ -60,33 +62,42 @@ CDECL_END
 
 #else
 
-#include <asm/mutex.h>
-
-#define DEFINE_MUTEX(__n) mutex_t __n = { .lock = 0, }
+#define DEFINE_MUTEX(__n) mutex_t __n = { SPIN_LOCK_INIT((__n).lock) }
 
 CDECL
 static inline void mutex_init(mutex_t *mutex)
 {
-	mutex->lock = 0;
+	spinlock_init(&mutex->lock);
 }
 
 static inline void mutex_wait(mutex_t *mutex)
 {
-	mutex->lock = 1;
-	barrier();
-	arch_mutex_wait(mutex);
+	mutex->lock.lock = 1;
+	spin_lock(&mutex->lock);
+}
+
+static inline int mutex_wait_tmo(mutex_t *mutex, int tmo)
+{
+	mutex_wait(mutex);
+	return 0;
 }
 
 static inline void mutex_unlock_irq(mutex_t *mutex)
 {
-	mutex->lock = 0;
-	barrier();
+	spin_unlock(&mutex->lock);
+}
+
+static inline void mutex_lock(mutex_t *mutex)
+{
+	spin_lock(&mutex->lock);
+}
+
+static inline void mutex_unlock(mutex_t *mutex)
+{
+	spin_unlock(&mutex->lock);
 }
 CDECL_END
 
-
-#define mutex_lock(__l) arch_mutex_lock(__l)
-#define mutex_unlock(__l) arch_mutex_unlock(__l)
 #endif
 
 #define mutex_unlock_from_irq(__m) mutex_unlock_irq(__m)

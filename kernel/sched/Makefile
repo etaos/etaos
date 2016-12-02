@@ -1,6 +1,8 @@
 obj-$(CONFIG_SCHED)		+= core.o algo.o thread.o
 obj-$(CONFIG_IPM)		+= ipm.o
 obj-$(CONFIG_EVENT_MUTEX)	+= event.o
+obj-$(CONFIG_MUTEX_EVENT_QUEUE) += mutex.o
+obj-$(CONFIG_SEM)               += semaphore.o
 
 algo-$(CONFIG_RR)		+= rr.o
 algo-$(CONFIG_RR_SHARED)	+= rr-shared.o
