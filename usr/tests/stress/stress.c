@@ -65,15 +65,19 @@ static char *current_thread_name(void)
 static irqreturn_t threaded_irq_handle(struct irq_data *data, void *arg)
 {
 	const char *filename = arg;
-	char buffer[32];
+	char *buffer;
 	int fd;
+	size_t length;
 
 	fd = open(filename, _FDEV_SETUP_RWA);
 	if(fd > 0) {
-		read(fd, buffer, sizeof(IRQ_THREAD_TEXT));
+		length = ftell(filep(fd));
+		buffer = kzalloc(length);
+		read(fd, buffer, length);
 		close(fd);
 
 		printf_P(PSTR("[irq]:       %s\n"), buffer);
+		kfree(buffer);
 	} else {
 		fprintf_P(stderr, PSTR("RAMFS read failed!\n"));
 	}
