@@ -30,7 +30,7 @@
  * All data that is already stored in \p old will be copied to the new buffer
  * by realloc, up to a maximum of \p newsize bytes.
  */
-void *realloc(void *old, size_t newsize)
+void *krealloc(void *old, size_t newsize)
 {
 	void *new;
 	size_t oldsize;

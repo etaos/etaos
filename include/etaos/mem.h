@@ -69,7 +69,7 @@ extern MEM void* mm_alloc(size_t);
 extern void *kzalloc(size_t num);
 extern void *kmalloc(size_t num);
 extern void *kcalloc(size_t, size_t);
-extern void *realloc(void *old, size_t newsize);
+extern void *krealloc(void *old, size_t newsize);
 
 extern size_t mm_heap_available(void);
 CDECL_END
