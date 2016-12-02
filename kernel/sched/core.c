@@ -1374,6 +1374,12 @@ unsigned char prio(struct thread *tp)
 }
 #endif
 
+/**
+ * @brief Initialise the scheduling core.
+ * @note This function is automatically called during the sysinit.
+ *
+ * This function initialises, but not starts, the scheduler.
+ */
 static void __used sched_init(void)
 {
 	struct rq *rq;
