@@ -62,6 +62,39 @@ static int ramfs_close(struct vfile *file)
 	return -EOK;
 }
 
+/**
+ * @brief Expand the a RAMFS file as required.
+ * @param file File to expend.
+ * @param required Minimum number of additional bytes required.
+ * @return An error code.
+ * @retval -ENOMEM if the reallocation of th file buffer failed.
+ * @retval -EOK on success.
+ */
+static int ramfs_expand(struct vfile *file, size_t required)
+{
+	size_t expand;
+	struct ramfs_file *ramfile;
+	void *tmp;
+
+	ramfile = container_of(file, struct ramfs_file, base);
+	
+	if(ramfile->wr_idx + required >= file->length) {
+		expand = file->length + 1;
+		expand += ramfile->wr_idx + required - file->length;
+		/*
+		 * Reallocate the file buffer using realloc.
+		 */
+		tmp = krealloc((void*)file->buff, expand);
+
+		if(!tmp)
+			return -ENOMEM;
+
+		file->buff = tmp;
+	}
+
+	return -EOK;
+}
+
 static int ramfs_write(struct vfile *file, const void *buff, size_t size)
 {
 	struct ramfs_file *ramfile;
@@ -69,7 +102,10 @@ static int ramfs_write(struct vfile *file, const void *buff, size_t size)
 	size_t idx = 0UL;
 
 	ramfile = container_of(file, struct ramfs_file, base);
-	
+
+	if(unlikely(!ramfs_expand(file, size)))
+		return 0;
+
 	while(idx < size && ramfile->wr_idx < file->length)
 		file->buff[ramfile->wr_idx++] = cbuff[idx++];
 
@@ -102,6 +138,9 @@ static int ramfs_getc(struct vfile *file)
 static int ramfs_putc(int c, struct vfile *file)
 {
 	struct ramfs_file *ramfile;
+
+	if(unlikely(!ramfs_expand(file, 1)))
+		return -EINVAL;
 
 	ramfile = container_of(file, struct ramfs_file, base);
 	file->buff[ramfile->wr_idx++] = c;
