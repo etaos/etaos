@@ -37,15 +37,19 @@ typedef enum {
 	SEEK_END, //!< Set the index to the file end + input.
 } lseek_t;
 
+/**
+ * @brief File system control
+ */
 typedef enum {
-	FS_FILE_OPEN,
-	FS_FILE_READ,
-	FS_FILE_WRITE,
-	FS_FILE_CLOSE,
+	FS_FILE_OPEN, //!< File opened.
+	FS_FILE_READ, //!< File read occurred.
+	FS_FILE_WRITE, //!< File write occurred.
 
-	FS_DIR_CREATE,
-	FS_DIR_OPEN,
-	FS_DIR_READ,
+	FS_FILE_CLOSE, //!< File closed.
+
+	FS_DIR_CREATE, //!< Directory created.
+	FS_DIR_OPEN,   //!< Directory opened.
+	FS_DIR_READ,   //!< Directory read occurred.
 } fs_ctrl_t;
 
 /**
@@ -68,15 +72,18 @@ struct fs_driver {
 	int (*ioctl)(struct vfile*, unsigned long reg, void *buf);
 };
 
+/**
+ * @brief Directory entry descriptor.
+ */
 struct dirent {
-	char *name;
+	char *name; //!< Directory name.
 
-	struct dirent *parent;
-	struct list_head entry;
-	struct list_head children;
+	struct dirent *parent; //!< Parent directory.
+	struct list_head entry; //!< List entry.
+	struct list_head children; //!< List head of child directory's.
 
-	struct vfile *file_head;
-	struct fs_driver *fs;
+	struct vfile *file_head; //!< List of file entry's.
+	struct fs_driver *fs;    //!< File system driver.
 };
 
 CDECL

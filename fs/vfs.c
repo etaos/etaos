@@ -46,6 +46,14 @@ struct dirent vfs_root = {
 	.fs = NULL,
 };
 
+/**
+ * @brief Mount a file system to a path.
+ * @param fs File system to mount.
+ * @param path Path to mount \p fs on.
+ * @return An error code.
+ * @retval -EOK on success.
+ * @retval -EINVAL on failure.
+ */
 int mount(struct fs_driver *fs, const char *path)
 {
 	struct dirent *dir;
@@ -65,6 +73,12 @@ int mount(struct fs_driver *fs, const char *path)
 	return -EOK;
 }
 
+/**
+ * @brief Create a new directory.
+ * @param path Path to the directory to create.
+ * @return An error code.
+ * @note This function cannot create directories recursively.
+ */
 int mkdir(const char *path)
 {
 	char *base;
@@ -105,6 +119,12 @@ err:
 	return -EINVAL;
 }
 
+/**
+ * @brief Add a new file to the VFS.
+ * @param path Path to add \p file to.
+ * @param file File to add.
+ * @return An error code.
+ */
 int vfs_add_file(const char *path, struct vfile *file)
 {
 	struct dirent *dir;
@@ -124,6 +144,11 @@ int vfs_add_file(const char *path, struct vfile *file)
 	return -EOK;
 }
 
+/**
+ * @brief Get the file system driver of a path.
+ * @param path Path to get the file system driver for.
+ * @return The file system driver behind \p path.
+ */
 struct fs_driver *vfs_path_to_fs(const char *path)
 {
 	struct dirent *dir;
@@ -137,6 +162,12 @@ struct fs_driver *vfs_path_to_fs(const char *path)
 	return dir ? dir->fs : NULL;
 }
 
+/**
+ * @brief Find a file in the VFS.
+ * @param path Path to the file to find.
+ * @return The found file.
+ * @retval NULL if no file was found.
+ */
 struct vfile *vfs_find_file(const char *path)
 {
 	unsigned long flags;
@@ -167,6 +198,11 @@ struct vfile *vfs_find_file(const char *path)
 	return file;
 }
 
+/**
+ * @brief Remove a file from the VFS.
+ * @param path Path to the file to remove.
+ * @return An error code.
+ */
 int unlink(const char *path)
 {
 	unsigned long flags;

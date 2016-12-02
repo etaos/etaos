@@ -1,6 +1,9 @@
 /* ================ File systems ================ */
 
 /**
- * @defgroup fops FS utility functions
+ * @defgroup fops FS utilities
  * @ingroup fs
+ * @brief File system utility functions.
+ *
+ * This group contains generic file system API functions to manipulate paths.
  */
