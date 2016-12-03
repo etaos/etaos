@@ -36,10 +36,10 @@
 
 /**
  * @brief Convert a file pointer to a SRAM structure.
- * @param file struct vfile * pointer to convert.
+ * @param file struct file * pointer to convert.
  * @return SRAM data structure.
  */
-static inline struct sram *to_sram_chip(struct vfile * file)
+static inline struct sram *to_sram_chip(struct file * file)
 {
 	struct device *dev;
 
@@ -54,7 +54,7 @@ static inline struct sram *to_sram_chip(struct vfile * file)
  * @param len Length of \p buf.
  * @return Error code or the number of bytes written.
  */
-static int sram_write(struct vfile * stream, const void *buf, size_t len)
+static int sram_write(struct file * stream, const void *buf, size_t len)
 {
 	int rc;
 	struct sram *ram;
@@ -79,7 +79,7 @@ static int sram_write(struct vfile * stream, const void *buf, size_t len)
  * @param len Length of \p buf.
  * @return Error code or number bytes read.
  */
-static int sram_read(struct vfile * stream, void *buf, size_t len)
+static int sram_read(struct file * stream, void *buf, size_t len)
 {
 	int rc;
 	struct sram *ram;
@@ -103,7 +103,7 @@ static int sram_read(struct vfile * stream, void *buf, size_t len)
  * @param stream File SRAM chip descriptor.
  * @return Error code or the number of bytes written.
  */
-static int sram_put(int c, struct vfile * stream)
+static int sram_put(int c, struct file * stream)
 {
 	int rc;
 	struct sram *ram;
@@ -126,7 +126,7 @@ static int sram_put(int c, struct vfile * stream)
  * @param stream File SRAM chip descriptor.
  * @return Error code or the number of bytes read.
  */
-static int sram_get(struct vfile * stream)
+static int sram_get(struct file * stream)
 {
 	int rc;
 	struct sram *ram;
@@ -144,7 +144,7 @@ static int sram_get(struct vfile * stream)
 	return rc;
 }
 
-static int sram_open(struct vfile *file)
+static int sram_open(struct file *file)
 {
 	struct device *dev = container_of(file, struct device, file);
 
@@ -152,7 +152,7 @@ static int sram_open(struct vfile *file)
 	return -EOK;
 }
 
-static int sram_close(struct vfile *file)
+static int sram_close(struct file *file)
 {
 	struct device *dev = container_of(file, struct device, file);
 

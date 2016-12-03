@@ -31,7 +31,7 @@
 #include <etaos/error.h>
 #include <etaos/mutex.h>
 
-static inline struct eeprom *to_eeprom_chip(struct vfile * file)
+static inline struct eeprom *to_eeprom_chip(struct file * file)
 {
 	struct device *dev;
 
@@ -46,7 +46,7 @@ static inline struct eeprom *to_eeprom_chip(struct vfile * file)
  * @param len Length of \p buf.
  * @return An error code.
  */
-static int eeprom_write(struct vfile * stream, const void *buf, size_t len)
+static int eeprom_write(struct file * stream, const void *buf, size_t len)
 {
 	int rc;
 	struct eeprom *ee;
@@ -72,7 +72,7 @@ static int eeprom_write(struct vfile * stream, const void *buf, size_t len)
  * @param len Length of \p buf.
  * @return An error code.
  */
-static int eeprom_read(struct vfile * stream, void *buf, size_t len)
+static int eeprom_read(struct file * stream, void *buf, size_t len)
 {
 	int rc;
 	struct eeprom *ee;
@@ -97,7 +97,7 @@ static int eeprom_read(struct vfile * stream, void *buf, size_t len)
  * @param stream File stream.
  * @return Error code.
  */
-static int eeprom_put(int c, struct vfile * stream)
+static int eeprom_put(int c, struct file * stream)
 {
 	int rc;
 	struct eeprom *ee;
@@ -121,7 +121,7 @@ static int eeprom_put(int c, struct vfile * stream)
  * @param stream File stream.
  * @return The byte read from the chip or an error code.
  */
-static int eeprom_get(struct vfile * stream)
+static int eeprom_get(struct file * stream)
 {
 	int rc;
 	struct eeprom *ee;
@@ -140,7 +140,7 @@ static int eeprom_get(struct vfile * stream)
 	return rc;
 }
 
-static int eeprom_open(struct vfile *file)
+static int eeprom_open(struct file *file)
 {
 	struct device *dev = container_of(file, struct device, file);
 
@@ -148,7 +148,7 @@ static int eeprom_open(struct vfile *file)
 	return -EOK;
 }
 
-static int eeprom_close(struct vfile *file)
+static int eeprom_close(struct file *file)
 {
 	struct device *dev = container_of(file, struct device, file);
 

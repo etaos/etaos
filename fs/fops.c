@@ -38,7 +38,7 @@
 	lseek(file, SEEK_SET, offset);
 @endcode
   */
-ssize_t vfs_setoffset(struct vfile *file, ssize_t offset, ssize_t max)
+ssize_t vfs_setoffset(struct file *file, ssize_t offset, ssize_t max)
 {
 	if(offset > max)
 		return -EINVAL;
@@ -51,7 +51,7 @@ ssize_t vfs_setoffset(struct vfile *file, ssize_t offset, ssize_t max)
 	return offset;
 }
 
-static size_t vfs_setindex(struct vfile *file, size_t index, size_t max)
+static size_t vfs_setindex(struct file *file, size_t index, size_t max)
 {
 	if(index > max && max)
 		return -EINVAL;
@@ -67,7 +67,7 @@ static size_t vfs_setindex(struct vfile *file, size_t index, size_t max)
  * @param file File (stream) to get the current position of.
  * @return The current position of the stream.
  */
-size_t ftell(struct vfile *file)
+size_t ftell(struct file *file)
 {
 	if(file->ftell)
 		return file->ftell(file);
@@ -94,7 +94,7 @@ size_t ftell(struct vfile *file)
  * \b SEEK_END \n
  * The offset is set to the size of the file plus \p offset bytes.
  */
-size_t lseek(struct vfile *file, size_t offset, int whence)
+size_t lseek(struct file *file, size_t offset, int whence)
 {
 	if(file->lseek)
 		return file->lseek(file, offset, whence);

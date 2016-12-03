@@ -38,7 +38,7 @@ static struct analog_chip *lm35_chip;
  */
 float lm35_read(int pin)
 {
-	struct vfile *dev;
+	struct file *dev;
 	int fd;
 	float rv;
 	char analog_name[20] = "/dev/";

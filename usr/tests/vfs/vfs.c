@@ -18,25 +18,25 @@
 
 extern struct dirent vfs_root;
 
-static int dummy_write(struct vfile * stream, const void *buf, size_t len)
+static int dummy_write(struct file * stream, const void *buf, size_t len)
 {
 	printf("DummyDev write!\n");
 	return -EOK;
 }
 
-static int dummy_read(struct vfile * stream, void *buf, size_t len)
+static int dummy_read(struct file * stream, void *buf, size_t len)
 {
 	printf("DummyDev read!\n");
 	return -EOK;
 }
 
-static int dummy_open(struct vfile *file)
+static int dummy_open(struct file *file)
 {
 	printf("DummyDev open!\n");
 	return -EOK;
 }
 
-static int dummy_close(struct vfile *file)
+static int dummy_close(struct file *file)
 {
 	printf("DummyDev close!\n");
 	return -EOK;

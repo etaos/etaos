@@ -59,7 +59,7 @@ struct device {
 	/** @brief Device list */
 	struct list_head devs;
 	/** @brief Device file descriptor */
-	struct vfile file;
+	struct file file;
 	/** @brief Mutex to ensure exclusive access */
 	mutex_t dev_lock;
 	/** @brief Backend platform device */
@@ -84,18 +84,18 @@ struct device {
  * is generally used during the setup of a device.
  */
 struct dev_file_ops {
-	int (*open)(struct vfile*); //!< Open a file.
-	int (*close)(struct vfile*); //!< File close.
-	int (*read)(struct vfile*, void*, size_t); //!< Read from a file.
-	int (*write)(struct vfile*, const void*, size_t); //!< Write to a file.
-	int (*flush)(struct vfile*); //!< Flush the file.
-	int (*put)(int c, struct vfile*); //!< Write 1 byte to a file.
-	int (*get)(struct vfile*); //!< Read 1 byte from a file.
+	int (*open)(struct file*); //!< Open a file.
+	int (*close)(struct file*); //!< File close.
+	int (*read)(struct file*, void*, size_t); //!< Read from a file.
+	int (*write)(struct file*, const void*, size_t); //!< Write to a file.
+	int (*flush)(struct file*); //!< Flush the file.
+	int (*put)(int c, struct file*); //!< Write 1 byte to a file.
+	int (*get)(struct file*); //!< Read 1 byte from a file.
 
 	/**
 	 * @brief I/O control function pointer.
 	 */
-	int (*ioctl)(struct vfile*, unsigned long reg, void *buf);
+	int (*ioctl)(struct file*, unsigned long reg, void *buf);
 };
 
 CDECL

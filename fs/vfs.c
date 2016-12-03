@@ -33,8 +33,8 @@
 #include <etaos/fs/util.h>
 #include <etaos/fs/basename.h>
 
-struct vfile * __iob[MAX_OPEN];
-static struct vfile *vfshead;
+struct file * __iob[MAX_OPEN];
+static struct file *vfshead;
 
 static spinlock_t vfs_lock;
 struct dirent vfs_root = {
@@ -125,7 +125,7 @@ err:
  * @param file File to add.
  * @return An error code.
  */
-int vfs_add_file(const char *path, struct vfile *file)
+int vfs_add_file(const char *path, struct file *file)
 {
 	struct dirent *dir;
 	unsigned long flags;
@@ -168,12 +168,12 @@ struct fs_driver *vfs_path_to_fs(const char *path)
  * @return The found file.
  * @retval NULL if no file was found.
  */
-struct vfile *vfs_find_file(const char *path)
+struct file *vfs_find_file(const char *path)
 {
 	unsigned long flags;
 	struct dirent *dir;
 	char *filepath, *filename;
-	struct vfile *file;
+	struct file *file;
 
 	filepath = basepath(path);
 	filename = basename(path);
@@ -208,7 +208,7 @@ int unlink(const char *path)
 	unsigned long flags;
 	struct dirent *dir;
 	char *filepath, *filename;
-	struct vfile *file;
+	struct file *file;
 	int err = -EOK;
 
 	filepath = basepath(path);
@@ -250,7 +250,7 @@ err_l:
  * @return Assigned file descriptor.
  * @retval -1 on error.
  */
-int iob_add(struct vfile * stream)
+int iob_add(struct file * stream)
 {
 	int rc;
 

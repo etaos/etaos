@@ -42,7 +42,7 @@ static struct analog_chip *tmp36_chip;
  */
 float tmp36_read(int pin)
 {
-	struct vfile *file;
+	struct file *file;
 	int fd;
 	float temperature;
 	char analog_name[20] = "/dev";

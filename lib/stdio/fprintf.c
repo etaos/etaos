@@ -42,7 +42,7 @@
  * What will be written to the file in the end:
  * Hey there, it is 6:23PM
  */
-int fprintf(struct vfile * stream, const char *fmt, ...)
+int fprintf(struct file * stream, const char *fmt, ...)
 {
 	int i;
 	va_list va;

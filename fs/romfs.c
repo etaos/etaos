@@ -45,7 +45,7 @@ weak_sym struct romfs *romEntryList = NULL;
  * This file copies all data belonging to this file into data memory for
  * quick access by read and getc.
  */
-static int romfs_open(struct vfile *file)
+static int romfs_open(struct file *file)
 {
         char *buff;
         struct romfs *entry;
@@ -69,7 +69,7 @@ static int romfs_open(struct vfile *file)
  * @return Error code.
  * @retval -EOK
  */
-static int romfs_close(struct vfile *file)
+static int romfs_close(struct file *file)
 {
 	int uses;
 
@@ -92,7 +92,7 @@ static int romfs_close(struct vfile *file)
  * @param len Amount of bytes to read.
  * @return The amount of bytes read.
  */
-static int romfs_read(struct vfile *file, void *buff, size_t len)
+static int romfs_read(struct file *file, void *buff, size_t len)
 {
 	size_t readable;
 
@@ -115,7 +115,7 @@ static int romfs_read(struct vfile *file, void *buff, size_t len)
  * @param file File to read from.
  * @return The character read from the file buffer.
  */
-static int romfs_getc(struct vfile *file)
+static int romfs_getc(struct file *file)
 {
 	int c;
 	char *data;
@@ -135,7 +135,7 @@ static int romfs_getc(struct vfile *file)
  * @param file File which has to be initialised.
  * @param entry ROMFS entry to use as a base for a file.
  */
-static void romfs_setup_file(struct vfile *file, struct romfs *entry)
+static void romfs_setup_file(struct file *file, struct romfs *entry)
 {
 	file->name = entry->name;
 	file->length = entry->length - 1; /* do not include EOF */
@@ -162,7 +162,7 @@ struct fs_driver romfs = {
 static void __used romfs_rollout(void)
 {
 	struct romfs *entry;
-	struct vfile *file;
+	struct file *file;
 
 	mkdir("/romfs");
 	mount(&romfs, "/romfs");

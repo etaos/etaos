@@ -36,7 +36,7 @@
  */
 int write(int fd, const void *buff, size_t len)
 {
-	struct vfile * file;
+	struct file * file;
 	int rv;
 
 	file = __iob[fd];

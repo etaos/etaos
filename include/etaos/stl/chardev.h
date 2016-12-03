@@ -47,7 +47,7 @@ public:
 	int putc(int& c);
 
 protected:
-	struct vfile *devfile; //!< Backend device file.
+	struct file *devfile; //!< Backend device file.
 	int fd; //!< Backend file descriptor.
 
 private:

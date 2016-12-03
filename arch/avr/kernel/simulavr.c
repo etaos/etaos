@@ -46,7 +46,7 @@ void simul_avr_exit(char err)
 	SIME = err;
 }
 
-int simul_avr_write_byte(int c, struct vfile * stream)
+int simul_avr_write_byte(int c, struct file * stream)
 {
 	if(c == '\n')
 		simul_avr_write_byte('\r', stream);
@@ -55,7 +55,7 @@ int simul_avr_write_byte(int c, struct vfile * stream)
 	return c;
 }
 
-void simul_avr_write_string(char *s, struct vfile * stream)
+void simul_avr_write_string(char *s, struct file * stream)
 {
 	while(*s) {
 		simul_avr_write_byte(*s, stream);

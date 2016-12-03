@@ -36,7 +36,7 @@
  * This function reads from the given file until a new line character is
  * read or \p num bytes have been read, whichever comes first.
  */
-char *fgets(char *buf, int num, struct vfile *stream)
+char *fgets(char *buf, int num, struct file *stream)
 {
 	int c;
 	char *buffer = buf;

@@ -31,7 +31,7 @@
  * @param stream Stream to read from.
  * @return The byte read from \p stream.
  */
-int getc(struct vfile * stream)
+int getc(struct file * stream)
 {
 	return fgetc(stream);
 }

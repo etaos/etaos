@@ -36,7 +36,7 @@
  * @retval -EINVAL when an error has occurred.
  * @retval -EOK on success.
  */
-static int devfs_ioctl(struct vfile *file, unsigned long reg, void *arg)
+static int devfs_ioctl(struct file *file, unsigned long reg, void *arg)
 {
 	return -EINVAL;
 }

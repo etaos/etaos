@@ -22,8 +22,8 @@
 #include <etaos/stdio.h>
 
 CDECL
-extern int simul_avr_write_byte(int c, struct vfile * stream);
-extern void simul_avr_write_string(char *s, struct vfile * stream);
+extern int simul_avr_write_byte(int c, struct file * stream);
+extern void simul_avr_write_string(char *s, struct file * stream);
 extern void simul_avr_setup_streams(void);
 extern void simul_avr_exit(char err);
 CDECL_END

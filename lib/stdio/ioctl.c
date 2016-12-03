@@ -34,7 +34,7 @@
  *       specific device driver for information on the length of the buffer.
  * @return An error code.
  */
-int ioctl(struct vfile * stream, unsigned long reg, void *buf)
+int ioctl(struct file * stream, unsigned long reg, void *buf)
 {
 	int rc;
 

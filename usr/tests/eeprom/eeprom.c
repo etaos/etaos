@@ -17,7 +17,7 @@
 int main(void)
 {
 	int fd;
-	struct vfile *file;
+	struct file *file;
 	unsigned char readback = 0;
 
 	irq_enable();

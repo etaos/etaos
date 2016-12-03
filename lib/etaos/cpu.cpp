@@ -103,7 +103,7 @@ void CPU::pin_out(unsigned short pin, int& value)
 int CPU::adc_read(unsigned short pin)
 {
 	int fd, rv;
-	struct vfile *file;
+	struct file *file;
 	const char *name = analog_chip_to_name(analog_syschip);
 
 	fd = open(name, _FDEV_SETUP_RW);

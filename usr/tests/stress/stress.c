@@ -90,7 +90,7 @@ THREAD(test_th_handle2, arg)
 	unsigned char sram_readback = 0;
 	unsigned long rand;
 	int fd;
-	struct vfile *file;
+	struct file *file;
 	size_t flen;
 	char *romdata = NULL;
 	float sram_entry = 3.1415F;

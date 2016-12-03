@@ -38,7 +38,7 @@
  */
 struct eeprom {
 	const char *name; //!< EEPROM chip name.
-	struct vfile *file; //!< EEPROM device file.
+	struct file *file; //!< EEPROM device file.
 
 	void *priv; //!< Private data, usually set to the i2c_client.
 

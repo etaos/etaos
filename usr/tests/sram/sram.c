@@ -18,7 +18,7 @@
 static int test_sram_read(uint16_t addr, void *buff, size_t len)
 {
 	int rc, fd;
-	struct vfile *stream;
+	struct file *stream;
 
 	fd = open("/dev/23K256", _FDEV_SETUP_RW);
 
@@ -37,7 +37,7 @@ static int test_sram_read(uint16_t addr, void *buff, size_t len)
 static int test_sram_write(uint16_t addr, const void *buff, size_t len)
 {
 	int fd, rc;
-	struct vfile *stream;
+	struct file *stream;
 
 	fd = open("/dev/23K256", _FDEV_SETUP_RW);
 

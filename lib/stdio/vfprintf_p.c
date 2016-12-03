@@ -35,7 +35,7 @@
  * @param ap VA list to complete the format string.
  * @return Number of bytes written to \p stream.
  */
-int vfprintf_P(struct vfile * stream, const char *fmt, va_list ap)
+int vfprintf_P(struct file * stream, const char *fmt, va_list ap)
 {
 	size_t strl = strlen_P(fmt) + 1;
 	int rc = -ENOMEM;

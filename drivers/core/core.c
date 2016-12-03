@@ -233,7 +233,7 @@ int device_initialize(struct device *dev, struct dev_file_ops *fops)
 
 static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 {
-	struct vfile *file;
+	struct file *file;
 
 	file = &dev->file;
 	file->flags = _FDEV_SETUP_RW;

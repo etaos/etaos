@@ -33,7 +33,7 @@
  */
 struct analog_chip *analog_syschip;
 
-static inline struct analog_chip *to_chip(struct vfile *file)
+static inline struct analog_chip *to_chip(struct file *file)
 {
 	struct device *dev;
 
@@ -47,7 +47,7 @@ static inline struct analog_chip *to_chip(struct vfile *file)
  * @return The value read from the ADC.
  * @see gets fgets
  */
-static int analog_get(struct vfile *file)
+static int analog_get(struct file *file)
 {
 	struct analog_chip *chip;
 
@@ -78,7 +78,7 @@ int analog_read(struct analog_pin *pin)
  * @return Error code.
  * @see ioctl ANALOG_SELECT_PIN
  */
-static int analog_ctl(struct vfile *file, unsigned long reg, void *arg)
+static int analog_ctl(struct file *file, unsigned long reg, void *arg)
 {
 	struct analog_chip *chip;
 	int pin;
@@ -107,7 +107,7 @@ static int analog_ctl(struct vfile *file, unsigned long reg, void *arg)
  * @note Acquires the ADC device lock.
  * @return An error code.
  */
-static int analog_open(struct vfile *file)
+static int analog_open(struct file *file)
 {
 	struct device *dev;
 
@@ -122,7 +122,7 @@ static int analog_open(struct vfile *file)
  * @note Releases the ADC device lock.
  * @return An error code.
  */
-static int analog_close(struct vfile *file)
+static int analog_close(struct file *file)
 {
 	struct device *dev;
 

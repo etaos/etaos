@@ -38,7 +38,7 @@
  */
 int vfs_open(const char *path, int mode)
 {
-	struct vfile *file;
+	struct file *file;
 	int err = -EINVAL;
 	char *dir;
 	struct fs_driver *fs;
@@ -86,7 +86,7 @@ int vfs_open(const char *path, int mode)
  */
 int vfs_close(int fd)
 {
-	struct vfile *file;
+	struct file *file;
 
 	file = __iob[fd];
 	if(file) {

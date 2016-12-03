@@ -36,7 +36,7 @@
  */
 struct sram {
 	const char *name; //!< Chip name.
-	struct vfile *file; //!< SRAM device file.
+	struct file *file; //!< SRAM device file.
 	
 	void *priv; //!< Private data.
 

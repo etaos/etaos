@@ -32,7 +32,7 @@
  * @param stream Stream to write \p c to.
  * @return An error code.
  */
-int putc(int c, struct vfile * stream)
+int putc(int c, struct file * stream)
 {
 	return fputc(c, stream);
 }

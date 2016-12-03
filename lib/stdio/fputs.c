@@ -34,7 +34,7 @@
  * @note Uses fputc internally
  * @return An error code.
  */
-int fputs(char *s, struct vfile * stream)
+int fputs(char *s, struct file * stream)
 {
 	write(stream->fd, s, strlen(s));
 	

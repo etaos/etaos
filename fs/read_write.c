@@ -33,7 +33,7 @@
  * @param size Size of \p buff.
  * @return The number of bytes written.
  */
-int vfs_write(struct vfile *file, const void *buff, size_t size)
+int vfs_write(struct file *file, const void *buff, size_t size)
 {
 	if(test_bit(STREAM_WRITE_FLAG, &file->flags) && file->write)
 		return file->write(file, buff, size);
@@ -48,7 +48,7 @@ int vfs_write(struct vfile *file, const void *buff, size_t size)
  * @param size Size of \p buff.
  * @return The number of bytes read.
  */
-int vfs_read(struct vfile *file, void *buff, size_t size)
+int vfs_read(struct file *file, void *buff, size_t size)
 {
 	if(test_bit(STREAM_READ_FLAG, &file->flags) && file->read)
 		return file->read(file, buff, size);

@@ -122,7 +122,7 @@ struct dirent *dirent_add_child(struct dirent *parent, struct dirent *child)
  * @param file File to add to \p dir.
  * @return The added file.
  */
-struct vfile *dirent_add_file(struct dirent *dir, struct vfile *file)
+struct file *dirent_add_file(struct dirent *dir, struct file *file)
 {
 	if(!dir || !file)
 		return NULL;
@@ -140,9 +140,9 @@ struct vfile *dirent_add_file(struct dirent *dir, struct vfile *file)
  * @return The found file or \p NULL.
  * @note This function doesn't search recursively.
  */
-struct vfile *dirent_find_file(struct dirent *dir, const char *filename)
+struct file *dirent_find_file(struct dirent *dir, const char *filename)
 {
-	struct vfile *carriage;
+	struct file *carriage;
 
 	if(!dir || !filename)
 		return NULL;
@@ -165,10 +165,10 @@ struct vfile *dirent_find_file(struct dirent *dir, const char *filename)
  * @return The removed file or \p NULL.
  * @note This function doesn't search recursively.
  */
-struct vfile *dirent_remove_file(struct dirent *dir, struct vfile *file)
+struct file *dirent_remove_file(struct dirent *dir, struct file *file)
 {
-	struct vfile **fpp;
-	struct vfile *carriage;
+	struct file **fpp;
+	struct file *carriage;
 
 	if(!dir || !file)
 		return NULL;

@@ -68,7 +68,7 @@
 #define _FDEV_SETUP_RWA   (_FDEV_SETUP_RW | __SAPP) //!< R/W stream while appending
 #define _FDEV_SETUP_RWB   __SRWB /**< Read/write from buffers */
 
-struct vfile;
+struct file;
 /**
  * \brief Define a file stream.
  * \param defname Variable name of the stream.
@@ -85,7 +85,7 @@ struct vfile;
  * This defines an initialized file stream structure.
  */
 #define FDEV_SETUP_STREAM(defname, r, w, p, g, f, n, fl, d) \
-	struct vfile defname = {	\
+	struct file defname = {	\
 	.write = r,		\
 	.read = w,		\
 	.put = p,		\
@@ -101,28 +101,28 @@ struct vfile;
 }
 
 /**
- * @struct vfile
+ * @struct file
  * @brief File definition
  */
-struct vfile {
+struct file {
 	const char *name; //!< File name.
-	struct vfile *next; //!< Next file.
+	struct file *next; //!< Next file.
 	spinlock_t lock;
 
 	unsigned long flags; //!< File flags.
 	int fd; //!< Assigned file descriptor.
 	atomic_t uses; //!< Amount of times the file is open.
 
-	int (*open)(struct vfile*); //!< Open a file.
-	int (*close)(struct vfile*); //!< File close.
-	int (*read)(struct vfile*, void*, size_t); //!< Read from a file.
-	int (*write)(struct vfile*, const void*, size_t); //!< Write to a file.
-	int (*flush)(struct vfile*); //!< Flush the file.
-	int (*put)(int c, struct vfile*); //!< Write 1 byte to a file.
-	int (*get)(struct vfile*); //!< Read 1 byte from a file.
-	int (*ioctl)(struct vfile*, unsigned long reg, void *buf);
-	size_t (*ftell)(struct vfile *); //!< Get the file length.
-	size_t (*lseek)(struct vfile *, size_t, int); //!< Seek into the file.
+	int (*open)(struct file*); //!< Open a file.
+	int (*close)(struct file*); //!< File close.
+	int (*read)(struct file*, void*, size_t); //!< Read from a file.
+	int (*write)(struct file*, const void*, size_t); //!< Write to a file.
+	int (*flush)(struct file*); //!< Flush the file.
+	int (*put)(int c, struct file*); //!< Write 1 byte to a file.
+	int (*get)(struct file*); //!< Read 1 byte from a file.
+	int (*ioctl)(struct file*, unsigned long reg, void *buf);
+	size_t (*ftell)(struct file *); //!< Get the file length.
+	size_t (*lseek)(struct file *, size_t, int); //!< Seek into the file.
 
 	void *fs_data; //!< File system info.
 	void *data; //!< Private file data.
@@ -134,7 +134,7 @@ struct vfile {
 
 CDECL
 
-extern struct vfile * __iob[];
+extern struct file * __iob[];
 
 #define stdin 	__iob[0]
 #define stdout 	__iob[1]
@@ -143,7 +143,7 @@ extern struct vfile * __iob[];
 #define to_fd(__f) (__f)->fd
 
 #define DIR struct dirent //!< Directory descriptor
-#define FILE struct vfile //!< File descriptor
+#define FILE struct file //!< File descriptor
 
 /**
  * @brief Convert a file pointer to a file structure.
@@ -151,28 +151,28 @@ extern struct vfile * __iob[];
  */
 #define filep(__idx) __iob[__idx]
 
-extern int putc(int c, struct vfile * stream);
-extern int fputc(int c, struct vfile * stream);
-extern int fputs(char *c, struct vfile * stream);
-extern int fprintf(struct vfile * stream, const char*, ...);
+extern int putc(int c, struct file * stream);
+extern int fputc(int c, struct file * stream);
+extern int fputs(char *c, struct file * stream);
+extern int fprintf(struct file * stream, const char*, ...);
 extern int printf(const char *, ...);
-extern int vfprintf(struct vfile * stream, const char *fmt, va_list va);
-extern int iob_add(struct vfile * iob);
+extern int vfprintf(struct file * stream, const char *fmt, va_list va);
+extern int iob_add(struct file * iob);
 extern int iob_remove(int fd);
 extern void close(int fd);
 extern int open(const char *name, unsigned long flags);
 extern int write(int fd, const void *buff, size_t size);
 extern int read(int fd, void *buff, size_t size);
-extern int ioctl(struct vfile *stream, unsigned long reg, void *buf);
-extern int getc(struct vfile *stream);
-extern int fgetc(struct vfile *stream);
-extern char *fgets(char *buf, int count, struct vfile *stream);
-extern size_t ftell(struct vfile *file);
+extern int ioctl(struct file *stream, unsigned long reg, void *buf);
+extern int getc(struct file *stream);
+extern int fgetc(struct file *stream);
+extern char *fgets(char *buf, int count, struct file *stream);
+extern size_t ftell(struct file *file);
 
 #ifdef CONFIG_HARVARD
 extern int printf_P(const char *fmt, ...);
-extern int fprintf_P(struct vfile *stream, const char *fmt, ...);
-extern int vfprintf_P(struct vfile * stream, const char *fmt, va_list ap);
+extern int fprintf_P(struct file *stream, const char *fmt, ...);
+extern int vfprintf_P(struct file * stream, const char *fmt, va_list ap);
 #else
 #define printf_P(__fmt, args...) printf(__fmt, args)
 #define fprintf_P(__iostream, __fmt, args...) fprintf(__iostream, __fmt, args)

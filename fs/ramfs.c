@@ -32,12 +32,12 @@
 
 #include <etaos/fs/basename.h>
 
-static inline void ramfs_lock_file(struct vfile *file)
+static inline void ramfs_lock_file(struct file *file)
 {
 	spin_lock(&file->lock);
 }
 
-static inline void ramfs_unlock_file(struct vfile *file)
+static inline void ramfs_unlock_file(struct file *file)
 {
 	spin_unlock(&file->lock);
 }
@@ -48,7 +48,7 @@ static inline void ramfs_unlock_file(struct vfile *file)
  * @return An exit code.
  * @retval -EOK on success.
  */
-static int ramfs_open(struct vfile *file)
+static int ramfs_open(struct file *file)
 {
 	struct ramfs_file *ramfile;
 
@@ -68,7 +68,7 @@ static int ramfs_open(struct vfile *file)
  * @return Exit code.
  * @retval -EOK on success.
  */
-static int ramfs_close(struct vfile *file)
+static int ramfs_close(struct file *file)
 {
 	struct ramfs_file *ramfile = container_of(file, struct ramfs_file, base);
 
@@ -87,7 +87,7 @@ static int ramfs_close(struct vfile *file)
  * @retval -ENOMEM if the reallocation of th file buffer failed.
  * @retval -EOK on success.
  */
-static int ramfs_expand(struct vfile *file, size_t required)
+static int ramfs_expand(struct file *file, size_t required)
 {
 	size_t expand;
 	struct ramfs_file *ramfile;
@@ -119,7 +119,7 @@ static int ramfs_expand(struct vfile *file, size_t required)
  * @param size Length of \p buff.
  * @return The number of bytes written.
  */
-static int ramfs_write(struct vfile *file, const void *buff, size_t size)
+static int ramfs_write(struct file *file, const void *buff, size_t size)
 {
 	struct ramfs_file *ramfile;
 	const char *cbuff = buff;
@@ -142,7 +142,7 @@ static int ramfs_write(struct vfile *file, const void *buff, size_t size)
  * @param file File to get the current index of.
  * @return The current index of \p file.
  */
-static size_t ramfs_ftell(struct vfile *file)
+static size_t ramfs_ftell(struct file *file)
 {
 	struct ramfs_file *ramfile;
 
@@ -150,7 +150,7 @@ static size_t ramfs_ftell(struct vfile *file)
 	return ramfile->wr_idx;
 }
 
-static size_t ramfs_setindex(struct vfile *file, size_t index, size_t max)
+static size_t ramfs_setindex(struct file *file, size_t index, size_t max)
 {
 	struct ramfs_file *ramfile;
 
@@ -174,7 +174,7 @@ static size_t ramfs_setindex(struct vfile *file, size_t index, size_t max)
  * @param whence Operation type.
  * @return The new index of \p file.
  */
-static size_t ramfs_lseek(struct vfile *file, size_t offset, int whence)
+static size_t ramfs_lseek(struct file *file, size_t offset, int whence)
 {
 	switch(whence) {
 	case SEEK_END:
@@ -200,7 +200,7 @@ static size_t ramfs_lseek(struct vfile *file, size_t offset, int whence)
  * @param size Number of bytes to read.
  * @return The number of bytes read.
  */
-static int ramfs_read(struct vfile *file, void *buff, size_t size)
+static int ramfs_read(struct file *file, void *buff, size_t size)
 {
 	struct ramfs_file *ramfile;
 	char *cbuff = buff;
@@ -219,7 +219,7 @@ static int ramfs_read(struct vfile *file, void *buff, size_t size)
  * @param file File to read from.
  * @return The character read.
  */
-static int ramfs_getc(struct vfile *file)
+static int ramfs_getc(struct file *file)
 {
 	struct ramfs_file *ramfile;
 
@@ -233,7 +233,7 @@ static int ramfs_getc(struct vfile *file)
  * @param file File to write to.
  * @return The character written, \p c.
  */
-static int ramfs_putc(int c, struct vfile *file)
+static int ramfs_putc(int c, struct file *file)
 {
 	struct ramfs_file *ramfile;
 
@@ -256,7 +256,7 @@ static int ramfs_putc(int c, struct vfile *file)
  * @note \p path contains the full path to the file.
  * @return The created RAMFS file.
  */
-static struct vfile *ramfs_create(const char *path, int mode)
+static struct file *ramfs_create(const char *path, int mode)
 {
 	struct ramfs_file *file;
 	char *basep, *basen;

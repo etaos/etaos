@@ -19,7 +19,7 @@
 
 int main(void)
 {
-	struct vfile *stream;
+	struct file *stream;
 	int fd;
 
 	fd = open("24C02", _FDEV_SETUP_RW);
