@@ -1,0 +1,54 @@
+#!/bin/bash
+
+function print_help
+{
+	echo "Usage: $0 [options]"
+	echo ""
+	echo "Options:"
+	echo "    -s | --search [pattern]             Pattern to search for."
+	echo "    -r | --search [replace]             Text to replace the search pattern with."
+	echo "    -h | --help                         Print this text."
+}
+
+function run_snr
+{
+	echo "Replacing $1 with $2..."
+	echo ""
+
+	git grep -l "$1" | xargs sed -i "s/$1/$2/g"
+	echo "Done.."
+}
+
+while [[ $# -ge 1 ]]
+do
+	key="$1"
+
+	case $key in
+		-s|--search)
+			SEARCH="$2"
+			shift
+			;;
+		-r|--replace)
+			REPLACE="$2"
+			shift
+			;;
+		-h|--help)
+			print_help
+			exit
+			;;
+		*)
+			print_help
+			exit -1
+			;;
+	esac
+	shift
+done
+
+if [[ -n $1 ]]; then
+	print_help
+	tail -1 $1
+	exit -1
+fi
+
+run_snr "$SEARCH" "$REPLACE"
+
