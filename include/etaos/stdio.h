@@ -145,6 +145,8 @@ extern struct file * __iob[];
 #define DIR struct dirent //!< Directory descriptor
 #define FILE struct file //!< File descriptor
 
+#define vfile file //!< VFILE definition for backwards compatibility.
+
 /**
  * @brief Convert a file pointer to a file structure.
  * @param __idx File pointer to get the struct file for.
