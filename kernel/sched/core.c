@@ -64,6 +64,7 @@ static DEFINE_RQ(grq, &sys_sched_class);
 /**
  * @brief Get the global run queue
  * @return The global run queue.
+ * @see sched_get_cpu_rq
  *
  * The most notable use of this function is in #sched_get_cpu_rq. This way
  * the scheduling core always gets the correct run queue independant of the
