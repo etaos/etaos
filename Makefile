@@ -5,7 +5,7 @@
 VERSION = 4
 PATCHLEVEL = 6
 SUBLEVEL = 2
-EXTRAVERSION = -rc1
+EXTRAVERSION =
 NAME = Fiery Desert Rose
 
 MAKEFLAGS += -rR --no-print-directory
