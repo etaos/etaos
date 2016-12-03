@@ -75,6 +75,32 @@ struct rq *sched_get_grq(void)
 }
 #endif
 
+/**
+ * @brief Set the current thread for \p rq.
+ * @param rq Run queue to set the running thread for.
+ * @param tp Thread to set as current on \p rq.
+ * @note This function assumes you hold struct rq::lock.
+ */
+static inline void __sched_set_current_thread(struct rq *rq, struct thread *tp)
+{
+	rq->current = tp;
+}
+
+/**
+ * @brief Set the current thread for the runnign CPU.
+ * @param tp Thread to set as current.
+ * @note This function assumes you hold struct rq::lock.
+ */
+static void sched_set_current_thread(struct thread *tp)
+{
+	int cpu;
+	struct rq *rq;
+
+	cpu = cpu_get_id();
+	rq = cpu_to_rq(cpu);
+	__sched_set_current_thread(rq, tp);
+}
+
 #ifdef CONFIG_IRQ_THREAD
 /**
  * @brief Put an IRQ thread in a waiting state.
@@ -534,7 +560,7 @@ int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp)
 
 	if(!tp->on_rq) {
 		err = -EINVAL;
-	} else if(rq->current == tp) {
+	} else if(current_thread() == tp) {
 		/*
 		 * The current thread is to be
 		 * removed from the RQ. This requires
@@ -587,7 +613,7 @@ int rq_remove_thread(struct thread *tp)
 	unsigned long flags;
 
 	rq = tp->rq;
-	if(rq->current != tp) {
+	if(current_thread() != tp) {
 		raw_spin_lock_irqsave(&rq->lock, flags);
 		err = raw_rq_remove_thread(rq, tp);
 		raw_spin_unlock_irqrestore(&rq->lock, flags);
@@ -607,8 +633,9 @@ static void rq_update(struct rq *rq)
 {
 	struct sched_class *class;
 	unsigned long flags = 0UL;
-	struct thread *tp = rq->current;
+	struct thread *tp;
 
+	tp = current_thread();
 	flags = tp->cpu_state;
 	cpu_set_state(&flags);
 	class = rq->sched_class;
@@ -676,11 +703,11 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
 	if(class) {
 		next = class->next_runnable(rq);
 		if(!next)
-			next = rq->current;
+			next = current_thread();
 
 		return next;
 	} else {
-		return rq->current;
+		return current_thread();
 	}
 }
 
@@ -813,12 +840,15 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 {
 	struct thread_queue *qp;
+	struct thread *current;
 
 	qp = thread_to_queue(tp);
 	tp = *tp->queue;
 
 	raw_rq_remove_wake_thread(rq, tp);
 	raw_queue_remove_thread(qp, tp);
+
+	current = current_thread();
 
 	if(!qp->qhead)
 		qp->qhead = SIGNALED;
@@ -827,10 +857,10 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		timer_stop_timer(tp->timer);
 	}
 
-	if(unlikely(rq->current != tp)) {
+	if(unlikely(current != tp)) {
 		raw_rq_add_thread(rq, tp);
-		if(prio(tp) <= prio(rq->current))
-			set_bit(THREAD_NEED_RESCHED_FLAG, &rq->current->flags);
+		if(prio(tp) <= prio(current))
+			set_bit(THREAD_NEED_RESCHED_FLAG, &current->flags);
 	} else {
 		set_bit(THREAD_RUNNING_FLAG, &tp->flags);
 		tp->on_rq = true;
@@ -838,14 +868,6 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 	}
 }
 #endif
-
-/**
- * @def current
- * @param _rq Run queue to get the current thread from.
- *
- * Get the current thread from a specific run queue.
- */
-#define current(_rq) ((_rq)->current)
 
 #ifdef CONFIG_EVENT_MUTEX
 /**
@@ -943,9 +965,10 @@ static inline void __schedule_prepare(struct rq *rq,
 				      struct thread *prev,
 				      unsigned long *irqs)
 {
-	struct thread *next = rq->current;
+	struct thread *next;
 	unsigned long flags = 0UL;
 
+	next = current_thread();
 	/*
 	 * Update the dynamic priorities of all threads that still
 	 * reside on the run queue.
@@ -1059,7 +1082,7 @@ static void __hot __schedule(int cpu, bool preempt)
 	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
 	raw_spin_lock_irq(&rq->lock, &flags);
-	prev = rq->current;
+	prev = current_thread();
 
 	/*
 	 * Run the sched clock and wake up threads that received an event
@@ -1079,7 +1102,7 @@ static void __hot __schedule(int cpu, bool preempt)
 	 * if prev == next a reschedule is redundant.
 	 */
 	if(likely(__schedule_need_resched(prev, next) && prev != next)) {
-		rq->current = next;
+		__sched_set_current_thread(rq, next);
 		rq->switch_count++;
 
 		__schedule_prepare(rq, prev, &flags);
@@ -1224,7 +1247,7 @@ void sched_start(void)
 
 	rq = sched_get_cpu_rq();
 	idle_thread.rq = rq;
-	rq->current = &idle_thread;
+	sched_set_current_thread(&idle_thread);
 
 	cpu_switch_context(rq, NULL, &idle_thread);
 }
@@ -1296,7 +1319,7 @@ void sched_yield(struct rq *rq)
 
 	preempt_disable();
 	next = sched_get_next_runnable(rq);
-	curr = current(rq);
+	curr = current_thread();
 
 	if(preempt_should_resched() || prio(next) <= prio(curr))
 		set_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
