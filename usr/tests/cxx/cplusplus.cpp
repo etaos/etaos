@@ -54,7 +54,7 @@ THREAD(test_th_handle, arg)
 	int i;
 
 	tc = new TestClass(10, 11);
-	sram = new SRAM("23K256");
+	sram = new SRAM("/dev/23K256");
 	sram->putc(0x20, 'E');
 	nice(150);
 
@@ -81,7 +81,7 @@ int main(void)
 				CONFIG_STACK_SIZE, test_thread_stack, 80);
 
 	tc = new TestClass(5,6);
-	ee = new EEPROM("24C02");
+	ee = new EEPROM("/dev/24C02");
 	Platform::pin_out(CPU::pin13, value);
 	ee->putc(0x10, 'X');
 
