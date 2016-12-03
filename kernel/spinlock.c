@@ -33,10 +33,13 @@ static uint8_t lock_test_and_set(volatile uint8_t *lock,
 		                                uint8_t value)
 {
 	uint8_t lockval;
+	unsigned long flags;
 
+	irq_save_and_disable(&flags);
 	barrier();
 	lockval = lock[LOCK_IDX];
 	lock[LOCK_IDX] = value;
+	irq_restore(&flags);
 	return lockval;
 }
 
@@ -94,8 +97,10 @@ void spinlock_release(spinlock_t *lock)
 #endif
 {
 	volatile uint8_t *lock_ptr;
+	unsigned long flags;
 
 	lock_ptr = &lock->lock;
+	irq_save_and_disable(&flags);
 	barrier();
 #ifdef CONFIG_SPINLOCK_DEBUG
 	lock->acquire_file = NULL;
@@ -105,5 +110,6 @@ void spinlock_release(spinlock_t *lock)
 #endif
 #endif /* CONFIG_SPINLOCK_DEBUG */
 	lock_ptr[LOCK_IDX] = 0;
+	irq_restore(&flags);
 }
 

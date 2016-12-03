@@ -1,4 +1,7 @@
 /* Script for -n: mix text and data on same page */
+
+#include <generated/autoconf.h>
+
 OUTPUT_FORMAT("elf32-avr","elf32-avr","elf32-avr")
 OUTPUT_ARCH(avr:51)
 MEMORY

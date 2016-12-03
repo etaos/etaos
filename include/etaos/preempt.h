@@ -32,12 +32,12 @@ struct thread;
 CDECL
 
 extern void schedule(void);
+extern bool preempt_should_resched(void);
 
 #ifdef CONFIG_PREEMPT
-
 extern void preempt_schedule(void);
 extern void preempt_schedule_irq(void);
-extern bool preempt_should_resched(void);
+
 /**
  * @brief Add to the preemption counter of the current thread.
  * @param num Number to add.
@@ -50,7 +50,7 @@ extern void __preempt_add(int num);
 extern void __preempt_sub(int num);
 /**
  * @brief Get the preemption counter pointer of the current thread.
- * @return The preemtion counter of the current thread.
+ * @return The preemption counter of the current thread.
  */
 extern int *preempt_counter_ptr(void);
 extern bool should_resched(void);

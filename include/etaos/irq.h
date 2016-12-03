@@ -170,7 +170,6 @@ struct irq_data {
 struct irq_thread_data {
 	struct thread *owner; //!< IRQ owner.
 	struct irq_data idata; //!< IRQ data.
-	volatile unsigned char event_cnt; //!< Event counter;
 };
 #endif
 
