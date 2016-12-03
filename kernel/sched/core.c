@@ -140,7 +140,7 @@ void irq_thread_signal(struct irq_thread_data *data)
 	clear_bit(THREAD_WAITING_FLAG, &tp->flags);
 	rq_add_thread_no_lock(tp);
 
-	set_bit(THREAD_NEED_RESCHED_FLAG, &current->flags);
+	set_bit(PREEMPT_NEED_RESCHED_FLAG, &current->flags);
 }
 
 /**
