@@ -57,8 +57,7 @@ int main(void)
 {
 	int fd;
 
-	printf_P(PSTR("Application started! (%u)\n"), mm_heap_available());
-
+	printf_P(PSTR("Application started!\n"));
 	device_initialize(&dummy_dev, &dummy_fops);
 
 	fd = vfs_open("/dev/dummy", _FDEV_SETUP_RW);
@@ -68,11 +67,6 @@ int main(void)
 	} else {
 		write(fd, NULL, 0);
 		close(fd);
-	}
-
-	for(;;) {
-		printf("Memory available: %u\n", mm_heap_available());
-		delay(1000);
 	}
 
 	printf(CALYPSO_EXIT);
