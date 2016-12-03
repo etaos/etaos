@@ -1271,38 +1271,38 @@ static bool thread_is_idle(struct thread *tp)
  * @brief Get a pointer to the preemption counter of the current thread.
  * @return A pointer to the preemption counter of the current thread.
  *
- * Returns struct thread::preemt_cnt.
+ * Returns struct thread::preempt_cnt.
  */
 int *preempt_counter_ptr(void)
 {
 	struct thread *tp = current_thread();
-	return &tp->preemt_cnt;
+	return &tp->preempt_cnt;
 }
 
 /**
  * @brief Substract \p num from the preemption counter of the current thread.
  * @param num Amount to substract from the preemption counter.
  *
- * Substracts \p num from struct thread::preemt_cnt.
+ * Substracts \p num from struct thread::preempt_cnt.
  */
 void __preempt_add(int num)
 {
-	volatile int *preemt_ptr = preempt_counter_ptr();
+	volatile int *preempt_ptr = preempt_counter_ptr();
 
-	*preemt_ptr += num;
+	*preempt_ptr += num;
 }
 
 /**
  * @brief Add \p num to the preemption counter of the current thread.
  * @param num Amount to add to the preemption counter.
  *
- * Will add \p num to struct thread::preemt_cnt.
+ * Will add \p num to struct thread::preempt_cnt.
  */
 void __preempt_sub(int num)
 {
-	volatile int *preemt_ptr = preempt_counter_ptr();
+	volatile int *preempt_ptr = preempt_counter_ptr();
 
-	*preemt_ptr -= num;
+	*preempt_ptr -= num;
 }
 #endif
 

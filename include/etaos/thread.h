@@ -142,7 +142,7 @@ struct thread {
 
 #ifdef CONFIG_PREEMPT
 	unsigned int slice; //!< Time slice.
-	int preemt_cnt; //!< Preempt enable counter.
+	int preempt_cnt; //!< Preempt enable counter.
 #endif
 
 	unsigned long cpu_state; //!< CPU flags for this thread.

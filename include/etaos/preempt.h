@@ -50,7 +50,7 @@ extern void __preempt_add(int num);
 extern void __preempt_sub(int num);
 /**
  * @brief Get the preemption counter pointer of the current thread.
- * @return The preemtion counter of the current thread.
+ * @return The preemption counter of the current thread.
  */
 extern int *preempt_counter_ptr(void);
 extern bool should_resched(void);

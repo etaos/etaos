@@ -64,7 +64,7 @@ static void raw_thread_init(struct thread *tp, const char *name,
 	tp->timer = NULL;
 #ifdef CONFIG_PREEMPT
 	tp->slice = CONFIG_TIME_SLICE;
-	tp->preemt_cnt = 0;
+	tp->preempt_cnt = 0;
 #endif
 #ifdef CONFIG_DYN_PRIO
 	tp->dprio = 0;
