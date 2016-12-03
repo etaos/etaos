@@ -27,7 +27,7 @@ THREAD(test_th_handle, arg)
 	struct ipm msg;
 	volatile int *idx = arg;
 
-	fd = open("atm-usart", _FDEV_SETUP_RW);
+	fd = to_fd(stdout);
 
 	nice(150);
 
