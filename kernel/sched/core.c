@@ -1340,7 +1340,7 @@ void sched_yield(struct rq *rq)
 bool preempt_should_resched(void)
 {
 	struct rq *rq;
-	unsigned int diff;
+	tick_t diff;
 	struct thread *tp = current_thread();
 
 	rq = tp->rq;
@@ -1352,7 +1352,7 @@ bool preempt_should_resched(void)
 		return true;
 	}
 
-	return false;
+	return test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 }
 #else
 bool preempt_should_resched(void)
