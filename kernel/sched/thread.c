@@ -214,6 +214,7 @@ void yield(void)
 
 	rq = sched_get_cpu_rq();
 	sched_yield(rq);
+	schedule();
 }
 
 /**
