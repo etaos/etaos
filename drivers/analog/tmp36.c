@@ -32,7 +32,7 @@
 
 #include <asm/io.h>
 
-static struct analog_chip *tmp36_chip;
+static struct analog_chip *tmp36_chip = NULL;
 
 /**
  * @brief Read the TMP36 sensor.
@@ -45,13 +45,13 @@ float tmp36_read(int pin)
 	struct file *file;
 	int fd;
 	float temperature;
-	char analog_name[20] = "/dev";
+	char analog_name[20] = "/dev/";
 
 	if(!tmp36_chip)
 		tmp36_set_analog_device(NULL);
 
 	strcat(analog_name, analog_chip_to_name(tmp36_chip));
-	fd = open(analog_chip_to_name(analog_syschip), _FDEV_SETUP_RW);
+	fd = open(analog_name, _FDEV_SETUP_RW);
 
 	if(fd < 0)
 		return -9999.9999F;
