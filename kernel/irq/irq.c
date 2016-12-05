@@ -96,13 +96,17 @@ void irq_restore(unsigned long *flags)
 static int irq_request_threaded_irq(struct irq_thread_data *data)
 {
 	void *stack;
+	thread_attr_t attr;
 
 	stack = kzalloc(CONFIG_IRQ_STACK_SIZE);
 	if(!stack)
 		return -ENOMEM;
 
+	attr.prio = IRQ_THREAD_PRIO;
+	attr.stack = stack;
+	attr.stack_size = CONFIG_IRQ_STACK_SIZE;
 	data->owner = thread_create("ithread", &irq_handle_fn, &data->idata,
-			CONFIG_IRQ_STACK_SIZE, stack, IRQ_THREAD_PRIO);
+			&attr);
 
 	if(!data->owner)
 		return -ENOMEM;

@@ -29,9 +29,6 @@
 #include <asm/pgm.h>
 #include <asm/io.h>
 
-static void *test_stack;
-static void *test_stack2;
-
 static struct ipm_queue ipm_q;
 static uint8_t ee_value = 0x0;
 
@@ -179,7 +176,6 @@ THREAD(test_th_handle, arg)
 }
 
 #define PREEMPT_PIN 11
-static void *preempt_stack;
 static volatile unsigned long preempt_counter;
 THREAD(preempt_thread, arg)
 {
@@ -224,15 +220,9 @@ int main(void)
 	ee_stress_write_byte(EE_BYTE_ADDR, 0xAC);
 	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);
 
-	test_stack = kzalloc(CONFIG_STACK_SIZE);
-	test_stack2 = kzalloc(CONFIG_STACK_SIZE);
-	preempt_stack = kzalloc(CONFIG_STACK_SIZE);
-	thread_create("test-1", &test_th_handle, NULL,
-			CONFIG_STACK_SIZE, test_stack, 150);
-	thread_create("test-2", &test_th_handle2, NULL, CONFIG_STACK_SIZE,
-			test_stack2, 80);
-	thread_create("preempt", &preempt_thread, NULL, CONFIG_STACK_SIZE,
-			preempt_stack, SCHED_DEFAULT_PRIO);
+	thread_create("test-1", &test_th_handle, NULL, NULL);
+	thread_create("test-2", &test_th_handle2, NULL, NULL);
+	thread_create("preempt", &preempt_thread, NULL, NULL);
 
 	read(to_fd(stdin), &buff[0], 10);
 	buff[10] = 0;

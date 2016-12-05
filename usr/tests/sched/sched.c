@@ -47,11 +47,15 @@ int main(void)
 	const char * ip_msg = "IPM message\n";
 	int64_t tick_orig;
 	int idx = 0;
+	thread_attr_t attr;
 
 	printf_P(PSTR("Application started!\n"));
 	ipm_queue_init(&ipm_q, 2);
-	test_t = thread_create( "tst", &test_th_handle, &idx,
-			CONFIG_STACK_SIZE, test_thread_stack, 130);
+
+	attr.prio = 130;
+	attr.stack = test_thread_stack;
+	attr.stack_size = CONFIG_STACK_SIZE;
+	test_t = thread_create( "tst", &test_th_handle, &idx, &attr);
 
 	tick_orig = sys_tick;
 

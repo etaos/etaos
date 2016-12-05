@@ -40,7 +40,6 @@
 void Kernel::yield(void)
 {
 	::yield();
-	Kernel::schedule();
 }
 
 /**

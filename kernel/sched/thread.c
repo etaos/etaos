@@ -80,6 +80,15 @@ static void raw_thread_init(struct thread *tp, const char *name,
 	barrier();
 }
 
+/**
+ * @brief Create the idle thread.
+ * @param tp Idle thread thread pointer.
+ * @param name Thread name.
+ * @param handle Idle thread handle.
+ * @param arg Idle thread argument.
+ * @param stack_size Idle thread stack size.
+ * @param stack Idle thread stack pointer.
+ */
 void sched_init_idle(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack)
@@ -89,17 +98,15 @@ void sched_init_idle(struct thread *tp, const char *name,
 }
 
 /**
- * @brief Thread initialise backend.
- * @param name Name of the thread.
- * @param handle Thread handle function pointer.
+ * @brief Allocate and start a new thread.
+ * @param name Thread name.
+ * @param handle Thread handle.
  * @param arg Thread argument.
- * @param stack_size Size of the stack.
- * @param stack Pointer to the stack.
- * @param prio Priority of the thread.
- * @return A pointer to the newly created thread.
+ * @param attr Thread attributes.
+ * @return The allocated thread.
  */
-struct thread *thread_create(const char *name, thread_handle_t handle, void *arg,
-			size_t stack_size, void *stack, unsigned char prio)
+struct thread *thread_create(const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr)
 {
 	struct thread *tp;
 
@@ -107,8 +114,106 @@ struct thread *thread_create(const char *name, thread_handle_t handle, void *arg
 	if(!tp)
 		return NULL;
 
-	thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+	thread_init(tp, name, handle, arg, attr);
 	return tp;
+}
+
+/**
+ * @brief Initialise a new thread.
+ * @param tp The thread pointer to initialise.
+ * @param name Thread name.
+ * @param handle Thread handle.
+ * @param arg Thread argument.
+ * @param attr Thread attributes.
+ * @return An error code.
+ */
+int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr)
+{
+	size_t stack_size;
+	void *stack;
+	unsigned char prio;
+
+	prio = 0;
+	stack_size = 0;
+	stack = NULL;
+
+	if(attr) {
+		prio = attr->prio;
+		stack = attr->stack;
+		stack_size = attr->stack_size;
+	}
+
+	if(!prio)
+		prio = SCHED_DEFAULT_PRIO;
+
+	if(!stack_size)
+		stack_size = CONFIG_STACK_SIZE;
+
+	if(!stack)
+		stack = kzalloc(stack_size);
+
+	return thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+}
+
+/**
+ * @brief Initialise a new thread.
+ * @param name Thread name.
+ * @param handle Thread handle.
+ * @param arg Thread argument.
+ * @param attr Thread attributes.
+ * @return The allocated thread.
+ * @note The thread \p tp is not started.
+ * @see thread_start
+ */
+struct thread *thread_alloc(const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr)
+{
+	struct thread *tp;
+	size_t stack_size;
+	void *stack;
+	unsigned char prio;
+
+	prio = 0;
+	stack_size = 0;
+	stack = NULL;
+	tp = kzalloc(sizeof(*tp));
+
+	if(!tp)
+		return NULL;
+
+	if(!prio)
+		prio = SCHED_DEFAULT_PRIO;
+
+	if(!stack_size)
+		stack_size = CONFIG_STACK_SIZE;
+
+	if(!stack)
+		stack = kzalloc(stack_size);
+
+	raw_thread_init(tp, name, handle, arg, stack_size, stack, prio);
+	return tp;
+}
+
+/**
+ * @brief Start a new thread.
+ * @param tp Thread to start.
+ * @see thread_init
+ */
+void thread_start(struct thread *tp)
+{
+	int cpu;
+	struct rq *rq;
+
+	if(!tp)
+		return;
+
+	cpu = cpu_get_id();
+	rq = cpu_to_rq(cpu);
+
+	preempt_disable();
+	rq_add_thread(rq, tp);
+	preempt_enable();
 }
 
 /**
@@ -214,6 +319,7 @@ void yield(void)
 
 	rq = sched_get_cpu_rq();
 	sched_yield(rq);
+	schedule();
 }
 
 /**

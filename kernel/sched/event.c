@@ -126,9 +126,7 @@ void event_notify(struct thread_queue *qp)
 		rq = sched_get_cpu_rq();
 		__raw_event_notify(rq, qp);
 	}
-	preempt_enable_no_resched();
-
-	yield();
+	preempt_enable();
 }
 
 /**
@@ -176,8 +174,7 @@ int raw_event_wait(struct thread_queue *qp, unsigned ms)
 	if(qp->qhead == SIGNALED) {
 		qp->qhead = NULL;
 		raw_spin_unlock_irq(&qp->lock, &flags);
-		preempt_enable_no_resched();
-		yield();
+		preempt_enable();
 		return -EOK;
 	} else {
 		raw_spin_unlock_irq(&qp->lock, &flags);

@@ -13,11 +13,9 @@
 #include <etaos/stl/platform.h>
 #include <etaos/stl/sram.h>
 #include <etaos/stl/eeprom.h>
+#include <etaos/stl/thread.h>
 
 #include <uapi/etaos/test.h>
-
-static unsigned char test_thread_stack[CONFIG_STACK_SIZE];
-static struct thread *test_t;
 
 class TestClass {
 	public:
@@ -28,6 +26,13 @@ class TestClass {
 	private:
 		int a;
 		int b;
+};
+
+class ThreadTest : public Thread {
+	public:
+		explicit ThreadTest(const char *name, void *arg) :
+			Thread(name, arg) {}
+		void run(void *arg);
 };
 
 TestClass::TestClass(int a, int b)
@@ -46,7 +51,7 @@ int TestClass::getB()
 	return this->b;
 }
 
-THREAD(test_th_handle, arg)
+void ThreadTest::run(void *arg)
 {
 	TestClass *tc;
 	SRAM *sram;
@@ -74,11 +79,12 @@ int main(void)
 {
 	TestClass *tc;
 	EEPROM *ee;
+	ThreadTest *tp;
 	int i, value = 0;
 	char readback;
 
-	test_t = thread_create( "tst", &test_th_handle, NULL,
-				CONFIG_STACK_SIZE, test_thread_stack, 80);
+	tp = new ThreadTest("test-1", NULL);
+	tp->start();
 
 	tc = new TestClass(5,6);
 	ee = new EEPROM("/dev/24C02");
@@ -95,6 +101,7 @@ int main(void)
 	}
 
 	delete ee;
+	delete tp;
 	printf(CALYPSO_EXIT);
 	return 0;
 }
