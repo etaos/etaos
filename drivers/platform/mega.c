@@ -39,7 +39,7 @@ struct gpio_pin *platform_pin_to_gpio(int pin)
 	uint8_t gpio;
 	struct gpio_chip *chip;
 
-	if(pin > 13)
+	if(pin > 54)
 			return NULL;
 
 	gpio = pgm_read_byte(platform_port_to_gpio+pin);
