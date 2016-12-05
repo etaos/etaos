@@ -16,11 +16,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
 
+/**
+ * @brief Compute absolute value of an integer.
+ * @param num The integer value.
+ * @return The absolute value.
+ */
 int abs(int num)
 {
 	return num < 0 ? -num : num;
 }
+
+/** @} */
 
