@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/mem.h>
@@ -57,4 +62,6 @@ void *krealloc(void *old, size_t newsize)
 	kfree(old);
 	return new;
 }
+
+/** @} */
 
