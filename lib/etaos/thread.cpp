@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup stl
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -34,6 +39,12 @@ static void stl_thread_start(void *arg)
 	context->kill();
 }
 
+/**
+ * @brief Create a new runnable object.
+ * @param name Name of th thread.
+ * @param arg Argument to the thread.
+ * @see thread_alloc
+ */
 Thread::Thread(const char *name, void *arg)
 {
 	thread_queue_init(&this->joinq);
@@ -42,12 +53,19 @@ Thread::Thread(const char *name, void *arg)
 	running = true;
 }
 
+/**
+ * @brief Destory a thread object.
+ * @see kill
+ */
 Thread::~Thread()
 {
 	if(running)
 		this->kill();
 }
 
+/**
+ * @brief Start the execution of the thread.
+ */
 void Thread::start()
 {
 	thread_start(this->base);
@@ -63,6 +81,12 @@ void Thread::notify_join_queue()
 	event_notify(&this->joinq);
 }
 
+/**
+ * @brief Stop the execution of the thread.
+ *
+ * Please note that this function _must_ be called within the class Thread::run
+ * method.
+ */
 void Thread::kill()
 {
 	running = false;
@@ -70,9 +94,14 @@ void Thread::kill()
 	::kill();
 }
 
+/**
+ * @brief Wait for the thread to finish execution.
+ */
 void Thread::join()
 {
 	if(running)
 		event_wait(&this->joinq, EVENT_WAIT_INFINITE);
 }
+
+/** @} */
 

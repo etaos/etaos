@@ -30,6 +30,13 @@
 #ifndef __STL_THREAD_H__
 #define __STL_THREAD_H__
 
+/**
+ * @brief Interface class for runnable objects.
+ *
+ * The Thread class is an interface class which can be implemented by any
+ * class whose instances are intended to be executed as a thread. The only
+ * method that the class _must_ implement is the class Thread::run method.
+ */
 class Thread {
 public:
 	explicit Thread(const char *name, void *arg);
