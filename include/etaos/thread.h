@@ -172,10 +172,13 @@ struct thread {
 	char name[16]; //!< Name of the thread.
 };
 
+/**
+ * @brief Thread attributes
+ */
 typedef struct thread_attr {
-	size_t stack_size;
-	void *stack;
-	unsigned char prio;
+	size_t stack_size; //!< Size of the stack.
+	void *stack; //!< Stack base pointer.
+	unsigned char prio; //!< Thread priority.
 } thread_attr_t;
 
 /**

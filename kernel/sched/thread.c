@@ -80,6 +80,15 @@ static void raw_thread_init(struct thread *tp, const char *name,
 	barrier();
 }
 
+/**
+ * @brief Create the idle thread.
+ * @param tp Idle thread thread pointer.
+ * @param name Thread name.
+ * @param handle Idle thread handle.
+ * @param arg Idle thread argument.
+ * @param stack_size Idle thread stack size.
+ * @param stack Idle thread stack pointer.
+ */
 void sched_init_idle(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack)
@@ -88,6 +97,14 @@ void sched_init_idle(struct thread *tp, const char *name,
 	set_bit(THREAD_IDLE_FLAG, &tp->flags);
 }
 
+/**
+ * @brief Allocate and start a new thread.
+ * @param name Thread name.
+ * @param handle Thread handle.
+ * @param arg Thread argument.
+ * @param attr Thread attributes.
+ * @return The allocated thread.
+ */
 struct thread *thread_create(const char *name, thread_handle_t handle,
 		void *arg, thread_attr_t *attr)
 {
@@ -101,6 +118,15 @@ struct thread *thread_create(const char *name, thread_handle_t handle,
 	return tp;
 }
 
+/**
+ * @brief Initialise a new thread.
+ * @param tp The thread pointer to initialise.
+ * @param name Thread name.
+ * @param handle Thread handle.
+ * @param arg Thread argument.
+ * @param attr Thread attributes.
+ * @return An error code.
+ */
 int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 		void *arg, thread_attr_t *attr)
 {
@@ -130,6 +156,16 @@ int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 	return thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
 }
 
+/**
+ * @brief Initialise a new thread.
+ * @param name Thread name.
+ * @param handle Thread handle.
+ * @param arg Thread argument.
+ * @param attr Thread attributes.
+ * @return The allocated thread.
+ * @note The thread \p tp is not started.
+ * @see thread_start
+ */
 struct thread *thread_alloc(const char *name, thread_handle_t handle,
 		void *arg, thread_attr_t *attr)
 {
@@ -159,6 +195,11 @@ struct thread *thread_alloc(const char *name, thread_handle_t handle,
 	return tp;
 }
 
+/**
+ * @brief Start a new thread.
+ * @param tp Thread to start.
+ * @see thread_init
+ */
 void thread_start(struct thread *tp)
 {
 	int cpu;
