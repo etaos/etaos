@@ -210,6 +210,9 @@ extern int thread_init(struct thread *tp, const char *name, thread_handle_t hand
 		void *arg, thread_attr_t *attr);
 extern struct thread *thread_create(const char *name, thread_handle_t handle,
 		void *arg, thread_attr_t *attr);
+extern struct thread *thread_alloc(const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr);
+extern void thread_start(struct thread *tp);
 
 extern void sched_init_idle(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 

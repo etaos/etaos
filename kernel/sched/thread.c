@@ -130,6 +130,51 @@ int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 	return thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
 }
 
+struct thread *thread_alloc(const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr)
+{
+	struct thread *tp;
+	size_t stack_size;
+	void *stack;
+	unsigned char prio;
+
+	prio = 0;
+	stack_size = 0;
+	stack = NULL;
+	tp = kzalloc(sizeof(*tp));
+
+	if(!tp)
+		return NULL;
+
+	if(!prio)
+		prio = SCHED_DEFAULT_PRIO;
+
+	if(!stack_size)
+		stack_size = CONFIG_STACK_SIZE;
+
+	if(!stack)
+		stack = kzalloc(stack_size);
+
+	raw_thread_init(tp, name, handle, arg, stack_size, stack, prio);
+	return tp;
+}
+
+void thread_start(struct thread *tp)
+{
+	int cpu;
+	struct rq *rq;
+
+	if(!tp)
+		return;
+
+	cpu = cpu_get_id();
+	rq = cpu_to_rq(cpu);
+
+	preempt_disable();
+	rq_add_thread(rq, tp);
+	preempt_enable();
+}
+
 /**
  * @brief Initialise a new thread.
  * @param tp Pointer to the thread which has to be initialised.
