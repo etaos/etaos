@@ -88,18 +88,8 @@ void sched_init_idle(struct thread *tp, const char *name,
 	set_bit(THREAD_IDLE_FLAG, &tp->flags);
 }
 
-/**
- * @brief Thread initialise backend.
- * @param name Name of the thread.
- * @param handle Thread handle function pointer.
- * @param arg Thread argument.
- * @param stack_size Size of the stack.
- * @param stack Pointer to the stack.
- * @param prio Priority of the thread.
- * @return A pointer to the newly created thread.
- */
-struct thread *thread_create(const char *name, thread_handle_t handle, void *arg,
-			size_t stack_size, void *stack, unsigned char prio)
+struct thread *thread_create(const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr)
 {
 	struct thread *tp;
 
@@ -107,8 +97,37 @@ struct thread *thread_create(const char *name, thread_handle_t handle, void *arg
 	if(!tp)
 		return NULL;
 
-	thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+	thread_init(tp, name, handle, arg, attr);
 	return tp;
+}
+
+int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr)
+{
+	size_t stack_size;
+	void *stack;
+	unsigned char prio;
+
+	prio = 0;
+	stack_size = 0;
+	stack = NULL;
+
+	if(attr) {
+		prio = attr->prio;
+		stack = attr->stack;
+		stack_size = attr->stack_size;
+	}
+
+	if(!prio)
+		prio = SCHED_DEFAULT_PRIO;
+
+	if(!stack_size)
+		stack_size = CONFIG_STACK_SIZE;
+
+	if(!stack)
+		stack = kzalloc(stack_size);
+
+	return thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
 }
 
 /**

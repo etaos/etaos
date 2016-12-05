@@ -41,8 +41,7 @@ int main(void)
 	printf_P(PSTR("Application started!\n"));
 
 	counter = 0;
-	test_t = thread_create( "tst", &test_th_handle, (void*)&trigger,
-			CONFIG_STACK_SIZE, test_thread_stack, 120);
+	test_t = thread_create( "tst", &test_th_handle, (void*)&trigger, NULL);
 
 	for(; i < 5; i++) {
 		trigger = true;

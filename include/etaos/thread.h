@@ -172,6 +172,12 @@ struct thread {
 	char name[16]; //!< Name of the thread.
 };
 
+typedef struct thread_attr {
+	size_t stack_size;
+	void *stack;
+	unsigned char prio;
+} thread_attr_t;
+
 /**
  * @name Thread flags
  * @{
@@ -200,9 +206,10 @@ CDECL
 extern int thread_initialise(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 
 		void *stack, unsigned char prio);
-
-extern struct thread *thread_create(const char *name, thread_handle_t handle, 
-		void *arg, size_t stack_size, void *stack, unsigned char prio);
+extern int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr);
+extern struct thread *thread_create(const char *name, thread_handle_t handle,
+		void *arg, thread_attr_t *attr);
 
 extern void sched_init_idle(struct thread *tp, const char *name, 
 		thread_handle_t handle, void *arg, size_t stack_size, 

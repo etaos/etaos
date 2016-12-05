@@ -52,8 +52,8 @@ int main(void)
 	set_led(false);
 	tp = current_thread();
 
-	profile_thread = thread_create("profiler", &profile_thread_handle,
-			tp, CONFIG_STACK_SIZE, profile_thread_stack, 120);
+	profile_thread = thread_create("profiler", &profile_thread_handle, NULL,
+			NULL);
 	
 	while(true) {
 		set_led(true);

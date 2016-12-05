@@ -76,9 +76,13 @@ int main(void)
 	EEPROM *ee;
 	int i, value = 0;
 	char readback;
+	thread_attr_t attr;
 
-	test_t = thread_create( "tst", &test_th_handle, NULL,
-				CONFIG_STACK_SIZE, test_thread_stack, 80);
+	attr.prio = 80;
+	attr.stack = test_thread_stack;
+	attr.stack_size = CONFIG_STACK_SIZE;
+
+	test_t = thread_create( "tst", &test_th_handle, NULL, &attr);
 
 	tc = new TestClass(5,6);
 	ee = new EEPROM("/dev/24C02");
