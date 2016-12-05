@@ -16,9 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/string.h>
 
+/**
+ * @brief Concatinate two strings.
+ * @param dst Destination string.
+ * @param src Source string.
+ * @return The destination string.
+ *
+ * The string \p src will be appended to the \p dst string.
+ */
 char *strcat(char *dst, const char *src)
 {
 	char *rv = dst;
@@ -29,4 +42,6 @@ char *strcat(char *dst, const char *src)
 
 	return rv;
 }
+
+/** @} */
 

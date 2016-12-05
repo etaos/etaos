@@ -16,11 +16,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
 
+/**
+ * @brief Compute the absolute value of a long integer.
+ * @param num The long integer.
+ * @return The absolute value of \p num.
+ */
 long labs(long num)
 {
 	return num < 0L ? -num : num;
 }
+
+/** @} */
 

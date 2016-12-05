@@ -17,12 +17,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/limits.h>
 #include <etaos/ctype.h>
 
-long
-strtol(nptr, endptr, base)
+/**
+ * @brief Convert a string to a long integer
+ * @param nptr String to convert.
+ * @param endptr Reference to an array, whose value is set by the function to
+ *               the next character in \p str after the numerical value.
+ * @param base Numerical base of the integer.
+ * @see strtoul
+ * @return The covnerted value.
+ */
+long strtol(nptr, endptr, base)
 	const char *nptr;
 	char **endptr;
 	register int base;
@@ -97,21 +110,25 @@ strtol(nptr, endptr, base)
 			acc += c;
 		}
 	}
-	if (any < 0) {
+	if (any < 0)
 		acc = neg ? LONG_MIN : LONG_MAX;
-//		errno = ERANGE;
-	} else if (neg)
+	else if (neg)
 		acc = -acc;
 	if (endptr != 0)
 		*endptr = (char *)(any ? s - 1 : nptr);
 	return (acc);
 }
 
-/*
- * Convert a string to an unsigned long integer.
- *
- * Ignores `locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
+
+/**
+ * @brief Convert a string to a long integer
+ * @param nptr String to convert.
+ * @param endptr Reference to an array, whose value is set by the function to
+ *               the next character in \p str after the numerical value.
+ * @param base Numerical base of the integer.
+ * @note Unsigned version of strtol
+ * @see strtol
+ * @return The covnerted value.
  */
 unsigned long
 strtoul(nptr, endptr, base)
@@ -176,4 +193,6 @@ strtoul(nptr, endptr, base)
 		*endptr = (char *)(any ? s - 1 : nptr);
 	return (acc);
 }
+
+/** @} */
 

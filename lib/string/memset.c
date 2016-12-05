@@ -16,10 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/string.h>
 
+/**
+ * @brief Fill a block of memory.
+ * @param dst Memory region to fill.
+ * @param c Filler character.
+ * @param n Length \p dst.
+ * @return The memory regeion \p dst.
+ */
 void *memset(void *dst, int c, size_t n)
 {
 	volatile unsigned char *data;
@@ -33,3 +45,6 @@ void *memset(void *dst, int c, size_t n)
 
 	return dst;
 }
+
+/** @} */
+
