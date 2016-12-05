@@ -389,6 +389,7 @@ clean: $(clean-dirs)
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
 		-o -name '*.symtypes' -o -name 'modules.order' \
 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+		-o -name '*.img' -o -name '*.hex' \
 		-o -name '*.gcno' \) -type f -print | xargs rm -f
 else
 CLEAN_DIRS += $(MODVERDIR)
