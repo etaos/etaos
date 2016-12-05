@@ -16,10 +16,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/string.h>
 #include <etaos/types.h>
 
+/**
+ * @brief Copy a number of bytes of string.
+ * @param dst Destination string.
+ * @param src Source string.
+ * @param num Number of bytes to copy.
+ * @return The destination string.
+ *
+ * Copy the length of \p src bytes or \p num bytes (whichever is smaller) into
+ * \p dst.
+ */
 char *strncpy(char *dst, const char *src, size_t num)
 {
 	char *rv = dst;
@@ -34,4 +49,6 @@ char *strncpy(char *dst, const char *src, size_t num)
 
 	return rv;
 }
+
+/** @} */
 

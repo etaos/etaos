@@ -16,10 +16,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/string.h>
 
+/**
+ * @brief Find the first occurrance of a string.
+ * @param s String to truncate. Please note that this string is modified.
+ * @param delimeter Delimiter characters.
+ * @return If a token is found, a pointer to the beginning of the token.
+ * @retval NULL if no tokens are found.
+ * @note This function is not thread safe.
+ * @see strtok_r
+ */
 char *strtok(char *s, const char *delimeter)
 {
 	static char *tmp;
@@ -27,6 +41,14 @@ char *strtok(char *s, const char *delimeter)
 	return strtok_r(s, delimeter, &tmp);
 }
 
+/**
+ * @brief Find the first occurrance of a string.
+ * @param s String to truncate. Please note that this string is modified.
+ * @param delim Delimiter characters.
+ * @param last Used to store the current search context.
+ * @return If a token is found, a pointer to the beginning of the token.
+ * @retval NULL if no tokens are found.
+ */
 char *strtok_r(char *s, const char *delim, char **last)
 {
 	char *spanp;
@@ -76,4 +98,6 @@ cont:
 
 	return NULL;
 }
+
+/** @} */
 

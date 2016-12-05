@@ -16,10 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/string.h>
 #include <etaos/types.h>
 
+/**
+ * @brief Copy a string.
+ * @param dst Destination string.
+ * @param src Source string.
+ * @return The destination string.
+ */
 char *strcpy(char *dst, const char *src)
 {
 	char *rv = dst;
@@ -32,4 +43,6 @@ char *strcpy(char *dst, const char *src)
 
 	return rv;
 }
+
+/** @} */
 

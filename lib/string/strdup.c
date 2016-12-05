@@ -16,12 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup libc
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/string.h>
 #include <etaos/stdlib.h>
 #include <etaos/mem.h>
 #include <etaos/types.h>
 
+/**
+ * @brief Duplicate a string.
+ * @param str String to duplicate.
+ * @return A duplicate of \p str.
+ */
 char *strdup(const char *str)
 {
 	size_t len;
@@ -36,4 +46,6 @@ char *strdup(const char *str)
 	memcpy(copy, str, len);
 	return copy;
 }
+
+/** @} */
 
