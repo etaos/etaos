@@ -192,8 +192,8 @@ __init:
 	out	AVR_STACK_LOW_ADDR, r28
 #endif  /* __AVR_XMEGA__ */
 
-#ifdef AVR_HAVE_RAMPD
-	out	AVR_RAMPD_ADDR, __zero_reg__
+#ifdef AVR_HAVE_EIND
+	out	AVR_EIND_ADDR, __zero_reg__
 #endif
 #ifdef AVR_HAVE_RAMPX
 	out	AVR_RAMPX_ADDR, __zero_reg__
@@ -204,8 +204,8 @@ __init:
 #ifdef AVR_HAVE_RAMPZ
 	out	AVR_RAMPZ_ADDR, __zero_reg__
 #endif
-#ifdef AVR_HAVE_EIND
-	out AVR_EIND_ADDR, __zero_reg__
+#ifdef AVR_HAVE_RAMPD
+	out AVR_RAMPD_ADDR, __zero_reg__
 #endif
 
 .section .init9,"ax",@progbits

@@ -14,7 +14,7 @@
  * in the program memory. At this address a so called vector table is defined.
  * The vector table is a table of jmp instructions for interrupts. However,
  * the first "interrupt" is the boot jump. This jump brings the IP to the
- * __init label. The __init function initialises the stack and RAMPD registers.
+ * __init label. The __init function initialises the stack and EIND registers.
  * The rest of the content of this function is variable, depending on whether
  * the application contains a data and/or bss segment. If it does, the compiler
  * imported some code from libgcc to set the entire content of the bss section
