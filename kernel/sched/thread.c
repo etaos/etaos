@@ -72,6 +72,9 @@ static void raw_thread_init(struct thread *tp, const char *name,
 #ifdef CONFIG_SYS_LOTTERY
 	list_head_init(&tp->se.tickets);
 #endif
+#ifdef CONFIG_EXTENDED_THREAD
+	thread_queue_init(&tp->joinq);
+#endif
 
 	irq_store_flags(&tp->irq_state);
 	sched_create_stack_frame(tp, stack, stack_size, handle);

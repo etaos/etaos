@@ -169,6 +169,9 @@ struct thread {
 #if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
 	struct rr_entity se; //!< Scheduling entity.
 #endif
+#ifdef CONFIG_EXTENDED_THREAD
+	struct thread_queue joinq;
+#endif
 	char name[16]; //!< Name of the thread.
 };
 
