@@ -41,6 +41,12 @@ config IPM
 	  'y' here. IPM can be used to communicate between different
 	  threads which might also be running on another CPU.
 
+config EXTENDED_THREAD
+	bool "Extended thread API"
+	depends on EVENT_MUTEX
+	help
+	  Say 'y' here to build the extended thread API.
+
 config SCHED_DBG
 	bool "Scheduling DBG"
 	help
