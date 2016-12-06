@@ -47,7 +47,7 @@ int gpio_chip_init(struct gpio_chip *chip, uint16_t pins)
 {
 	int err;
 
-	chip->pins = kmalloc(sizeof(*chip->pins) * pins);
+	chip->pins = kzalloc(sizeof(*chip->pins) * pins);
 	chip->num = pins;
 	if(!chip->pins)
 		return -ENOMEM;
@@ -86,10 +86,24 @@ void gpio_pin_init(struct gpio_chip *chip,
  */
 struct gpio_pin *gpio_chip_to_pin(struct gpio_chip *chip, uint16_t nr)
 {
+	struct gpio_pin *pin;
+
 	if(!chip)
 		return NULL;
 
-	return chip->pins[nr];
+	if(nr >= chip->num)
+		return NULL;
+
+	pin = chip->pins[nr];
+#ifdef CONFIG_GPIO_LOW_FOOTPRINT
+	if(pin)
+		return pin;
+
+	pin = kzalloc(sizeof(*pin));
+	gpio_pin_init(chip, pin, nr, 0UL);
+	chip->pins[nr] = pin;
+#endif
+	return pin;
 }
 
 /**

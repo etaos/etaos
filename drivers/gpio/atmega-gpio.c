@@ -281,15 +281,20 @@ static struct gpio_chip atmega_gpio_chip = {
 void atmega_init_gpio(void)
 {
 	int err;
+#ifndef CONFIG_GPIO_LOW_FOOTPRINT
 	struct gpio_pin *pin;
+#endif
 
 	err = gpio_chip_init(&atmega_gpio_chip, GPIO_PINS);
+
 	if(!err) {
+#ifndef CONFIG_GPIO_LOW_FOOTPRINT
 		for(err = 0; err < GPIO_PINS; err++) {
 			pin = kzalloc(sizeof(*pin));
 			gpio_pin_init(&atmega_gpio_chip, pin, err, 0);
 			atmega_gpio_chip.pins[err] = pin;
 		}
+#endif
 	} else {
 		return;
 	}

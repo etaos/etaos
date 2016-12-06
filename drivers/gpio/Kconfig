@@ -12,5 +12,11 @@ config ATMEGA_GPIO
 	  Say 'y' or 'm' here to build support for the AVR ATmega GPIO
 	  chip.
 
+config GPIO_LOW_FOOTPRINT
+	bool "Low memory footprint"
+	help
+	  Say 'y' here to reduce the memory usage of the GPIO drivers to
+	  an absolute minimum.
+
 endif
 
