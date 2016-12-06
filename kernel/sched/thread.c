@@ -281,6 +281,9 @@ void kill(void)
 	set_bit(THREAD_EXIT_FLAG, &tp->flags);
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+#ifdef CONFIG_EXTENDED_THREAD
+	raw_event_notify_broadcast(&tp->joinq);
+#endif
 	thread_add_to_kill_q(tp);
 	
 	if(class->kill)

@@ -233,6 +233,10 @@ extern void wait(void);
 extern void signal(struct thread *tp);
 extern unsigned char nice(unsigned char prio);
 
+#ifdef CONFIG_EXTENDED_THREAD
+extern int join(struct thread *tp);
+#endif
+
 #ifdef CONFIG_THREAD_QUEUE
 extern void thread_queue_init(struct thread_queue *qp);
 #endif
