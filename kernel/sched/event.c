@@ -224,24 +224,27 @@ int raw_event_notify_broadcast(struct thread_queue *qp)
 	struct thread *tp;
 	unsigned long flags;
 
-	raw_spin_lock_irqsave(&qp->lock, flags);
+	preempt_disable();
+	raw_spin_lock_irq(&qp->lock, &flags);
 	tp = qp->qhead;
 	rv = -EOK;
 
 	if(tp == SIGNALED) {
 		qp->qhead = NULL;
-		raw_spin_unlock_irqrestore(&qp->lock, flags);
+		raw_spin_unlock_irq(&qp->lock, &flags);
+		preempt_enable_no_resched();
 		return rv;
 	} else if(tp) {
 		do {
-			raw_spin_unlock_irqrestore(&qp->lock, flags);
+			raw_spin_unlock_irq(&qp->lock, &flags);
 			event_notify(qp);
-			raw_spin_lock_irqsave(&qp->lock, flags);
+			raw_spin_lock_irq(&qp->lock, &flags);
 			tp = qp->qhead;
 		} while(tp && tp != SIGNALED);
 	}
 
-	raw_spin_unlock_irqrestore(&qp->lock, flags);
+	raw_spin_unlock_irq(&qp->lock, &flags);
+	preempt_enable_no_resched();
 
 	return rv;
 }
