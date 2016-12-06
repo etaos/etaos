@@ -16,53 +16,46 @@
 
 #include <asm/pgm.h>
 
-static DEFINE_THREAD_QUEUE(test_queue);
+#include <uapi/etaos/test.h>
 
-THREAD(test_th_handle, arg)
+THREAD(test_th_handle1, arg)
 {
-	while(true) {
-		printf("Hai 1\n");
-		event_wait(&test_queue, EVENT_WAIT_INFINITE);
-		sleep(100);
-	}
+	sleep(1000);
+	printf("Thread 1\n");
+	kill();
 }
 
 THREAD(test_th_handle2, arg)
 {
-	while(true) {
-		printf("Hai 2\n");
-		event_wait(&test_queue, EVENT_WAIT_INFINITE);
-		sleep(100);
-	}
+	sleep(1000);
+	printf("Thread 2\n");
+	kill();
 }
 
 
-static volatile unsigned long preempt_counter;
-THREAD(preempt_thread, arg)
+THREAD(test_th_handle3, arg)
 {
-	while(true) {
-		printf("Hai 3\n");
-		event_wait(&test_queue, EVENT_WAIT_INFINITE);
-		sleep(100);
-	}
+	sleep(5000);
+	printf("Thread 3\n");
+	kill();
 }
 
 
 int main(void)
 {
-	printf_P(PSTR("Application started (m: %u)\n"), mm_heap_available());
+	struct thread *tp1, *tp2, *tp3;
 
-	thread_create("test-1", &test_th_handle, NULL, NULL);
-	thread_create("test-2", &test_th_handle2, NULL, NULL);
-	thread_create("preempt", &preempt_thread, NULL, NULL);
+	printf_P(PSTR("Application started\n"), mm_heap_available());
 
-	sleep(10);
+	tp1 = thread_create("test-1", &test_th_handle1, NULL, NULL);
+	tp2 = thread_create("test-2", &test_th_handle2, NULL, NULL);
+	tp3 = thread_create("test-3", &test_th_handle3, NULL, NULL);
 
-	while(true) {
-		printf("Hai main\n");
-		event_notify_broadcast(&test_queue);
-		sleep(1000);
-	}
+	printf("Main thread\n");
+	join(tp1);
+	join(tp2);
+	join(tp3);
 
+	printf(CALYPSO_EXIT);
 	return 0;
 }
