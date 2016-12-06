@@ -157,6 +157,61 @@ int vfs_add_file(const char *path, struct file *file)
 	return -EOK;
 }
 
+struct dirent *opendir(const char *dirname)
+{
+	struct dirent *dir;
+	unsigned long flags;
+
+	spin_lock_irqsave(&vfs_lock, flags);
+	dir = dirent_find(&vfs_root, dirname);
+	spin_unlock_irqrestore(&vfs_lock, flags);
+
+	return dir;
+}
+
+struct dirent *readdir_r(struct dirent *dir, struct dirent *entry,
+		struct dirent **result)
+{
+	struct dirent *rv, *tmp;
+	struct list_head *carriage;
+	unsigned long flags;
+	bool found = false;
+
+	tmp = NULL;
+	rv = NULL;
+
+	spin_lock_irqsave(&vfs_lock, flags);
+	list_for_each(carriage, &dir->children) {
+		tmp = list_entry(carriage, struct dirent, entry);
+
+		if(found || entry == NULL) {
+			rv = tmp;
+			break;
+		}
+
+		if(tmp == entry)
+			found = true;
+	}
+	spin_unlock_irqrestore(&vfs_lock, flags);
+
+	*result = rv;
+	return rv;
+}
+
+struct dirent *readdir(struct dirent *dirp)
+{
+	static struct dirent *entry = NULL;
+	static struct dirent *result = NULL;
+
+	entry = readdir_r(dirp, entry, &result);
+	return result;
+}
+
+int closedir(struct dirent *dirp)
+{
+	return -EOK;
+}
+
 /**
  * @brief Get the file system driver of a path.
  * @param path Path to get the file system driver for.

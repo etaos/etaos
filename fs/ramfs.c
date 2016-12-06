@@ -294,7 +294,7 @@ static int ramfs_ioctl(struct file *file, unsigned long reg, void *arg)
 
 	switch(reg) {
 	case FS_FILE_UNLINK:
-		kfree(file->base.buff);
+		kfree((void*)file->buff);
 		kfree(file);
 		rv = -EOK;
 		break;
