@@ -89,7 +89,7 @@ struct gpio_pin *gpio_chip_to_pin(struct gpio_chip *chip, uint16_t nr)
 	if(!chip)
 		return NULL;
 
-	return &chip->pins[nr];
+	return chip->pins[nr];
 }
 
 /**

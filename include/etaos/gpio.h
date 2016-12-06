@@ -52,7 +52,7 @@ struct gpio_pin {
  * pins.
  */
 struct gpio_chip {
-	struct gpio_pin *pins; //!< Pin descriptor array.
+	struct gpio_pin **pins; //!< Pin descriptor array.
 	uint16_t num; //!< Lengths of \p pins.
 
 	spinlock_t lock; //!< Concurrency lock.
