@@ -27,6 +27,7 @@
 #include <etaos/error.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/event.h>
 #include <etaos/irq.h>
 #include <etaos/spinlock.h>
 #include <etaos/mem.h>
@@ -287,6 +288,16 @@ void kill(void)
 
 	schedule();
 }
+
+#ifdef CONFIG_EXTENDED_THREAD
+int join(struct thread *tp)
+{
+	if(test_bit(THREAD_EXIT_FLAG, &tp->flags))
+		return -EOK;
+
+	return event_wait(&tp->joinq, EVENT_WAIT_INFINITE);
+}
+#endif
 
 /**
  * @brief Put the current thread in a waiting state.

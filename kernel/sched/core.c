@@ -38,6 +38,7 @@
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/event.h>
 #include <etaos/power.h>
 #include <etaos/cpu.h>
 #include <etaos/preempt.h>
@@ -730,6 +731,9 @@ static void rq_destroy_kill_q(struct rq *rq)
 
 	for(tmp = walker->rq_next; walker; 
 			walker = tmp, tmp = walker->rq_next) {
+#ifdef CONFIG_EXTENDED_THREAD
+		raw_event_notify_broadcast(&walker->joinq);
+#endif
 		raw_rq_remove_kill_thread(rq, walker);
 
 		if(test_bit(THREAD_SYSTEM_STACK, &walker->flags))
