@@ -98,6 +98,7 @@ void sched_init_idle(struct thread *tp, const char *name,
 {
 	raw_thread_init(tp, name, handle, arg, stack_size, stack, 255);
 	set_bit(THREAD_IDLE_FLAG, &tp->flags);
+	set_bit(THREAD_SYSTEM_STACK, &tp->flags);
 }
 
 /**
@@ -136,6 +137,8 @@ int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 	size_t stack_size;
 	void *stack;
 	unsigned char prio;
+	bool alloc = false;
+	int rv;
 
 	prio = 0;
 	stack_size = 0;
@@ -153,10 +156,17 @@ int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 	if(!stack_size)
 		stack_size = CONFIG_STACK_SIZE;
 
-	if(!stack)
+	if(!stack) {
 		stack = kzalloc(stack_size);
+		alloc = true;
+	}
 
-	return thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+	rv = thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+
+	if(alloc)
+		set_bit(THREAD_SYSTEM_STACK, &tp->flags);
+
+	return rv;
 }
 
 /**
@@ -176,6 +186,7 @@ struct thread *thread_alloc(const char *name, thread_handle_t handle,
 	size_t stack_size;
 	void *stack;
 	unsigned char prio;
+	bool alloc;
 
 	prio = 0;
 	stack_size = 0;
@@ -191,10 +202,16 @@ struct thread *thread_alloc(const char *name, thread_handle_t handle,
 	if(!stack_size)
 		stack_size = CONFIG_STACK_SIZE;
 
-	if(!stack)
+	if(!stack) {
 		stack = kzalloc(stack_size);
+		alloc = true;
+	}
 
 	raw_thread_init(tp, name, handle, arg, stack_size, stack, prio);
+
+	if(alloc)
+		set_bit(THREAD_SYSTEM_STACK, &tp->flags);
+
 	return tp;
 }
 
