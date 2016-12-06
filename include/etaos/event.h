@@ -36,6 +36,8 @@ extern int event_wait(struct thread_queue *qp, unsigned ms);
 extern int raw_event_wait(struct thread_queue *qp, unsigned ms);
 extern void event_notify(struct thread_queue *qp);
 extern void event_notify_irq(struct thread_queue *qp);
+extern int event_notify_broadcast(struct thread_queue *qp);
+extern int raw_event_notify_broadcast(struct thread_queue *qp);
 
 #define evm_signal_event_queue(__qp) event_notify(__qp)
 #define evm_signal_from_irq(__qp) event_notify_irq(__qp)
