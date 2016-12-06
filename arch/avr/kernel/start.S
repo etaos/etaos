@@ -204,6 +204,9 @@ __init:
 #ifdef AVR_HAVE_RAMPZ
 	out	AVR_RAMPZ_ADDR, __zero_reg__
 #endif
+#ifdef AVR_HAVE_EIND
+	out AVR_EIND_ADDR, __zero_reg__
+#endif
 
 .section .init9,"ax",@progbits
 	XCALL avr_init
