@@ -46,6 +46,19 @@ struct dirent vfs_root = {
 	.fs = NULL,
 };
 
+int vfs_ioctl(struct dirent *dir, struct file *file, unsigned long reg, void *arg)
+{
+	struct fs_driver *fs;
+
+	if((fs = dir->fs) == NULL)
+		return -EINVAL;
+
+	if(fs->ioctl == NULL)
+		return -EINVAL;
+
+	return fs->ioctl(file, reg, arg);
+}
+
 /**
  * @brief Mount a file system to a path.
  * @param fs File system to mount.
@@ -235,7 +248,8 @@ int unlink(const char *path)
 
 	if(dirent_remove_file(dir, file) != file)
 		err = -EINVAL;
-
+	else
+		vfs_ioctl(dir, file, FS_FILE_UNLINK, NULL);
 err_l:
 	spin_unlock_irqrestore(&vfs_lock, flags);
 	kfree(filepath);
