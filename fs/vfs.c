@@ -45,6 +45,19 @@ struct dirent vfs_root = {
 	.fs = NULL,
 };
 
+int vfs_ioctl(struct dirent *dir, struct file *file, unsigned long reg, void *arg)
+{
+	struct fs_driver *fs;
+
+	if((fs = dir->fs) == NULL)
+		return -EINVAL;
+
+	if(fs->ioctl == NULL)
+		return -EINVAL;
+
+	return fs->ioctl(file, reg, arg);
+}
+
 /**
  * @brief Add a new file to the VFS.
  * @param path Path to add \p file to.

@@ -45,6 +45,12 @@ extern struct dirent *dirent_add_child(struct dirent *parent,
 extern struct file *dirent_add_file(struct dirent *dir, struct file *file);
 extern struct file *dirent_remove_file(struct dirent *dir, struct file *file);
 extern struct file *dirent_find_file(struct dirent *dir, const char *filename);
+
+extern struct dirent *opendir(const char *dirname);
+extern int closedir(struct dirent *dir);
+extern struct dirent *readdir(struct dirent *dirp);
+extern struct dirent *readdir_r(struct dirent *dir, struct dirent *entry,
+		struct dirent **result);
 CDECL_END
 
 #endif

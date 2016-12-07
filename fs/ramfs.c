@@ -289,6 +289,23 @@ static struct file *ramfs_create(const char *path, int mode)
 	return &file->base;
 }
 
+static int ramfs_ioctl(struct file *file, unsigned long reg, void *arg)
+{
+	int rv = -EINVAL;
+
+	switch(reg) {
+	case FS_FILE_UNLINK:
+		kfree((void*)file->buff);
+		kfree(file);
+		rv = -EOK;
+		break;
+	default:
+		break;
+	}
+
+	return rv;
+}
+
 /**
  * @brief RAMFS driver.
  */
@@ -299,6 +316,7 @@ struct fs_driver ramfs = {
 	.read = ramfs_read,
 	.get = ramfs_getc,
 	.put = ramfs_putc,
+	.ioctl = ramfs_ioctl,
 };
 
 void __used ramfs_init(void)

@@ -53,13 +53,30 @@ static struct dev_file_ops dummy_fops = {
 	.close = &dummy_close,
 };
 
+static void dir_test(void)
+{
+	struct dirent *dir, *entry;
+
+	mkdir("/tmp");
+	mkdir("/tmp/dir1");
+	mkdir("/tmp/dir2");
+	mkdir("/tmp/dir3");
+	mkdir("/tmp/dir4");
+
+	dir = opendir("/tmp");
+	while((entry = readdir(dir)) != NULL) {
+		printf("Entry name: %s\n", entry->name);
+	}
+}
+
 int main(void)
 {
 	int fd;
 
 	printf_P(PSTR("Application started!\n"));
-	device_initialize(&dummy_dev, &dummy_fops);
+	dir_test();
 
+	device_initialize(&dummy_dev, &dummy_fops);
 	fd = vfs_open("/dev/dummy", _FDEV_SETUP_RW);
 
 	if(fd < 0) {

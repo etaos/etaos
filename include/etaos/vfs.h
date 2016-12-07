@@ -45,12 +45,13 @@ typedef enum {
 	FS_FILE_OPEN, //!< File opened.
 	FS_FILE_READ, //!< File read occurred.
 	FS_FILE_WRITE, //!< File write occurred.
-
 	FS_FILE_CLOSE, //!< File closed.
+	FS_FILE_UNLINK, //!< Remove a file.
 
 	FS_DIR_CREATE, //!< Directory created.
 	FS_DIR_OPEN,   //!< Directory opened.
 	FS_DIR_READ,   //!< Directory read occurred.
+
 } fs_ctrl_t;
 
 /**
@@ -88,6 +89,8 @@ extern int vfs_close(int fd);
 
 extern int vfs_read(struct file *file, void *buff, size_t size);
 extern int vfs_write(struct file *file, const void *buff, size_t size);
+extern int vfs_ioctl(struct dirent *dir, struct file *file,
+		unsigned long reg, void *arg);
 
 extern ssize_t vfs_setoffset(struct file *file, ssize_t offset, ssize_t max);
 extern size_t vfs_setindex(struct file *file, size_t index, size_t max);

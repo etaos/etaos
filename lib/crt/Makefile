@@ -19,6 +19,7 @@ libc-files-$(CONFIG_CRT) += memset.o strcat.o strdup.o
 libc-files-$(CONFIG_CRT) += strcpy.o strncpy.o strtok.o
 
 libc-files-$(CONFIG_CRT) += unlink.o mount.o mkdir.o ftell.o lseek.o
+libc-files-$(CONFIG_CRT) += opendir.o readdir.o readdir_r.o closedir.o
 
 libc-files-$(CONFIG_HARVARD) += printf_p.o vfprintf_p.o
 libc-files-$(CONFIG_HARVARD) += fprintf_P.o
