@@ -23,6 +23,8 @@
 
 CDECL
 
+extern void *memcpy(void *dst, const void *src, size_t length);
+extern int   memcmp(const void *r1, const void *r2, size_t nbytes);
 extern char *strchr(const char *str, int c);
 extern size_t strlen(const char *str);
 extern int strnlen(const char *str, size_t size);
@@ -36,5 +38,24 @@ extern char *strtok(char *s, const char *delimeter);
 extern char *strdup(const char *s);
 
 CDECL_END
+
+#ifndef __HARVARD__
+/**
+ * @ingroup libc
+ * @def memcpy_P
+ * @brief Copy memory from a one location to another.
+ * @param x Destination address.
+ * @param y Source address.
+ * @param z Number of bytes to copy.
+ *
+ * Not all architectures support the 'P' version of memcpy (i.e. not all
+ * architectures can copy memory from program space to data space). If this
+ * operation is not supported, this function will redirect to the standard
+ * memcpy implementation.
+ */
+#define memcpy_P(x,y,z) memcpy(x,y,z)
+#define strlen_P(c) strlen(c)
+#define PSTR(s) (s)
+#endif
 
 #endif
