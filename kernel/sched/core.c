@@ -38,6 +38,7 @@
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/event.h>
 #include <etaos/power.h>
 #include <etaos/cpu.h>
 #include <etaos/preempt.h>
@@ -731,8 +732,9 @@ static void rq_destroy_kill_q(struct rq *rq)
 	for(tmp = walker->rq_next; walker; 
 			walker = tmp, tmp = walker->rq_next) {
 		raw_rq_remove_kill_thread(rq, walker);
-		sched_free_stack_frame(walker);
-		kfree(walker);
+
+		if(test_bit(THREAD_SYSTEM_STACK, &walker->flags))
+			sched_free_stack_frame(walker);
 	}
 	raw_spin_unlock_irq(&rq->lock, &flags);
 }

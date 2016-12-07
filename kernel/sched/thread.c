@@ -27,6 +27,7 @@
 #include <etaos/error.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
+#include <etaos/event.h>
 #include <etaos/irq.h>
 #include <etaos/spinlock.h>
 #include <etaos/mem.h>
@@ -72,6 +73,9 @@ static void raw_thread_init(struct thread *tp, const char *name,
 #ifdef CONFIG_SYS_LOTTERY
 	list_head_init(&tp->se.tickets);
 #endif
+#ifdef CONFIG_EXTENDED_THREAD
+	thread_queue_init(&tp->joinq);
+#endif
 
 	irq_store_flags(&tp->irq_state);
 	sched_create_stack_frame(tp, stack, stack_size, handle);
@@ -95,6 +99,7 @@ void sched_init_idle(struct thread *tp, const char *name,
 {
 	raw_thread_init(tp, name, handle, arg, stack_size, stack, 255);
 	set_bit(THREAD_IDLE_FLAG, &tp->flags);
+	set_bit(THREAD_SYSTEM_STACK, &tp->flags);
 }
 
 /**
@@ -133,6 +138,8 @@ int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 	size_t stack_size;
 	void *stack;
 	unsigned char prio;
+	bool alloc = false;
+	int rv;
 
 	prio = 0;
 	stack_size = 0;
@@ -150,10 +157,17 @@ int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 	if(!stack_size)
 		stack_size = CONFIG_STACK_SIZE;
 
-	if(!stack)
+	if(!stack) {
 		stack = kzalloc(stack_size);
+		alloc = true;
+	}
 
-	return thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+	rv = thread_initialise(tp, name, handle, arg, stack_size, stack, prio);
+
+	if(alloc)
+		set_bit(THREAD_SYSTEM_STACK, &tp->flags);
+
+	return rv;
 }
 
 /**
@@ -173,6 +187,7 @@ struct thread *thread_alloc(const char *name, thread_handle_t handle,
 	size_t stack_size;
 	void *stack;
 	unsigned char prio;
+	bool alloc;
 
 	prio = 0;
 	stack_size = 0;
@@ -188,10 +203,16 @@ struct thread *thread_alloc(const char *name, thread_handle_t handle,
 	if(!stack_size)
 		stack_size = CONFIG_STACK_SIZE;
 
-	if(!stack)
+	if(!stack) {
 		stack = kzalloc(stack_size);
+		alloc = true;
+	}
 
 	raw_thread_init(tp, name, handle, arg, stack_size, stack, prio);
+
+	if(alloc)
+		set_bit(THREAD_SYSTEM_STACK, &tp->flags);
+
 	return tp;
 }
 
@@ -260,6 +281,9 @@ void kill(void)
 	set_bit(THREAD_EXIT_FLAG, &tp->flags);
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+#ifdef CONFIG_EXTENDED_THREAD
+	raw_event_notify_broadcast(&tp->joinq);
+#endif
 	thread_add_to_kill_q(tp);
 	
 	if(class->kill)
@@ -267,6 +291,23 @@ void kill(void)
 
 	schedule();
 }
+
+/**
+ * @brief Wait for a thread to finish execution.
+ * @param tp Thread to wait for.
+ * @return An error code.
+ *
+ * Wait on a waiting queue until the thread \p tp terminates.
+ */
+#ifdef CONFIG_EXTENDED_THREAD
+int join(struct thread *tp)
+{
+	if(test_bit(THREAD_EXIT_FLAG, &tp->flags))
+		return -EOK;
+
+	return event_wait(&tp->joinq, EVENT_WAIT_INFINITE);
+}
+#endif
 
 /**
  * @brief Put the current thread in a waiting state.

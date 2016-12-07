@@ -62,11 +62,11 @@
 
 #define AVR_INTERRUPT_FLAG 7
 
-#define AVR_HAVE_RAMPD 1
-#define AVR_RAMPD_ADDR 0x3C
-
 #define AVR_HAVE_RAMPZ 1
 #define AVR_RAMPZ_ADDR 0x3B
+
+#define AVR_HAVE_EIND  1
+#define AVR_EIND_ADDR 0x3C
 
 #define XJMP jmp
 #define XCALL call

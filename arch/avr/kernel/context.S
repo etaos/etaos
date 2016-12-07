@@ -32,8 +32,24 @@
 avr_switch_context:
 	push r0
 
-#ifdef AVR_RAMPD_ADDR
+#ifdef AVR_HAVE_EIND
+	in r0, AVR_EIND_ADDR
+	push r0
+#endif
+#ifdef AVR_HAVE_RAMPD
 	in r0, AVR_RAMPD_ADDR
+	push r0
+#endif
+#ifdef AVR_HAVE_RAMPZ
+	in r0, AVR_RAMPZ_ADDR
+	push r0
+#endif
+#ifdef AVR_HAVE_RAMPY
+	in r0, AVR_RAMPY_ADDR
+	push r0
+#endif
+#ifdef AVR_HAVE_RAMPX
+	in r0, AVR_RAMPX_ADDR
 	push r0
 #endif
 
@@ -121,10 +137,26 @@ avr_switch_context:
 
 	pop r0
 	out AVR_STATUS_ADDR, r0
-
-#ifdef AVR_RAMPD_ADDR
+#ifdef AVR_HAVE_RAMPX
+	pop r0
+	out AVR_RAMPX_ADDR, r0
+#endif
+#ifdef AVR_HAVE_RAMPY
+	pop r0
+	out AVR_RAMPY_ADDR, r0
+#endif
+#ifdef AVR_HAVE_RAMPZ
+	pop r0
+	out AVR_RAMPZ_ADDR, r0
+#endif
+#ifdef AVR_HAVE_RAMPD
 	pop r0
 	out AVR_RAMPD_ADDR, r0
+#endif
+
+#ifdef AVR_HAVE_EIND
+	pop r0
+	out AVR_EIND_ADDR, r0
 #endif
 
 	pop r0

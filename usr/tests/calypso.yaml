@@ -32,6 +32,19 @@ unit-tests:
     libdir: usr/lib
     compare: expected_output.cyo
 
+  event-test:
+    hardware: ard-mega
+    autorun: true
+    mode: auto
+    name: "Event queue test"
+    path: usr/tests/event
+    execute: clean all hex upload
+    config: config-atmega2560.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
   eeprom-test:
     hardware: ard-mega
     autorun: true

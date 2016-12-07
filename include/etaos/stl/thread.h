@@ -47,13 +47,11 @@ public:
 	void kill();
 	void join();
 	void *get_arg();
-	void notify_join_queue();
 
 private:
 	bool running;
 	void *arg;
 	struct thread *base;
-	struct thread_queue joinq;
 };
 
 #endif

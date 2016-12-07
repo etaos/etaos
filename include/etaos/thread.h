@@ -169,6 +169,9 @@ struct thread {
 #if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
 	struct rr_entity se; //!< Scheduling entity.
 #endif
+#ifdef CONFIG_EXTENDED_THREAD
+	struct thread_queue joinq; //!< Waiting queue for \p join.
+#endif
 	char name[16]; //!< Name of the thread.
 };
 
@@ -192,6 +195,7 @@ typedef struct thread_attr {
 #define THREAD_NEED_RESCHED_FLAG 4 //!< Thread need a resched.
 #define PREEMPT_NEED_RESCHED_FLAG 5 //!< Thread has used its full time slice.
 #define THREAD_IDLE_FLAG	 6 //!< Thread is the idle thread.
+#define THREAD_SYSTEM_STACK      7 //!< Stack is allocated by the system.
 /** @} */
 
 /**
@@ -228,6 +232,10 @@ extern void kill(void);
 extern void wait(void);
 extern void signal(struct thread *tp);
 extern unsigned char nice(unsigned char prio);
+
+#ifdef CONFIG_EXTENDED_THREAD
+extern int join(struct thread *tp);
+#endif
 
 #ifdef CONFIG_THREAD_QUEUE
 extern void thread_queue_init(struct thread_queue *qp);

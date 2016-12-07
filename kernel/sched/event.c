@@ -218,5 +218,46 @@ void event_notify_irq(struct thread_queue *qp)
 		tp->ec++;
 }
 
+int raw_event_notify_broadcast(struct thread_queue *qp)
+{
+	int rv;
+	struct thread *tp;
+	unsigned long flags;
+
+	preempt_disable();
+	raw_spin_lock_irq(&qp->lock, &flags);
+	tp = qp->qhead;
+	rv = -EOK;
+
+	if(tp == SIGNALED) {
+		qp->qhead = NULL;
+		raw_spin_unlock_irq(&qp->lock, &flags);
+		preempt_enable_no_resched();
+		return rv;
+	} else if(tp) {
+		do {
+			raw_spin_unlock_irq(&qp->lock, &flags);
+			event_notify(qp);
+			raw_spin_lock_irq(&qp->lock, &flags);
+			tp = qp->qhead;
+		} while(tp && tp != SIGNALED);
+	}
+
+	raw_spin_unlock_irq(&qp->lock, &flags);
+	preempt_enable_no_resched();
+
+	return rv;
+}
+
+int event_notify_broadcast(struct thread_queue *qp)
+{
+	int rv;
+
+	rv = raw_event_notify_broadcast(qp);
+	yield();
+
+	return rv;
+}
+
 /* @} */
 
