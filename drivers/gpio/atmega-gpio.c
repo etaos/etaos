@@ -25,6 +25,7 @@
 #include <etaos/types.h>
 #include <etaos/gpio.h>
 #include <etaos/init.h>
+#include <etaos/mem.h>
 
 #include <asm/io.h>
 #include <asm/pgm.h>
@@ -179,7 +180,7 @@ static int atmega_set_pin(struct gpio_chip *chip, int val, uint16_t nr)
 	struct gpio_pin *pin;
 
 	irq_enter_critical();
-	pin = &chip->pins[nr];
+	pin = chip->pins[nr];
 	idx = atmega_pin_to_port(pin);
 	bit = atmega_pin_index(pin);
 
@@ -200,7 +201,7 @@ static int atmega_get_pin(struct gpio_chip *chip, uint16_t nr)
 	int retval;
 
 	irq_enter_critical();
-	pin = &chip->pins[nr];
+	pin = chip->pins[nr];
 	idx = atmega_pin_to_pin_addr(pin);
 	bit = atmega_pin_index(pin);
 
@@ -218,7 +219,7 @@ static int atmega_dir_out(struct gpio_chip *chip, int val, uint16_t nr)
 	struct gpio_pin *pin;
 
 	irq_enter_critical();
-	pin = &chip->pins[nr];
+	pin = chip->pins[nr];
 	idx = atmega_pin_to_ddr(pin);
 	bit = atmega_pin_index(pin);
 
@@ -235,7 +236,7 @@ static int atmega_dir_in(struct gpio_chip *chip, uint16_t nr)
 	struct gpio_pin *pin;
 
 	irq_enter_critical();
-	pin = &chip->pins[nr];
+	pin = chip->pins[nr];
 	idx = atmega_pin_to_ddr(pin);
 	bit = atmega_pin_index(pin);
 
@@ -253,7 +254,7 @@ static int atmega_get_dir(struct gpio_chip *chip, uint16_t nr)
 	int dir;
 
 	irq_enter_critical();
-	pin = &chip->pins[nr];
+	pin = chip->pins[nr];
 	idx = atmega_pin_to_ddr(pin);
 	bit = atmega_pin_index(pin);
 
@@ -280,14 +281,20 @@ static struct gpio_chip atmega_gpio_chip = {
 void atmega_init_gpio(void)
 {
 	int err;
+#ifndef CONFIG_GPIO_LOW_FOOTPRINT
 	struct gpio_pin *pin;
+#endif
 
 	err = gpio_chip_init(&atmega_gpio_chip, GPIO_PINS);
+
 	if(!err) {
+#ifndef CONFIG_GPIO_LOW_FOOTPRINT
 		for(err = 0; err < GPIO_PINS; err++) {
-			pin = gpio_chip_to_pin(&atmega_gpio_chip, err);
+			pin = kzalloc(sizeof(*pin));
 			gpio_pin_init(&atmega_gpio_chip, pin, err, 0);
+			atmega_gpio_chip.pins[err] = pin;
 		}
+#endif
 	} else {
 		return;
 	}
