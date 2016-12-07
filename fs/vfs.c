@@ -157,6 +157,11 @@ int vfs_add_file(const char *path, struct file *file)
 	return -EOK;
 }
 
+/**
+ * @brief Open a directory stream.
+ * @param dirname Directory to open.
+ * @return A directory stream or NULL.
+ */
 struct dirent *opendir(const char *dirname)
 {
 	struct dirent *dir;
@@ -169,6 +174,13 @@ struct dirent *opendir(const char *dirname)
 	return dir;
 }
 
+/**
+ * @brief Read from a directory stream.
+ * @param dir Directory stream.
+ * @param entry Previous entry
+ * @param result Pointer to store the result (next entry).
+ * @return The next directory entry or NULL.
+ */
 struct dirent *readdir_r(struct dirent *dir, struct dirent *entry,
 		struct dirent **result)
 {
@@ -198,6 +210,13 @@ struct dirent *readdir_r(struct dirent *dir, struct dirent *entry,
 	return rv;
 }
 
+/**
+ * @brief Read from a directory stream.
+ * @param dirp Directory stream.
+ * @return The next directory entry.
+ * @note This function is not thread safe.
+ * @see readdir_r
+ */
 struct dirent *readdir(struct dirent *dirp)
 {
 	static struct dirent *entry = NULL;
@@ -207,6 +226,11 @@ struct dirent *readdir(struct dirent *dirp)
 	return result;
 }
 
+/**
+ * @brief Close a directory stream.
+ * @param dirp Directory stream to close.
+ * @return An error code.
+ */
 int closedir(struct dirent *dirp)
 {
 	return -EOK;
