@@ -19,6 +19,7 @@
 #ifndef __STDLIB_H__
 #define __STDLIB_H__
 
+#include <etaos/mem.h>
 #include <etaos/types.h>
 #include <asm/io.h>
 
@@ -38,6 +39,17 @@ extern char *itoa(int num, char *str, int base);
 
 extern void *memcpy(void *dst, const void *src, size_t length);
 extern int   memcmp(const void *r1, const void *r2, size_t nbytes);
+
+#define malloc(__num) kmalloc(__num)
+#define zalloc(__num) kzalloc(__num)
+#define realloc(__old, __new) krealloc(__old, __new)
+#define calloc(__s1, __s2) kcalloc(__s1, __s2)
+
+#ifdef CONFIG_MM_DEBUG
+#define free(__p) mm_free(__p, __FILE__, __LINE__)
+#else
+#define free(__num)   kfree(__num)
+#endif
 
 #ifndef __HARVARD__
 /**
