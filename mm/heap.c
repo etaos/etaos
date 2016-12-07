@@ -27,6 +27,7 @@
 #include <etaos/mem.h>
 #include <etaos/spinlock.h>
 #include <etaos/stdio.h>
+#include <etaos/panic.h>
 
 #include <asm/pgm.h>
 
@@ -130,7 +131,13 @@ static void *raw_mm_heap_alloc(struct heap_node **root, size_t size)
 		}
 
 		fit = mm_prep_user_area(fit);
+#ifdef CONFIG_MM_DESTRUCTIVE_ALLOC
+	} else {
+		panic("NO MEMORY!\n");
 	}
+#else
+	}
+#endif
 
 	return fit;
 }

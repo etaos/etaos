@@ -14,4 +14,12 @@ config MM_DEBUG
 	  Say 'Y' here if you want to enable the memory
 	  allocation debugging code.
 
+config MM_DESTRUCTIVE_ALLOC
+	bool "Destructive memory allocation"
+	depends on MALLOC
+	help
+	  Say 'y' here to turn the memory allocator into a
+	  destructive allocator. This means that whenever an
+	  allocation fails, a kernel panic is thrown up.
+
 endmenu
