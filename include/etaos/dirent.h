@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - VFS driver.
+ *  ETA/OS - Dirent header
  *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify

@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - VFS driver.
- *  Copyright (C) 2012, 2014, 2015   Michel Megens
+ *  Copyright (C) 2012, 2014, 2015, 2016   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -88,11 +88,6 @@ extern int vfs_read(struct file *file, void *buff, size_t size);
 extern int vfs_write(struct file *file, const void *buff, size_t size);
 
 extern ssize_t vfs_setoffset(struct file *file, ssize_t offset, ssize_t max);
-extern size_t lseek(struct file *file, size_t offset, int whence);
-
-extern int mkdir(const char *path);
-extern int mount(struct fs_driver *fs, const char *path);
-extern int unlink(const char *path);
 
 CDECL_END
 

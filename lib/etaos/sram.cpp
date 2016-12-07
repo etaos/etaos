@@ -22,6 +22,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/unistd.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/stdio.h>

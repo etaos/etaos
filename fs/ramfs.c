@@ -24,6 +24,7 @@
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/vfs.h>
+#include <etaos/unistd.h>
 #include <etaos/ramfs.h>
 #include <etaos/init.h>
 #include <etaos/mem.h>

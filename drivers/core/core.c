@@ -17,6 +17,7 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/unistd.h>
 #include <etaos/types.h>
 #include <etaos/stdio.h>
 #include <etaos/string.h>

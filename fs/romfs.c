@@ -24,6 +24,7 @@
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
 #include <etaos/string.h>
+#include <etaos/unistd.h>
 #include <etaos/init.h>
 #include <etaos/types.h>
 #include <etaos/error.h>

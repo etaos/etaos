@@ -20,6 +20,7 @@
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/stdio.h>
+#include <etaos/unistd.h>
 #include <etaos/vfs.h>
 
 #include <etaos/stl/chardev.h>
