@@ -23,9 +23,11 @@
 #include <etaos/stdio.h>
 #include <etaos/vfs.h>
 
+CDECL
 extern size_t lseek(struct file *file, size_t offset, int whence);
 extern int mkdir(const char *path);
 extern int mount(struct fs_driver *fs, const char *path);
 extern int unlink(const char *path);
+CDECL_END
 
 #endif /* __UNISTD_H__ */

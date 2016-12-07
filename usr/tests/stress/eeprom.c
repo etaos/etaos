@@ -11,6 +11,7 @@
 #include <etaos/delay.h>
 #include <etaos/eeprom.h>
 #include <etaos/vfs.h>
+#include <etaos/unistd.h>
 
 int ee_stress_write_byte(uint8_t addr, uint8_t byte)
 {

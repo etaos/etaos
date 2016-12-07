@@ -9,6 +9,7 @@
 #include <etaos/mem.h>
 #include <etaos/vfs.h>
 #include <etaos/thread.h>
+#include <etaos/unistd.h>
 
 #include <asm/pgm.h>
 #include <uapi/etaos/test.h>

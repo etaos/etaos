@@ -19,7 +19,11 @@
 #ifndef __STRING_H__
 #define __STRING_H__
 
+#include <etaos/kernel.h>
 #include <etaos/types.h>
+
+#include <asm/io.h>
+#include <asm/pgm.h>
 
 CDECL
 

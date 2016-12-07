@@ -4,8 +4,8 @@
  */
 
 #include <etaos/kernel.h>
-#include <etaos/stdio.h>
 #include <etaos/string.h>
+#include <etaos/stdio.h>
 #include <etaos/mem.h>
 #include <etaos/sched.h>
 #include <etaos/thread.h>

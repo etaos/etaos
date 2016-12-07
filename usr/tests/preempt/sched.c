@@ -15,7 +15,6 @@
 
 #include <asm/pgm.h>
 
-static unsigned char test_thread_stack[CONFIG_STACK_SIZE];
 static struct thread *test_t;
 static volatile int counter;
 

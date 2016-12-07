@@ -5,6 +5,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
+#include <etaos/unistd.h>
 #include <etaos/stdlib.h>
 #include <etaos/string.h>
 #include <etaos/mem.h>

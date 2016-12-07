@@ -6,8 +6,8 @@
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/string.h>
-#include <etaos/mem.h>
-#include <etaos/vfs.h>
+#include <etaos/dirent.h>
+#include <etaos/unistd.h>
 #include <etaos/delay.h>
 #include <etaos/device.h>
 #include <etaos/error.h>

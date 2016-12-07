@@ -20,7 +20,6 @@
 #define LED_DDR  DDRB
 #define LED_PIN  7
 
-static uint8_t profile_thread_stack[CONFIG_STACK_SIZE];
 static struct thread *profile_thread;
 
 static inline void set_led(bool val)
@@ -45,12 +44,9 @@ THREAD(profile_thread_handle, arg)
 
 int main(void)
 {
-	struct thread *tp;
-
 	printf_P(PSTR("Application started! (%u)\n"), mm_heap_available());
 	LED_DDR |= BIT(LED_PIN);
 	set_led(false);
-	tp = current_thread();
 
 	profile_thread = thread_create("profiler", &profile_thread_handle, NULL,
 			NULL);

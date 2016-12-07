@@ -11,6 +11,7 @@
 #include <etaos/delay.h>
 #include <etaos/sram.h>
 #include <etaos/vfs.h>
+#include <etaos/unistd.h>
 
 int sram_stress_write_byte(uint16_t addr, uint8_t byte)
 {
