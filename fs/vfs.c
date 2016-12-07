@@ -34,9 +34,8 @@
 #include <etaos/fs/basename.h>
 
 struct file * __iob[MAX_OPEN];
-static struct file *vfshead;
 
-static spinlock_t vfs_lock;
+spinlock_t vfs_lock;
 struct dirent vfs_root = {
 	.name = "/",
 	.parent = NULL,
@@ -45,79 +44,6 @@ struct dirent vfs_root = {
 	.file_head = NULL,
 	.fs = NULL,
 };
-
-/**
- * @brief Mount a file system to a path.
- * @param fs File system to mount.
- * @param path Path to mount \p fs on.
- * @return An error code.
- * @retval -EOK on success.
- * @retval -EINVAL on failure.
- */
-int mount(struct fs_driver *fs, const char *path)
-{
-	struct dirent *dir;
-	unsigned long flags;
-
-	if(!fs || !path)
-		return -EINVAL;
-
-	spin_lock_irqsave(&vfs_lock, flags);
-	if((dir = dirent_find(&vfs_root, path)) == NULL) {
-		spin_unlock_irqrestore(&vfs_lock, flags);
-		return -EINVAL;
-	}
-
-	dir->fs = fs;
-	spin_unlock_irqrestore(&vfs_lock, flags);
-	return -EOK;
-}
-
-/**
- * @brief Create a new directory.
- * @param path Path to the directory to create.
- * @return An error code.
- * @note This function cannot create directories recursively.
- */
-int mkdir(const char *path)
-{
-	char *base;
-	char *dirname;
-	struct dirent *dir, *parent;
-	unsigned long flags;
-
-	spin_lock_irqsave(&vfs_lock, flags);
-	dirname = basename(path);
-	base = basepath(path);
-
-	if(!dirname || !base)
-		goto err;
-
-	parent = dirent_find(&vfs_root, base);
-	if(!parent)
-		goto err;
-
-	dir = dirent_create(dirname);
-	if(!dir)
-		goto err;
-
-	dirent_add_child(parent, dir);
-
-	kfree(dirname);
-	kfree(base);
-	spin_unlock_irqrestore(&vfs_lock, flags);
-
-	return -EOK;
-
-err:
-	if(dirname)
-		kfree(dirname);
-	if(base)
-		kfree(base);
-
-	spin_unlock_irqrestore(&vfs_lock, flags);
-	return -EINVAL;
-}
 
 /**
  * @brief Add a new file to the VFS.
@@ -199,52 +125,6 @@ struct file *vfs_find_file(const char *path)
 }
 
 /**
- * @brief Remove a file from the VFS.
- * @param path Path to the file to remove.
- * @return An error code.
- */
-int unlink(const char *path)
-{
-	unsigned long flags;
-	struct dirent *dir;
-	char *filepath, *filename;
-	struct file *file;
-	int err = -EOK;
-
-	filepath = basepath(path);
-	filename = basename(path);
-
-	if(!filepath || !filename) {
-		if(filename)
-			kfree(filename);
-		if(filepath)
-			kfree(filepath);
-
-		return -EINVAL;
-	}
-
-	spin_lock_irqsave(&vfs_lock, flags);
-	dir = dirent_find(&vfs_root, filepath);
-	/* dirent_find_file handles NULL dirs correctly */
-	file = dirent_find_file(dir, filename);
-
-	if(!file) {
-		err = -EINVAL;
-		goto err_l;
-	}
-
-	if(dirent_remove_file(dir, file) != file)
-		err = -EINVAL;
-
-err_l:
-	spin_unlock_irqrestore(&vfs_lock, flags);
-	kfree(filepath);
-	kfree(filename);
-
-	return err;
-}
-
-/**
  * @brief Add a file to the file descriptor array.
  * @param stream File to add.
  * @return Assigned file descriptor.
@@ -291,8 +171,6 @@ void vfs_init(void)
 	spinlock_init(&vfs_lock);
 	for(; i < MAX_OPEN; i++)
 		__iob[i] = NULL;
-
-	vfshead = NULL;
 }
 
 /* @} */

@@ -73,6 +73,8 @@ struct fs_driver {
 	int (*ioctl)(struct file*, unsigned long reg, void *buf);
 };
 
+extern spinlock_t vfs_lock;
+extern struct dirent vfs_root;
 
 CDECL
 
@@ -88,6 +90,7 @@ extern int vfs_read(struct file *file, void *buff, size_t size);
 extern int vfs_write(struct file *file, const void *buff, size_t size);
 
 extern ssize_t vfs_setoffset(struct file *file, ssize_t offset, ssize_t max);
+extern size_t vfs_setindex(struct file *file, size_t index, size_t max);
 
 CDECL_END
 

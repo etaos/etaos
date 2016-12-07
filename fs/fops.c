@@ -51,7 +51,14 @@ ssize_t vfs_setoffset(struct file *file, ssize_t offset, ssize_t max)
 	return offset;
 }
 
-static size_t vfs_setindex(struct file *file, size_t index, size_t max)
+/**
+ * @brief Set the index of a file.
+ * @param file File to set the index for.
+ * @param index Index to set.
+ * @param max Maximum index.
+ * @return The index that was set for \p file.
+ */
+size_t vfs_setindex(struct file *file, size_t index, size_t max)
 {
 	if(index > max && max)
 		return -EINVAL;
@@ -60,60 +67,6 @@ static size_t vfs_setindex(struct file *file, size_t index, size_t max)
 		file->index  = index;
 
 	return index;
-}
-
-/**
- * @brief Get the current position of a stream.
- * @param file File (stream) to get the current position of.
- * @return The current position of the stream.
- */
-size_t ftell(struct file *file)
-{
-	if(file->ftell)
-		return file->ftell(file);
-
-	return file->index;
-}
-
-/**
- * @brief The lseek function repositions the offset of the given file.
- * @param file Index of \p file will be repositioned.
- * @param offset Number bytes to offset \p file 's index.
- * @param whence Way to offset \p file 's index.
- * @return The resulting offset location (file index) from the start of the 
- *         file.
- *
- * The index of \p file will be repositioned arrording to \p whence as follows:
- *
- * \b SEEK_SET \n
- * The index is set to \p offset.
- *
- * \b SEEK_CUR \n
- * The index is set to its current location plus \p offset bytes.
- *
- * \b SEEK_END \n
- * The offset is set to the size of the file plus \p offset bytes.
- */
-size_t lseek(struct file *file, size_t offset, int whence)
-{
-	if(file->lseek)
-		return file->lseek(file, offset, whence);
-
-	switch(whence) {
-	case SEEK_END:
-		offset += file->length;
-		break;
-
-	case SEEK_CUR:
-		if(!offset)
-			return file->index;
-
-		return vfs_setindex(file, file->index + offset, 0);
-	default:
-		break;
-	}
-
-	return vfs_setindex(file, offset, 0);
 }
 
 /** @} */
