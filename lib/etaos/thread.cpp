@@ -35,7 +35,6 @@ static void stl_thread_start(void *arg)
 	Thread *context = (Thread*)arg;
 
 	context->run(context->get_arg());
-	context->notify_join_queue();
 	context->kill();
 }
 
@@ -47,7 +46,6 @@ static void stl_thread_start(void *arg)
  */
 Thread::Thread(const char *name, void *arg)
 {
-	thread_queue_init(&this->joinq);
 	this->arg = arg;
 	this->base = thread_alloc(name, stl_thread_start, this, NULL);
 	running = true;
@@ -76,11 +74,6 @@ void *Thread::get_arg()
 	return this->arg;
 }
 
-void Thread::notify_join_queue()
-{
-	event_notify(&this->joinq);
-}
-
 /**
  * @brief Stop the execution of the thread.
  *
@@ -90,7 +83,6 @@ void Thread::notify_join_queue()
 void Thread::kill()
 {
 	running = false;
-	this->notify_join_queue();
 	::kill();
 }
 
@@ -99,8 +91,7 @@ void Thread::kill()
  */
 void Thread::join()
 {
-	if(running)
-		event_wait(&this->joinq, EVENT_WAIT_INFINITE);
+	::join(this->base);
 }
 
 /** @} */
