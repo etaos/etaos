@@ -2071,6 +2071,7 @@ PREDEFINED             = CONFIG_TIMER \
                          CONFIG_SCHED \
                          CONFIG_PREEMPT \
                          CONFIG_IRQ \
+			 CONFIG_EXTENDED_THREAD \
                          CDECL \
                          CDECL_END \
                          __DOXYGEN__

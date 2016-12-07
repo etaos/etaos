@@ -292,6 +292,13 @@ void kill(void)
 	schedule();
 }
 
+/**
+ * @brief Wait for a thread to finish execution.
+ * @param tp Thread to wait for.
+ * @return An error code.
+ *
+ * Wait on a waiting queue until the thread \p tp terminates.
+ */
 #ifdef CONFIG_EXTENDED_THREAD
 int join(struct thread *tp)
 {

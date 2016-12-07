@@ -170,7 +170,7 @@ struct thread {
 	struct rr_entity se; //!< Scheduling entity.
 #endif
 #ifdef CONFIG_EXTENDED_THREAD
-	struct thread_queue joinq;
+	struct thread_queue joinq; //!< Waiting queue for \p join.
 #endif
 	char name[16]; //!< Name of the thread.
 };
