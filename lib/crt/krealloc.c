@@ -25,6 +25,7 @@
 #include <etaos/types.h>
 #include <etaos/mem.h>
 #include <etaos/stdlib.h>
+#include <etaos/string.h>
 
 /**
  * @brief Expand or shrink an allocated memory region.

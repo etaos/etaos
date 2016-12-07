@@ -23,6 +23,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
+#include <etaos/string.h>
 #include <etaos/types.h>
 #include <etaos/i2c.h>
 #include <etaos/eeprom.h>

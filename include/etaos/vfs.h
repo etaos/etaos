@@ -26,6 +26,7 @@
 #include <etaos/kernel.h>
 #include <etaos/stdio.h>
 #include <etaos/list.h>
+#include <etaos/dirent.h>
 
 /**
  * @ingroup vfs
@@ -72,19 +73,6 @@ struct fs_driver {
 	int (*ioctl)(struct file*, unsigned long reg, void *buf);
 };
 
-/**
- * @brief Directory entry descriptor.
- */
-struct dirent {
-	char *name; //!< Directory name.
-
-	struct dirent *parent; //!< Parent directory.
-	struct list_head entry; //!< List entry.
-	struct list_head children; //!< List head of child directory's.
-
-	struct file *file_head; //!< List of file entry's.
-	struct fs_driver *fs;    //!< File system driver.
-};
 
 CDECL
 
@@ -105,15 +93,6 @@ extern size_t lseek(struct file *file, size_t offset, int whence);
 extern int mkdir(const char *path);
 extern int mount(struct fs_driver *fs, const char *path);
 extern int unlink(const char *path);
-
-/* DIRENT functions */
-extern struct dirent *dirent_create(const char *name);
-extern struct dirent *dirent_find(struct dirent *root, const char *path);
-extern struct dirent *dirent_add_child(struct dirent *parent,
-		struct dirent *child);
-extern struct file *dirent_add_file(struct dirent *dir, struct file *file);
-extern struct file *dirent_remove_file(struct dirent *dir, struct file *file);
-extern struct file *dirent_find_file(struct dirent *dir, const char *filename);
 
 CDECL_END
 

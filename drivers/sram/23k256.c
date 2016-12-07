@@ -27,6 +27,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
+#include <etaos/string.h>
 #include <etaos/types.h>
 #include <etaos/spi.h>
 #include <etaos/gpio.h>
