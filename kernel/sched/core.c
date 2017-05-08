@@ -208,9 +208,12 @@ static void queue_wait_tmo(struct timer *timer, void *arg)
 }
 
 /**
- * @brief Let a thread wait on a thread queue.
+ * @brief Let the current thread wait on a thread queue.
  * @param qp Thread queue to wait on.
  * @param ms Miliseconds to wait on \p qp.
+ *
+ * The current thread is removed from the run queue and put on hold for \p ms
+ * miliseconds.
  */
 void thread_queue_wait(struct thread_queue *qp, unsigned int ms)
 {
