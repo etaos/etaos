@@ -84,5 +84,17 @@ struct list_head {
 	struct list_head *prev; //!< Previous node pointer.
 };
 
+/**
+ * @brief Pointer width unsigned integer type.
+ * @see intptr_t for the signed version.
+ */
+typedef size_t uintptr_t;
+
+/**
+ * @brief Pointer width signed integer type.
+ * @see uintptr_t for the unsigned version.
+ */
+typedef ssize_t intptr_t;
+
 #endif
 

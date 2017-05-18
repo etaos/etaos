@@ -34,8 +34,6 @@
 static struct heap_node *mm_free_list = NULL;
 static DEFINE_SPINLOCK(mlock);
 
-typedef size_t uintptr_t;
-
 #ifdef CONFIG_MM_GUARD
 #define MM_GUARD_PATTERN 0xDEADBEEF
 #define MM_GUARD_BYTES   sizeof(MM_GUARD_PATTERN)
