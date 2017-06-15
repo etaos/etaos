@@ -1080,12 +1080,13 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot __schedule(int cpu, bool preempt)
+static bool __hot __schedule(int cpu, bool preempt)
 {
 	struct rq *rq;
 	struct thread *next,
 		      *prev;
 	unsigned long flags;
+	bool rescheduled = false;
 
 	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
@@ -1112,6 +1113,7 @@ static void __hot __schedule(int cpu, bool preempt)
 	if(likely(__schedule_need_resched(prev, next) && prev != next)) {
 		__sched_set_current_thread(rq, next);
 		rq->switch_count++;
+		rescheduled = true;
 
 		__schedule_prepare(rq, prev, &flags);
 		rq_switch_context(rq, prev, next);
@@ -1123,7 +1125,8 @@ static void __hot __schedule(int cpu, bool preempt)
 
 	rq_destroy_kill_q(rq);
 	cpu_notify(SCHED_EXIT);
-	return;
+
+	return rescheduled;
 }
 
 /**
