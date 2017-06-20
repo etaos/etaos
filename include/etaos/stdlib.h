@@ -19,6 +19,7 @@
 #ifndef __STDLIB_H__
 #define __STDLIB_H__
 
+#include <etaos/kernel.h>
 #include <etaos/mem.h>
 #include <etaos/types.h>
 #include <asm/io.h>

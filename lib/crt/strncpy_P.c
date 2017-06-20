@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - fputs
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - strncpy_P()
+ *  Copyright (C) 2015   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,28 +16,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file fputs.c */
-
-#include <etaos/kernel.h>
-#include <etaos/stdio.h>
-#include <etaos/string.h>
-
 /**
- * @addtogroup libcio
+ * @addtogroup libc
  * @{
  */
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/stdlib.h>
+#include <etaos/stdio.h>
+#include <etaos/string.h>
+#include <etaos/mem.h>
+#include <asm/pgm.h>
 
-/**
- * @brief Write a string to a stream.
- * @param s String to write.
- * @param stream Stream to write to.
- * @note Uses fputc internally
- * @return An error code.
- */
-int fputs(char *s, struct file * stream)
+char *strncpy_P(char *dst, const char *src, size_t num)
 {
-	write(stream->fd, s, strlen(s));
-	return 0;
+	char *_src;
+	char *rv;
+
+	_src = kzalloc(num + 1);
+	if(_src == NULL)
+		return NULL;
+	
+	memcpy_P(_src, src, num);
+	rv = strncpy(dst, _src, num);
+	kfree(_src);
+	return rv;
 }
 
 /** @} */

@@ -27,6 +27,7 @@
 
 CDECL
 
+extern void *memchr(const void *s, int c, size_t n);
 extern void *memcpy(void *dst, const void *src, size_t length);
 extern int   memcmp(const void *r1, const void *r2, size_t nbytes);
 extern char *strchr(const char *str, int c);
@@ -37,9 +38,12 @@ extern void *memset(void *dst, int c, size_t n);
 extern char *strcat(char *src, const char *dst);
 extern char *strcpy(char *dst, const char *src);
 extern char *strncpy(char *dst, const char *src, size_t num);
+extern char *strncpy_P(char *dst, const char *src, size_t num);
 extern char *strtok_r(char *s, const char *delimeter, char **last);
 extern char *strtok(char *s, const char *delimeter);
 extern char *strdup(const char *s);
+
+#define ERROR_MSG_THINGY "Wtf bitch"
 
 CDECL_END
 

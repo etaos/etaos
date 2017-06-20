@@ -1,6 +1,7 @@
 /*
- *  ETA/OS - fputs
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - LibC memchr()
+ *  Copyright (C) 2004 by Egnite Software GmbH
+ *  Copyright (C) 2015  Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,28 +17,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file fputs.c */
-
-#include <etaos/kernel.h>
-#include <etaos/stdio.h>
-#include <etaos/string.h>
-
 /**
- * @addtogroup libcio
+ * @addtogroup libc
  * @{
  */
 
+#include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/string.h>
+
 /**
- * @brief Write a string to a stream.
- * @param s String to write.
- * @param stream Stream to write to.
- * @note Uses fputc internally
- * @return An error code.
+ * @brief Find the first occurance of a byte.
+ * @param s Memory region to search.
+ * @param c Byte to look for.
+ * @param n Length of \p s.
+ * @return A pointer, within \p s, to the located byte, or NULL if nothing
+ *         is found.
  */
-int fputs(char *s, struct file * stream)
+void *memchr(const void *s, int c, size_t n)
 {
-	write(stream->fd, s, strlen(s));
-	return 0;
+	const char *p;
+
+	if(!n)
+		return NULL;
+
+	p = s;
+	do {
+		if(*p++ == (unsigned char)c)
+			return (void*) (p - 1);
+	} while(--n);
+
+	return NULL;
 }
 
 /** @} */

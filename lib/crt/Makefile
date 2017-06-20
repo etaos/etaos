@@ -11,9 +11,10 @@ libc-files-$(CONFIG_CRT) += putc.o printf.o vfprintf.o
 libc-files-$(CONFIG_CRT) += fputs.o fputc.o fprintf.o
 libc-files-$(CONFIG_CRT) += read.o write.o fgets.o
 libc-files-$(CONFIG_CRT) += ioctl.o getc.o fgetc.o
+libc-files-$(CONFIG_CRT) += strncpy_P.o puts.o puts_P.o
 libc-files-$(CONFIG_CRT) += open.o close.o
 
-libc-files-$(CONFIG_CRT) += strlen.o strchr.o
+libc-files-$(CONFIG_CRT) += strlen.o strchr.o memchr.o
 libc-files-$(CONFIG_CRT) += strcmp.o strnlen.o 
 libc-files-$(CONFIG_CRT) += memset.o strcat.o strdup.o
 libc-files-$(CONFIG_CRT) += strcpy.o strncpy.o strtok.o

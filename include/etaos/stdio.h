@@ -154,6 +154,7 @@ extern struct file * __iob[];
 #define filep(__idx) __iob[__idx]
 
 extern int putc(int c, struct file * stream);
+extern int puts(const char *string);
 extern int fputc(int c, struct file * stream);
 extern int fputs(char *c, struct file * stream);
 extern int fprintf(struct file * stream, const char*, ...);
@@ -172,10 +173,12 @@ extern char *fgets(char *buf, int count, struct file *stream);
 extern size_t ftell(struct file *file);
 
 #ifdef CONFIG_HARVARD
+extern int puts_P(const char *string);
 extern int printf_P(const char *fmt, ...);
 extern int fprintf_P(struct file *stream, const char *fmt, ...);
 extern int vfprintf_P(struct file * stream, const char *fmt, va_list ap);
 #else
+#define puts_P(__str__) puts(__str__)
 #define printf_P(__fmt, args...) printf(__fmt, args)
 #define fprintf_P(__iostream, __fmt, args...) fprintf(__iostream, __fmt, args)
 #define vfprintf_P(__iostream, __fmt, __ap) vfprintf(__iostream, __fmt, __ap)
