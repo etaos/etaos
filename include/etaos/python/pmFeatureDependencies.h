@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __PM_EMPTY_PM_FEATURES_H__
 #define __PM_EMPTY_PM_FEATURES_H__
-
 
 /**
  * \file
@@ -165,16 +163,13 @@
 #error HAVE_ASSERT requires HAVE_CLASSES
 #endif
 
-
 #if defined(HAVE_GENERATORS) && !defined(HAVE_CLASSES)
 #error HAVE_GENERATORS requires HAVE_CLASSES
 #endif
 
-
 #if defined(HAVE_CLOSURES) && !defined(HAVE_DEFAULTARGS)
 #error HAVE_CLOSURES requires HAVE_DEFAULTARGS
 #endif
-
 
 #if defined(HAVE_BYTEARRAY) && !defined(HAVE_CLASSES)
 #error HAVE_BYTEARRAY requires HAVE_CLASSES
@@ -182,4 +177,4 @@
 
 #if defined(HAVE_SNPRINTF_FORMAT) && !defined(HAVE_STRING_FORMAT)
 #error HAVE_SNPRINTF_FORMAT requires HAVE_STRING_FORMAT
-#endif /* __PM_EMPTY_PM_FEATURES_H__ */
+#endif				/* __PM_EMPTY_PM_FEATURES_H__ */

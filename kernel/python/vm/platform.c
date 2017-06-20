@@ -29,7 +29,7 @@
 
 #include <asm/pgm.h>
 
-#define PYTHON_SYSTEM_TICK_INTERVAL 1000000 /* 1 milisecond */
+#define PYTHON_SYSTEM_TICK_INTERVAL 1000000	/* 1 milisecond */
 
 static struct hrtimer *timer;
 static uint32_t interval = 1000000;
@@ -46,7 +46,7 @@ static void platform_timer_handle(struct hrtimer *hrt, void *arg)
 PmReturn_t plat_init(void)
 {
 	hrtimer_create(hr_sys_clk, PYTHON_SYSTEM_TICK_INTERVAL,
-			&platform_timer_handle, &interval, 0UL);
+		       &platform_timer_handle, &interval, 0UL);
 	return PM_RET_OK;
 }
 
@@ -74,8 +74,8 @@ uint8_t plat_memGetByte(PmMemSpace_t memspace, uint8_t const **paddr)
 	case MEMSPACE_EEPROM:
 		return 0;
 		/*b = eeprom_read_byte(*paddr);
-		*paddr += 1;
-		return b;*/
+		 *paddr += 1;
+		 return b;*/
 
 	case MEMSPACE_SEEPROM:
 	case MEMSPACE_OTHER0:
@@ -95,16 +95,16 @@ PmReturn_t plat_putByte(uint8_t b)
 	return PM_RET_OK;
 }
 
-PmReturn_t plat_getByte(uint8_t *b)
+PmReturn_t plat_getByte(uint8_t * b)
 {
 	int rv;
 
 	rv = fgetc(stdin);
-	*b = (uint8_t)rv;
+	*b = (uint8_t) rv;
 	return PM_RET_OK;
 }
 
-PmReturn_t plat_getMsTicks(uint32_t *r_ticks)
+PmReturn_t plat_getMsTicks(uint32_t * r_ticks)
 {
 	unsigned long flags;
 
@@ -153,15 +153,14 @@ static const char fnstr_24[] __pgm = "class.c";
 static const char fnstr_25[] __pgm = "bytearray.c";
 static const char fnstr_26[] __pgm = "sched.c";
 
-static const char* const fnlookup[LEN_FNLOOKUP] __pgm =
-{
-    fnstr_00, fnstr_01, fnstr_02, fnstr_03,
-    fnstr_04, fnstr_05, fnstr_06, fnstr_07,
-    fnstr_08, fnstr_09, fnstr_10, fnstr_11,
-    fnstr_12, fnstr_13, fnstr_14, fnstr_15,
-    fnstr_16, fnstr_17, fnstr_18, fnstr_19,
-    fnstr_20, fnstr_21, fnstr_22, fnstr_23,
-    fnstr_24, fnstr_25, fnstr_26
+static const char *const fnlookup[LEN_FNLOOKUP] __pgm = {
+	fnstr_00, fnstr_01, fnstr_02, fnstr_03,
+	fnstr_04, fnstr_05, fnstr_06, fnstr_07,
+	fnstr_08, fnstr_09, fnstr_10, fnstr_11,
+	fnstr_12, fnstr_13, fnstr_14, fnstr_15,
+	fnstr_16, fnstr_17, fnstr_18, fnstr_19,
+	fnstr_20, fnstr_21, fnstr_22, fnstr_23,
+	fnstr_24, fnstr_25, fnstr_26
 };
 
 /* This table should match src/vm/pm.h PmReturn_t */
@@ -183,180 +182,171 @@ static const char exnstr_14[] __pgm = "ValueError";
 static const char exnstr_15[] __pgm = "StopIteration";
 static const char exnstr_16[] __pgm = "Warning";
 
-static const char * const exnlookup[LEN_EXNLOOKUP] __pgm =
-{
-    exnstr_00, exnstr_01, exnstr_02, exnstr_03,
-    exnstr_04, exnstr_05, exnstr_06, exnstr_07,
-    exnstr_08, exnstr_09, exnstr_10, exnstr_11,
-    exnstr_12, exnstr_13, exnstr_14, exnstr_15,
-    exnstr_16
+static const char *const exnlookup[LEN_EXNLOOKUP] __pgm = {
+	exnstr_00, exnstr_01, exnstr_02, exnstr_03,
+	exnstr_04, exnstr_05, exnstr_06, exnstr_07,
+	exnstr_08, exnstr_09, exnstr_10, exnstr_11,
+	exnstr_12, exnstr_13, exnstr_14, exnstr_15,
+	exnstr_16
 };
-#endif /* HAVE_DEBUG_INFO */
-
+#endif				/* HAVE_DEBUG_INFO */
 
 void plat_reportError(PmReturn_t result)
 {
 #ifdef HAVE_DEBUG_INFO
-    uint8_t res;
-    pPmFrame_t pframe;
-    pPmObj_t pstr;
-    PmReturn_t retval;
-    uint16_t bcindex;
-    uint16_t bcsum;
-    uint16_t linesum;
-    uint16_t len_lnotab;
-    uint8_t const *plnotab;
-    uint16_t i;
-    char pstrbuf[MAX(FN_MAX_LEN, EXN_MAX_LEN)];
+	uint8_t res;
+	pPmFrame_t pframe;
+	pPmObj_t pstr;
+	PmReturn_t retval;
+	uint16_t bcindex;
+	uint16_t bcsum;
+	uint16_t linesum;
+	uint16_t len_lnotab;
+	uint8_t const *plnotab;
+	uint16_t i;
+	char pstrbuf[MAX(FN_MAX_LEN, EXN_MAX_LEN)];
 
-    /* Print traceback */
-    puts_P(PSTR("Traceback (most recent call first):"));
+	/* Print traceback */
+	puts_P(PSTR("Traceback (most recent call first):"));
 
-    /* Get the top frame */
-    pframe = gVmGlobal.pthread->pframe;
+	/* Get the top frame */
+	pframe = gVmGlobal.pthread->pframe;
 
-    /* If it's the native frame, print the native function name */
-    if (pframe == (pPmFrame_t)&(gVmGlobal.nativeframe))
-    {
+	/* If it's the native frame, print the native function name */
+	if (pframe == (pPmFrame_t) & (gVmGlobal.nativeframe)) {
 
-        /* The last name in the names tuple of the code obj is the name */
-        retval = tuple_getItem((pPmObj_t)gVmGlobal.nativeframe.nf_func->
-                               f_co->co_names, -1, &pstr);
-        if ((retval) != PM_RET_OK)
-        {
-            puts_P(PSTR("  Unable to get native func name."));
-            return;
-        }
-        else
-        {
-            printf_P(PSTR("  %s() __NATIVE__\n"), ((pPmString_t)pstr)->val);
-        }
+		/* The last name in the names tuple of the code obj is the name */
+		retval =
+		    tuple_getItem((pPmObj_t) gVmGlobal.nativeframe.
+				  nf_func->f_co->co_names, -1, &pstr);
+		if ((retval) != PM_RET_OK) {
+			puts_P(PSTR("  Unable to get native func name."));
+			return;
+		} else {
+			printf_P(PSTR("  %s() __NATIVE__\n"),
+				 ((pPmString_t) pstr)->val);
+		}
 
-        /* Get the frame that called the native frame */
-        pframe = (pPmFrame_t)gVmGlobal.nativeframe.nf_back;
-    }
+		/* Get the frame that called the native frame */
+		pframe = (pPmFrame_t) gVmGlobal.nativeframe.nf_back;
+	}
 
-    /* Print the remaining frame stack */
-    for (; pframe != C_NULL; pframe = pframe->fo_back)
-    {
-        /* The last name in the names tuple of the code obj is the name */
-        retval = tuple_getItem((pPmObj_t)pframe->fo_func->f_co->co_names,
-                               -1,
-                               &pstr);
-        if ((retval) != PM_RET_OK) break;
+	/* Print the remaining frame stack */
+	for (; pframe != C_NULL; pframe = pframe->fo_back) {
+		/* The last name in the names tuple of the code obj is the name */
+		retval =
+		    tuple_getItem((pPmObj_t) pframe->fo_func->f_co->co_names,
+				  -1, &pstr);
+		if ((retval) != PM_RET_OK)
+			break;
 
-        /*
-         * Get the line number of the current bytecode. Algorithm comes from:
-         * http://svn.python.org/view/python/trunk/Objects/lnotab_notes.txt?view=markup
-         */
-        bcindex = pframe->fo_ip - pframe->fo_func->f_co->co_codeaddr;
-        plnotab = pframe->fo_func->f_co->co_lnotab;
-        len_lnotab = mem_getWord(MEMSPACE_PROG, &plnotab);
-        bcsum = 0;
-        linesum = pframe->fo_func->f_co->co_firstlineno;
-        for (i = 0; i < len_lnotab; i += 2)
-        {
-            bcsum += mem_getByte(MEMSPACE_PROG, &plnotab);
-            if (bcsum > bcindex) break;
-            linesum += mem_getByte(MEMSPACE_PROG, &plnotab);
-        }
+		/*
+		 * Get the line number of the current bytecode. Algorithm comes from:
+		 * http://svn.python.org/view/python/trunk/Objects/lnotab_notes.txt?view=markup
+		 */
+		bcindex = pframe->fo_ip - pframe->fo_func->f_co->co_codeaddr;
+		plnotab = pframe->fo_func->f_co->co_lnotab;
+		len_lnotab = mem_getWord(MEMSPACE_PROG, &plnotab);
+		bcsum = 0;
+		linesum = pframe->fo_func->f_co->co_firstlineno;
+		for (i = 0; i < len_lnotab; i += 2) {
+			bcsum += mem_getByte(MEMSPACE_PROG, &plnotab);
+			if (bcsum > bcindex)
+				break;
+			linesum += mem_getByte(MEMSPACE_PROG, &plnotab);
+		}
 
-        /* Get the file name of this frame's function */
-        if (pframe->fo_func->f_co->co_memspace == MEMSPACE_PROG)
-        {
-            strncpy_P(pstrbuf,
-                      (char *)pframe->fo_func->f_co->co_filename,
-                      MAX(FN_MAX_LEN, EXN_MAX_LEN));
-        }
-        printf_P(PSTR("  File \"%s\", line %d, in %s\n"),
-                 ((pframe->fo_func->f_co->co_memspace == MEMSPACE_PROG)
-                 ? pstrbuf
-                 : (char *)pframe->fo_func->f_co->co_filename),
-                 linesum,
-                 ((pPmString_t)pstr)->val);
-    }
+		/* Get the file name of this frame's function */
+		if (pframe->fo_func->f_co->co_memspace == MEMSPACE_PROG) {
+			strncpy_P(pstrbuf,
+				  (char *)pframe->fo_func->f_co->co_filename,
+				  MAX(FN_MAX_LEN, EXN_MAX_LEN));
+		}
+		printf_P(PSTR("  File \"%s\", line %d, in %s\n"),
+			 ((pframe->fo_func->f_co->co_memspace == MEMSPACE_PROG)
+			  ? pstrbuf
+			  : (char *)pframe->fo_func->f_co->co_filename),
+			 linesum, ((pPmString_t) pstr)->val);
+	}
 
-    /* Print error */
-    res = (uint8_t)result;
-    if ((res > 0) && ((res - PM_RET_EX) < LEN_EXNLOOKUP))
-    {
-        strncpy_P(pstrbuf,
-                  (const char*)pgm_read_word(&exnlookup[res - PM_RET_EX]),
-                  EXN_MAX_LEN);
-        printf_P(PSTR("%s"), pstrbuf);
-    }
-    else
-    {
-        printf_P(PSTR("Error code 0x%02X"), result);
-    }
-    printf_P(PSTR(" detected by "));
+	/* Print error */
+	res = (uint8_t) result;
+	if ((res > 0) && ((res - PM_RET_EX) < LEN_EXNLOOKUP)) {
+		strncpy_P(pstrbuf,
+			  (const char *)
+			  pgm_read_word(&exnlookup[res - PM_RET_EX]),
+			  EXN_MAX_LEN);
+		printf_P(PSTR("%s"), pstrbuf);
+	} else {
+		printf_P(PSTR("Error code 0x%02X"), result);
+	}
+	printf_P(PSTR(" detected by "));
 
-    if ((gVmGlobal.errFileId > 0) && (gVmGlobal.errFileId < LEN_FNLOOKUP))
-    {
-        strncpy_P(pstrbuf,
-                  (const char*)pgm_read_word(&fnlookup[gVmGlobal.errFileId]),
-                  FN_MAX_LEN);
-        printf_P(PSTR("%s:"), pstrbuf);
-    }
-    else
-    {
-        printf_P(PSTR("FileId 0x%02X line "), gVmGlobal.errFileId);
-    }
-    printf_P(PSTR("%d\n"), gVmGlobal.errLineNum);
+	if ((gVmGlobal.errFileId > 0) && (gVmGlobal.errFileId < LEN_FNLOOKUP)) {
+		strncpy_P(pstrbuf,
+			  (const char *)
+			  pgm_read_word(&fnlookup[gVmGlobal.errFileId]),
+			  FN_MAX_LEN);
+		printf_P(PSTR("%s:"), pstrbuf);
+	} else {
+		printf_P(PSTR("FileId 0x%02X line "), gVmGlobal.errFileId);
+	}
+	printf_P(PSTR("%d\n"), gVmGlobal.errLineNum);
 
-#else /* HAVE_DEBUG_INFO */
+#else				/* HAVE_DEBUG_INFO */
 
-    /* Print error */
-    printf_P(PSTR("Error:     0x%02X\n"), result);
-    printf_P(PSTR("  Release: 0x%02X\n"), gVmGlobal.errVmRelease);
-    printf_P(PSTR("  FileId:  0x%02X\n"), gVmGlobal.errFileId);
-    printf_P(PSTR("  LineNum: %d\n"), gVmGlobal.errLineNum);
+	/* Print error */
+	printf_P(PSTR("Error:     0x%02X\n"), result);
+	printf_P(PSTR("  Release: 0x%02X\n"), gVmGlobal.errVmRelease);
+	printf_P(PSTR("  FileId:  0x%02X\n"), gVmGlobal.errFileId);
+	printf_P(PSTR("  LineNum: %d\n"), gVmGlobal.errLineNum);
 
-    /* Print traceback */
-    {
-        pPmObj_t pframe;
-        pPmObj_t pstr;
-        PmReturn_t retval;
+	/* Print traceback */
+	{
+		pPmObj_t pframe;
+		pPmObj_t pstr;
+		PmReturn_t retval;
 
-        puts_P(PSTR("Traceback (top first):"));
+		puts_P(PSTR("Traceback (top first):"));
 
-        /* Get the top frame */
-        pframe = (pPmObj_t)gVmGlobal.pthread->pframe;
+		/* Get the top frame */
+		pframe = (pPmObj_t) gVmGlobal.pthread->pframe;
 
-        /* If it's the native frame, print the native function name */
-        if (pframe == (pPmObj_t)&(gVmGlobal.nativeframe))
-        {
+		/* If it's the native frame, print the native function name */
+		if (pframe == (pPmObj_t) & (gVmGlobal.nativeframe)) {
 
-            /* The last name in the names tuple of the code obj is the name */
-            retval = tuple_getItem((pPmObj_t)gVmGlobal.nativeframe.nf_func->
-                                   f_co->co_names, -1, &pstr);
-            if ((retval) != PM_RET_OK)
-            {
-                puts_P(PSTR("  Unable to get native func name."));
-                return;
-            }
-            else
-            {
-                printf_P(PSTR("  %s() __NATIVE__\n"), ((pPmString_t)pstr)->val);
-            }
+			/* The last name in the names tuple of the code obj is the name */
+			retval =
+			    tuple_getItem((pPmObj_t) gVmGlobal.nativeframe.
+					  nf_func->f_co->co_names, -1, &pstr);
+			if ((retval) != PM_RET_OK) {
+				puts_P(PSTR
+				       ("  Unable to get native func name."));
+				return;
+			} else {
+				printf_P(PSTR("  %s() __NATIVE__\n"),
+					 ((pPmString_t) pstr)->val);
+			}
 
-            /* Get the frame that called the native frame */
-            pframe = (pPmObj_t)gVmGlobal.nativeframe.nf_back;
-        }
+			/* Get the frame that called the native frame */
+			pframe = (pPmObj_t) gVmGlobal.nativeframe.nf_back;
+		}
 
-        /* Print the remaining frame stack */
-        for (;
-             pframe != C_NULL;
-             pframe = (pPmObj_t)((pPmFrame_t)pframe)->fo_back)
-        {
-            /* The last name in the names tuple of the code obj is the name */
-            retval = tuple_getItem((pPmObj_t)((pPmFrame_t)pframe)->
-                                   fo_func->f_co->co_names, -1, &pstr);
-            if ((retval) != PM_RET_OK) break;
+		/* Print the remaining frame stack */
+		for (;
+		     pframe != C_NULL;
+		     pframe = (pPmObj_t) ((pPmFrame_t) pframe)->fo_back) {
+			/* The last name in the names tuple of the code obj is the name */
+			retval =
+			    tuple_getItem((pPmObj_t)
+					  ((pPmFrame_t) pframe)->fo_func->f_co->
+					  co_names, -1, &pstr);
+			if ((retval) != PM_RET_OK)
+				break;
 
-            printf_P(PSTR("  %s()\n"), ((pPmString_t)pstr)->val);
-        }
-        puts_P(PSTR("  <module>."));
-    }
-#endif /* HAVE_DEBUG_INFO */
+			printf_P(PSTR("  %s()\n"), ((pPmString_t) pstr)->val);
+		}
+		puts_P(PSTR("  <module>."));
+	}
+#endif				/* HAVE_DEBUG_INFO */
 }

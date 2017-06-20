@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __SEGLIST_H__
 #define __SEGLIST_H__
-
 
 /**
  * \file
@@ -29,38 +27,30 @@
  * that are beyond the index of the last item.
  */
 
-
 /** Defines the length of the object array in a segment */
 #define SEGLIST_OBJS_PER_SEG 8
 
-
 /** Segment - an array of ptrs to objs */
-typedef struct Segment_s
-{
+typedef struct Segment_s {
     /** object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
     /** array of ptrs to objs */
-    pPmObj_t s_val[SEGLIST_OBJS_PER_SEG];
+	pPmObj_t s_val[SEGLIST_OBJS_PER_SEG];
     /** ptr to next segment */
-    struct Segment_s *next;
-} Segment_t,
- *pSegment_t;
-
+	struct Segment_s *next;
+} Segment_t, *pSegment_t;
 
 /** Seglist - linked list of segments with current index info */
-typedef struct Seglist_s
-{
+typedef struct Seglist_s {
     /** object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
     /** index of (one past) last obj in last segment */
-    int16_t sl_length;
+	int16_t sl_length;
     /** ptr to first segment in list */
-    pSegment_t sl_rootseg;
+	pSegment_t sl_rootseg;
     /** ptr to last segment */
-    pSegment_t sl_lastseg;
-} Seglist_t,
- *pSeglist_t;
-
+	pSegment_t sl_lastseg;
+} Seglist_t, *pSeglist_t;
 
 /**
  * Puts the new object at the end of the list.
@@ -94,7 +84,7 @@ PmReturn_t seglist_clear(pSeglist_t pseglist);
  *          was found.  PM_RET_ERR otherwise.
  */
 PmReturn_t seglist_findEqual(pSeglist_t pseglist,
-                             pPmObj_t pobj, int16_t *r_index);
+			     pPmObj_t pobj, int16_t * r_index);
 
 /**
  * Gets the item in the seglist at the given coordinates.
@@ -108,7 +98,7 @@ PmReturn_t seglist_findEqual(pSeglist_t pseglist,
  *          PM_RET_ERR otherwise.
  */
 PmReturn_t seglist_getItem(pSeglist_t pseglist,
-                           int16_t index, pPmObj_t *r_pobj);
+			   int16_t index, pPmObj_t * r_pobj);
 
 /**
  * Allocates a new empty seglist
@@ -116,8 +106,7 @@ PmReturn_t seglist_getItem(pSeglist_t pseglist,
  * @param   r_pseglist return; Address of ptr to new seglist
  * @return  Return status
  */
-PmReturn_t seglist_new(pSeglist_t *r_pseglist);
-
+PmReturn_t seglist_new(pSeglist_t * r_pseglist);
 
 /**
  * Puts the item in the next available slot in the first available segment.
@@ -133,7 +122,7 @@ PmReturn_t seglist_new(pSeglist_t *r_pseglist);
  *              Any error condition comes from heap_getChunk.
  */
 PmReturn_t seglist_insertItem(pSeglist_t pseglist,
-                              pPmObj_t pobj, int16_t index);
+			      pPmObj_t pobj, int16_t index);
 
 /**
  * Puts the item in the designated slot and segment.
@@ -157,4 +146,4 @@ PmReturn_t seglist_setItem(pSeglist_t pseglist, pPmObj_t pobj, int16_t index);
  */
 PmReturn_t seglist_removeItem(pSeglist_t pseglist, uint16_t index);
 
-#endif /* __SEGLIST_H__ */
+#endif				/* __SEGLIST_H__ */

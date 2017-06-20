@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __SLI_H__
 #define __SLI_H__
-
 
 /**
  * \file
@@ -26,13 +24,11 @@
  * to the target system.
  */
 
-
 /**
  * If the compiler has string.h, set HAVE_STRING to 1;
  * otherwise, leave it 0 and the sli functions will be used.
  */
 #define HAVE_STRING_H 0
-
 
 /*
  * This section creates a macro or a function prototype
@@ -98,7 +94,7 @@ int sli_strlen(char const *s);
  */
 int sli_strncmp(char const *s1, char const *s2, unsigned int n);
 
-#endif /* HAVE_STRING_H */
+#endif				/* HAVE_STRING_H */
 
 /**
  * Copy a value repeatedly into a block of memory
@@ -126,7 +122,7 @@ void sli_puts(uint8_t * s);
  * @param buflen the length of the given buffer in bytes
  * @return a pointer to the string. 
  */
-PmReturn_t sli_ltoa10(int32_t value, uint8_t *buf, uint8_t buflen);
+PmReturn_t sli_ltoa10(int32_t value, uint8_t * buf, uint8_t buflen);
 
 /**
  * Formats an 8-bit int as a hexadecimal value.
@@ -137,7 +133,8 @@ PmReturn_t sli_ltoa10(int32_t value, uint8_t *buf, uint8_t buflen);
  * @param upperCase when zero, hex chars rendered lowercase, else uppercase
  * @return Always PM_RET_OK
  */
-PmReturn_t sli_btoa16(uint8_t value, uint8_t *buf, uint8_t buflen, uint8_t upperCase);
+PmReturn_t sli_btoa16(uint8_t value, uint8_t * buf, uint8_t buflen,
+		      uint8_t upperCase);
 
 /**
  * Formats a 32-bit signed int as a hexadecimal value.
@@ -148,7 +145,8 @@ PmReturn_t sli_btoa16(uint8_t value, uint8_t *buf, uint8_t buflen, uint8_t upper
  * @param upperCase when zero, hex chars rendered lowercase, else uppercase
  * @return Always PM_RET_OK
  */
-PmReturn_t sli_ltoa16(int32_t value, uint8_t *buf, uint8_t buflen, uint8_t upperCase);
+PmReturn_t sli_ltoa16(int32_t value, uint8_t * buf, uint8_t buflen,
+		      uint8_t upperCase);
 
 /**
  * Formats a pointer as a hexadecimal value.
@@ -159,7 +157,8 @@ PmReturn_t sli_ltoa16(int32_t value, uint8_t *buf, uint8_t buflen, uint8_t upper
  * @param upperCase when zero, hex chars rendered lowercase, else uppercase
  * @return Always PM_RET_OK
  */
-PmReturn_t sli_ptoa16(intptr_t value, uint8_t *buf, uint8_t buflen, uint8_t upperCase);
+PmReturn_t sli_ptoa16(intptr_t value, uint8_t * buf, uint8_t buflen,
+		      uint8_t upperCase);
 
 /**
  * Formats a 32-bit (single-precision) float as an ascii string.
@@ -169,6 +168,6 @@ PmReturn_t sli_ptoa16(intptr_t value, uint8_t *buf, uint8_t buflen, uint8_t uppe
  * @param buflen the size of the buffer
  * @return Status
  */
-PmReturn_t sli_ftoa(float f, uint8_t *buf, uint8_t buflen);
+PmReturn_t sli_ftoa(float f, uint8_t * buf, uint8_t buflen);
 
-#endif /* __SLI_H__ */
+#endif				/* __SLI_H__ */

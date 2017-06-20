@@ -32,8 +32,8 @@ int python_init(void)
 
 	heap = kzalloc(CONFIG_PYTHON_HEAP_SIZE);
 	retval = pm_init(heap, CONFIG_PYTHON_HEAP_SIZE,
-			MEMSPACE_PROG, usrlib_img);
-	if(retval != PM_RET_OK)
+			 MEMSPACE_PROG, usrlib_img);
+	if (retval != PM_RET_OK)
 		return -EINVAL;
 
 	return -EOK;
@@ -49,7 +49,7 @@ THREAD(py_runner, modname)
 {
 	uint8_t *pymodule;
 
-	pymodule = (uint8_t*)modname;
+	pymodule = (uint8_t *) modname;
 	vm_status_code = pm_run(pymodule);
 	kill();
 }
@@ -74,9 +74,8 @@ int python_start(const char *modname)
 #else
 int python_start(const char *modname)
 {
-	uint8_t *pymod = (uint8_t*)modname;
+	uint8_t *pymod = (uint8_t *) modname;
 
 	return pm_run(pymod);
 }
 #endif
-

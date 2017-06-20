@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __MODULE_H__
 #define __MODULE_H__
-
 
 /**
  * \file
@@ -16,7 +14,6 @@
  *
  * Module object type header.
  */
-
 
 /**
  * Creates a Module Obj for the given Code Obj.
@@ -30,7 +27,7 @@
  * @param   pmod Return by reference; ptr to new module obj
  * @return  Return status
  */
-PmReturn_t mod_new(pPmObj_t pco, pPmObj_t *pmod);
+PmReturn_t mod_new(pPmObj_t pco, pPmObj_t * pmod);
 
 /**
  * Imports a module of the given name.
@@ -42,6 +39,6 @@ PmReturn_t mod_new(pPmObj_t pco, pPmObj_t *pmod);
  * @param   pmod Return by reference; ptr to imported module
  * @return  Return status
  */
-PmReturn_t mod_import(pPmObj_t pstr, pPmObj_t *pmod);
+PmReturn_t mod_import(pPmObj_t pstr, pPmObj_t * pmod);
 
-#endif /* __MODULE_H__ */
+#endif				/* __MODULE_H__ */

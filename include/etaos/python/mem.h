@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __PMMEM_H__
 #define __PMMEM_H__
-
 
 /**
  * \file
@@ -17,24 +15,21 @@
  * VM memory header.
  */
 
-
 /**
  * Memory Space enum.
  *
  * Defines the different addressable areas of the system.
  */
-typedef enum PmMemSpace_e
-{
-    MEMSPACE_RAM = 0,
-    MEMSPACE_PROG,
-    MEMSPACE_EEPROM,
-    MEMSPACE_SEEPROM,
-    MEMSPACE_OTHER0,
-    MEMSPACE_OTHER1,
-    MEMSPACE_OTHER2,
-    MEMSPACE_OTHER3
+typedef enum PmMemSpace_e {
+	MEMSPACE_RAM = 0,
+	MEMSPACE_PROG,
+	MEMSPACE_EEPROM,
+	MEMSPACE_SEEPROM,
+	MEMSPACE_OTHER0,
+	MEMSPACE_OTHER1,
+	MEMSPACE_OTHER2,
+	MEMSPACE_OTHER3
 } PmMemSpace_t, *pPmMemSpace_t;
-
 
 /**
  * Returns the byte at the given address in memspace.
@@ -88,7 +83,7 @@ uint32_t mem_getInt(PmMemSpace_t memspace, uint8_t const **paddr);
  *          addr - points one byte past the word
  */
 float mem_getFloat(PmMemSpace_t memspace, uint8_t const **paddr);
-#endif /* HAVE_FLOAT */
+#endif				/* HAVE_FLOAT */
 
 /**
  * Copies count number of bytes from src in memspace to dest in RAM.
@@ -103,7 +98,7 @@ float mem_getFloat(PmMemSpace_t memspace, uint8_t const **paddr);
  * @see     sli_memcpy
  */
 void mem_copy(PmMemSpace_t memspace,
-              uint8_t **pdest, uint8_t const **psrc, uint16_t count);
+	      uint8_t ** pdest, uint8_t const **psrc, uint16_t count);
 
 /**
  * Returns the number of bytes in the C string pointed to by pstr.
@@ -113,8 +108,7 @@ void mem_copy(PmMemSpace_t memspace,
  * @param   pstr  ptr to source C string
  * @return  Number of bytes in the string.
  */
-uint16_t mem_getStringLength(PmMemSpace_t memspace,
-                             uint8_t const *const pstr);
+uint16_t mem_getStringLength(PmMemSpace_t memspace, uint8_t const *const pstr);
 
 /**
  * Compares a byte array in RAM to a byte array in the given memory space
@@ -125,7 +119,7 @@ uint16_t mem_getStringLength(PmMemSpace_t memspace,
  * @param paddr Pointer to address of other byte array
  * @return PM_RET_OK if all bytes in both arrays match; PM_RET_NO otherwise
  */
-PmReturn_t mem_cmpn(uint8_t *cname, uint16_t cnamelen, PmMemSpace_t memspace,
-                    uint8_t const **paddr);
+PmReturn_t mem_cmpn(uint8_t * cname, uint16_t cnamelen, PmMemSpace_t memspace,
+		    uint8_t const **paddr);
 
-#endif /* __MEM_H__ */
+#endif				/* __MEM_H__ */

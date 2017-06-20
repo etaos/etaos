@@ -5,16 +5,13 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __SEQ_H__
 #define __SEQ_H__
-
 
 /**
  * \file
  * \brief Sequence Header
  */
-
 
 /**
  * Sequence Iterator Object
@@ -22,19 +19,16 @@
  * Instances of this object are created by GET_ITER and used by FOR_ITER.
  * Stores a pointer to a sequence and an index int16_t.
  */
-typedef struct PmSeqIter_s
-{
+typedef struct PmSeqIter_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Sequence object */
-    pPmObj_t si_sequence;
+	pPmObj_t si_sequence;
 
     /** Index value */
-    int16_t si_index;
-} PmSeqIter_t,
- *pPmSeqIter_t;
-
+	int16_t si_index;
+} PmSeqIter_t, *pPmSeqIter_t;
 
 /**
  * Compares two sequences for equality
@@ -52,7 +46,7 @@ int8_t seq_compare(pPmObj_t pobj1, pPmObj_t pobj2);
  * @param   r_index Return arg, length of sequence
  * @return  Return status
  */
-PmReturn_t seq_getLength(pPmObj_t pobj, uint16_t *r_index);
+PmReturn_t seq_getLength(pPmObj_t pobj, uint16_t * r_index);
 
 /**
  * Returns the object from sequence[index]
@@ -62,7 +56,7 @@ PmReturn_t seq_getLength(pPmObj_t pobj, uint16_t *r_index);
  * @param   r_pobj Return arg, object from sequence
  * @return  Return status
  */
-PmReturn_t seq_getSubscript(pPmObj_t pobj, int16_t index, pPmObj_t *r_pobj);
+PmReturn_t seq_getSubscript(pPmObj_t pobj, int16_t index, pPmObj_t * r_pobj);
 
 /**
  * Returns the next item from the sequence iterator object
@@ -71,8 +65,7 @@ PmReturn_t seq_getSubscript(pPmObj_t pobj, int16_t index, pPmObj_t *r_pobj);
  * @param   r_pitem Return arg, pointer to next item from sequence.
  * @return  Return status.
  */
-PmReturn_t seqiter_getNext(pPmObj_t pobj, pPmObj_t *r_pitem);
-
+PmReturn_t seqiter_getNext(pPmObj_t pobj, pPmObj_t * r_pitem);
 
 /**
  * Returns a new sequence iterator object
@@ -81,6 +74,6 @@ PmReturn_t seqiter_getNext(pPmObj_t pobj, pPmObj_t *r_pitem);
  * @param   r_pobj Return by reference, new sequence iterator
  * @return  Return status.
  */
-PmReturn_t seqiter_new(pPmObj_t pobj, pPmObj_t *r_pobj);
+PmReturn_t seqiter_new(pPmObj_t pobj, pPmObj_t * r_pobj);
 
-#endif /* __SEQ_H__ */
+#endif				/* __SEQ_H__ */

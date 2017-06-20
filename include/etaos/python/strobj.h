@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __STRINGOBJ_H__
 #define __STRINGOBJ_H__
-
 
 /**
  * \file
@@ -17,10 +15,8 @@
  * String object type header.
  */
 
-
 /** Set to nonzero to enable string cache.  DO NOT REMOVE THE DEFINITION. */
 #define USE_STRING_CACHE 1
-
 
 /**
  * Loads a string from image
@@ -75,18 +71,17 @@
  *
  * Null terminated array of chars.
  */
-typedef struct PmString_s
-{
+typedef struct PmString_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Length of string */
-    uint16_t length;
+	uint16_t length;
 
 #if USE_STRING_CACHE
     /** Ptr to next string in cache */
-    struct PmString_s *next;
-#endif                          /* USE_STRING_CACHE */
+	struct PmString_s *next;
+#endif				/* USE_STRING_CACHE */
 
     /**
      * Null-term char array
@@ -94,10 +89,8 @@ typedef struct PmString_s
      * Use length 1 here so that string-alloc function can use
      * "sizeof(PmString_t) + len" and there will be room for the null-term
      */
-    uint8_t val[1];
-} PmString_t,
- *pPmString_t;
-
+	uint8_t val[1];
+} PmString_t, *pPmString_t;
 
 /***************************************************************
  * Prototypes
@@ -132,7 +125,7 @@ typedef struct PmString_s
  * @return  Return status
  */
 PmReturn_t string_create(PmMemSpace_t memspace, uint8_t const **paddr,
-                         int16_t len, int16_t n, pPmObj_t *r_pstring);
+			 int16_t len, int16_t n, pPmObj_t * r_pstring);
 
 /**
  * Creates a new String object from a single character.
@@ -141,7 +134,7 @@ PmReturn_t string_create(PmMemSpace_t memspace, uint8_t const **paddr,
  * @param   r_pstring Return by reference; ptr to String obj
  * @return  Return status
  */
-PmReturn_t string_newFromChar(uint8_t const c, pPmObj_t *r_pstring);
+PmReturn_t string_newFromChar(uint8_t const c, pPmObj_t * r_pstring);
 
 /**
  * Compares two String objects for equality.
@@ -163,7 +156,7 @@ int8_t string_compare(pPmString_t pstr1, pPmString_t pstr2);
  * @return Return status
  */
 PmReturn_t string_print(pPmObj_t pstr, uint8_t is_escaped);
-#endif /* HAVE_PRINT */
+#endif				/* HAVE_PRINT */
 
 /**
  * Clears the string cache if one exists.
@@ -173,9 +166,8 @@ PmReturn_t string_print(pPmObj_t pstr, uint8_t is_escaped);
  */
 PmReturn_t string_cacheInit(void);
 
-
 /** Returns a pointer to the base of the string cache */
-PmReturn_t string_getCache(pPmString_t **r_ppstrcache);
+PmReturn_t string_getCache(pPmString_t ** r_ppstrcache);
 
 /**
  * Returns a new string object that is the concatenation
@@ -187,7 +179,7 @@ PmReturn_t string_getCache(pPmString_t **r_ppstrcache);
  * @return Return status
  */
 PmReturn_t
-string_concat(pPmString_t pstr1, pPmString_t pstr2, pPmObj_t *r_pstring);
+string_concat(pPmString_t pstr1, pPmString_t pstr2, pPmObj_t * r_pstring);
 
 /**
  * Returns a new string object that is created from the given format string
@@ -198,7 +190,7 @@ string_concat(pPmString_t pstr1, pPmString_t pstr2, pPmObj_t *r_pstring);
  * @param r_pstring Return arg; ptr to new string object
  * @return Return status
  */
-PmReturn_t string_format(pPmString_t pstr, pPmObj_t parg, pPmObj_t *r_pstring);
+PmReturn_t string_format(pPmString_t pstr, pPmObj_t parg, pPmObj_t * r_pstring);
 
 #ifdef HAVE_PRINT
 /**
@@ -209,10 +201,9 @@ PmReturn_t string_format(pPmString_t pstr, pPmObj_t parg, pPmObj_t *r_pstring);
  * @param n Number of bytes to print
  * @return Return status
  */
-PmReturn_t string_printFormattedBytes(uint8_t *pb,
-                                      uint8_t is_escaped,
-                                      uint16_t n);
-#endif /* HAVE_PRINT */
+PmReturn_t string_printFormattedBytes(uint8_t * pb,
+				      uint8_t is_escaped, uint16_t n);
+#endif				/* HAVE_PRINT */
 
 #ifdef HAVE_SLICE
 /**
@@ -225,8 +216,8 @@ PmReturn_t string_printFormattedBytes(uint8_t *pb,
  * @param   r_pslice Reference of ptr to object containing resulting slice object
  * @return  Return status
  */
-PmReturn_t string_slice(pPmObj_t pstring, pPmObj_t pstart, pPmObj_t pend, 
-                        pPmObj_t pstride, pPmObj_t *r_pslice);
-#endif /* HAVE_SLICE */
+PmReturn_t string_slice(pPmObj_t pstring, pPmObj_t pstart, pPmObj_t pend,
+			pPmObj_t pstride, pPmObj_t * r_pslice);
+#endif				/* HAVE_SLICE */
 
-#endif /* __STRING_H__ */
+#endif				/* __STRING_H__ */

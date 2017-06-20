@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __TUPLE_H__
 #define __TUPLE_H__
-
 
 /**
  * \file
@@ -22,10 +20,9 @@
  *
  * Immutable ordered sequence.  Contains array of ptrs to objs.
  */
-typedef struct PmTuple_s
-{
+typedef struct PmTuple_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /**
      * Length of tuple
@@ -33,16 +30,13 @@ typedef struct PmTuple_s
      * but if I set this type to int8_t, a 0-element tuple
      * is too small to be allocated.
      */
-    uint16_t length;
+	uint16_t length;
 
     /** Array of ptrs to objs */
-    pPmObj_t val[1];
-} PmTuple_t,
- *pPmTuple_t;
-
+	pPmObj_t val[1];
+} PmTuple_t, *pPmTuple_t;
 
 #define tuple_copy(src, dest) tuple_replicate((src), 1, (dest))
-
 
 /**
  * Creates a Tuple by loading a tuple image from memory.
@@ -63,7 +57,7 @@ typedef struct PmTuple_s
  * @return  Return status
  */
 PmReturn_t tuple_loadFromImg(PmMemSpace_t memspace,
-                             uint8_t const **paddr, pPmObj_t *r_ptuple);
+			     uint8_t const **paddr, pPmObj_t * r_ptuple);
 
 /**
  * Allocates space for a new Tuple.  Returns a pointer to the tuple.
@@ -72,7 +66,7 @@ PmReturn_t tuple_loadFromImg(PmMemSpace_t memspace,
  * @param   r_ptuple Return by ref, ptr to new tuple
  * @return  Return status
  */
-PmReturn_t tuple_new(uint16_t n, pPmObj_t *r_ptuple);
+PmReturn_t tuple_new(uint16_t n, pPmObj_t * r_ptuple);
 
 /**
  * Replicates a tuple, n number of times to create a new tuple
@@ -84,7 +78,7 @@ PmReturn_t tuple_new(uint16_t n, pPmObj_t *r_ptuple);
  * @param   r_ptuple Return arg; Ptr to new tuple.
  * @return  Return status
  */
-PmReturn_t tuple_replicate(pPmObj_t ptup, int16_t n, pPmObj_t *r_ptuple);
+PmReturn_t tuple_replicate(pPmObj_t ptup, int16_t n, pPmObj_t * r_ptuple);
 
 /**
  * Gets the object in the tuple at the index.
@@ -94,7 +88,7 @@ PmReturn_t tuple_replicate(pPmObj_t ptup, int16_t n, pPmObj_t *r_ptuple);
  * @param   r_pobj Return by reference; ptr to item
  * @return  Return status
  */
-PmReturn_t tuple_getItem(pPmObj_t ptup, int16_t index, pPmObj_t *r_pobj);
+PmReturn_t tuple_getItem(pPmObj_t ptup, int16_t index, pPmObj_t * r_pobj);
 
 #ifdef HAVE_PRINT
 /**
@@ -104,7 +98,7 @@ PmReturn_t tuple_getItem(pPmObj_t ptup, int16_t index, pPmObj_t *r_pobj);
  * @return Return status
  */
 PmReturn_t tuple_print(pPmObj_t pobj);
-#endif /* HAVE_PRINT */
+#endif				/* HAVE_PRINT */
 
 #ifdef HAVE_SLICE
 /**
@@ -118,7 +112,7 @@ PmReturn_t tuple_print(pPmObj_t pobj);
  * @return  Return status
  */
 PmReturn_t tuple_slice(pPmObj_t ptuple, pPmObj_t pstart, pPmObj_t pend,
-                       pPmObj_t pstride, pPmObj_t *r_pslice);
-#endif /* HAVE_SLICE */
+		       pPmObj_t pstride, pPmObj_t * r_pslice);
+#endif				/* HAVE_SLICE */
 
-#endif /* __TUPLE_H__ */
+#endif				/* __TUPLE_H__ */

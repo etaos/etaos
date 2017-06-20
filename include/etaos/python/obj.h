@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __OBJ_H__
 #define __OBJ_H__
-
 
 /**
  * \file
@@ -16,7 +14,6 @@
  *
  * Object type header.
  */
-
 
 /** Object descriptor field constants */
 #define OD_MARK_SHIFT (uint8_t)0
@@ -80,7 +77,6 @@
     } \
     while (0)
 
-
 /**
  * Object type enum
  *
@@ -91,102 +87,100 @@
  *
  * WARNING: od_type must be at most 5 bits! (must be < 0x20)
  */
-typedef enum PmType_e
-{
-    OBJ_TYPE_HASHABLE_MIN = 0x00,
+typedef enum PmType_e {
+	OBJ_TYPE_HASHABLE_MIN = 0x00,
 
     /** None */
-    OBJ_TYPE_NON = 0x00,
+	OBJ_TYPE_NON = 0x00,
 
     /** Signed integer */
-    OBJ_TYPE_INT = 0x01,
+	OBJ_TYPE_INT = 0x01,
 
     /** Floating point 32b */
-    OBJ_TYPE_FLT = 0x02,
+	OBJ_TYPE_FLT = 0x02,
 
     /** String */
-    OBJ_TYPE_STR = 0x03,
+	OBJ_TYPE_STR = 0x03,
 
     /** Tuple (immutable sequence) */
-    OBJ_TYPE_TUP = 0x04,
+	OBJ_TYPE_TUP = 0x04,
 
     /** Code obj */
-    OBJ_TYPE_COB = 0x05,
+	OBJ_TYPE_COB = 0x05,
 
     /** Module obj */
-    OBJ_TYPE_MOD = 0x06,
+	OBJ_TYPE_MOD = 0x06,
 
     /** Class obj */
-    OBJ_TYPE_CLO = 0x07,
+	OBJ_TYPE_CLO = 0x07,
 
     /** Function obj (callable) */
-    OBJ_TYPE_FXN = 0x08,
+	OBJ_TYPE_FXN = 0x08,
 
     /** Class instance */
-    OBJ_TYPE_CLI = 0x09,
+	OBJ_TYPE_CLI = 0x09,
 
     /** Code image in static memory */
-    OBJ_TYPE_CIM = 0x0A,
+	OBJ_TYPE_CIM = 0x0A,
 
     /** Native function image */
-    OBJ_TYPE_NIM = 0x0B,
+	OBJ_TYPE_NIM = 0x0B,
 
     /** Native function object */
-    OBJ_TYPE_NOB = 0x0C,
+	OBJ_TYPE_NOB = 0x0C,
 
     /** Thread */
-    OBJ_TYPE_THR = 0x0D,
+	OBJ_TYPE_THR = 0x0D,
 
     /** Boolean object */
-    OBJ_TYPE_BOOL = 0x0F,
+	OBJ_TYPE_BOOL = 0x0F,
 
     /** Code image object */
-    OBJ_TYPE_CIO = 0x10,
+	OBJ_TYPE_CIO = 0x10,
 
     /** Method object */
-    OBJ_TYPE_MTH = 0x11,
+	OBJ_TYPE_MTH = 0x11,
 
-    /* All types after this are not hashable */
-    OBJ_TYPE_HASHABLE_MAX = 0x11,
+	/* All types after this are not hashable */
+	OBJ_TYPE_HASHABLE_MAX = 0x11,
 
     /** List (mutable sequence) */
-    OBJ_TYPE_LST = 0x12,
+	OBJ_TYPE_LST = 0x12,
 
     /** Dictionary (hash table) */
-    OBJ_TYPE_DIC = 0x13,
+	OBJ_TYPE_DIC = 0x13,
 
 #ifdef HAVE_BYTEARRAY
     /** Bytearray (mutable) */
-    OBJ_TYPE_BYA = 0x14,
-#endif /* HAVE_BYTEARRAY */
+	OBJ_TYPE_BYA = 0x14,
+#endif				/* HAVE_BYTEARRAY */
 
-    /* All types after this are not accessible to the user */
-    OBJ_TYPE_ACCESSIBLE_MAX = 0x18,
+	/* All types after this are not accessible to the user */
+	OBJ_TYPE_ACCESSIBLE_MAX = 0x18,
 
 #ifdef HAVE_BYTEARRAY
     /** Bytes (mutable container for Bytearray type) */
-    OBJ_TYPE_BYS = 0x18,
-#endif /* HAVE_BYTEARRAY */
+	OBJ_TYPE_BYS = 0x18,
+#endif				/* HAVE_BYTEARRAY */
 
     /** Frame type */
-    OBJ_TYPE_FRM = 0x19,
+	OBJ_TYPE_FRM = 0x19,
 
     /** Block type (for,while,try,etc) */
-    OBJ_TYPE_BLK = 0x1A,
+	OBJ_TYPE_BLK = 0x1A,
 
     /** Segment (within a seglist) */
-    OBJ_TYPE_SEG = 0x1B,
+	OBJ_TYPE_SEG = 0x1B,
 
     /** Seglist */
-    OBJ_TYPE_SGL = 0x1C,
+	OBJ_TYPE_SGL = 0x1C,
 
     /** Sequence iterator */
-    OBJ_TYPE_SQI = 0x1D,
+	OBJ_TYPE_SQI = 0x1D,
 
     /** Native frame (there is only one) */
-    OBJ_TYPE_NFM = 0x1E,
+	OBJ_TYPE_NFM = 0x1E,
 } PmType_t, *pPmType_t;
-
 
 /**
  * Object Descriptor
@@ -215,23 +209,19 @@ typedef enum PmType_e
 typedef uint16_t PmObjDesc_t, *pPmObjDesc_t;
 
 /** The abstract empty object type for PyMite. */
-typedef struct PmObj_s
-{
+typedef struct PmObj_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 } PmObj_t, *pPmObj_t;
 
 /** Boolean object */
-typedef struct PmBoolean_s
-{
+typedef struct PmBoolean_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Boolean value */
-    int32_t val;
-}
-PmBoolean_t, *pPmBoolean_t;
-
+	int32_t val;
+} PmBoolean_t, *pPmBoolean_t;
 
 /**
  * Loads an object from an image in memory.
@@ -264,7 +254,7 @@ PmBoolean_t, *pPmBoolean_t;
  * @return  Return status
  */
 PmReturn_t obj_loadFromImg(PmMemSpace_t memspace,
-                           uint8_t const **paddr, pPmObj_t *r_pobj);
+			   uint8_t const **paddr, pPmObj_t * r_pobj);
 
 /**
  * Loads a code object from a code image object
@@ -273,7 +263,7 @@ PmReturn_t obj_loadFromImg(PmMemSpace_t memspace,
  * @param r_pobj Return arg, the loaded object
  * @return  Returns status
  */
-PmReturn_t obj_loadFromImgObj(pPmObj_t pimg, pPmObj_t *r_pobj);
+PmReturn_t obj_loadFromImgObj(pPmObj_t pimg, pPmObj_t * r_pobj);
 
 /**
  * Finds the boolean value of the given object.
@@ -326,7 +316,7 @@ PmReturn_t obj_print(pPmObj_t pobj, uint8_t is_expr_repr, uint8_t is_nested);
  * @param r_pstr Return arg, the string object
  * @return Return status
  */
-PmReturn_t obj_repr(pPmObj_t pobj, pPmObj_t *r_pstr);
-#endif /* HAVE_BACKTICK */
+PmReturn_t obj_repr(pPmObj_t pobj, pPmObj_t * r_pstr);
+#endif				/* HAVE_BACKTICK */
 
-#endif /* __OBJ_H__ */
+#endif				/* __OBJ_H__ */

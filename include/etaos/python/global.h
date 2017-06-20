@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __GLOBAL_H__
 #define __GLOBAL_H__
-
 
 /**
  * \file
@@ -16,7 +14,6 @@
  *
  * VM globals header.
  */
-
 
 /** The global root PmGlobals Dict object */
 #define PM_PBUILTINS    (pPmObj_t)(gVmGlobal.builtins)
@@ -45,120 +42,115 @@
 #ifdef HAVE_CLASSES
 /** The global string "__init__" */
 #define PM_INIT_STR     (pPmObj_t)(gVmGlobal.pinitStr)
-#endif /* HAVE_CLASSES */
+#endif				/* HAVE_CLASSES */
 
 #ifdef HAVE_GENERATORS
 /** The global string "Generator" */
 #define PM_GENERATOR_STR (pPmObj_t)(gVmGlobal.pgenStr)
 /** The global string "next" */
 #define PM_NEXT_STR (pPmObj_t)(gVmGlobal.pnextStr)
-#endif /* HAVE_GENERATORS */
+#endif				/* HAVE_GENERATORS */
 
 #ifdef HAVE_ASSERT
 /** The global string "Exception" */
 #define PM_EXCEPTION_STR (pPmObj_t)(gVmGlobal.pexnStr)
-#endif /* HAVE_ASSERT */
+#endif				/* HAVE_ASSERT */
 
 #ifdef HAVE_BYTEARRAY
 /** The global string "bytearray" */
 #define PM_BYTEARRAY_STR (pPmObj_t)(gVmGlobal.pbaStr)
-#endif /* HAVE_BYTEARRAY */
+#endif				/* HAVE_BYTEARRAY */
 
 /** The global string "__md" */
 #define PM_MD_STR (pPmObj_t)(gVmGlobal.pmdStr)
 
-
 /**
  * This struct contains ALL of PyMite's globals
  */
-typedef struct PmVmGlobal_s
-{
+typedef struct PmVmGlobal_s {
     /** Global none obj (none) */
-    pPmObj_t pnone;
+	pPmObj_t pnone;
 
     /** Global integer 0 obj */
-    pPmInt_t pzero;
+	pPmInt_t pzero;
 
     /** Global integer 1 obj */
-    pPmInt_t pone;
+	pPmInt_t pone;
 
     /** Global integer -1 obj */
-    pPmInt_t pnegone;
+	pPmInt_t pnegone;
 
     /** Global boolean False obj */
-    pPmInt_t pfalse;
+	pPmInt_t pfalse;
 
     /** Global boolean True obj */
-    pPmInt_t ptrue;
+	pPmInt_t ptrue;
 
     /** The string "code", used in interp.c RAISE_VARARGS */
-    pPmString_t pcodeStr;
+	pPmString_t pcodeStr;
 
     /** Dict for builtins */
-    pPmDict_t builtins;
+	pPmDict_t builtins;
 
     /** Paths to available images */
-    PmImgPaths_t imgPaths;
+	PmImgPaths_t imgPaths;
 
     /** The single native frame.  Static alloc so it won't be GC'd */
-    PmNativeFrame_t nativeframe;
+	PmNativeFrame_t nativeframe;
 
     /** PyMite release value for when an error occurs */
-    uint8_t errVmRelease;
+	uint8_t errVmRelease;
 
     /** PyMite source file ID number for when an error occurs */
-    uint8_t errFileId;
+	uint8_t errFileId;
 
     /** Line number for when an error occurs */
-    uint16_t errLineNum;
+	uint16_t errLineNum;
 
     /** Thread list */
-    pPmList_t threadList;
+	pPmList_t threadList;
 
     /** Ptr to current thread */
-    pPmThread_t pthread;
+	pPmThread_t pthread;
 
 #ifdef HAVE_CLASSES
-    /* NOTE: placing this field before the nativeframe field causes errors */
+	/* NOTE: placing this field before the nativeframe field causes errors */
     /** The string "__init__", used in interp.c CALL_FUNCTION */
-    pPmString_t pinitStr;
-#endif /* HAVE_CLASSES */
+	pPmString_t pinitStr;
+#endif				/* HAVE_CLASSES */
 
 #ifdef HAVE_GENERATORS
     /** The string "Generator", used in interp.c CALL_FUNCTION */
-    pPmString_t pgenStr;
+	pPmString_t pgenStr;
     /** The string "next", used in interp.c FOR_ITER */
-    pPmString_t pnextStr;
-#endif /* HAVE_GENERATORS */
+	pPmString_t pnextStr;
+#endif				/* HAVE_GENERATORS */
 
 #ifdef HAVE_ASSERT
     /** The string "Exception", used in RAISE_VARARGS */
-    pPmString_t pexnStr;
-#endif /* HAVE_ASSERT */
+	pPmString_t pexnStr;
+#endif				/* HAVE_ASSERT */
 
 #ifdef HAVE_BYTEARRAY
     /** The global string "bytearray" */
-    pPmString_t pbaStr;
-#endif /* HAVE_BYTEARRAY */
+	pPmString_t pbaStr;
+#endif				/* HAVE_BYTEARRAY */
 
     /** The global string "__md" */
-    pPmString_t pmdStr;
+	pPmString_t pmdStr;
 
 #ifdef HAVE_PRINT
     /** Remembers when a space is needed before printing the next object */
-    uint8_t needSoftSpace;
+	uint8_t needSoftSpace;
     /** Remembers when something has printed since the last newline */
-    uint8_t somethingPrinted;
-#endif /* HAVE_PRINT */
+	uint8_t somethingPrinted;
+#endif				/* HAVE_PRINT */
 
     /** Flag to trigger rescheduling */
-    uint8_t reschedule;
-} PmVmGlobal_t,
- *pPmVmGlobal_t;
-
+	uint8_t reschedule;
+} PmVmGlobal_t, *pPmVmGlobal_t;
 
 extern volatile PmVmGlobal_t gVmGlobal;
-
 
 /**
  * Initializes the global struct
@@ -190,4 +182,4 @@ PmReturn_t global_setBuiltins(pPmFunc_t pmod);
  */
 PmReturn_t global_loadBuiltins(void);
 
-#endif /* __GLOBAL_H__ */
+#endif				/* __GLOBAL_H__ */

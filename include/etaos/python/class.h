@@ -5,7 +5,6 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __CLASS_H__
 #define __CLASS_H__
 
@@ -14,57 +13,49 @@
  *  \brief Class header. 
  */
 
-
 /**
  * Class struct
  *
  * This C struct is used for PyMite class objects
  * Note: Exceptions are objects.
  */
-typedef struct PmClass_s
-{
+typedef struct PmClass_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Attributes dict */
-    pPmDict_t cl_attrs;
-    
+	pPmDict_t cl_attrs;
+
     /** Bases tuple */
-    pPmTuple_t cl_bases;
-} PmClass_t,
- *pPmClass_t;
+	pPmTuple_t cl_bases;
+} PmClass_t, *pPmClass_t;
 
 /** Class instance struct */
-typedef struct PmInstance_s
-{
+typedef struct PmInstance_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Class of this instance */
-    pPmClass_t cli_class;
+	pPmClass_t cli_class;
 
     /** Attributes dict */
-    pPmDict_t cli_attrs;
-} PmInstance_t, 
-*pPmInstance_t;
+	pPmDict_t cli_attrs;
+} PmInstance_t, *pPmInstance_t;
 
 /** Method struct */
-typedef struct PmMethod_s
-{
+typedef struct PmMethod_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Class instance of this method */
-    pPmInstance_t m_instance;
-    
-    /** Func of this method */
-    pPmFunc_t m_func;
-    
-    /** Attributes dict */
-    pPmDict_t m_attrs;
-} PmMethod_t, 
-*pPmMethod_t;
+	pPmInstance_t m_instance;
 
+    /** Func of this method */
+	pPmFunc_t m_func;
+
+    /** Attributes dict */
+	pPmDict_t m_attrs;
+} PmMethod_t, *pPmMethod_t;
 
 /**
  * Creates a new Class object from the methods dict, bases tuple,
@@ -77,7 +68,7 @@ typedef struct PmMethod_s
  * @return  Return status
  */
 PmReturn_t class_new(pPmObj_t pmeths, pPmObj_t pbases, pPmObj_t pname,
-                     pPmObj_t *r_pclass);
+		     pPmObj_t * r_pclass);
 
 /**
  * Returns an instance of the given class
@@ -86,7 +77,7 @@ PmReturn_t class_new(pPmObj_t pmeths, pPmObj_t pbases, pPmObj_t pname,
  * @param r_pobj Return by ref, instance object
  * @return  Return status
  */
-PmReturn_t class_instantiate(pPmObj_t pclass, pPmObj_t *r_pobj);
+PmReturn_t class_instantiate(pPmObj_t pclass, pPmObj_t * r_pobj);
 
 #ifdef HAVE_AUTOBOX
 /**
@@ -95,7 +86,7 @@ PmReturn_t class_instantiate(pPmObj_t pclass, pPmObj_t *r_pobj);
  * @param pclass Pointer to object
  * @return  Return status
  */
-PmReturn_t class_autobox(pPmObj_t *pobj);
+PmReturn_t class_autobox(pPmObj_t * pobj);
 #endif
 
 /**
@@ -106,7 +97,7 @@ PmReturn_t class_autobox(pPmObj_t *pobj);
  * @param   r_pmeth Return by ref, ptr to new method
  * @return  Return status
  */
-PmReturn_t class_method(pPmObj_t pinstance, pPmObj_t pfunc, pPmObj_t *r_pmeth);
+PmReturn_t class_method(pPmObj_t pinstance, pPmObj_t pfunc, pPmObj_t * r_pmeth);
 
 /**
  * Returns the first attribute named __init__ in the class' inheritance tree
@@ -116,7 +107,7 @@ PmReturn_t class_method(pPmObj_t pinstance, pPmObj_t pfunc, pPmObj_t *r_pmeth);
  * @param   r_pobj Return by ref, ptr to attr if found, or undetermined
  * @return  Return status
  */
-PmReturn_t class_getAttr(pPmObj_t pobj, pPmObj_t pname, pPmObj_t *r_pobj);
+PmReturn_t class_getAttr(pPmObj_t pobj, pPmObj_t pname, pPmObj_t * r_pobj);
 
 /**
  * Returns a C boolean if the base class is found in the inheritance tree
@@ -129,4 +120,4 @@ PmReturn_t class_getAttr(pPmObj_t pobj, pPmObj_t pname, pPmObj_t *r_pobj);
  */
 uint8_t class_isSubclass(pPmObj_t ptest_class, pPmObj_t pbase_class);
 
-#endif /* __CLASS_H__ */
+#endif				/* __CLASS_H__ */

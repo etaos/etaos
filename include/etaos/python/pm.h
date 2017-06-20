@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __PM_H__
 #define __PM_H__
-
 
 /**
  * \file
@@ -16,7 +14,6 @@
  *
  * Include things that are needed by nearly everything.
  */
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +34,6 @@ extern "C" {
  * and line number.
  */
 #define PM_RELEASE 8
-
 
 /** null for C++ and C code */
 #ifdef __cplusplus
@@ -60,7 +56,6 @@ extern "C" {
 
 /** PORT inline for C code */
 #define INLINE __inline__
-
 
 /**
  * Returns an exception error code and stores debug data
@@ -147,7 +142,6 @@ extern "C" {
 #define C_DEBUG_PRINT(...)
 #endif
 
-
 /**
  * Return values for system functions
  * to report status, errors, exceptions, etc.
@@ -155,41 +149,62 @@ extern "C" {
  * should propagate the same return value
  * up the call tree to the interpreter.
  */
-typedef enum PmReturn_e
-{
-    /* general status return values */
-    PM_RET_OK = 0,              /**< Everything is ok */
-    PM_RET_NO = 0xFF,           /**< General "no result" */
-    PM_RET_ERR = 0xFE,          /**< General failure */
-    PM_RET_STUB = 0xFD,         /**< Return val for stub fxn */
-    PM_RET_ASSERT_FAIL = 0xFC,  /**< Assertion failure */
-    PM_RET_FRAME_SWITCH = 0xFB, /**< Frame pointer was modified */
-    PM_RET_ALIGNMENT = 0xFA,    /**< Heap is not aligned */
+	typedef enum PmReturn_e {
+		/* general status return values */
+		PM_RET_OK = 0,	/**< Everything is ok */
+		PM_RET_NO = 0xFF,
+				/**< General "no result" */
+		PM_RET_ERR = 0xFE,
+				/**< General failure */
+		PM_RET_STUB = 0xFD,
+				/**< Return val for stub fxn */
+		PM_RET_ASSERT_FAIL = 0xFC,
+				/**< Assertion failure */
+		PM_RET_FRAME_SWITCH = 0xFB,
+				/**< Frame pointer was modified */
+		PM_RET_ALIGNMENT = 0xFA,
+				/**< Heap is not aligned */
 
-    /* return vals that indicate an exception occured */
-    PM_RET_EX = 0xE0,           /**< General exception */
-    PM_RET_EX_EXIT = 0xE1,      /**< System exit */
-    PM_RET_EX_IO = 0xE2,        /**< Input/output error */
-    PM_RET_EX_ZDIV = 0xE3,      /**< Zero division error */
-    PM_RET_EX_ASSRT = 0xE4,     /**< Assertion error */
-    PM_RET_EX_ATTR = 0xE5,      /**< Attribute error */
-    PM_RET_EX_IMPRT = 0xE6,     /**< Import error */
-    PM_RET_EX_INDX = 0xE7,      /**< Index error */
-    PM_RET_EX_KEY = 0xE8,       /**< Key error */
-    PM_RET_EX_MEM = 0xE9,       /**< Memory error */
-    PM_RET_EX_NAME = 0xEA,      /**< Name error */
-    PM_RET_EX_SYNTAX = 0xEB,    /**< Syntax error */
-    PM_RET_EX_SYS = 0xEC,       /**< System error */
-    PM_RET_EX_TYPE = 0xED,      /**< Type error */
-    PM_RET_EX_VAL = 0xEE,       /**< Value error */
-    PM_RET_EX_STOP = 0xEF,      /**< Stop iteration */
-    PM_RET_EX_WARN = 0xF0,      /**< Warning */
-    PM_RET_EX_OFLOW = 0xF1,     /**< Overflow */
-} PmReturn_t;
+		/* return vals that indicate an exception occured */
+		PM_RET_EX = 0xE0,
+				/**< General exception */
+		PM_RET_EX_EXIT = 0xE1,
+				/**< System exit */
+		PM_RET_EX_IO = 0xE2,
+				/**< Input/output error */
+		PM_RET_EX_ZDIV = 0xE3,
+				/**< Zero division error */
+		PM_RET_EX_ASSRT = 0xE4,
+				/**< Assertion error */
+		PM_RET_EX_ATTR = 0xE5,
+				/**< Attribute error */
+		PM_RET_EX_IMPRT = 0xE6,
+				/**< Import error */
+		PM_RET_EX_INDX = 0xE7,
+				/**< Index error */
+		PM_RET_EX_KEY = 0xE8,
+				/**< Key error */
+		PM_RET_EX_MEM = 0xE9,
+				/**< Memory error */
+		PM_RET_EX_NAME = 0xEA,
+				/**< Name error */
+		PM_RET_EX_SYNTAX = 0xEB,
+				/**< Syntax error */
+		PM_RET_EX_SYS = 0xEC,
+				/**< System error */
+		PM_RET_EX_TYPE = 0xED,
+				/**< Type error */
+		PM_RET_EX_VAL = 0xEE,
+				/**< Value error */
+		PM_RET_EX_STOP = 0xEF,
+				/**< Stop iteration */
+		PM_RET_EX_WARN = 0xF0,
+				/**< Warning */
+		PM_RET_EX_OFLOW = 0xF1,
+				/**< Overflow */
+	} PmReturn_t;
 
-
-extern volatile uint32_t pm_timerMsTicks;
-
+	extern volatile uint32_t pm_timerMsTicks;
 
 /* WARNING: The order of the following includes is critical */
 #include <asm/python/pm.h>
@@ -221,10 +236,9 @@ extern volatile uint32_t pm_timerMsTicks;
 #include <etaos/python/bytearray.h>
 
 /** Pointer to a native function used for lookup tables in interp.c */
-typedef PmReturn_t (* pPmNativeFxn_t)(pPmFrame_t *);
-extern pPmNativeFxn_t const std_nat_fxn_table[];
-extern pPmNativeFxn_t const usr_nat_fxn_table[];
-
+	typedef PmReturn_t(*pPmNativeFxn_t) (pPmFrame_t *);
+	extern pPmNativeFxn_t const std_nat_fxn_table[];
+	extern pPmNativeFxn_t const usr_nat_fxn_table[];
 
 /**
  * Initializes the PyMite virtual machine and indexes the user's application
@@ -238,8 +252,8 @@ extern pPmNativeFxn_t const usr_nat_fxn_table[];
  * @param pusrimg       Address of the user image in the memory space
  * @return Return status
  */
-PmReturn_t pm_init(uint8_t *heap_base, uint32_t heap_size,
-                   PmMemSpace_t memspace, uint8_t const * const pusrimg);
+	PmReturn_t pm_init(uint8_t * heap_base, uint32_t heap_size,
+			   PmMemSpace_t memspace, uint8_t const *const pusrimg);
 
 /**
  * Executes the named module
@@ -247,7 +261,7 @@ PmReturn_t pm_init(uint8_t *heap_base, uint32_t heap_size,
  * @param modstr        Name of module to run
  * @return Return status
  */
-PmReturn_t pm_run(uint8_t const *modstr);
+	PmReturn_t pm_run(uint8_t const *modstr);
 
 /**
  * Needs to be called periodically by the host program.
@@ -259,10 +273,9 @@ PmReturn_t pm_run(uint8_t const *modstr);
  *                           since last call. This must be <64535.
  * @return Return status
  */
-PmReturn_t pm_vmPeriodic(uint16_t usecsSinceLastCall);
+	PmReturn_t pm_vmPeriodic(uint16_t usecsSinceLastCall);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* __PM_H__ */
+#endif				/* __PM_H__ */

@@ -5,7 +5,6 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __FUNC_H__
 #define __FUNC_H__
 
@@ -25,33 +24,30 @@
  * The first (__main__) module that is executed has a function obj
  * created for it to execute the bytecode which builds the module.
  */
-typedef struct PmFunc_s
-{
+typedef struct PmFunc_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Ptr to code obj */
-    pPmCo_t f_co;
+	pPmCo_t f_co;
 
     /** Ptr to attribute dict */
-    pPmDict_t f_attrs;
+	pPmDict_t f_attrs;
 
     /** Ptr to globals dict */
-    pPmDict_t f_globals;
+	pPmDict_t f_globals;
 
 #ifdef HAVE_DEFAULTARGS
     /** Ptr to tuple holding default args */
-    pPmTuple_t f_defaultargs;
-#endif /* HAVE_DEFAULTARGS */
+	pPmTuple_t f_defaultargs;
+#endif				/* HAVE_DEFAULTARGS */
 
 #ifdef HAVE_CLOSURES
     /** Ptr to tuple of cell values */
-    pPmTuple_t f_closure;
-#endif /* HAVE_CLOSURES */
+	pPmTuple_t f_closure;
+#endif				/* HAVE_CLOSURES */
 
-} PmFunc_t,
- *pPmFunc_t;
-
+} PmFunc_t, *pPmFunc_t;
 
 /**
  * Creates a Function Obj for the given Code Obj.
@@ -62,6 +58,6 @@ typedef struct PmFunc_s
  * @param   r_pfunc Return by reference; pointer to new function
  * @return  Return status
  */
-PmReturn_t func_new(pPmObj_t pco, pPmObj_t pglobals, pPmObj_t *r_pfunc);
+PmReturn_t func_new(pPmObj_t pco, pPmObj_t pglobals, pPmObj_t * r_pfunc);
 
-#endif /* __FUNC_H__ */
+#endif				/* __FUNC_H__ */

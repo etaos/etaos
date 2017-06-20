@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __FLOAT_H__
 #define __FLOAT_H__
-
 
 /**
  * \file
@@ -17,21 +15,18 @@
  * Float object type header.
  */
 
-
 /**
  * Float obj
  *
  * 32b floating point number
  */
-typedef struct PmFloat_s
-{
+typedef struct PmFloat_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Float value */
-    float val;
+	float val;
 } PmFloat_t, *pPmFloat_t;
-
 
 #ifdef HAVE_FLOAT
 
@@ -42,7 +37,7 @@ typedef struct PmFloat_s
  * @param   r_pint Return by ref, ptr to new float
  * @return  Return status
  */
-PmReturn_t float_new(float f, pPmObj_t *r_pf);
+PmReturn_t float_new(float f, pPmObj_t * r_pf);
 
 /**
  * Implements the UNARY_NEGATIVE bcode.
@@ -53,7 +48,7 @@ PmReturn_t float_new(float f, pPmObj_t *r_pf);
  * @param   r_pint Return by ref, ptr to float
  * @return  Return status
  */
-PmReturn_t float_negative(pPmObj_t pf, pPmObj_t *r_pf);
+PmReturn_t float_negative(pPmObj_t pf, pPmObj_t * r_pf);
 
 /**
  * Returns by reference a float that is x op y.
@@ -64,7 +59,7 @@ PmReturn_t float_negative(pPmObj_t pf, pPmObj_t *r_pf);
  * @param op The operator (+,-,*,/ and power)
  * @return Return status
  */
-PmReturn_t float_op(pPmObj_t px, pPmObj_t py, pPmObj_t *r_pn, int8_t op);
+PmReturn_t float_op(pPmObj_t px, pPmObj_t py, pPmObj_t * r_pn, int8_t op);
 
 /**
  * Returns by reference a boolean that is x op y.
@@ -75,8 +70,8 @@ PmReturn_t float_op(pPmObj_t px, pPmObj_t py, pPmObj_t *r_pn, int8_t op);
  * @param cmp The comparison operator
  * @return Return status
  */
-PmReturn_t float_compare(pPmObj_t px, pPmObj_t py, pPmObj_t *r_pobj,
-                         PmCompare_t cmp);
+PmReturn_t float_compare(pPmObj_t px, pPmObj_t py, pPmObj_t * r_pobj,
+			 PmCompare_t cmp);
 
 #ifdef HAVE_PRINT
 /**
@@ -88,8 +83,8 @@ PmReturn_t float_compare(pPmObj_t px, pPmObj_t py, pPmObj_t *r_pobj,
  */
 PmReturn_t float_print(pPmObj_t pf);
 
-#endif /* HAVE_PRINT */
+#endif				/* HAVE_PRINT */
 
-#endif /* HAVE_FLOAT */
+#endif				/* HAVE_FLOAT */
 
-#endif /* __FLOAT_H__ */
+#endif				/* __FLOAT_H__ */

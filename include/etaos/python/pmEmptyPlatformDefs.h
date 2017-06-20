@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __PM_EMPTY_PLATFORM_DEFS_H__
 #define __PM_EMPTY_PLATFORM_DEFS_H__
-
 
 /**
  * \file
@@ -28,4 +26,4 @@
 #define PM_PLAT_HEAP_ATTR
 #endif
 
-#endif /* __PM_EMPTY_PLATFORM_DEFS_H__ */
+#endif				/* __PM_EMPTY_PLATFORM_DEFS_H__ */

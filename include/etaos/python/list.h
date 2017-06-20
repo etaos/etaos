@@ -5,7 +5,6 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __PMLIST_H__
 #define __PMLIST_H__
 
@@ -21,19 +20,16 @@
  *
  * Mutable ordered sequence of objects.  Contains ptr to linked list of nodes.
  */
-typedef struct PmList_s
-{
+typedef struct PmList_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** List length; number of objs linked */
-    uint16_t length;
+	uint16_t length;
 
     /** Ptr to linked list of nodes */
-    pSeglist_t val;
-} PmList_t,
- *pPmList_t;
-
+	pSeglist_t val;
+} PmList_t, *pPmList_t;
 
 /**
  * Allocates a new List object.
@@ -47,7 +43,7 @@ typedef struct PmList_s
  * @param   r_pobj Return; addr of ptr to obj
  * @return  Return status
  */
-PmReturn_t list_new(pPmObj_t *r_pobj);
+PmReturn_t list_new(pPmObj_t * r_pobj);
 
 /**
  * Gets the object in the list at the index.
@@ -57,7 +53,7 @@ PmReturn_t list_new(pPmObj_t *r_pobj);
  * @param   r_pobj Return by reference; ptr to item
  * @return  Return status
  */
-PmReturn_t list_getItem(pPmObj_t plist, int16_t index, pPmObj_t *r_pobj);
+PmReturn_t list_getItem(pPmObj_t plist, int16_t index, pPmObj_t * r_pobj);
 
 /**
  * Sets the item in the list at the index.
@@ -79,7 +75,7 @@ PmReturn_t list_setItem(pPmObj_t plist, int16_t index, pPmObj_t pobj);
  * @param   r_pobj Return; Addr of ptr to return obj
  * @return  Return status
  */
-PmReturn_t list_copy(pPmObj_t pobj, pPmObj_t *r_pobj);
+PmReturn_t list_copy(pPmObj_t pobj, pPmObj_t * r_pobj);
 
 /**
  * Appends the given obj to the end of the given list.
@@ -104,7 +100,7 @@ PmReturn_t list_append(pPmObj_t plist, pPmObj_t pobj);
  * @param   r_pnewlist Return; new list with its contents set.
  * @return  Return status
  */
-PmReturn_t list_replicate(pPmObj_t psrclist, int16_t n, pPmObj_t *r_pnewlist);
+PmReturn_t list_replicate(pPmObj_t psrclist, int16_t n, pPmObj_t * r_pnewlist);
 
 /**
  * Inserts the object into the list at the desired index.
@@ -134,7 +130,7 @@ PmReturn_t list_remove(pPmObj_t plist, pPmObj_t item);
  * @param   r_index Return by reference; ptr to index (C uint16)
  * @return  Return status
  */
-PmReturn_t list_index(pPmObj_t plist, pPmObj_t pitem, uint16_t *r_index);
+PmReturn_t list_index(pPmObj_t plist, pPmObj_t pitem, uint16_t * r_index);
 
 /**
  * Removes the item at the given index.
@@ -155,7 +151,7 @@ PmReturn_t list_delItem(pPmObj_t plist, int16_t index);
  * @return Return status
  */
 PmReturn_t list_print(pPmObj_t pobj);
-#endif /* HAVE_PRINT */
+#endif				/* HAVE_PRINT */
 
 /**
  * Removes all items from the list and zeroes the length.
@@ -176,8 +172,8 @@ PmReturn_t list_clear(pPmObj_t plist);
  * @param   r_pslice Reference of ptr to object containing resulting slice object
  * @return 	Return status
  */
-PmReturn_t list_slice(pPmObj_t plist, pPmObj_t pstart, pPmObj_t pend, 
-	                  pPmObj_t pstride, pPmObj_t *r_pslice);
-#endif /* HAVE_SLICE */
+PmReturn_t list_slice(pPmObj_t plist, pPmObj_t pstart, pPmObj_t pend,
+		      pPmObj_t pstride, pPmObj_t * r_pslice);
+#endif				/* HAVE_SLICE */
 
-#endif /* __LIST_H__ */
+#endif				/* __LIST_H__ */

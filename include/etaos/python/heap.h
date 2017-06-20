@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __PMHEAP_H__
 #define __PMHEAP_H__
-
 
 /**
  * \file
@@ -17,13 +15,11 @@
  * VM heap header.
  */
 
-
 /**
  * The threshold of heap.avail under which the interpreter will run the GC
  * just before starting a native session.
  */
 #define HEAP_GC_NF_THRESHOLD (512)
-
 
 #ifdef __DEBUG__
 #define DEBUG_PRINT_HEAP_AVAIL(s) \
@@ -33,7 +29,6 @@
 #define DEBUG_PRINT_HEAP_AVAIL(s)
 #endif
 
-
 /**
  * Initializes the heap for use.
  *
@@ -41,7 +36,7 @@
  * @param size The size in bytes (octets) of the given heap.
  * @return  Return code.
  */
-PmReturn_t heap_init(uint8_t *base, uint32_t size);
+PmReturn_t heap_init(uint8_t * base, uint32_t size);
 
 /**
  * Returns a free chunk from the heap.
@@ -53,7 +48,7 @@ PmReturn_t heap_init(uint8_t *base, uint32_t size);
  * @param   r_pchunk Addr of ptr to chunk (return).
  * @return  Return code
  */
-PmReturn_t heap_getChunk(uint16_t requestedsize, uint8_t **r_pchunk);
+PmReturn_t heap_getChunk(uint16_t requestedsize, uint8_t ** r_pchunk);
 
 /**
  * Places the chunk back in the heap.
@@ -84,7 +79,7 @@ PmReturn_t heap_gcRun(void);
  */
 PmReturn_t heap_gcSetAuto(uint8_t auto_gc);
 
-#endif /* HAVE_GC */
+#endif				/* HAVE_GC */
 
 /**
  * Pushes an object onto the temporary roots stack if there is room
@@ -93,7 +88,7 @@ PmReturn_t heap_gcSetAuto(uint8_t auto_gc);
  * @param pobj Object to push onto the roots stack
  * @param r_objid By reference; ID to use when popping the object from the stack
  */
-void heap_gcPushTempRoot(pPmObj_t pobj, uint8_t *r_objid);
+void heap_gcPushTempRoot(pPmObj_t pobj, uint8_t * r_objid);
 
 /**
  * Pops from the temporary roots stack all objects upto and including the one
@@ -103,4 +98,4 @@ void heap_gcPushTempRoot(pPmObj_t pobj, uint8_t *r_objid);
  */
 void heap_gcPopTempRoot(uint8_t objid);
 
-#endif /* __HEAP_H__ */
+#endif				/* __HEAP_H__ */

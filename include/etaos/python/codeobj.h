@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __CODEOBJ_H__
 #define __CODEOBJ_H__
-
 
 /**
  * \file
@@ -16,7 +14,6 @@
  *
  * CodeObj type header.
  */
-
 
 /** Code image field offset consts */
 #define CI_TYPE_FIELD       0
@@ -27,22 +24,21 @@
 #define CI_NLOCALS_FIELD    6
 
 #ifdef HAVE_CLOSURES
-# define CI_FREEVARS_FIELD  7
-# ifdef HAVE_DEBUG_INFO
-#  define CI_FIRST_LINE_NO  8
-#  define CI_NAMES_FIELD    10
-# else
-#  define CI_NAMES_FIELD    8
-# endif /* HAVE_DEBUG_INFO */
+#define CI_FREEVARS_FIELD  7
+#ifdef HAVE_DEBUG_INFO
+#define CI_FIRST_LINE_NO  8
+#define CI_NAMES_FIELD    10
 #else
-# ifdef HAVE_DEBUG_INFO
-#  define CI_FIRST_LINE_NO  7
-#  define CI_NAMES_FIELD    9
-# else
-#  define CI_NAMES_FIELD    7
-# endif /* HAVE_DEBUG_INFO */
-#endif /* HAVE_CLOSURES */
-
+#define CI_NAMES_FIELD    8
+#endif				/* HAVE_DEBUG_INFO */
+#else
+#ifdef HAVE_DEBUG_INFO
+#define CI_FIRST_LINE_NO  7
+#define CI_NAMES_FIELD    9
+#else
+#define CI_NAMES_FIELD    7
+#endif				/* HAVE_DEBUG_INFO */
+#endif				/* HAVE_CLOSURES */
 
 /** Native code image size */
 #define NATIVE_IMAGE_SIZE   4
@@ -63,47 +59,45 @@
  * of the static code image.  Other parts can be obtained by
  * inspecting the code image itself.
  */
-typedef struct PmCo_s
-{
+typedef struct PmCo_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
     /** Address in progmem of the code image, or of code img obj in heap */
-    uint8_t const *co_codeimgaddr;
+	uint8_t const *co_codeimgaddr;
     /** Address in RAM of names tuple */
-    pPmTuple_t co_names;
+	pPmTuple_t co_names;
     /** Address in RAM of constants tuple */
-    pPmTuple_t co_consts;
+	pPmTuple_t co_consts;
     /** Address in memspace of bytecode (or native function) */
-    uint8_t const *co_codeaddr;
+	uint8_t const *co_codeaddr;
 
 #ifdef HAVE_DEBUG_INFO
     /** Address in memspace of the line number table */
-    uint8_t const *co_lnotab;
+	uint8_t const *co_lnotab;
     /** Address in memspace of the filename */
-    uint8_t const *co_filename;
+	uint8_t const *co_filename;
     /** Line number of first source line of lnotab */
-    uint16_t co_firstlineno;
-#endif /* HAVE_DEBUG_INFO */
+	uint16_t co_firstlineno;
+#endif				/* HAVE_DEBUG_INFO */
 
 #ifdef HAVE_CLOSURES
     /** Address in RAM of cellvars tuple */
-    pPmTuple_t co_cellvars;
+	pPmTuple_t co_cellvars;
     /** Number of freevars */
-    uint8_t co_nfreevars;
-#endif /* HAVE_CLOSURES */
+	uint8_t co_nfreevars;
+#endif				/* HAVE_CLOSURES */
 
     /** Memory space selector */
-    PmMemSpace_t co_memspace:8;
+	PmMemSpace_t co_memspace:8;
     /** Number of positional arguments the function expects */
-    uint8_t co_argcount;
+	uint8_t co_argcount;
     /** Compiler flags */
-    uint8_t co_flags;
+	uint8_t co_flags;
     /** Stack size */
-    uint8_t co_stacksize;
+	uint8_t co_stacksize;
     /** Number of local variables */
-    uint8_t co_nlocals;
-} PmCo_t,
- *pPmCo_t;
+	uint8_t co_nlocals;
+} PmCo_t, *pPmCo_t;
 
 /**
  * Native Code Object
@@ -112,17 +106,14 @@ typedef struct PmCo_s
  * of the static native image.  Other parts can be obtained by
  * inspecting the native image itself.
  */
-typedef struct PmNo_s
-{
+typedef struct PmNo_s {
     /** object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
     /** expected num args to the func */
-    int8_t no_argcount;
+	int8_t no_argcount;
     /** index into native function table */
-    int16_t no_funcindx;
-} PmNo_t,
- *pPmNo_t;
-
+	int16_t no_funcindx;
+} PmNo_t, *pPmNo_t;
 
 /**
  * Creates a CodeObj by loading info from a code image in memory.
@@ -165,7 +156,7 @@ typedef struct PmNo_s
  * @return  Return status
  */
 PmReturn_t
-co_loadFromImg(PmMemSpace_t memspace, uint8_t const **paddr, pPmObj_t *r_pco);
+co_loadFromImg(PmMemSpace_t memspace, uint8_t const **paddr, pPmObj_t * r_pco);
 
 /**
  * Recursively sets image address of the CO and all its nested COs
@@ -206,6 +197,6 @@ void co_rSetCodeImgAddr(pPmCo_t pco, uint8_t const *pimg);
  * @return  Return status
  */
 PmReturn_t no_loadFromImg(PmMemSpace_t memspace,
-                          uint8_t const **paddr, pPmObj_t *r_pno);
+			  uint8_t const **paddr, pPmObj_t * r_pno);
 
-#endif /* __CODEOBJ_H__ */
+#endif				/* __CODEOBJ_H__ */

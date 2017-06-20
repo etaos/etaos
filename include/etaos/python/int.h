@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __INT_H__
 #define __INT_H__
-
 
 /**
  * \file
@@ -22,16 +20,13 @@
  *
  * 32b signed integer
  */
-typedef struct PmInt_s
-{
+typedef struct PmInt_s {
     /** Object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
 
     /** Integer value */
-    int32_t val;
-} PmInt_t,
- *pPmInt_t;
-
+	int32_t val;
+} PmInt_t, *pPmInt_t;
 
 /**
  * Creates a duplicate Integer object
@@ -42,7 +37,7 @@ typedef struct PmInt_s
  * @param   r_pint Return by ref, ptr to new int
  * @return  Return status
  */
-PmReturn_t int_dup(pPmObj_t pint, pPmObj_t *r_pint);
+PmReturn_t int_dup(pPmObj_t pint, pPmObj_t * r_pint);
 
 /**
  * Creates a new Integer object
@@ -51,7 +46,7 @@ PmReturn_t int_dup(pPmObj_t pint, pPmObj_t *r_pint);
  * @param   r_pint Return by ref, ptr to new int
  * @return  Return status
  */
-PmReturn_t int_new(int32_t val, pPmObj_t *r_pint);
+PmReturn_t int_new(int32_t val, pPmObj_t * r_pint);
 
 /**
  * Implements the UNARY_POSITIVE bcode.
@@ -62,7 +57,7 @@ PmReturn_t int_new(int32_t val, pPmObj_t *r_pint);
  * @param   r_pint Return by reference, ptr to int
  * @return  Return status
  */
-PmReturn_t int_positive(pPmObj_t pobj, pPmObj_t *r_pint);
+PmReturn_t int_positive(pPmObj_t pobj, pPmObj_t * r_pint);
 
 /**
  * Implements the UNARY_NEGATIVE bcode.
@@ -73,7 +68,7 @@ PmReturn_t int_positive(pPmObj_t pobj, pPmObj_t *r_pint);
  * @param   r_pint Return by ref, ptr to int
  * @return  Return status
  */
-PmReturn_t int_negative(pPmObj_t pobj, pPmObj_t *r_pint);
+PmReturn_t int_negative(pPmObj_t pobj, pPmObj_t * r_pint);
 
 /**
  * Implements the UNARY_INVERT bcode.
@@ -85,7 +80,7 @@ PmReturn_t int_negative(pPmObj_t pobj, pPmObj_t *r_pint);
  * @param   r_pint Return by reference; new integer
  * @return  Return status
  */
-PmReturn_t int_bitInvert(pPmObj_t pobj, pPmObj_t *r_pint);
+PmReturn_t int_bitInvert(pPmObj_t pobj, pPmObj_t * r_pint);
 
 #ifdef HAVE_PRINT
 /**
@@ -103,7 +98,7 @@ PmReturn_t int_print(pPmObj_t pint);
  * @param pint Pointer to Int object
  */
 PmReturn_t int_printHex(pPmObj_t pint);
-#endif /* HAVE_PRINT */
+#endif				/* HAVE_PRINT */
 
 /**
  * Returns by reference an integer that is x raised to the power of y.
@@ -113,7 +108,7 @@ PmReturn_t int_printHex(pPmObj_t pint);
  * @param r_pn Return by reference; New integer with value of x ** y
  * @return Return status
  */
-PmReturn_t int_pow(pPmObj_t px, pPmObj_t py, pPmObj_t *r_pn);
+PmReturn_t int_pow(pPmObj_t px, pPmObj_t py, pPmObj_t * r_pn);
 
 /**
  * Returns by reference the result of the selected operation.
@@ -124,6 +119,6 @@ PmReturn_t int_pow(pPmObj_t px, pPmObj_t py, pPmObj_t *r_pn);
  * @param r_pn Return by reference; New integer with value of x / y or x % y.
  * @return Return status
  */
-PmReturn_t int_divmod(pPmObj_t px, pPmObj_t py, uint8_t op, pPmObj_t *r_pxopy);
+PmReturn_t int_divmod(pPmObj_t px, pPmObj_t py, uint8_t op, pPmObj_t * r_pxopy);
 
-#endif /* __INT_H__ */
+#endif				/* __INT_H__ */

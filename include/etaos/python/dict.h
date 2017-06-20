@@ -5,10 +5,8 @@
 # See the LICENSE file for details.
 */
 
-
 #ifndef __DICT_H__
 #define __DICT_H__
-
 
 /**
  * \file
@@ -17,7 +15,6 @@
  * Dict object type header.
  */
 
-
 /**
  * Dict
  *
@@ -25,19 +22,16 @@
  * one for keys, the other for values;
  * and a length, the number of key/value pairs.
  */
-typedef struct PmDict_s
-{
+typedef struct PmDict_s {
     /** object descriptor */
-    PmObjDesc_t od;
+	PmObjDesc_t od;
     /** number of key,value pairs in the dict */
-    uint16_t length;
+	uint16_t length;
     /** ptr to seglist containing keys */
-    pSeglist_t d_keys;
+	pSeglist_t d_keys;
     /** ptr to seglist containing values */
-    pSeglist_t d_vals;
-} PmDict_t,
- *pPmDict_t;
-
+	pSeglist_t d_vals;
+} PmDict_t, *pPmDict_t;
 
 /**
  * Clears the contents of a dict.
@@ -57,7 +51,7 @@ PmReturn_t dict_clear(pPmObj_t pdict);
  * @param   r_pobj Return; addr of ptr to obj
  * @return  Return status
  */
-PmReturn_t dict_getItem(pPmObj_t pdict, pPmObj_t pkey, pPmObj_t *r_pobj);
+PmReturn_t dict_getItem(pPmObj_t pdict, pPmObj_t pkey, pPmObj_t * r_pobj);
 
 #ifdef HAVE_DEL
 /**
@@ -70,7 +64,7 @@ PmReturn_t dict_getItem(pPmObj_t pdict, pPmObj_t pkey, pPmObj_t *r_pobj);
  * @return  Return status
  */
 PmReturn_t dict_delItem(pPmObj_t pdict, pPmObj_t pkey);
-#endif /* HAVE_DEL */
+#endif				/* HAVE_DEL */
 
 /**
  * Allocates space for a new Dict.
@@ -79,7 +73,7 @@ PmReturn_t dict_delItem(pPmObj_t pdict, pPmObj_t pkey);
  * @param   r_pdict Return; Addr of ptr to dict
  * @return  Return status
  */
-PmReturn_t dict_new(pPmObj_t *r_pdict);
+PmReturn_t dict_new(pPmObj_t * r_pdict);
 
 /**
  * Sets a value in the dict using the given key.
@@ -104,7 +98,7 @@ PmReturn_t dict_setItem(pPmObj_t pdict, pPmObj_t pkey, pPmObj_t pval);
  * @return Return status
  */
 PmReturn_t dict_print(pPmObj_t pdict);
-#endif /* HAVE_PRINT */
+#endif				/* HAVE_PRINT */
 
 /**
  * Updates the destination dict with the key,value pairs from the source dict
@@ -116,7 +110,7 @@ PmReturn_t dict_print(pPmObj_t pdict);
  * @return  Return status
  */
 PmReturn_t dict_update(pPmObj_t pdestdict, pPmObj_t psourcedict,
-                       uint8_t omit_underscored);
+		       uint8_t omit_underscored);
 
 /**
  * Returns C_SAME if the two given dictionaries have the same contents
@@ -127,4 +121,4 @@ PmReturn_t dict_update(pPmObj_t pdestdict, pPmObj_t psourcedict,
  */
 int8_t dict_compare(pPmObj_t d1, pPmObj_t d2);
 
-#endif /* __DICT_H__ */
+#endif				/* __DICT_H__ */
