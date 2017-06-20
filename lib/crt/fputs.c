@@ -19,13 +19,32 @@
 /** @file fputs.c */
 
 #include <etaos/kernel.h>
+#include <etaos/types.h>
+#include <etaos/error.h>
 #include <etaos/stdio.h>
 #include <etaos/string.h>
+#include <etaos/bitops.h>
 
 /**
  * @addtogroup libcio
  * @{
  */
+
+static int write_to_buffer(struct file *f, const char *s)
+{
+	size_t idx, strl;
+
+	strl = strlen(s);
+	idx = 0;
+
+	while(f->index < f->length && idx < strl) {
+		f->buff[f->index] = s[idx];
+		f->index++;
+		idx++;
+	}
+
+	return idx;
+}
 
 /**
  * @brief Write a string to a stream.
@@ -36,6 +55,12 @@
  */
 int fputs(char *s, struct file * stream)
 {
+	if(!test_bit(STREAM_WRITE_FLAG, &stream->flags))
+		return -EOF;
+
+	if(test_bit(STREAM_RW_BUFFER_FLAG, &stream->flags))
+		return write_to_buffer(stream, s);
+
 	write(stream->fd, s, strlen(s));
 	return 0;
 }

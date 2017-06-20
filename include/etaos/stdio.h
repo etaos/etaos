@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - ETA/OS stdio header
- *  Copyright (C) 2014   Michel Megens <dev@bietje.net>
+ *  ETA/OS - ETA/OS stdio header
+ *  Copyright (C) 2014, 2015, 2016, 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -160,6 +160,7 @@ extern int fputs(char *c, struct file * stream);
 extern int fprintf(struct file * stream, const char*, ...);
 extern int printf(const char *, ...);
 extern int vfprintf(struct file * stream, const char *fmt, va_list va);
+extern int snprintf(char *s, size_t length, const char *fmt, ...);
 extern int iob_add(struct file * iob);
 extern int iob_remove(int fd);
 extern void close(int fd);

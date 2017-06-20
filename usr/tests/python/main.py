@@ -13,6 +13,7 @@
 import sys
 
 while True:
-	print "Hello, %s: %f" % ("World", 3.1415)
+	output = "Hello, World: %d of June 2017" % 20
+	print output
 	sys.wait(500)
 

@@ -40,10 +40,10 @@ static int convert_to_num(uint64_t num, uint8_t base, bool sign,
 	//memset(cp, 0xa, BUFF-1UL);
 
 	if(num == 0) {
-		putc('0', stream);
+		fputc('0', stream);
 		return 0;
 	} else if((int64_t)num < 0 && sign) {
-		putc('-', stream);
+		fputc('-', stream);
 	}
 	
 	if(caps) {
@@ -69,7 +69,7 @@ static int convert_to_num(uint64_t num, uint8_t base, bool sign,
 			} while(num);
 		}
 	}
-	
+
 	fputs(cp, stream);
 	return 0;
 }
@@ -153,7 +153,7 @@ int vfprintf(struct file * stream, const char *fmt, va_list ap)
 	preempt_disable();
 	for(i = 0; fmt[i] != '\0'; i++) {
 		if(fmt[i] != '%') {
-			putc(fmt[i], stream);
+			fputc(fmt[i], stream);
 		} else {
 			fmt++;
 			switch(fmt[i]) {
@@ -192,7 +192,7 @@ int vfprintf(struct file * stream, const char *fmt, va_list ap)
 				break;
 
 			case 'c':
-				putc((char)va_arg(ap, unsigned int), stream);
+				fputc((char)va_arg(ap, unsigned int), stream);
 				break;
 
 			case 's':
@@ -200,7 +200,7 @@ int vfprintf(struct file * stream, const char *fmt, va_list ap)
 				break;
 
 			case '%':
-				putc('%', stream);
+				fputc('%', stream);
 				break;
 
 			default:

@@ -174,6 +174,38 @@ int iob_remove(int fd)
 	}
 }
 
+struct file *raw_vfs_init_buffered_file(struct file *f, size_t n, void *buf)
+{
+	if(!buf)
+		return NULL;
+
+	f->flags |= __SWR | __SRWB;
+	f->buff = buf;
+	f->length = n;
+	f->index = 0;
+
+	return f;
+}
+
+struct file *vfs_init_buffered_file(struct file *f, size_t bufsize)
+{
+	void *buf;
+
+	buf = kzalloc(bufsize);
+	return raw_vfs_init_buffered_file(f, bufsize, buf);
+}
+
+struct file *vfs_create_buffered_file(size_t bufsize)
+{
+	struct file *file;
+
+	file = kzalloc(sizeof(*file));
+	if(!file)
+		return NULL;
+
+	return vfs_init_buffered_file(file, bufsize);
+}
+
 /**
  * @brief Initialise the VFS.
  */

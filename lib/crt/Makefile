@@ -7,7 +7,7 @@ libc-files-$(CONFIG_CRT) += krealloc.o
 
 libc-files-$(CONFIG_CRT) += gmtime.o localtime.o mktime.o
 
-libc-files-$(CONFIG_CRT) += putc.o printf.o vfprintf.o
+libc-files-$(CONFIG_CRT) += putc.o printf.o vfprintf.o snprintf.o
 libc-files-$(CONFIG_CRT) += fputs.o fputc.o fprintf.o
 libc-files-$(CONFIG_CRT) += read.o write.o fgets.o
 libc-files-$(CONFIG_CRT) += ioctl.o getc.o fgetc.o

@@ -17,6 +17,10 @@
 
 #include <etaos/python.h>
 
+#ifdef HAVE_SNPRINTF_FORMAT
+#include <etaos/stdio.h>
+#endif
+
 #if USE_STRING_CACHE
 /** String obj cachche: a list of all string objects. */
 static pPmString_t pstrcache = C_NULL;
@@ -314,7 +318,6 @@ string_concat(pPmString_t pstr1, pPmString_t pstr2, pPmObj_t * r_pstring)
 }
 
 #ifdef HAVE_STRING_FORMAT
-
 #define SIZEOF_FMTDBUF 42
 #define SIZEOF_SMALLFMT 8
 
