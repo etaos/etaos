@@ -1,4 +1,5 @@
 obj-y += stress.o eeprom.o sram.o
+pyusrlib-y += main.py
 crurom-y := data
 crurom-obj := romfs.o
 

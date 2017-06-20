@@ -1,0 +1,82 @@
+menuconfig PYTHON
+	bool "Python virtual machine (PyMite)"
+	help
+	  Say 'y' here if you want to let ETA/OS applications
+	  use the Python language. Please note that ETA/OS only
+	  provides a basic virtual machine, based on the bytecode
+	  produced by Python 2.6, and a verry limited standard
+	  library.
+
+if PYTHON
+config HAVE_SLICE
+	bool
+	default y
+
+config HAVE_PRINT
+	bool "Implement 'print'"
+	depends on CRT
+
+config CLASSES
+	bool
+	depends on CRT
+	default y
+
+config HAVE_REPLICATION
+	bool "Replication of strings, lists and hashes"
+	depends on CRT
+	default y
+
+config DEFAULTARGS
+	bool "Default method arguments"
+	default y
+
+config HAVE_DEL
+	bool "'del' keyword"
+	default y
+
+config HAVE_BACKTICK
+	bool "Support backticking"
+	default y
+
+config HAVE_FLOAT
+	bool "Support floating point operations"
+	default y
+
+config HAVE_GC
+	bool "Garbage collection"
+	default y
+
+config HAVE_STRING_FORMAT
+	bool "String formatting"
+	depends on CRT
+	default y
+
+config HAVE_ASSERT
+	bool "Assert"
+	default y
+
+config HAVE_CLOSURES
+	bool "Function closures"
+
+config HAVE_GENERATORS
+	bool
+	depends on HAVE_CLASSES
+	default y
+
+config HAVE_IMPORTS
+	bool
+	default y
+
+config HAVE_BYTEARRAY
+	bool "Support bytearray()"
+
+config HAVE_DEBUG_INFO
+	bool "Debug info"
+	default y
+	depends on CRT
+	help
+	  Say 'y' here to print debug information (stacktraces etc.)
+	  when an error / exception occurs. If you are unsure, say 'y'
+	  here.
+endif
+

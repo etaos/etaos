@@ -12,6 +12,10 @@ __build:
 # 2) they do not inherit any value from the environment
 crurom-y :=
 crurom-obj :=
+pylib-y := 
+pythonlibs := $(shell $(PYLIBLIST) \
+	arch/$(ARCH)/kernel/python/lib kernel/python/lib)
+pyusrlib-y :=
 ldscripts-y :=
 obj-y :=
 obj-m :=
@@ -95,6 +99,7 @@ modorder-target := $(obj)/modules.order
 
 __build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y)) \
 	 $(if $(KBUILD_MODULES),$(obj-m)) \
+	 $(if $(pyusrlib-y), $(pyusrlib-target) $(pyusrlib-obj-target)) \
 	 $(subdir-ym) $(always)
 	@:
 
@@ -200,6 +205,22 @@ quiet_cmd_cc_crurom_o_c = CC      $@
 $(crurom-obj):
 	$(call cmd,gen_romfs)
 	$(call cmd,cc_crurom_o_c)
+
+quiet_cmd_gen_pylib = GEN     pylib.c\n  GEN     pylib-img.c
+      cmd_gen_pylib = $(PYLIBCREATOR) -f kernel/python/lib/pmfeatures.py \
+		      -c -s --memspace=flash -o kernel/python/vm/pylib-img.c \
+		      --native-file=kernel/python/vm/pylib.c $(pythonlibs)
+
+kernel/python/vm/pylib.c kernel/python/vm/pylib-img.c: $(pythonlibs) $(PYLIBCREATOR)
+	$(call cmd,gen_pylib)
+
+quiet_cmd_gen_pyusrlib = GEN     pyusrlib.c\n  GEN     pyusrlib-img.c
+      cmd_gen_pyusrlib = $(PYLIBCREATOR) -f kernel/python/lib/pmfeatures.py \
+		      -c -u --memspace=flash -o $(obj)/pyusrlib-img.c \
+		      --native-file=$(obj)/pyusrlib.c $(pyusrlib-y)
+
+$(pyusrlib-target):
+	$(call cmd,gen_pyusrlib)
 
 # Built-in and composite module parts
 $(obj)/%.o: $(src)/%.c FORCE

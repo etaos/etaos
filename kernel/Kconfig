@@ -29,12 +29,13 @@ config CPP
 	  language. If you are unsure, say leave this option set
 	  to 'y'.
 
+source "kernel/python/Kconfig"
+
 source "kernel/irq/Kconfig"
 
 source "kernel/time/Kconfig"
 
 source "kernel/sched/Kconfig"
-
 
 config SPINLOCK_DEBUG
 	depends on CRT
