@@ -8,6 +8,27 @@ menuconfig PYTHON
 	  library.
 
 if PYTHON
+if SCHED
+config PYTHON_STACK_SIZE
+	int "Python runner stack size"
+	default 4096
+	help
+	  The size of the stack, in bytes, running the
+	  Python virtual machine.
+
+config PYTHON_PRIO
+	int "VM thread priority"
+	default 75
+	help
+	  Priority of the thread running the Python VM.
+endif
+
+config PYTHON_HEAP_SIZE
+	int "Python heap size"
+	default 8192
+	help
+	  Number of bytes allocated to the Python heap.
+
 config HAVE_SLICE
 	bool
 	default y

@@ -198,33 +198,6 @@ THREAD(preempt_thread, arg)
 	}
 }
 
-#define PY_THREAD_STACK_SIZE 4096
-#define PY_HEAP_SIZE 8192
-#define PYTHON_THREAD_PRIO 75
-
-extern unsigned char usrlib_img[];
-
-THREAD(py_thread, arg)
-{
-	void *heap;
-	PmReturn_t retval;
-
-	heap = kzalloc(PY_HEAP_SIZE);
-	if(!heap)
-		kill();
-
-	retval = pm_init(heap, PY_HEAP_SIZE, MEMSPACE_PROG, usrlib_img);
-
-	if(retval != PM_RET_OK) {
-		fprintf_P(stderr, "Could not initialize Python VM!\n");
-		kill();
-	}
-
-	pm_run((uint8_t *)"main");
-
-	kill();
-}
-
 static struct gpio_pin *led_pin;
 
 static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
@@ -242,7 +215,6 @@ int main(void)
 	char buff[16];
 	time_t now;
 	float temperature;
-	thread_attr_t attribs;
 
 	printf_P(PSTR("Application started (m: %u)\n"), mm_heap_available());
 
@@ -254,10 +226,8 @@ int main(void)
 	thread_create("test-2", &test_th_handle2, NULL, NULL);
 	thread_create("preempt", &preempt_thread, NULL, NULL);
 
-	attribs.stack = kzalloc(PY_THREAD_STACK_SIZE);
-	attribs.stack_size = PY_THREAD_STACK_SIZE;
-	attribs.prio = PYTHON_THREAD_PRIO;
-	thread_create("python", &py_thread, NULL, &attribs);
+	python_init();
+	python_start("main");
 
 	read(to_fd(stdin), &buff[0], 10);
 	buff[10] = 0;

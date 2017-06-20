@@ -19,7 +19,18 @@
 #ifndef __PYTHON_H__
 #define __PYTHON_H__
 
+#include <etaos/kernel.h>
 #include <etaos/python/pm.h>
+
+CDECL
+extern int python_init(void);
+extern int python_start(const char *modname);
+
+#ifdef CONFIG_SCHED
+extern int python_status();
+#endif
+
+CDECL_END
 
 #endif
 
