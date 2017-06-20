@@ -111,6 +111,26 @@ extern double log10(double __x);
  */
 extern double exp(double __x);
 
+/**
+ * @brief Compute the remainder of the divion of x by y.
+ * @param x Number to divide.
+ * @param y Number to divide by.
+ * @return The return value is  x - n*y, where n is the quotient of x/y,
+ *         rounded towards the nearest whole integer.
+ */
+extern double fmod(double x, double y);
+
+/**
+ * @brief Compute the y-th power of x.
+ * @param x Base number to compute the power of.
+ * @param y Power to raise \p x to.
+ * @return The result of x^y.
+ */
+extern double pow(double x, double y);
+
+#define fmodf(__x__, __y__) fmod(__x__, __y__)
+#define powf(__x__, __y__) pow(__x__, __y__)
+
 #define to_ns(__s) (__s * 1E9) //!< Convert seconds to nanoseconds
 #define to_us(__s) (__s * 1E6) //!< Convert seconds to microseconds
 #define to_ms(__s) (__s * 1E3) //!< Convert seconds to miliseconds
