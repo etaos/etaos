@@ -1,4 +1,4 @@
-python-files-$(CONFIG_PYTHON) += bytearray.o class.o codeobj.o dict.o float.o
+python-files-$(CONFIG_PYTHON) += cpu.o bytearray.o class.o codeobj.o dict.o float.o
 python-files-$(CONFIG_PYTHON) += frame.o func.o global.o heap.o img.o int.o
 python-files-$(CONFIG_PYTHON) += interp.o list.o mem.o module.o object.o pm.o
 python-files-$(CONFIG_PYTHON) += seglist.o seq.o sli.o strobj.o thread.o tuple.o 

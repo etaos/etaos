@@ -10,10 +10,13 @@
 # A copy of the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
 # is seen in the file COPYING up one directory from this.
 
-import sys
+import sys, cpu
+
+cpu.set_output(15, False)
 
 while True:
-	output = "Hello, World: %d of June 2017" % 20
-	print output
+	cpu.write(15, True)
+	sys.wait(500)
+	cpu.write(15, False)
 	sys.wait(500)
 

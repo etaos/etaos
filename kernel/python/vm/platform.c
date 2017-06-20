@@ -151,7 +151,7 @@ static const char fnstr_22[] __pgm = "thread.c";
 static const char fnstr_23[] __pgm = "float.c";
 static const char fnstr_24[] __pgm = "class.c";
 static const char fnstr_25[] __pgm = "bytearray.c";
-static const char fnstr_26[] __pgm = "sched.c";
+static const char fnstr_26[] __pgm = "cpu.c";
 
 static const char *const fnlookup[LEN_FNLOOKUP] __pgm = {
 	fnstr_00, fnstr_01, fnstr_02, fnstr_03,

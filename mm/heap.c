@@ -41,7 +41,7 @@ static DEFINE_SPINLOCK(mlock);
 #define MM_GUARD_BYTES   0
 #endif
 
-#define MM_ALIGNMENT          1
+#define MM_ALIGNMENT          4
 #define MM_BOTTOM_ALIGN(s)    ((s) & ~(MM_ALIGNMENT - 1))
 #define MM_TOP_ALIGN(s)	      MM_BOTTOM_ALIGN((s + (MM_ALIGNMENT - 1)))
 
