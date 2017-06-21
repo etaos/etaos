@@ -41,9 +41,12 @@ static DEFINE_SPINLOCK(mlock);
 #define MM_GUARD_BYTES   0
 #endif
 
-#define MM_ALIGNMENT          4
+#define MM_ALIGNMENT          1
 #define MM_BOTTOM_ALIGN(s)    ((s) & ~(MM_ALIGNMENT - 1))
 #define MM_TOP_ALIGN(s)	      MM_BOTTOM_ALIGN((s + (MM_ALIGNMENT - 1)))
+
+#define __MM_BOTTOM_ALIGN__(s, a) ((s) & ~(a - 1))
+#define __MM_TOP_ALIGN__(s, a) __MM_BOTTOM_ALIGN__((s + (a - 1)), a)
 
 #define HEAP_OVERHEAD (sizeof(struct heap_node) - sizeof(struct heap_node*))
 #define HEAP_MIN (sizeof(struct heap_node) + (2 * MM_GUARD_BYTES))
@@ -138,6 +141,15 @@ static void *raw_mm_heap_alloc(struct heap_node **root, size_t size)
 #endif
 
 	return fit;
+}
+
+static void *raw_mm_heal_alloc_aligned(struct heap_node **root,
+		size_t size, size_t alignment)
+{
+	size_t real_size;
+
+	real_size = __MM_TOP_ALIGN__(size, alignment);
+	return raw_mm_heap_alloc(root, real_size);
 }
 
 static inline struct heap_node *mm_region_to_node(void *ptr)
@@ -254,6 +266,24 @@ MEM void *mm_alloc(size_t size)
 
 	raw_spin_lock_irqsave(&mlock, flags);
 	rv = raw_mm_heap_alloc(&mm_free_list, size);
+	raw_spin_unlock_irqrestore(&mlock, flags);
+
+	return rv;
+}
+
+/**
+ * @brief Allocate an area of memory aligned to \p alignment.
+ * @param size Minimum size of the region to allocate.
+ * @param alignment Number of bytes to align \p size to.
+ * @return A pointer aligned to \p alignment.
+ */
+MEM void *mm_alloc_aligned(size_t size, size_t alignment)
+{
+	unsigned long flags;
+	void *rv;
+
+	raw_spin_lock_irqsave(&mlock, flags);
+	rv = raw_mm_heal_alloc_aligned(&mm_free_list, size, alignment);
 	raw_spin_unlock_irqrestore(&mlock, flags);
 
 	return rv;
