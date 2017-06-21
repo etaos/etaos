@@ -57,10 +57,7 @@ int pm_ee_write(uint8_t addr, const void *buff, size_t len)
 	if(fd >= 0) {
 		stream = filep(fd);
 		lseek(stream, addr, SEEK_SET);
-		if(len == 1)
-			putc(*((uint8_t*)buff), stream);
-		else
-			write(fd, buff, len);
+		write(fd, buff, len);
 		close(fd);
 	} else {
 		rc = -1;

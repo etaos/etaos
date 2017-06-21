@@ -81,8 +81,37 @@ class EE24C02(object):
 		"""
 		pass
 
-	def write(self, addr, data):
-		for byte in data:
-			self.write_byte(addr, byte)
-			addr += 1
+	def write(self, addr, data, length):
+		"""__NATIVE__
+		PmReturn_t retval = PM_RET_OK;
+		pPmObj_t addr, data, len;
+		uint8_t rawaddr;
+		size_t rawsize;
+		void *dst;
+
+		if (NATIVE_GET_NUM_ARGS() != 4) {
+			PM_RAISE(retval, PM_RET_EX_TYPE);
+			return retval;
+		}
+
+		addr = NATIVE_GET_LOCAL(1);
+		data = NATIVE_GET_LOCAL(2);
+		len = NATIVE_GET_LOCAL(3);
+
+		if(OBJ_GET_TYPE(addr) != OBJ_TYPE_INT ||
+			OBJ_GET_TYPE(data) != OBJ_TYPE_LST ||
+			OBJ_GET_TYPE(len) != OBJ_TYPE_INT) {
+			PM_RAISE(retval, PM_RET_EX_TYPE);
+			return retval;
+		}
+
+		rawaddr = ((pPmInt_t)addr)->val & 0xFF;
+		rawsize = ((pPmInt_t)len)->val;
+		dst = kzalloc(rawsize);
+		list_to_byte_array(data, dst, rawsize);
+		pm_ee_write(rawaddr, dst, rawsize);
+		kfree(dst);
+		return retval;
+		"""
+		pass
 
