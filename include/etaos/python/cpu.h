@@ -26,6 +26,7 @@ extern bool pm_cpu_pin_read(int32_t pin);
 extern void pm_cpu_direction_input(int32_t pin);
 extern void pm_cpu_direction_output(int32_t pin, bool value);
 extern void pm_cpu_pin_write(int32_t pin, bool value);
+extern float pm_cpu_analog_pin_read(int32_t _pin);
 CDECL_END
 
 #endif

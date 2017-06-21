@@ -10,9 +10,12 @@
 # A copy of the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
 # is seen in the file COPYING up one directory from this.
 
-import sys
+import sys, cpu
+from lm35 import LM35
+
+lm = LM35(0)
 
 while True:
-	print "Hello, %s: %f" % ("World", 3.1415)
+	print "Hello, %s: Temperature %f" % ("World", lm.read())
 	sys.wait(500)
 

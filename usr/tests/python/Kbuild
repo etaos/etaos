@@ -2,7 +2,7 @@ obj-y += python.o
 pyusrlib-y += main.py
 
 ETAOS_LIBS += -latmega-gpio -lgpio -lusart-atmega -lusart \
-		-ldriver-core -ldevfs -lc
+		-ldriver-core -ldevfs -lanalog -latmega-analog -lc
 ETAOS_LIB_DIR := usr/lib/etaos
 APP_TARGET := test-app.img
 clean-files += test-app.img test-app.hex pyusrlib.c pyusrlib-img.c

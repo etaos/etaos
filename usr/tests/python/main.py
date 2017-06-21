@@ -11,12 +11,17 @@
 # is seen in the file COPYING up one directory from this.
 
 import sys, cpu
+from lm35 import LM35
 
 cpu.set_output(15, False)
+
+tempsensor = LM35(0)
 
 while True:
 	cpu.write(15, True)
 	sys.wait(500)
 	cpu.write(15, False)
 	sys.wait(500)
+	print "Temperature: %f" % tempsensor.read()
+
 

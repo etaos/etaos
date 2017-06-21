@@ -128,3 +128,32 @@ def read(pin):
 	"""
 	pass
 
+def analog_read(pin):
+	"""__NATIVE__
+	PmReturn_t retval = PM_RET_OK;
+	pPmObj_t pin;
+	int32_t _pin;
+	pPmObj_t rv;
+	float value;
+
+	if (NATIVE_GET_NUM_ARGS() != 1) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	pin = NATIVE_GET_LOCAL(0);
+
+	if(OBJ_GET_TYPE(pin) != OBJ_TYPE_INT) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	_pin = ((pPmInt_t)pin)->val;
+	value = pm_cpu_analog_pin_read(_pin);
+	retval = float_new(value, &rv);
+	NATIVE_SET_TOS(rv);
+
+	return retval;
+	"""
+	pass
+

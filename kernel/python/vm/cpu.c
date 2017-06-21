@@ -24,6 +24,7 @@
 #include <etaos/error.h>
 #include <etaos/python.h>
 #include <etaos/gpio.h>
+#include <etaos/analog.h>
 
 bool pm_cpu_pin_read(int32_t _pin)
 {
@@ -74,5 +75,18 @@ void pm_cpu_pin_write(int32_t _pin, bool value)
 
 	gpio_pin_write(pin, value);
 	gpio_pin_release(pin);
+}
+
+float pm_cpu_analog_pin_read(int32_t _pin)
+{
+	int __pin = (int)_pin & 0x7FF;
+	struct analog_chip *chip = analog_syschip;
+	struct analog_pin *pin;
+
+	if(__pin >= chip->num)
+		return 0.0f;
+
+	pin = &chip->pins[__pin];
+	return (float)analog_read(pin);
 }
 
