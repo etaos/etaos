@@ -935,6 +935,13 @@ static inline void preempt_reset_slice(struct thread *tp)
 }
 #endif
 
+/**
+ * @brief Search a given run queue for a thread with a name \p name.
+ * @param rq Run queue to search.
+ * @param name Name to look for.
+ * @return Either NULL or a thread by the name of \p name.
+ * @see sched_find_thread_by_name
+ */
 static struct thread *rq_find_thread(struct rq *rq, const char *name)
 {
 	unsigned long flags;
@@ -954,6 +961,12 @@ static struct thread *rq_find_thread(struct rq *rq, const char *name)
 	return NULL;
 }
 
+/**
+ * @brief Search all available run queue's for a thread by name.
+ * @param name Name to look for.
+ * @return Either NULL or a thread by the name of \p name.
+ * @see rq_find_thread
+ */
 struct thread *sched_find_thread_by_name(const char *name)
 {
 	struct rq *rq;
