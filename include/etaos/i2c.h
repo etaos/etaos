@@ -157,7 +157,7 @@ static inline void i2c_destroy_info(struct i2c_device_info *info)
 		kfree(info);
 }
 
-
+extern struct i2c_client *i2c_find_client(struct i2c_bus *bus, const char *name);
 extern int i2c_init_bus(struct i2c_bus *bus);
 extern void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client);
 extern int i2c_master_send(const struct i2c_client *client, 

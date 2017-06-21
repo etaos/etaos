@@ -17,6 +17,57 @@
 
 #include <etaos/python.h>
 
+pPmObj_t list_create_from_ptr(void *data, size_t length)
+{
+	size_t i;
+	pPmObj_t list;
+	pPmObj_t val;
+	uint8_t *ptr = data;
+
+	list_new(&list);
+	for(i = 0; i < length; i++) {
+		int_new(ptr[i], &val);
+		list_append(list, val);
+	}
+
+	return list;
+}
+
+PmReturn_t list_to_byte_array(pPmObj_t listobj, void *dst, size_t length)
+{
+	PmReturn_t retval = PM_RET_OK;
+	pPmList_t list = (pPmList_t)listobj;
+	pPmObj_t val;
+	size_t idx = 0;
+	uint8_t *ary = dst;
+	int32_t numval;
+
+	while(idx < list->length && idx < length) {
+		list_getItem(listobj, idx, &val);
+		if(OBJ_GET_TYPE(val) != OBJ_TYPE_INT) {
+			PM_RAISE(retval, PM_RET_EX_TYPE);
+			return retval;
+		}
+
+		numval = ((pPmInt_t)val)->val;
+
+		if(numval > 255) {
+			PM_RAISE(retval, PM_RET_EX_TYPE);
+			return retval;
+		}
+
+		ary[idx] = numval & 0xFF;
+		idx++;
+	}
+
+	return retval;
+}
+
+size_t list_len(pPmObj_t list)
+{
+	return ((pPmList_t)list)->length;
+}
+
 PmReturn_t list_append(pPmObj_t plist, pPmObj_t pobj)
 {
 	PmReturn_t retval;

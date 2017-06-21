@@ -233,6 +233,7 @@ extern "C" {
 #include <etaos/python/thread.h>
 #include <etaos/python/float.h>
 #include <etaos/python/cpu.h>
+#include <etaos/python/eeprom.h>
 #include <etaos/python/plat_interface.h>
 #include <etaos/python/bytearray.h>
 

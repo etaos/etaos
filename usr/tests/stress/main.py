@@ -12,10 +12,15 @@
 
 import sys, cpu
 from lm35 import LM35
+from eeprom import EE24C02
 
 lm = LM35(0)
+ee = EE24C02()
+data_ary = [0x79, 0x6F]
+ee.write(0x60, data_ary)
+data = ee.read(0x60, 2);
 
 while True:
-	print "Hello, %s: Temperature %f" % ("World", lm.read())
+	print "EEPROM: " + chr(data[0]) + chr(data[1])
 	sys.wait(500)
 

@@ -10,6 +10,9 @@
 
 #include <uapi/etaos/test.h>
 
+#undef __FILE_ID__
+#define __FILE_ID__ 0xC
+
 int main(void)
 {
 	python_init();

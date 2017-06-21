@@ -1,7 +1,8 @@
 obj-y += python.o
 pyusrlib-y += main.py
 
-ETAOS_LIBS += -latmega-gpio -lgpio -lusart-atmega -lusart \
+ETAOS_LIBS += -l24c02 -leeprom -latmega-i2c -li2c-core -latmega-gpio \
+		-lgpio -lusart-atmega -lusart \
 		-ldriver-core -ldevfs -lanalog -latmega-analog -lc
 ETAOS_LIB_DIR := usr/lib/etaos
 APP_TARGET := test-app.img

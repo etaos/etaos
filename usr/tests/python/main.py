@@ -11,17 +11,19 @@
 # is seen in the file COPYING up one directory from this.
 
 import sys, cpu
-from lm35 import LM35
+from eeprom import EE24C02
 
 cpu.set_output(15, False)
 
-tempsensor = LM35(0)
+ee = EE24C02()
 
 while True:
 	cpu.write(15, True)
 	sys.wait(500)
 	cpu.write(15, False)
 	sys.wait(500)
-	print "Temperature: %f" % tempsensor.read()
 
+	ee.write(0x40, [155, 140, 120])
+	data = ee.read(0x40, 3)
+	print data
 

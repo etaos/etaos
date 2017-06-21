@@ -160,6 +160,9 @@ PmReturn_t list_print(pPmObj_t pobj);
  * @return Return status
  */
 PmReturn_t list_clear(pPmObj_t plist);
+extern pPmObj_t list_create_from_ptr(void *data, size_t length);
+extern PmReturn_t list_to_byte_array(pPmObj_t listobj, void *dst, size_t length);
+extern size_t list_len(pPmObj_t list);
 
 #ifdef HAVE_SLICE
 /**
