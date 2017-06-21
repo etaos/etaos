@@ -193,6 +193,13 @@ struct rq {
 
 CDECL
 
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
+static inline struct thread *rq_get_head(struct rq *rq)
+{
+	return rq->rr_rq.run_queue;
+}
+#endif
+
 extern unsigned char prio(struct thread *tp);
 extern void schedule(void);
 extern bool should_resched(void);
@@ -280,6 +287,7 @@ extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
 extern void rq_add_thread_no_lock(struct thread *tp);
+extern struct thread *sched_find_thread_by_name(const char *name);
 
 extern void rq_update_clock(void);
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);

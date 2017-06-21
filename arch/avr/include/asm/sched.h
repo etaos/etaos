@@ -27,6 +27,10 @@
 CDECL
 extern void avr_save_stack(stack_t *stack, struct thread *current);
 extern void avr_switch_context(stack_t *s, struct thread *tp);
+extern struct rq *sched_get_cpu_rq(void);
+
+#define RQ_FOREACH(__rq__) \
+	for(__rq__ = sched_get_cpu_rq(); __rq__; __rq__ = NULL)
 
 CDECL_END
 

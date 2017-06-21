@@ -35,6 +35,7 @@
 #include <etaos/init.h>
 #include <etaos/list.h>
 #include <etaos/error.h>
+#include <etaos/string.h>
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
@@ -933,6 +934,44 @@ static inline void preempt_reset_slice(struct thread *tp)
 {
 }
 #endif
+
+static struct thread *rq_find_thread(struct rq *rq, const char *name)
+{
+	unsigned long flags;
+	struct thread *tp;
+
+	raw_spin_lock_irqsave(&rq->lock, flags);
+	tp = rq_get_head(rq);
+
+	while(tp != NULL) {
+		if(strcmp(tp->name, name) == 0) {
+			raw_spin_unlock_irqrestore(&rq->lock, flags);
+			return tp;
+		}
+	}
+
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+	return NULL;
+}
+
+struct thread *sched_find_thread_by_name(const char *name)
+{
+	struct rq *rq;
+#ifndef CONFIG_SQS
+	struct thread *tp = NULL;
+
+	RQ_FOREACH(rq) {
+		tp = rq_find_thread(rq, name);
+		if(tp != NULL)
+			break;
+	}
+
+	return tp;
+#else
+	rq = sched_get_grq();
+	return rq_find_thread(rq, name);
+#endif
+}
 
 /**
  * @brief Update the scheduling clock.
