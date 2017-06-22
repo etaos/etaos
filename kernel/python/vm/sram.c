@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - Python EEPROM library
+ *  ETA/OS - Python SRAM library
  *  Copyright (C) 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,11 @@
  */
 
 #undef __FILE_ID__
-#define __FILE_ID__ 0x1B
+#define __FILE_ID__ 0x1C
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/stdio.h>
 #include <etaos/error.h>
 #include <etaos/mem.h>
 #include <etaos/python.h>
@@ -28,40 +29,45 @@
 #include <etaos/vfs.h>
 #include <etaos/unistd.h>
 
-int pm_ee_read(uint8_t addr, void *buff, size_t len)
+#define SRAM_NAME_BUFFER_SIZE 32
+
+int pm_sram_write(const char *name, uint16_t addr,
+		const void *buff, size_t length)
 {
-	int rc, fd;
-	struct file *stream;
+	char namebuff[SRAM_NAME_BUFFER_SIZE];
+	int fd, rc;
+	FILE *stream;
 
-	fd = open("/dev/24C02", _FDEV_SETUP_RW);
+	snprintf(namebuff, SRAM_NAME_BUFFER_SIZE, "/dev/%s", name);
+	fd = open(namebuff, _FDEV_SETUP_RW);
 
-	if(fd >= 0) {
-		stream = filep(fd);
-		lseek(stream, addr, SEEK_SET);
-		rc = read(fd, buff, len);
-		close(fd);
-	} else {
-		rc = -1;
-	}
+	if(fd < 0)
+		return fd;
+
+	stream = filep(fd);
+	lseek(stream, addr, SEEK_SET);
+	rc = write(fd, buff, length);
+	close(fd);
 
 	return rc;
 }
 
-int pm_ee_write(uint8_t addr, const void *buff, size_t len)
+int pm_sram_read(const char *name, uint16_t addr, void *buff, size_t length)
 {
-	int fd, rc = -EOK;
-	struct file *stream;
+	char namebuff[SRAM_NAME_BUFFER_SIZE];
+	int fd, rc;
+	FILE *stream;
 
-	fd = open("/dev/24C02", _FDEV_SETUP_RW);
+	snprintf(namebuff, SRAM_NAME_BUFFER_SIZE, "/dev/%s", name);
+	fd = open(namebuff, _FDEV_SETUP_RW);
 
-	if(fd >= 0) {
-		stream = filep(fd);
-		lseek(stream, addr, SEEK_SET);
-		write(fd, buff, len);
-		close(fd);
-	} else {
-		rc = -1;
-	}
+	if(fd < 0)
+		return fd;
+
+	stream = filep(fd);
+	lseek(stream, addr, SEEK_SET);
+	rc = read(fd, buff, length);
+	close(fd);
 
 	return rc;
 }

@@ -1,5 +1,5 @@
 #
-#   ETA/OS - I2C library
+#   ETA/OS - EEPROM library
 #   Copyright (C) 2017  Michel Megens <dev@michelmegens.net>
 #
 #    This program is free software: you can redistribute it and/or modify

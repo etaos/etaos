@@ -116,7 +116,7 @@ PmReturn_t plat_getMsTicks(uint32_t * r_ticks)
 }
 
 #ifdef HAVE_DEBUG_INFO
-#define LEN_FNLOOKUP 28
+#define LEN_FNLOOKUP 29
 #define LEN_EXNLOOKUP 18
 #define FN_MAX_LEN 64
 #define EXN_MAX_LEN 64
@@ -153,6 +153,7 @@ static const char fnstr_24[] __pgm = "class.c";
 static const char fnstr_25[] __pgm = "bytearray.c";
 static const char fnstr_26[] __pgm = "cpu.c";
 static const char fnstr_27[] __pgm = "eeprom.c";
+static const char fnstr_28[] __pgm = "sram.c";
 
 static const char *const fnlookup[LEN_FNLOOKUP] __pgm = {
 	fnstr_00, fnstr_01, fnstr_02, fnstr_03,

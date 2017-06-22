@@ -10,14 +10,15 @@
 # A copy of the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
 # is seen in the file COPYING up one directory from this.
 
-import sys
+import sys, sram
+from sram import SRAM
 
-from time import Time
-
-now = Time(True)
+ram = SRAM("23K256")
+data_ary = [100, 50, 33]
+ram.write(0x40, data_ary, len(data_ary))
 
 while True:
-	print now.to_string()
-	now.now()
+	print "SRAM read:"
+	print ram.read(0x40, 2)
 	sys.wait(1000)
 
