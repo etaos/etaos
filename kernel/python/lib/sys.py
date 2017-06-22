@@ -264,13 +264,8 @@ def thread_yield():
 # Waits in a busy loop for the given number of milliseconds
 #
 def wait(ms):
-	now = clock()
 	t = clock() + ms
 	while clock() < t:
-		# Yield to the CPU every 10ms while waiting
-		if now + 10 <= clock():
-			thread_yield()
-			now = clock()
 		pass
 
 # :mode=c:
