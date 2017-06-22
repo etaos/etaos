@@ -16,14 +16,16 @@ from eeprom import EEPROM
 
 ram = SRAM("23K256")
 ee = EEPROM("24C02")
+
 data_ary = [100, 50, 33]
-ram.write(0x40, data_ary, len(data_ary))
+sram_str = "Some piece of text"
+sram_len = len(sram_str)
+
+ram.write_string(0x40, sram_str)
 ee.write(0x60, data_ary, len(data_ary))
 
 while True:
 	print "SRAM read:"
-	print ram.read(0x40, 2)
-	print "EEPROM read:"
-	print ee.read(0x60, 2)
+	print ram.read_string(0x40, sram_len)
 	sys.wait(1000)
 

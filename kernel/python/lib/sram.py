@@ -30,6 +30,12 @@ class SRAM(object):
 	def write(self, addr, data, length):
 		write(self.name, addr, data, length)
 
+	def write_string(self, addr, string):
+		write_string(self.name, addr, string, len(string))
+
+	def read_string(self, addr, length):
+		return read_string(self.name, addr, length)
+
 def write(name, addr, data, num):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -106,6 +112,83 @@ def read(name, addr, num):
 	kfree(cdata);
 
 	NATIVE_SET_TOS(data);
+	return retval;
+	"""
+	pass
+
+def write_string(name, addr, string, length):
+	"""__NATIVE__
+	PmReturn_t retval = PM_RET_OK;
+	pPmObj_t addr, data, num, name;
+	const char *cname;
+	size_t cnum;
+	uint16_t caddr;
+	void *cdata;
+
+	if (NATIVE_GET_NUM_ARGS() != 4) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	name = NATIVE_GET_LOCAL(0);
+	addr = NATIVE_GET_LOCAL(1);
+	data = NATIVE_GET_LOCAL(2);
+	num = NATIVE_GET_LOCAL(3);
+
+	if(OBJ_GET_TYPE(name) != OBJ_TYPE_STR ||
+		OBJ_GET_TYPE(data) != OBJ_TYPE_STR ||
+		OBJ_GET_TYPE(addr) != OBJ_TYPE_INT ||
+		OBJ_GET_TYPE(num) != OBJ_TYPE_INT) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	cname = (const char*)((pPmString_t)name)->val;
+	caddr = ((pPmInt_t)addr)->val;
+	cnum = ((pPmInt_t)num)->val + 1;
+	cdata = (void*)((pPmString_t)data)->val;
+
+	pm_sram_write(cname, caddr, cdata, cnum);
+	return retval;
+	"""
+	pass
+
+def read_string(name, addr, length):
+	"""__NATIVE__
+	PmReturn_t retval = PM_RET_OK;
+	pPmObj_t name, addr, num, text;
+	const char *cname;
+	size_t cnum;
+	uint16_t caddr;
+	char *cdata, *cpy;
+
+	if (NATIVE_GET_NUM_ARGS() != 3) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	name = NATIVE_GET_LOCAL(0);
+	addr = NATIVE_GET_LOCAL(1);
+	num = NATIVE_GET_LOCAL(2);
+
+	if(OBJ_GET_TYPE(name) != OBJ_TYPE_STR ||
+		OBJ_GET_TYPE(addr) != OBJ_TYPE_INT ||
+		OBJ_GET_TYPE(num) != OBJ_TYPE_INT) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	cname = (const char*)((pPmString_t)name)->val;
+	caddr = ((pPmInt_t)addr)->val;
+	cnum = ((pPmInt_t)num)->val + 1;
+	cpy = cdata = kzalloc(cnum);
+
+	pm_sram_read(cname, caddr, cdata, cnum);
+
+	string_new((uint8_t const **)&cdata, &text);
+	kfree(cpy);
+
+	NATIVE_SET_TOS(text);
 	return retval;
 	"""
 	pass
