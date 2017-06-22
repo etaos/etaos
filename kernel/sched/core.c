@@ -104,6 +104,20 @@ static void sched_set_current_thread(struct thread *tp)
 	__sched_set_current_thread(rq, tp);
 }
 
+/**
+ * @brief Return the current thread for a given run queue.
+ * @param Run queue to get the current thread for.
+ * @return The current thread of \p rq.
+ * @see current_thread
+ */
+static struct thread *current_thread_for(struct rq *rq)
+{
+	if(!rq)
+		return NULL;
+
+	return rq->current;
+}
+
 #ifdef CONFIG_IRQ_THREAD
 /**
  * @brief Put an IRQ thread in a waiting state.
@@ -1053,6 +1067,83 @@ static inline void __schedule_prepare(struct rq *rq,
 }
 
 /**
+ * @brief Mark a thread for termination.
+ * @param Thread to be terminated.
+ * @see sched_remote_kill_if thread_destroy
+ *
+ * The thread will be removed from the system the next time the
+ * scheduler attempts to run it.
+ */
+void sched_mark_remote_kill(struct thread *tp)
+{
+	struct thread *cur;
+	struct rq *rq;
+	unsigned long flags;
+	struct sched_class *class;
+
+	rq = tp->rq;
+	cur = current_thread_for(rq);
+
+	if(cur == tp) {
+		class = rq->sched_class;
+		set_bit(THREAD_EXIT_FLAG, &tp->flags);
+		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+		clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+#ifdef CONFIG_EXTENDED_THREAD
+		raw_event_notify_broadcast(&tp->joinq);
+#endif
+		raw_spin_lock_irqsave(&rq->lock, flags);
+		rq_add_kill_thread(rq, tp);
+		raw_spin_unlock_irqrestore(&rq->lock, flags);
+
+		if(class->kill)
+			class->kill(tp);
+
+		return;
+	}
+
+	set_bit(THREAD_REMOTE_KILL, &tp->flags);
+
+	if(!test_bit(THREAD_SLEEPING_FLAG, &tp->flags) &&
+			!test_bit(THREAD_WAITING_FLAG, &tp->flags)) {
+		cur = current_thread();
+		set_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
+	}
+}
+
+/**
+ * @brief Kill the current thread if its marked for removal.
+ * @param rq The run queue that we're on.
+ * @see __schedule sched_mark_remote_kill thread_destroy
+ *
+ * Appends the current thread to the kill queue and prepares it for
+ * a reschedule.
+ */
+static void sched_remote_kill_if(struct rq *rq)
+{
+	struct thread *tp;
+	struct sched_class *class;
+
+	tp = current_thread_for(rq);
+	if(likely(!test_bit(THREAD_REMOTE_KILL, &tp->flags)))
+		return;
+
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	set_bit(THREAD_EXIT_FLAG, &tp->flags);
+	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+
+	rq_add_kill_thread(rq, tp);
+	class = rq->sched_class;
+
+	if(class->kill)
+		class->kill(tp);
+
+#ifdef CONFIG_EXTENDED_THREAD
+	raw_event_notify_broadcast(&tp->joinq);
+#endif
+}
+
+/**
  * @brief Reschedule policy.
  * @param curr Current thread.
  * @param next Thread which is supposed to be running after \p curr.
@@ -1176,6 +1267,7 @@ static bool __hot __schedule(int cpu, bool preempt)
 	}
 
 	rq_destroy_kill_q(rq);
+	sched_remote_kill_if(rq);
 	cpu_notify(SCHED_EXIT);
 
 	return rescheduled;

@@ -196,6 +196,7 @@ typedef struct thread_attr {
 #define PREEMPT_NEED_RESCHED_FLAG 5 //!< Thread has used its full time slice.
 #define THREAD_IDLE_FLAG	 6 //!< Thread is the idle thread.
 #define THREAD_SYSTEM_STACK      7 //!< Stack is allocated by the system.
+#define THREAD_REMOTE_KILL	 8 //!< Thread has been killed by someone else
 /** @} */
 
 /**
@@ -226,6 +227,8 @@ extern void sched_init_idle(struct thread *tp, const char *name,
 		void *stack);
 extern struct thread *current_thread();
 
+extern int thread_destroy(struct thread *tp);
+extern int thread_destroy_by_name(const char *name);
 extern void yield(void);
 extern void sleep(unsigned ms);
 extern void kill(void);

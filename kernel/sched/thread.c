@@ -23,6 +23,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
+#include <etaos/stdio.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/thread.h>
@@ -290,6 +291,41 @@ void kill(void)
 		class->kill(tp);
 
 	schedule();
+}
+
+/**
+ * @brief Kill another thread identified by its name.
+ * @param name Name of the thread to destroy.
+ * @return An error code.
+ * @see thread_destroy
+ */
+int thread_destroy_by_name(const char *name)
+{
+	return thread_destroy(sched_find_thread_by_name(name));
+}
+
+/**
+ * Destroy another thread.
+ * @param tp Thread to destroy.
+ * @return An error code.
+ * @see thread_destroy_by_name
+ */
+int thread_destroy(struct thread *tp)
+{
+	if(!tp)
+		return -EINVAL;
+
+	if(test_bit(THREAD_EXIT_FLAG, &tp->flags))
+		return 1;
+
+#ifdef CONFIG_SCHED_DBG
+	if(test_bit(THREAD_IDLE_FLAG, &tp->flags)) {
+		fprintf(stderr, PSTR("Attemped to kill idle thread!\n"));
+		return -EINVAL;
+	}
+#endif
+	sched_mark_remote_kill(tp);
+	return -EOK;
 }
 
 /**
