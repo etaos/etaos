@@ -18,6 +18,9 @@
 # ver = "0.1"            # XXX compile date & platform?
 # Example: sys.version = '2.4.1 (#1, Feb 26 2006, 16:26:36) \n[GCC 4.0.0 20041026 (Apple Computer, Inc. build 4061)]'
 
+"""__NATIVE__
+#include <etaos/thread.h>
+"""
 
 maxint = 0x7FFFFFFF     # 2147483647
 
@@ -218,7 +221,7 @@ def runInThread(f):
 #
 # Returns the number of milliseconds since the PyMite VM was initialized
 #
-def time():
+def clock():
     """__NATIVE__
     uint32_t t;
     pPmObj_t pt;
@@ -252,14 +255,24 @@ def time():
     """
     pass
 
+def thread_yield():
+	"""__NATIVE__
+	yield();
+	return PM_RET_OK;
+	"""
+	pass
 
 #
 # Waits in a busy loop for the given number of milliseconds
 #
 def wait(ms):
-    t = time() + ms
-    while time() < t:
-        pass
-
+	now = clock()
+	t = clock() + ms
+	while clock() < t:
+		# Yield to the CPU every 10ms while waiting
+		if now + 10 <= clock():
+			thread_yield()
+			now = clock()
+		pass
 
 # :mode=c:

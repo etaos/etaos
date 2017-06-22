@@ -21,6 +21,6 @@ ee.write(0x60, data_ary, len(data_ary))
 
 while True:
 	data = ee.read(0x60, 2);
-	print "EEPROM: %d and %d" % (data[0], data[1])
-	sys.wait(500)
+	print "EEPROM: %d and %d - Temperature: %f" % (data[0], data[1], lm.read())
+	sys.wait(1000)
 
