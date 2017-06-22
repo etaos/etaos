@@ -28,12 +28,16 @@
 #include <etaos/vfs.h>
 #include <etaos/unistd.h>
 
-int pm_ee_read(uint8_t addr, void *buff, size_t len)
+#define EEPROM_NAME_BUFF_SIZE 32
+
+int pm_ee_read(const char *name, uint8_t addr, void *buff, size_t len)
 {
 	int rc, fd;
+	char namebuff[EEPROM_NAME_BUFF_SIZE];
 	struct file *stream;
 
-	fd = open("/dev/24C02", _FDEV_SETUP_RW);
+	snprintf(namebuff, EEPROM_NAME_BUFF_SIZE, "/dev/%s", name);
+	fd = open(namebuff, _FDEV_SETUP_RW);
 
 	if(fd >= 0) {
 		stream = filep(fd);
@@ -47,12 +51,14 @@ int pm_ee_read(uint8_t addr, void *buff, size_t len)
 	return rc;
 }
 
-int pm_ee_write(uint8_t addr, const void *buff, size_t len)
+int pm_ee_write(const char *name, uint8_t addr, const void *buff, size_t len)
 {
+	char namebuff[EEPROM_NAME_BUFF_SIZE];
 	int fd, rc = -EOK;
 	struct file *stream;
 
-	fd = open("/dev/24C02", _FDEV_SETUP_RW);
+	snprintf(namebuff, EEPROM_NAME_BUFF_SIZE, "/dev/%s", name);
+	fd = open(namebuff, _FDEV_SETUP_RW);
 
 	if(fd >= 0) {
 		stream = filep(fd);

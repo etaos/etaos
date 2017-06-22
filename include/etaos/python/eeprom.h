@@ -22,8 +22,8 @@
 #include <etaos/kernel.h>
 
 CDECL
-extern int pm_ee_read(uint8_t addr, void *buff, size_t len);
-extern int pm_ee_write(uint8_t addr, const void *buff, size_t len);
+extern int pm_ee_read(const char *name, uint8_t addr, void *buff, size_t len);
+extern int pm_ee_write(const char *name, uint8_t addr, const void *buff, size_t len);
 CDECL_END
 
 #endif

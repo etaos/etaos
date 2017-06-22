@@ -12,10 +12,10 @@
 
 import sys, cpu, string
 from lm35 import LM35
-from eeprom import EE24C02
+from eeprom import EEPROM
 from time import Time
 
-chip = EE24C02()
+ee = EEPROM("24C02")
 addr = 0x60
 num = 2
 
@@ -29,14 +29,14 @@ def print_temperature(sensor):
 
 def print_eeprom():
 	while True:
-		data = chip.read(addr, num)
+		data = ee.read(addr, num)
 		print "[python]:    EEPROM: %d and %d" % (data[0], data[1])
 		sys.wait(1000)
 
 def main():
 	lm = LM35(0)
 	data_ary = [155, 120, 10, 20, 52, 80]
-	chip.write(0x60, data_ary, len(data_ary))
+	ee.write(addr, data_ary, len(data_ary))
 	sys.run(print_eeprom)
 
 	while True:
