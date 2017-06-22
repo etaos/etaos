@@ -16,6 +16,7 @@
  */
 
 #include <etaos/python.h>
+#include <etaos/preempt.h>
 
 #ifdef HAVE_SNPRINTF_FORMAT
 #include <etaos/stdio.h>
@@ -180,17 +181,15 @@ string_printFormattedBytes(uint8_t * pb, uint8_t is_escaped, uint16_t n)
 	uint8_t nibble;
 	PmReturn_t retval = PM_RET_OK;
 
-	if (is_escaped) {
-		retval = plat_putByte('\'');
-		PM_RETURN_IF_ERROR(retval);
-	}
+	preempt_disable();
+	if (is_escaped)
+		plat_putByte('\'');
 
 	for (i = 0; i < n; i++) {
 		ch = pb[i];
 		if (is_escaped && (ch == '\\')) {
 			/* Output an additional backslash to escape it. */
-			retval = plat_putByte('\\');
-			PM_RETURN_IF_ERROR(retval);
+			plat_putByte('\\');
 		}
 
 		/* Print the hex escape code of non-printable characters */
@@ -216,13 +215,13 @@ string_printFormattedBytes(uint8_t * pb, uint8_t is_escaped, uint16_t n)
 			}
 
 			/* Output character */
-			retval = plat_putByte(ch);
-			PM_RETURN_IF_ERROR(retval);
+			plat_putByte(ch);
 		}
 	}
-	if (is_escaped) {
-		retval = plat_putByte('\'');
-	}
+
+	if (is_escaped)
+		plat_putByte('\'');
+	preempt_enable_no_resched();
 
 	return retval;
 }
