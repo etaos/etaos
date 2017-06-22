@@ -191,31 +191,29 @@ def putb(b):
 #
 # Runs the given function in a thread sharing the current global namespace
 #
-def runInThread(f):
-    """__NATIVE__
-    PmReturn_t retval;
-    pPmObj_t pf;
+def run(f):
+	"""__NATIVE__
+	PmReturn_t retval;
+	pPmObj_t pf;
 
-    /* If wrong number of args, raise TypeError */
-    if (NATIVE_GET_NUM_ARGS() != 1)
-    {
-        PM_RAISE(retval, PM_RET_EX_TYPE);
-        return retval;
-    }
+	/* If wrong number of args, raise TypeError */
+	if (NATIVE_GET_NUM_ARGS() != 1) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
 
-    /* If arg is not a function, raise TypeError */
-    pf = NATIVE_GET_LOCAL(0);
-    if (OBJ_GET_TYPE(pf) != OBJ_TYPE_FXN)
-    {
-        PM_RAISE(retval, PM_RET_EX_TYPE);
-        return retval;
-    }
+	/* If arg is not a function, raise TypeError */
+	pf = NATIVE_GET_LOCAL(0);
+	if (OBJ_GET_TYPE(pf) != OBJ_TYPE_FXN) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
 
-    retval = interp_addThread((pPmFunc_t)pf);
-    NATIVE_SET_TOS(PM_NONE);
-    return retval;
-    """
-    pass
+	retval = interp_addThread((pPmFunc_t)pf);
+	NATIVE_SET_TOS(PM_NONE);
+	return retval;
+	"""
+	pass
 
 
 #

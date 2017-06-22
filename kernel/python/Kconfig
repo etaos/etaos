@@ -18,7 +18,7 @@ config PYTHON_STACK_SIZE
 
 config PYTHON_PRIO
 	int "VM thread priority"
-	default 75
+	default 160
 	help
 	  Priority of the thread running the Python VM.
 endif

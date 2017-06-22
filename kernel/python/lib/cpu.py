@@ -1,6 +1,6 @@
 #
 #   ETA/OS - CPU class
-#   Copyright (C) 2015  Michel Megens <dev@michelmegens.net>
+#   Copyright (C) 2017  Michel Megens <dev@michelmegens.net>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Lesser General Public License as published

@@ -120,4 +120,6 @@ PmReturn_t class_getAttr(pPmObj_t pobj, pPmObj_t pname, pPmObj_t * r_pobj);
  */
 uint8_t class_isSubclass(pPmObj_t ptest_class, pPmObj_t pbase_class);
 
+extern PmReturn_t class_get_attrib(pPmObj_t obj, const char *name, pPmObj_t *r_obj);
+
 #endif				/* __CLASS_H__ */

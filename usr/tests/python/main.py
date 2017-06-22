@@ -10,20 +10,14 @@
 # A copy of the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
 # is seen in the file COPYING up one directory from this.
 
-import sys, cpu
-from eeprom import EE24C02
+import sys
 
-cpu.set_output(15, False)
+from time import Time
 
-ee = EE24C02()
+now = Time(True)
 
 while True:
-	cpu.write(15, True)
-	sys.wait(500)
-	cpu.write(15, False)
-	sys.wait(500)
-
-	ee.write(0x40, [155, 140, 120])
-	data = ee.read(0x40, 3)
-	print data
+	print now.to_string()
+	now.now()
+	sys.wait(1000)
 

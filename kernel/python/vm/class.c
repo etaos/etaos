@@ -221,6 +221,14 @@ PmReturn_t class_getAttr(pPmObj_t pobj, pPmObj_t pname, pPmObj_t * r_pobj)
 	return retval;
 }
 
+PmReturn_t class_get_attrib(pPmObj_t obj, const char *name, pPmObj_t *r_obj)
+{
+	pPmObj_t attrname;
+
+	string_new((uint8_t**)&name, &attrname);
+	return class_getAttr(obj, attrname, r_obj);
+}
+
 uint8_t				/* boolean */
 class_isSubclass(pPmObj_t ptest_class, pPmObj_t pbase_class)
 {
