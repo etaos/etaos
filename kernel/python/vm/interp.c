@@ -2269,3 +2269,4 @@ void interp_setRescheduleFlag(uint8_t boolean)
 {
 	gVmGlobal.reschedule = boolean;
 }
+

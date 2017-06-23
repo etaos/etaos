@@ -10,7 +10,7 @@
 # A copy of the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
 # is seen in the file COPYING up one directory from this.
 
-import sys, cpu, string
+import sys, cpu, string, avr
 from lm35 import LM35
 from eeprom import EEPROM
 from sram import SRAM
@@ -24,10 +24,18 @@ num = 2
 
 def print_temperature(sensor):
 	tm = Time(True)
+	high = False
 	while True:
 		temp = sensor.read()
 		tm.now()
 		print "[python]:    Temperature: %f at %s" % (temp, tm.to_string())
+
+		if high:
+			avr.port_and(avr.portb, 0x7F)
+			high = False
+		else:
+			avr.port_or(avr.portb, 0x80)
+			high = True
 		sys.wait(1000)
 
 def print_eeprom_and_sram():
@@ -44,6 +52,9 @@ def main():
 	data_ary = [155, 120, 10, 20, 52, 80]
 	ee.write(addr, data_ary, len(data_ary))
 	ram.write_string(addr, sram_string)
+
+	# Setup the LED pin
+	avr.port_direction_or(avr.portb, 0x80)
 	sys.run(print_eeprom_and_sram)
 
 	while True:

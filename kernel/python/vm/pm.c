@@ -18,7 +18,7 @@
 #include <etaos/python.h>
 
 /** Number of millisecond-ticks to pass before scheduler is run */
-#define PM_THREAD_TIMESLICE_MS  10
+#define PM_THREAD_TIMESLICE_MS  5
 
 /** Stores the timer millisecond-ticks since system start */
 volatile uint32_t pm_timerMsTicks = 0;

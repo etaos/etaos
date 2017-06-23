@@ -16,7 +16,6 @@
  */
 
 #include <etaos/python.h>
-#include <etaos/preempt.h>
 
 #ifdef HAVE_SNPRINTF_FORMAT
 #include <etaos/stdio.h>
@@ -181,7 +180,6 @@ string_printFormattedBytes(uint8_t * pb, uint8_t is_escaped, uint16_t n)
 	uint8_t nibble;
 	PmReturn_t retval = PM_RET_OK;
 
-	preempt_disable();
 	if (is_escaped)
 		plat_putByte('\'');
 
@@ -221,7 +219,6 @@ string_printFormattedBytes(uint8_t * pb, uint8_t is_escaped, uint16_t n)
 
 	if (is_escaped)
 		plat_putByte('\'');
-	preempt_enable_no_resched();
 
 	return retval;
 }

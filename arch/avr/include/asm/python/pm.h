@@ -19,8 +19,20 @@
 #ifndef __PYTHON_AVR_H__
 #define __PYTHON_AVR_H__
 
+#include <etaos/kernel.h>
+
 #define PM_PLAT_POINTER_SIZE 2
 #define PM_FLOAT_LITTLE_ENDIAN 1
+
+typedef enum port_type {
+	PORT,
+	PIN,
+	DDR,
+} port_type_t;
+
+CDECL
+extern volatile unsigned char *pm_port_to_addr(int32_t port, port_type_t type);
+CDECL_END
 
 #endif
 
