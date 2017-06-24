@@ -25,7 +25,7 @@
 #include <asm/io.h>
 
 #ifndef BAUD
-#define BAUD 9600
+#define BAUD 19200
 #endif
 
 	/* baud calculations */
