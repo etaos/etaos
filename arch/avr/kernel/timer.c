@@ -140,7 +140,6 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 	}
 #endif
 	chip->chip_handle(TIMER0_OVERFLOW_VECTOR_NUM);
-	preempt_schedule_irq();
 	return;
 }
 
