@@ -146,11 +146,7 @@ static void irq_thread_wait(void)
 void irq_thread_signal(struct irq_thread_data *data)
 {
 	struct thread *tp, *current;
-	struct rq *rq;
-	unsigned long flags;
 
-	rq = sched_get_cpu_rq();
-	raw_spin_lock_irq(&rq->lock, &flags);
 	tp = data->owner;
 	current = current_thread();
 
@@ -162,7 +158,6 @@ void irq_thread_signal(struct irq_thread_data *data)
 	rq_add_thread_no_lock(tp);
 
 	set_bit(PREEMPT_NEED_RESCHED_FLAG, &current->flags);
-	raw_spin_unlock_irq(&rq->lock, &flags);
 }
 
 /**
@@ -645,6 +640,26 @@ int rq_remove_thread(struct thread *tp)
 
 	return err;
 }
+
+#ifdef CONFIG_SCHED_FAIR
+/**
+ * Check which of two threads has received the most time on the CPU.
+ *
+ * @param tp First thread, most likely the current thread.
+ * @param nxt A contestant for the CPU.
+ * @return True only iff the CPU time \p nxt has received is less or equal to
+ *         the CPU time received by \p tp.
+ */
+static inline bool should_resched_cputime(struct thread *tp, struct thread *nxt)
+{
+	return nxt->cputime <= tp->cputime;
+}
+#else
+static inline bool should_resched_cputime(struct thread *tp, struct thread *nxt)
+{
+	return false;
+}
+#endif
 
 /**
  * @brief Update a run queue.
@@ -1199,15 +1214,17 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
  * When the algorithm wants to preempt the current thread, the
  * \p PREEMPT_NEED_RESCHED_FLAG will be set.
  */
-static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
+static void preempt_check(struct rq *rq, struct thread *cur, struct thread *nxt)
 {
 	struct sched_class *class = rq->sched_class;
 
-	if(class->preempt_chk(rq, cur, nxt))
+	if(class->preempt_chk(rq, cur, nxt) ||
+			should_resched_cputime(cur, nxt)) {
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+	}
 }
 #else
-#define preempt_chk(__rq, __cur, __nxt)
+#define preempt_check(__rq, __cur, __nxt)
 #endif
 
 /**
@@ -1246,7 +1263,7 @@ static bool __hot __schedule(int cpu, bool preempt)
 	next = sched_get_next_runnable(rq);
 
 	if(preempt)
-		preempt_chk(rq, prev, next);
+		preempt_check(rq, prev, next);
 
 	/*
 	 * Only reschedule if we have to. The decision is based on the
@@ -1496,16 +1513,19 @@ bool preempt_should_resched(void)
 {
 	struct rq *rq;
 	tick_t diff;
-	struct thread *tp = current_thread();
+	struct thread *tp = current_thread(),
+		      *next;
 
 	rq = tp->rq;
 	diff = clocksource_get_tick(rq->source);
 	diff -= cs_last_update(rq->source);
+	next = sched_get_next_runnable(rq);
 
-	if(diff >= tp->slice) {
+	if(diff >= tp->slice || should_resched_cputime(tp, next)) {
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
 		return true;
 	}
+
 
 	return test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 }

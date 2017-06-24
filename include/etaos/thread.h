@@ -152,6 +152,10 @@ struct thread {
 	struct rq *rq; //!< Run queue pointer.
 	unsigned long flags; //!< Thread flags
 
+#ifdef CONFIG_SCHED_FAIR
+	time_t cputime; //!< Total CPU time.
+#endif
+
 	void    *stack; //!< Root stack pointer.
 	stack_t *sp; //!< Run time stack pointer.
 	size_t stack_size; //!< Size of the stack.
