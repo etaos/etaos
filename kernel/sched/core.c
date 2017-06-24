@@ -652,6 +652,11 @@ int rq_remove_thread(struct thread *tp)
  */
 static inline bool should_resched_cputime(struct thread *tp, struct thread *nxt)
 {
+	if(test_bit(THREAD_IDLE_FLAG, &nxt->flags))
+		return false;
+	else if(test_bit(THREAD_IDLE_FLAG, &tp->flags))
+		return true;
+
 	return nxt->cputime <= tp->cputime;
 }
 #else
@@ -1343,7 +1348,7 @@ void __hot preempt_schedule_irq(void)
 {
 	int cpu;
 
-	if(preempt_count())
+	if(preempt_count() || !preempt_should_resched())
 		return;
 
 	do {
