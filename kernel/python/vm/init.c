@@ -30,7 +30,8 @@ int python_init(void)
 	void *heap;
 	PmReturn_t retval;
 
-	heap = mm_alloc_aligned(CONFIG_PYTHON_HEAP_SIZE, 4);
+//	heap = mm_alloc_aligned(CONFIG_PYTHON_HEAP_SIZE, 4);
+	heap = kzalloc(CONFIG_PYTHON_HEAP_SIZE);
 	retval = pm_init(heap, CONFIG_PYTHON_HEAP_SIZE,
 			 MEMSPACE_PROG, usrlib_img);
 	if (retval != PM_RET_OK)
