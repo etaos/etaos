@@ -38,9 +38,6 @@
  */
 struct timer {
 	struct list_head entry;
-	struct timer *next; //!< Next pointer.
-	struct timer *prev; //!< Previous pointer.
-
 	struct clocksource *source; //!< Source of the timer.
 	/**
 	 * @brief Timer trigger.
@@ -53,9 +50,6 @@ struct timer {
 	void *priv_data; //!< Private timer data.
 	time_t expire_at;
 	unsigned int interval;
-
-	unsigned long tleft; //!< Ticks left.
-	unsigned long ticks; //!< Total ticks,used for non ONE_SHOT timers.
 };
 
 /**
