@@ -46,9 +46,6 @@ static struct list_head dev_root = STATIC_INIT_LIST_HEAD(dev_root);
 static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops);
 static struct device *dev_allocate(const char *name, struct dev_file_ops *fops);
 
-#ifdef CONFIG_THREAD_QUEUE
-static DEFINE_THREAD_QUEUE(sync_queue);
-#endif
 
 /**
  * @brief Initialise the device core.
@@ -82,25 +79,19 @@ static void dev_release(struct device *dev)
 void dev_sync_lock(struct device *dev, unsigned ms)
 {
 	sync_t *syn = &dev->sync_lock;
-#ifdef CONFIG_THREAD_QUEUE
+#ifdef CONFIG_SCHED
 	unsigned int time;
 #endif
 
-	mutex_lock(&syn->lock);
-
 	if(syn->last_rw_op == NEVER)
 		return;
-#ifdef CONFIG_THREAD_QUEUE
+#ifdef CONFIG_SCHED
 	if(time_before(sys_tick, syn->last_rw_op+ms)) {
 		time = (syn->last_rw_op+ms) - sys_tick;
-		thread_queue_wait(&sync_queue, time);
+		sleep(time);
 	}
 #else
-	while(time_before(sys_tick, syn->last_rw_op+ms)) {
-#ifdef CONFIG_SCHED
-		yield();
-#endif
-	}
+	while(time_before(sys_tick, syn->last_rw_op+ms));
 #endif
 }
 
@@ -115,22 +106,19 @@ void dev_sync_lock(struct device *dev, unsigned ms)
 void dev_sync_wait(struct device *dev, unsigned ms)
 {
 	sync_t *syn = &dev->sync_lock;
-#ifdef CONFIG_THREAD_QUEUE
+#ifdef CONFIG_SCHED
 	unsigned int time;
 #endif
 
 	syn->last_rw_op = sys_tick;
 
-#ifdef CONFIG_THREAD_QUEUE
+#ifdef CONFIG_SCHED
 	if(time_before(sys_tick, syn->last_rw_op+ms)) {
 		time = (syn->last_rw_op+ms) - sys_tick;
-		thread_queue_wait(&sync_queue, time);
+		sleep(time);
 	}
 #else
-	while(time_before(sys_tick, syn->last_rw_op+ms)) {
-#ifdef CONFIG_SCHED
-		yield();
-#endif
+	while(time_before(sys_tick, syn->last_rw_op+ms));
 	}
 #endif
 }
@@ -147,9 +135,7 @@ void dev_sync_wait(struct device *dev, unsigned ms)
 void dev_sync_unlock(struct device *dev)
 {
 	sync_t *syn = &dev->sync_lock;
-
 	syn->last_rw_op = sys_tick;
-	mutex_unlock(&syn->lock);
 }
 
 static inline int dev_name_is_unique(struct device *dev)
@@ -192,7 +178,6 @@ struct device *device_create(const char *name, void *data,
 
 static inline void sync_lock_init(sync_t *lock)
 {
-	mutex_init(&lock->lock);
 	lock->last_rw_op = NEVER;
 }
 
