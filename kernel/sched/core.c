@@ -231,8 +231,8 @@ void thread_queue_wait(struct thread_queue *qp, unsigned int ms)
 {
 	struct thread *current = current_thread();
 
-	current->timer = timer_create_timer(current->rq->source, ms,
-			&queue_wait_tmo, current, TIMER_ONESHOT_MASK);
+	current->timer = timer_create(current->rq->source, ms, &queue_wait_tmo,
+			              current, TIMER_ONESHOT_MASK);
 	queue_add_thread(qp, current);
 	schedule();
 }
@@ -641,6 +641,11 @@ int rq_remove_thread(struct thread *tp)
 	return err;
 }
 
+static inline struct clocksource *rq_get_clock(struct rq *rq)
+{
+	return rq->source;
+}
+
 #ifdef CONFIG_SCHED_FAIR
 /**
  * Check which of two threads has received the most time on the CPU.
@@ -726,8 +731,8 @@ void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 
-	tp->timer = timer_create_timer(rq->source, ms, &sched_sleep_timeout,
-			tp, TIMER_ONESHOT_MASK);
+	tp->timer = timer_create(rq->source, ms, &sched_sleep_timeout,
+			         tp, TIMER_ONESHOT_MASK);
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
@@ -897,7 +902,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		qp->qhead = SIGNALED;
 
 	if(tp->timer && tp->timer != SIGNALED) {
-		timer_stop_timer(tp->timer);
+		timer_stop(tp->timer);
 	}
 
 	if(unlikely(current != tp)) {
@@ -1021,29 +1026,17 @@ struct thread *sched_find_thread_by_name(const char *name)
 }
 
 /**
- * @brief Update the scheduling clock.
- * @param rq Run queue (AKA CPU) to update.
- */
-static void __rq_update_clock(struct rq *rq)
-{
-	unsigned int tdelta = 0;
-
-	tdelta = clocksource_update(rq->source);
-	timer_process_clock(rq->source, tdelta);
-}
-
-/**
- * @brief API version of #__rq_update_clock.
+ * @brief Update the system clock.
  * @see __rq_update_clock
  */
-void rq_update_clock(void)
+static void rq_update_clock(void)
 {
 	int cpu;
 	struct rq *rq;
 
 	cpu = cpu_get_id();
 	rq = cpu_to_rq(cpu);
-	__rq_update_clock(rq);
+	timer_process(rq_get_clock(rq));
 }
 
 /**

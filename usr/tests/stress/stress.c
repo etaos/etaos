@@ -124,6 +124,7 @@ THREAD(test_th_handle2, arg)
 		kfree(romdata);
 		now = time(NULL);
 		tm = localtime(&now);
+
 		printf_P(PSTR("[2][%s]: Date: %i-%i-%i, %i:%i\n"),
 				current_thread_name(),
 					tm->tm_mday,

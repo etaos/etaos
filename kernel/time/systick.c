@@ -45,10 +45,15 @@ struct clocksource *sys_clk;
 static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 {
 	struct clocksource *cs = (struct clocksource*)data;
+#if defined(CONFIG_SCHED_FAIR) || defined(CONFIG_PREEMPT)
 	struct rq *rq = sched_get_cpu_rq();
 	struct thread *tp = rq->current;
 
+#ifdef CONFIG_SCHED_FAIR
 	tp->cputime += 1ULL;
+#endif
+#endif
+
 	time_inc(); /* Handle system time */
 	timer_source_inc(cs); /* Increase the system / sched clock */
 

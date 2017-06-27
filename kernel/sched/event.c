@@ -53,7 +53,7 @@ static void __raw_event_notify(struct rq *rq, struct thread_queue *qp)
 		qp->qhead = SIGNALED;
 
 	if(tp->timer && tp->timer != SIGNALED) {
-		timer_stop_timer(tp->timer);
+		timer_stop(tp->timer);
 		tp->timer = NULL;
 	}
 
@@ -184,8 +184,8 @@ int raw_event_wait(struct thread_queue *qp, unsigned ms)
 	cs = tp->rq->source;
 
 	if(ms)
-		tp->timer = timer_create_timer(cs, ms, &event_tmo,
-				(void*)qp, TIMER_ONESHOT_MASK);
+		tp->timer = timer_create(cs, ms, &event_tmo, (void*)qp,
+				               TIMER_ONESHOT_MASK);
 	else
 		tp->timer = NULL;
 

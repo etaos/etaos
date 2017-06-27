@@ -21,6 +21,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/list.h>
 #include <etaos/spinlock.h>
 
 struct timer;
@@ -49,6 +50,7 @@ struct clocksource {
 	spinlock_t lock; //!< Clocksource lock.
 
 	struct list_head list; //!< List of clocksources.
+	struct list_head timers;
 	struct timer *thead;
 };
 
@@ -92,6 +94,15 @@ extern void clocksource_add_timer(struct clocksource *cs, struct timer *t);
 extern void clocksource_delete_timer(struct clocksource *cs, struct timer *timer);
 extern tick_t clocksource_update(struct clocksource *cs);
 extern time_t clocksource_get_seconds(struct clocksource *src);
+
+/* Timer rewrite funcs */
+
+extern void clocksource_insert_timer(struct clocksource *cs,
+		struct list_head *lh, list_comparator_t comp);
+extern void raw_clocksource_insert_timer(struct clocksource *cs,
+		struct list_head *lh, list_comparator_t comp);
+extern int clocksource_remove_timer(struct clocksource *cs,
+		struct list_head *lh);
 CDECL_END
 
 #endif /* CLOCKSOURCE_H */

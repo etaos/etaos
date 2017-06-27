@@ -72,6 +72,8 @@ CDECL_END
  */
 #define time_before(a, b) ((a) < (b))
 
+#define time_at_or_after(x, y) ((x) >= (y))
+
 #endif /* __TICK_H__ */
 
 /** @} */

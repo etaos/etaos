@@ -57,6 +57,7 @@ int clocksource_init(const char *name, struct clocksource *cs,
 	cs->tc_update = 0UL;
 	spinlock_init(&cs->lock);
 	list_add(&cs->list, &sources);
+	list_head_init(&cs->timers);
 	return -EOK;
 }
 
@@ -167,6 +168,52 @@ void clocksource_delete_timer(struct clocksource *cs, struct timer *timer)
 		timer->next->tleft += timer->tleft;
 	}
 	raw_spin_unlock_irqrestore(&cs->lock, flags);
+}
+
+/* TIMER REWRITE */
+
+void raw_clocksource_insert_timer(struct clocksource *cs,
+		struct list_head *lh, list_comparator_t comp)
+{
+	struct list_head *carriage;
+
+	if(list_empty(&cs->timers)) {
+		list_add(lh, &cs->timers);
+		return;
+	}
+
+	list_for_each(carriage, &cs->timers) {
+		if(list_is_last(carriage, &cs->timers)) {
+			list_add(lh, carriage);
+			break;
+		}
+
+		if(comp(lh, carriage) <= 0) {
+			list_add_tail(lh, carriage);
+			break;
+		}
+	}
+}
+
+void clocksource_insert_timer(struct clocksource *cs, struct list_head *lh,
+				list_comparator_t comp)
+{
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&cs->lock, flags);
+	raw_clocksource_insert_timer(cs, lh, comp);
+	raw_spin_unlock_irqrestore(&cs->lock, flags);
+}
+
+int clocksource_remove_timer(struct clocksource *cs, struct list_head *lh)
+{
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&cs->lock, flags);
+	list_del(lh);
+	raw_spin_unlock_irqrestore(&cs->lock, flags);
+
+	return -EOK;
 }
 
 /** @} */

@@ -290,7 +290,6 @@ extern void rq_add_thread_no_lock(struct thread *tp);
 extern struct thread *sched_find_thread_by_name(const char *name);
 
 extern void sched_mark_remote_kill(struct thread *tp);
-extern void rq_update_clock(void);
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 extern void sched_yield(struct rq *rq);
 extern void sched_start(void);
