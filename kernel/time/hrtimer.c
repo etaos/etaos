@@ -30,55 +30,23 @@
 #include <etaos/bitops.h>
 #include <etaos/clocksource.h>
 #include <etaos/hrtimer.h>
+#include <etaos/tick.h>
 
-/**
- * @brief The system high resolution clock source.
- */
 struct clocksource *hr_sys_clk;
 
-static void raw_hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer)
+static int hrtimer_list_comparator(struct list_head *lh1, struct list_head *lh2)
 {
-	struct hrtimer *carriage;
+	struct hrtimer *t1, *t2;
 
-	for(carriage = src->timers; carriage; carriage = carriage->next) {
-		if(timer->ticks < carriage->ticks) {
-			carriage->ticks -= timer->ticks;
-			break;
-		}
+	t1 = list_entry(lh1, struct hrtimer, entry);
+	t2 = list_entry(lh2, struct hrtimer, entry);
 
-		timer->ticks -= carriage->ticks;
-		timer->prev = carriage;
-	}
+	if(t1->expire_at < t2->expire_at)
+		return -1;
+	else if(t1->expire_at > t2->expire_at)
+		return 1;
 
-	timer->next = carriage;
-
-	if(timer->next)
-		timer->next->prev = timer;
-	if(timer->prev)
-		timer->prev->next = timer;
-	else
-		src->timers = timer;
-}
-
-static void hrtimer_source_add(struct hrtimer_source *src, struct hrtimer *timer)
-{
-	unsigned long flags;
-
-	raw_spin_lock_irqsave(&src->base.lock, flags);
-	raw_hrtimer_source_add(src, timer);
-	raw_spin_unlock_irqrestore(&src->base.lock, flags);
-}
-
-static void hrtimer_source_delete(struct hrtimer_source *src, struct hrtimer *timer)
-{
-	if(timer->prev)
-		timer->prev->next = timer->next;
-	else
-		src->timers = timer->next;
-	if(timer->next) {
-		timer->next->prev = timer->prev;
-		timer->next->ticks += timer->ticks;
-	}
+	return 0;
 }
 
 /**
@@ -95,25 +63,24 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
 				void *arg, unsigned long flags)
 {
 	struct hrtimer *timer;
-	struct hrtimer_source *hrsrc;
 
 	timer = kzalloc(sizeof(*timer));
-	hrsrc = container_of(src, struct hrtimer_source, base);
 
 	if(!timer)
 		panic_P("No memory available\n");
 
-	timer->ticks = (ns * src->freq) / 1E9;
+	timer->source = src;
+	timer->interval = timer->expire_at = (ns * src->freq) / 1E9;
+	timer->expire_at += clocksource_get_tick(src);
 	timer->handle = handle;
 	timer->handle_argument = arg;
-	timer->base = hrsrc;
+	timer->source = src;
+	list_head_init(&timer->entry);
 
 	if(test_bit(HRTIMER_ONESHOT, &flags))
-		timer->timer_once = 0UL;
-	else
-		timer->timer_once = timer->ticks;
+		timer->interval = 0;
 
-	hrtimer_source_add(hrsrc, timer);
+	clocksource_insert_timer(src, &timer->entry, &hrtimer_list_comparator);
 	return timer;
 }
 
@@ -126,57 +93,53 @@ struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
  */
 int hrtimer_stop(struct hrtimer *timer)
 {
-	struct clocksource *cs;
-	unsigned long flags;
+	int rc;
 
-	if(!timer || timer == SIGNALED)
-		return -EINVAL;
+	rc = clocksource_remove_timer(timer->source, &timer->entry);
+	if(rc == -EOK)
+		kfree(timer);
 
-	cs = hrtimer_to_source(timer);
-
-	raw_spin_lock_irqsave(&cs->lock, flags);
-	timer->handle = NULL;
-	hrtimer_source_delete(timer->base, timer);
-	raw_spin_unlock_irqrestore(&cs->lock, flags);
-	kfree(timer);
-
-	return -EOK;
+	return rc;
 }
 
-static void hrtimer_handle(struct hrtimer_source *cs)
+static inline bool hrtimer_is_expired(struct hrtimer *timer)
 {
-	unsigned int diff;
+	time_t now;
+
+	now = clocksource_get_tick(timer->source);
+	return time_at_or_after(now, timer->expire_at);
+}
+
+static void hrtimer_handle(struct clocksource *cs)
+{
+	unsigned long flags;
+	struct list_head *carriage, *x;
 	struct hrtimer *timer;
 
-	diff = clocksource_update(&cs->base);
-	if(!cs->timers || diff < 0 || diff == 0)
-		return;
+	raw_spin_lock_irqsave(&cs->lock, flags);
+	clocksource_update(cs);
 
-	while(cs->timers && diff) {
-		timer = cs->timers;
-
-		if(diff < timer->ticks) {
-			timer->ticks -= diff;
-			diff = 0;
-		} else {
-			diff -= timer->ticks;
-			timer->ticks = 0;
-		}
-
-		if(timer->ticks == 0) {
+	list_for_each_safe(carriage, x, &cs->timers) {
+		timer = list_entry(carriage, struct hrtimer, entry);
+		if(hrtimer_is_expired(timer)) {
+			list_del(carriage);
+			
 			if(timer->handle)
 				timer->handle(timer, timer->handle_argument);
 
-			cs->timers = cs->timers->next;
-			if(cs->timers)
-				cs->timers->prev = NULL;
-
-			if((timer->ticks = timer->timer_once) == 0)
+			if(timer->interval) {
+				timer->expire_at = timer->interval +
+					clocksource_get_tick(cs);
+				raw_clocksource_insert_timer(cs, &timer->entry,
+						&hrtimer_list_comparator);
+			} else {
 				kfree(timer);
-			else
-				raw_hrtimer_source_add(cs, timer);
+			}
+
 		}
 	}
+
+	raw_spin_unlock_irqrestore(&cs->lock, flags);
 }
 
 /**
@@ -189,13 +152,11 @@ static void hrtimer_handle(struct hrtimer_source *cs)
 irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
 {
 	struct clocksource *src;
-	struct hrtimer_source *hrsrc;
 
 	src = arg;
-	hrsrc = container_of(src, struct hrtimer_source, base);
 	
 	timer_source_inc(src);
-	hrtimer_handle(hrsrc);
+	hrtimer_handle(src);
 	return IRQ_HANDLED;
 }
 

@@ -66,7 +66,6 @@ struct timer *timer_create_timer(struct clocksource *cs, unsigned long ms,
 		return NULL;
 
 	timer->tleft = (cs->freq / 1000UL) * ms;
-	list_head_init(&timer->entry);
 
 	if(test_bit(TIMER_ONESHOT_FLAG, &flags))
 		timer->ticks = 0;
@@ -200,6 +199,7 @@ struct timer *timer_create(struct clocksource *cs, unsigned long ms,
 	if(test_bit(TIMER_ONESHOT_FLAG, &flags))
 		timer->interval = 0;
 
+	list_head_init(&timer->entry);
 	timer->expire_at = expire;
 	timer->source = cs;
 	timer->handle = handle;

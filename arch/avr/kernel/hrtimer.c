@@ -30,10 +30,8 @@
 
 #define AVR_HRTIMER_FREQ 2000
 
-static struct hrtimer_source avr_hrtimer_src = {
-	.base = {
-		.name = "avr-hr-clock",
-	},
+static struct clocksource avr_hrtimer_src = {
+	.name = "avr-hr-clock",
 };
 
 static void avr_start_hrclock(int irq, struct clocksource *src)
@@ -53,10 +51,10 @@ static void avr_start_hrclock(int irq, struct clocksource *src)
 
 static void __used avr_hrtimer_init(void)
 {
-	hrtimer_source_init(avr_hrtimer_src.base.name, &avr_hrtimer_src,
-			NULL, NULL, AVR_HRTIMER_FREQ);
-	sysctl(SYS_SET_HR_CLK, &avr_hrtimer_src.base);
-	avr_start_hrclock(TIMER2_OVERFLOW_VECTOR_NUM, &avr_hrtimer_src.base);
+	clocksource_init(avr_hrtimer_src.name, &avr_hrtimer_src,
+			AVR_HRTIMER_FREQ, NULL, NULL);
+	sysctl(SYS_SET_HR_CLK, &avr_hrtimer_src);
+	avr_start_hrclock(TIMER2_OVERFLOW_VECTOR_NUM, &avr_hrtimer_src);
 }
 
 SIGNAL(TIMER2_OVERFLOW_VECTOR)

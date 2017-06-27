@@ -29,24 +29,16 @@
  */
 
 #include <etaos/kernel.h>
+#include <etaos/list.h>
 #include <etaos/timer.h>
 #include <etaos/clocksource.h>
-
-/**
- * @brief HR timer clock source.
- */
-struct hrtimer_source {
-	struct clocksource base; //!< Base clocksource.
-	struct hrtimer *timers; //!< Linked list head.
-};
 
 /**
  * @brief High resolution timer structure.
  */
 struct hrtimer {
-	struct hrtimer *next, //!< List next pointer.
-		       *prev; //!< List prev pointer.
-	struct hrtimer_source *base; //!< Timer base.
+	struct list_head entry;
+	struct clocksource *source;
 
 	/**
 	 * @brief Handler for the timer.
@@ -55,9 +47,8 @@ struct hrtimer {
 	 */
 	void (*handle)(struct hrtimer *timer, void *arg);
 	void *handle_argument; //!< Argument passed to \p handle.
-
-	unsigned long ticks, //!< Number of ticks per interval.
-		      timer_once; //!< Set if the timer is repeating.
+	time_t expire_at;
+	unsigned long interval;
 };
 
 extern struct clocksource *hr_sys_clk;
@@ -73,31 +64,13 @@ extern struct clocksource *hr_sys_clk;
 
 CDECL
 /**
- * @brief Initialise a HR timer clocksource.
- * @param name Name for the clocksource.
- * @param src HR timer source to initialise.
- * @param enable Function to enable the source.
- * @param disable Function to disable to source.
- * @param freq Frequency (IRQ interval) of the source.
- */
-static inline void hrtimer_source_init(const char *name,
-				       struct hrtimer_source *src,
-				       int (*enable)(struct clocksource *),
-				       void (*disable)(struct clocksource*),
-				       unsigned long freq)
-{
-	src->timers = NULL;
-	clocksource_init(name, &src->base, freq, enable, disable);
-}
-
-/**
  * @brief Get the base clocksource of a hrtimer.
  * @param timer hrtimer to get the base clocksource for.
  * @return The base clocksource of \p timer.
  */
 static inline struct clocksource *hrtimer_to_source(struct hrtimer *timer)
 {
-	return &timer->base->base;
+	return timer->source;
 }
 
 extern struct hrtimer *hrtimer_create(struct clocksource *src, uint64_t ns,
