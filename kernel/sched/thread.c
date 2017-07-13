@@ -34,6 +34,7 @@
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
 #include <etaos/string.h>
+#include <etaos/list.h>
 
 /**
  * @brief Thread initialise backend.
@@ -61,7 +62,6 @@ static void raw_thread_init(struct thread *tp, const char *name,
 	tp->ec = 0;
 #endif
 
-	tp->rq_next = NULL;
 	tp->queue = NULL;
 	tp->timer = NULL;
 #ifdef CONFIG_PREEMPT
@@ -78,6 +78,7 @@ static void raw_thread_init(struct thread *tp, const char *name,
 	thread_queue_init(&tp->joinq);
 #endif
 
+	list_head_init(&tp->entry);
 	irq_store_flags(&tp->irq_state);
 	sched_create_stack_frame(tp, stack, stack_size, handle);
 

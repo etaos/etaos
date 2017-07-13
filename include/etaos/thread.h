@@ -99,10 +99,10 @@ struct lottery_ticket {
 struct rr_entity {
 	struct thread *next; //!< List entry pointer.
 #ifdef CONFIG_LOTTERY
-	struct list_head tickets;
+	struct list_head tickets; //!< Lotery tickets.
 #endif
 #ifdef CONFIG_EDF
-	time_t deadline;
+	time_t deadline; //!< EDF deadline timestamp.
 #endif
 };
 
@@ -138,7 +138,7 @@ struct rq;
  */
 struct thread {
 	struct thread *volatile*queue; //!< Queue root pointer.
-	struct thread *rq_next; //!< Wake/Kill list entry.
+	struct list_head entry; //!< Wake / kill queue entry.
 
 #ifdef CONFIG_PREEMPT
 	unsigned int slice; //!< Time slice.
@@ -246,6 +246,10 @@ extern int join(struct thread *tp);
 
 #ifdef CONFIG_THREAD_QUEUE
 extern void thread_queue_init(struct thread_queue *qp);
+#endif
+
+#ifdef CONFIG_SCHED_DBG
+extern void print_rq(void);
 #endif
 
 CDECL_END

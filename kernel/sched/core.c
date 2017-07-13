@@ -106,7 +106,7 @@ static void sched_set_current_thread(struct thread *tp)
 
 /**
  * @brief Return the current thread for a given run queue.
- * @param Run queue to get the current thread for.
+ * @param rq Run queue to get the current thread for.
  * @return The current thread of \p rq.
  * @see current_thread
  */
@@ -319,33 +319,12 @@ void queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 /**
  * @brief Remove a thread from the rq_list.
  * @param tp Thread to remove.
- * @param tpp Root queue pointer.
  * @return Error code.
  * @retval -EOK on success.
  */
-static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
+static int rq_list_remove(struct thread *tp)
 {
-	struct thread *carriage;
-
-	/* get the queue head */
-	carriage = *tpp;
-	if(carriage == SIGNALED)
-		return -EINVAL;
-
-	/* loop through all threads in the queue */
-	while(carriage) {
-		if(carriage == tp) {
-			*tpp = tp->rq_next;
-			tp->rq_next = NULL;
-			tp->queue = NULL;
-			break;
-		}
-
-		tpp = &carriage->rq_next;
-		carriage = carriage->rq_next;
-		continue;
-	}
-
+	list_del(&tp->entry);
 	return -EOK;
 }
 
@@ -360,7 +339,7 @@ void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 	unsigned long flags;
 
 	irq_save_and_disable(&flags);
-	rq_list_remove(tp, &rq->wake_queue);
+	rq_list_remove(tp);
 	irq_restore(&flags);
 }
 
@@ -374,7 +353,7 @@ void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 	unsigned long flags;
 
 	irq_save_and_disable(&flags);
-	rq_list_remove(tp, &rq->kill_queue);
+	rq_list_remove(tp);
 	irq_restore(&flags);
 }
 
@@ -408,12 +387,12 @@ void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 
 /**
  * @brief Add a thread to rq_list.
- * @param new Thread to add.
- * @param head New is add after this thread
+ * @param lh List head to add \p tp to.
+ * @param tp Thread to addd to \p lh.
  */
-static inline void rq_list_add(struct thread *new, struct thread *head)
+static inline void rq_list_add(struct list_head *lh, struct thread *tp)
 {
-	new->rq_next = head;
+	list_add(&tp->entry, lh);
 }
 
 /**
@@ -424,8 +403,7 @@ static inline void rq_list_add(struct thread *new, struct thread *head)
 static void rq_add_wake_thread(struct rq *rq, struct thread *new)
 {
 	new->rq = rq;
-	rq_list_add(new, rq->wake_queue);
-	rq->wake_queue = new;
+	rq_list_add(&rq->wake_head, new);
 }
 
 /**
@@ -436,8 +414,7 @@ static void rq_add_wake_thread(struct rq *rq, struct thread *new)
 static void rq_add_kill_thread(struct rq *rq, struct thread *new)
 {
 	new->rq = rq;
-	rq_list_add(new, rq->kill_queue);
-	rq->kill_queue = new;
+	rq_list_add(&rq->kill_head, new);
 }
 
 /**
@@ -764,22 +741,18 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
  */
 static void rq_destroy_kill_q(struct rq *rq)
 {
-	struct thread *walker, *tmp;
+	struct thread *walker;
 	unsigned long flags;
+	struct list_head *carriage, *x;
 
 	raw_spin_lock_irq(&rq->lock, &flags);
-	walker = rq->kill_queue;
-	if(!walker) {
-		raw_spin_unlock_irq(&rq->lock, &flags);
-		return;
-	}
-
-	for(tmp = walker->rq_next; walker; 
-			walker = tmp, tmp = walker->rq_next) {
+	list_for_each_safe(carriage, x, &rq->kill_head) {
+		walker = list_entry(carriage, struct thread, entry);
 		raw_rq_remove_kill_thread(rq, walker);
 
 		if(test_bit(THREAD_SYSTEM_STACK, &walker->flags))
 			sched_free_stack_frame(walker);
+
 	}
 	raw_spin_unlock_irq(&rq->lock, &flags);
 }
@@ -929,26 +902,25 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
  */
 static void rq_signal_threads(struct rq *rq)
 {
-	struct thread *carriage, 
+	struct thread *iterator,
 		      *tp,
 		      *volatile*tpp;
 	unsigned char events;
+	struct list_head *carriage, *x;
 
-	carriage = rq->wake_queue;
-	while(carriage) {
-		events = carriage->ec;
+	list_for_each_safe(carriage, x, &rq->wake_head) {
+		iterator = list_entry(carriage, struct thread, entry);
+		events = iterator->ec;
 
 		if(events) {
-			tpp = carriage->queue;
-			carriage->ec--;
+			tpp = iterator->queue;
+			iterator->ec--;
 			tp = *tpp;
 			if(tp != SIGNALED)
 				rq_signal_event_queue(rq, tp);
 		}
-		carriage = carriage->rq_next;
-	}
 
-	return;
+	}
 }
 #else
 static void rq_signal_threads(struct rq *rq)
@@ -1081,7 +1053,7 @@ static inline void __schedule_prepare(struct rq *rq,
 
 /**
  * @brief Mark a thread for termination.
- * @param Thread to be terminated.
+ * @param tp Thread to be terminated.
  * @see sched_remote_kill_if thread_destroy
  *
  * The thread will be removed from the system the next time the
@@ -1235,6 +1207,7 @@ static void preempt_check(struct rq *rq, struct thread *cur, struct thread *nxt)
  * 	   - threads which have used up their time slice;
  * 	   - the kill queue of the run queue;
  * @see __schedule_need_resched
+ * @return Boolean value indicating whether a reschedule occurred or not.
  *
  * struct rq::lock will be locked (and unlocked).
  */
@@ -1341,7 +1314,7 @@ void __hot preempt_schedule_irq(void)
 {
 	int cpu;
 
-	if(preempt_count() || !preempt_should_resched())
+	if(preempt_count())
 		return;
 
 	do {
@@ -1509,23 +1482,11 @@ void sched_yield(struct rq *rq)
  */
 bool preempt_should_resched(void)
 {
-	struct rq *rq;
-	tick_t diff;
-	struct thread *tp = current_thread(),
-		      *next;
+	struct thread *tp;
 
-	rq = tp->rq;
-	diff = clocksource_get_tick(rq->source);
-	diff -= cs_last_update(rq->source);
-	next = sched_get_next_runnable(rq);
-
-	if(diff >= tp->slice || should_resched_cputime(tp, next)) {
-		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
-		return true;
-	}
-
-
-	return test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	tp = current_thread();
+	return test_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags) ||
+		should_resched();
 }
 #else
 bool preempt_should_resched(void)
@@ -1543,12 +1504,21 @@ bool preempt_should_resched(void)
 bool should_resched(void)
 {
 	struct thread *tp = current_thread();
-
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags))
-		return true;
-	else
-		return false;
+	return test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 }
+
+#ifdef CONFIG_SCHED_DBG
+/**
+ * @brief Print the threads on the run queue of \p this CPU.
+ */
+void print_rq(void)
+{
+	struct rq *rq;
+
+	rq = sched_get_cpu_rq();
+	rq->sched_class->print_rq(rq);
+}
+#endif
 
 #ifdef CONFIG_DYN_PRIO
 /**

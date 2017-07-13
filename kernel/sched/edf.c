@@ -327,6 +327,27 @@ static struct thread *edf_thread_after(struct thread *tp)
 }
 #endif
 
+#ifdef CONFIG_SCHED_DBG
+/**
+ * Print information about the EDF run queue.
+ *
+ * @param rq Run queue to print out.
+ */
+static void edf_print_rq(struct rq *rq)
+{
+	struct rr_rq *rr;
+	struct thread *tp;
+
+	rr = &rq->rr_rq;
+	tp = rr->run_queue;
+
+	while(tp) {
+		printf("Name: %s - Flags: %lu\n", tp->name, tp->flags);
+		tp = tp->se.next;
+	}
+}
+#endif
+
 /**
  * @brief EDF scheduling class.
  */
@@ -344,6 +365,9 @@ struct sched_class edf_class = {
 #ifdef CONFIG_THREAD_QUEUE
 	.queue_add = &edf_thread_queue_add,
 	.queue_rm = &edf_thread_queue_remove,
+#endif
+#ifdef CONFIG_SCHED_DBG
+	.print_rq = &edf_print_rq,
 #endif
 };
 
