@@ -136,6 +136,8 @@ static void hrtimer_handle(struct clocksource *cs)
 				kfree(timer);
 			}
 
+		} else {
+			break;
 		}
 	}
 

@@ -145,12 +145,18 @@ void clocksource_insert_timer(struct clocksource *cs, struct list_head *lh,
 	raw_spin_unlock_irqrestore(&cs->lock, flags);
 }
 
+int raw_clocksource_remove_timer(struct list_head *lh)
+{
+	list_del(lh);
+	return -EOK;
+}
+
 int clocksource_remove_timer(struct clocksource *cs, struct list_head *lh)
 {
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&cs->lock, flags);
-	list_del(lh);
+	raw_clocksource_remove_timer(lh);
 	raw_spin_unlock_irqrestore(&cs->lock, flags);
 
 	return -EOK;

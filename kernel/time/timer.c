@@ -85,6 +85,17 @@ struct timer *timer_create(struct clocksource *cs, unsigned long ms,
 	return timer;
 }
 
+int raw_timer_stop(struct timer *timer)
+{
+	int rc;
+
+	rc = raw_clocksource_remove_timer(&timer->entry);
+	if(rc == -EOK)
+		kfree(timer);
+
+	return rc;
+}
+
 int timer_stop(struct timer *timer)
 {
 	int rc;
@@ -122,6 +133,8 @@ void timer_process(struct clocksource *cs)
 				kfree(timer);
 			}
 
+		} else {
+			break;
 		}
 	}
 

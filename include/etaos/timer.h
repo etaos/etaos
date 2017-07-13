@@ -86,11 +86,6 @@ static inline void timer_source_inc(struct clocksource *cs)
 	cs->count += 1ULL;
 }
 
-extern struct timer *timer_create_timer(struct clocksource *cs, unsigned long ms,
-		void (*handle)(struct timer*,void*), void *arg,
-		unsigned long flags);
-extern int timer_stop_timer(struct timer *timer);
-extern void timer_process_clock(struct clocksource *cs, unsigned int diff);
 extern struct clocksource *timer_get_source_by_name(const char *name);
 
 extern void timer_process(struct clocksource *cs);
@@ -98,6 +93,7 @@ extern struct timer *timer_create(struct clocksource *cs, unsigned long ms,
 		void (*handle)(struct timer*,void*), void *arg,
 		unsigned long flags);
 extern int timer_stop(struct timer *timer);
+extern int raw_timer_stop(struct timer *timer);
 
 CDECL_END
 

@@ -61,8 +61,8 @@ static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 	if(--tp->slice == 0) {
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
 		tp->slice = CONFIG_TIME_SLICE;
-		preempt_schedule_irq();
 	}
+	preempt_schedule_irq();
 #endif
 
 	return IRQ_HANDLED;

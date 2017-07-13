@@ -97,6 +97,7 @@ extern time_t clocksource_get_seconds(struct clocksource *src);
 
 /* Timer rewrite funcs */
 
+extern int raw_clocksource_remove_timer(struct list_head *lh);
 extern void clocksource_insert_timer(struct clocksource *cs,
 		struct list_head *lh, list_comparator_t comp);
 extern void raw_clocksource_insert_timer(struct clocksource *cs,
