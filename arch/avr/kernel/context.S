@@ -32,10 +32,9 @@
 avr_switch_context:
 	push r0
 
-#ifdef AVR_HAVE_EIND
-	in r0, AVR_EIND_ADDR
+	in r0, AVR_STATUS_ADDR
 	push r0
-#endif
+
 #ifdef AVR_HAVE_RAMPD
 	in r0, AVR_RAMPD_ADDR
 	push r0
@@ -52,10 +51,6 @@ avr_switch_context:
 	in r0, AVR_RAMPX_ADDR
 	push r0
 #endif
-
-	in r0, AVR_STATUS_ADDR
-	push r0
-
 
 	push r1
 	push r2
@@ -135,8 +130,6 @@ avr_switch_context:
 	pop r2
 	pop r1
 
-	pop r0
-	out AVR_STATUS_ADDR, r0
 #ifdef AVR_HAVE_RAMPX
 	pop r0
 	out AVR_RAMPX_ADDR, r0
@@ -154,10 +147,8 @@ avr_switch_context:
 	out AVR_RAMPD_ADDR, r0
 #endif
 
-#ifdef AVR_HAVE_EIND
 	pop r0
-	out AVR_EIND_ADDR, r0
-#endif
+	out AVR_STATUS_ADDR, r0
 
 	pop r0
 	ret
