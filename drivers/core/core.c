@@ -119,7 +119,6 @@ void dev_sync_wait(struct device *dev, unsigned ms)
 	}
 #else
 	while(time_before(sys_tick, syn->last_rw_op+ms));
-	}
 #endif
 }
 
