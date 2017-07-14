@@ -2,6 +2,7 @@
 
 /**
  * @defgroup libc C runtime library
+ * @ingroup lib
  * @brief C run time library
  * @note When linking your application, pass -lc as the last library to your
  *       linker.

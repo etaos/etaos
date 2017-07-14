@@ -1,0 +1,16 @@
+/**
+ * @defgroup lib ETA/OS libraries
+ * @brief ETA/OS system libraries
+ *
+ * This module contains documentation for all the ETA/OS system libraries,
+ * such as the runtime library and the collections (list, xorlist, etc..).
+ */
+
+/**
+ * @defgroup xorlist XOR-list library
+ * @ingroup lib
+ * @brief XOR-list library documentation.
+ *
+ * A XOR-list is a doubly linked list that stores both pointers in a single
+ * field using the XOR operation.
+ */

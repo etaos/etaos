@@ -768,6 +768,7 @@ INPUT                  = . \
                          Documentation/fs/fs.txt \
                          Documentation/mm/mem.txt \
                          Documentation/kernel/irq.txt \
+                         Documentation/kernel/lib.txt \
                          Documentation/kernel/libc.txt \
                          Documentation/kernel/sched.txt \
                          Documentation/kernel/timer.txt \
