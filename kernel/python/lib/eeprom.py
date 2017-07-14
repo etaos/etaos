@@ -16,19 +16,39 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+## @addtogroup python-eeprom
+# @{
+
+## @package EEPROM
+#  @brief Provides PyMite's EEPROM module
+
 __name__ = "eeprom"
 
+## EEPROM object
 class EEPROM(object):
 	name = ""
 
+	## Create a new EEPROM object.
+	# @param name Driver name.
 	def __init__(self, name):
 		self.name = name
 	
+	## Read from \p this EEPROM chip.
+	# @param addr Address to start reading.
+	# @param num Number of bytes to read.
+	# @return An array list of the read bytes.
 	def read(self, addr, num):
 		return read(self.name, addr, num)
 
+	## Write to \p this EEPROM chip.
+	# @param addr Address to start writing.
+	# @param data List of bytes to write.
+	# @param num Length of \p data.
+	# @return None
 	def write(self, addr, data, num):
 		write(self.name, addr, data, num)
+
+## @}
 
 def read(name, addr, num):
 	"""__NATIVE__

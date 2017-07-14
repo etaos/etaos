@@ -1,14 +1,20 @@
-# This file is Copyright 2007 Dean Hall.
-# This file is part of the Python-on-a-Chip libraries.
-# This software is licensed under the MIT License.
-# See the LICENSE file for details.
-
-## @file
-#  @copybrief ipm_target
-
-## @package ipm_target
-#  @brief Provides PyMite's interactive interface for the target.
-
+#
+#   ETA/OS - CPU class
+#   Copyright (C) 2017  Dean Hall
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 ##
 # Receives an image over the platform's standard connection.

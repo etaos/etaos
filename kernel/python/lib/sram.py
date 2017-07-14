@@ -16,25 +16,52 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+## @addtogroup python-tmp35
+# @{
+
+## @package SRAM
+#  @brief Provides PyMite's SRAM drivers
+
 __name__ = "sram"
 
 class SRAM(object):
 	name = ""
 
+	## Create a new SRAM object.
+	# @param name Name of the SRAM device driver.
 	def __init__(self, name):
 		self.name = name
 
+	## Read from \p this SRAM chip.
+	# @param addr Address to start reading.
+	# @param num Number of bytes to read.
+	# @return An array list of the read bytes.
 	def read(self, addr, num):
 		return read(self.name, addr, num)
 
+	## Write to \p this SRAM chip.
+	# @param addr Address to start writing.
+	# @param data List of bytes to write.
+	# @param length Length of \p data.
+	# @return None
 	def write(self, addr, data, length):
 		write(self.name, addr, data, length)
 
+	## Write to \p this SRAM chip.
+	# @param addr Address to start writing.
+	# @param string List of bytes to write.
+	# @return None
 	def write_string(self, addr, string):
 		write_string(self.name, addr, string, len(string))
 
+	## Read from \p this SRAM chip.
+	# @param addr Address to start reading.
+	# @param length Number of bytes to read.
+	# @return String object.
 	def read_string(self, addr, length):
 		return read_string(self.name, addr, length)
+
+## @}
 
 def write(name, addr, data, num):
 	"""__NATIVE__

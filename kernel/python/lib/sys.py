@@ -1,7 +1,24 @@
-# This file is Copyright 2002 Dean Hall.
-# This file is part of the Python-on-a-Chip libraries.
-# This software is licensed under the MIT License.
-# See the LICENSE file for details.
+#
+#   ETA/OS - SRAM library
+#   Copyright (C) 2017  Michel Megens <dev@bietje.net>
+#   Copyright (C) 2017  Dean Hall
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+## @addtogroup python-sys
+# @{
 
 ## @package sys
 #  @brief Provides PyMite's system module, sys
@@ -12,12 +29,6 @@
 #  import sys
 #
 
-#### TODO
-# modules = None #set ptr to dict w/native func
-# platform string or device id, rand
-# ver = "0.1"            # XXX compile date & platform?
-# Example: sys.version = '2.4.1 (#1, Feb 26 2006, 16:26:36) \n[GCC 4.0.0 20041026 (Apple Computer, Inc. build 4061)]'
-
 """__NATIVE__
 #include <etaos/thread.h>
 """
@@ -25,6 +36,9 @@
 maxint = 0x7FFFFFFF     # 2147483647
 
 
+## Stop the program.
+# @param val Exit code.
+# @return None.
 def exit(val):
     """__NATIVE__
     pPmObj_t pval = C_NULL;
@@ -57,9 +71,8 @@ def exit(val):
     pass
 
 
-#
-# Runs the Garbage Collector
-#
+## Runs the Garbage Collector
+# @return None.
 def gc():
     """__NATIVE__
     PmReturn_t retval = PM_RET_OK;
@@ -80,10 +93,8 @@ def gc():
     pass
 
 
-#
-# Gets a byte from the platform's default I/O
-# Returns the byte in the LSB of the returned integer
-#
+## Gets a byte from the platform's default I/O
+# @return Byte obtained from stdin.
 def getb():
     """__NATIVE__
     uint8_t b;
@@ -107,9 +118,8 @@ def getb():
     pass
 
 
-#
-# Returns a tuple containing the amout of heap available and the maximum
-#
+## Returns a tuple containing the amout of heap available and the maximum
+# @return Tuple object.
 def heap():
     """__NATIVE__
     PmReturn_t retval;
@@ -155,9 +165,9 @@ def heap():
     pass
 
 
-#
-# Sends the LSB of the integer out the platform's default I/O
-#
+## Sends the LSB of the integer out the platform's default I/O
+# @param b Byte to sent to stdout.
+# @return None.
 def putb(b):
     """__NATIVE__
     uint8_t b;
@@ -188,9 +198,9 @@ def putb(b):
     pass
 
 
-#
-# Runs the given function in a thread sharing the current global namespace
-#
+## Runs the given function in a thread sharing the current global namespace
+# @param f Function object.
+# @return None.
 def run(f):
 	"""__NATIVE__
 	PmReturn_t retval;
@@ -216,9 +226,8 @@ def run(f):
 	pass
 
 
-#
-# Returns the number of milliseconds since the PyMite VM was initialized
-#
+## Returns the number of milliseconds since the PyMite VM was initialized
+# @return Number of milliseconds since VM initialization.
 def clock():
     """__NATIVE__
     uint32_t t;
@@ -253,6 +262,8 @@ def clock():
     """
     pass
 
+## Yield the PythonVM.
+# @return None.
 def thread_yield():
 	"""__NATIVE__
 	yield();
@@ -260,12 +271,15 @@ def thread_yield():
 	"""
 	pass
 
-#
-# Waits in a busy loop for the given number of milliseconds
+## Waits in a busy loop for the given number of milliseconds
+# @param ms Number milliseconds to wait.
+# @return None.
 #
 def wait(ms):
 	t = clock() + ms
 	while clock() < t:
 		pass
+
+## @}
 
 # :mode=c:

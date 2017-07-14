@@ -16,18 +16,32 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+## @addtogroup python-tmp35
+# @{
+
+## @package TMP35
+#  @brief Provides PyMite's TMP35 sensor driver.
+
 import cpu
 
 __name__ = "lm35"
 
+## LM35 class
 class LM35:
 	pin = 0
 
+	## Create a new LM35 object.
+	# @param pin Analog pin to which an LM35 device is connected.
 	def __init__(self, pin):
 		self.pin = pin
 
+	## Read from \p this device.
+	# @return the temperature value as indicated (in celcius).
 	def read(self):
 		t = cpu.analog_read(self.pin)
 		t /= 1024;
 		t *= 5000;
 		return t / 10;
+
+## @}
+

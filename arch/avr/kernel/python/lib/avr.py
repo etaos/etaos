@@ -16,6 +16,18 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+## @addtogroup python-avr
+# @{
+
+## @package avr
+#  @brief Provides PyMite's AVR module.
+#
+#  USAGE
+#  -----
+#
+#  import avr
+#
+
 """__NATIVE__
 #include <asm/io.h>
 """
@@ -25,6 +37,10 @@ __name__ = "avr"
 none, porta, portb, portc, portd, porte, portf, portg, porth, porti, \
 		portj, portk, portl = range(13)
 
+## Apply \p value with an OR operation to \p port.
+# @param port I/O port.
+# @param value Value to apply to \p port.
+# @return None.
 def port_or(port, value):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -58,6 +74,10 @@ def port_or(port, value):
 	"""
 	pass
 
+## Apply \p value with an AND operation to \p port.
+# @param port I/O port.
+# @param value Value to apply to \p port.
+# @return None.
 def port_and(port, value):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -91,6 +111,9 @@ def port_and(port, value):
 	"""
 	pass
 
+## Read from \p port.
+# @param port I/O port.
+# @return The value of \p port.
 def port_read(port):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -124,6 +147,10 @@ def port_read(port):
 	"""
 	pass
 
+## Set the direction of \p port to value using an OR operation.
+# @param port I/O port.
+# @param value Value to apply to \p port.
+# @return None.
 def port_direction_or(port, value):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -157,6 +184,10 @@ def port_direction_or(port, value):
 	"""
 	pass
 
+## Set the direction of \p port to value using an AND operation.
+# @param port I/O port.
+# @param value Value to apply to \p port.
+# @return None
 def port_direction_and(port, value):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -189,4 +220,6 @@ def port_direction_and(port, value):
 	return retval;
 	"""
 	pass
+
+## @}
 

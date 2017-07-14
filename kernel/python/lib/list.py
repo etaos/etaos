@@ -1,10 +1,23 @@
-# This file is Copyright 2009 Dean Hall.
-# This file is part of the Python-on-a-Chip libraries.
-# This software is licensed under the MIT License.
-# See the LICENSE file for details.
+#
+#   ETA/OS - CPU class
+#   Copyright (C) 2017  Dean Hall
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-## @file
-#  @copybrief list
+## @addtogroup python-list
+# @{
 
 ## @package list
 #  @brief Provides PyMite's list module.
@@ -40,7 +53,10 @@ class _Autobox:
     def remove(self, v):
         return remove(self.obj, v)
 
-
+## Append to list.
+# @param l List object
+# @param o Object to append.
+# @return None.
 def append(l, o):
     """__NATIVE__
     pPmObj_t pl;
@@ -63,7 +79,10 @@ def append(l, o):
     """
     pass
 
-
+## Count occurances of \p v in \p l.
+# @param l List object
+# @param v Object to count.
+# @return Number of times \p v was found in \p l.
 def count(l, v):
     c = 0
     for o in l:
@@ -71,12 +90,18 @@ def count(l, v):
             c = c + 1
     return c
 
-
+## Add the elements of \p s to \p l.
+# @param l List object.
+# @param s List object.
+# @return None.
 def extend(l, s):
     for i in s:
         append(l, i)
 
-
+## Get the index of the first occurance of \p o in \p l.
+# @param l List object
+# @param o Object to search for.
+# @return Index of the first occurance of \p o in \p l.
 def index(l, o):
     """__NATIVE__
     pPmObj_t pl;
@@ -110,7 +135,11 @@ def index(l, o):
     """
     pass
 
-
+## Insert \p o at \p i in \p l.
+# @param l List object.
+# @param i Index to insert at.
+# @param o Object to insert.
+# @return None.
 def insert(l, i, o):
     """__NATIVE__
     pPmObj_t pl;
@@ -149,7 +178,10 @@ def insert(l, i, o):
     """
     pass
 
-
+## Pop item \p i of list \p l.
+# @param l List object.
+# @param i Index to pop.
+# @return The item stored at \p i.
 def pop(l, i):
     """__NATIVE__
     pPmObj_t pl;
@@ -204,7 +236,10 @@ def pop(l, i):
     """
     pass
 
-
+## Remove the first match of \p v in \p l.
+# @param l List object.
+# @param v Object to search for.
+# @return None.
 def remove(l, v):
     """__NATIVE__
     pPmObj_t pl;
@@ -233,12 +268,6 @@ def remove(l, v):
     """
     pass
 
-
-
-
-# TODO:
-# L.reverse() -- reverse *IN PLACE*
-# L.sort(cmp=None, key=None, reverse=False) -- stable sort *IN PLACE*;
-#    cmp(x, y) -> -1, 0, 1
+## @}
 
 # :mode=c:

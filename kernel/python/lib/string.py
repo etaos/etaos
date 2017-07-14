@@ -1,13 +1,27 @@
-# This file is Copyright 2009 Dean Hall.
-# This file is part of the Python-on-a-Chip libraries.
-# This software is licensed under the MIT License.
-# See the LICENSE file for details.
+#
+#   ETA/OS - SRAM library
+#   Copyright (C) 2017  Dean Hall
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-## @file
+
+## @addtogroup python-string
+# @{
 
 ## @package string
 #  @brief Provides PyMite's string module.
-#
 
 
 """__NATIVE__
@@ -35,10 +49,10 @@ hexdigits = "0123456789abcdefABCDEF"
 letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-#
-# Returns the integer represented by the string a [in base b].
-# Optional int arg, b, may be 0 or 2 through 36; otherwise it is a ValueError.
-#
+## Returns the integer represented by the string a [in base b].
+# @param a String object.
+# @param b Numeral base, option argument.
+# @return Integer value of \p a.
 def atoi(a, b):
     """__NATIVE__
     pPmObj_t pa;
@@ -104,10 +118,11 @@ def atoi(a, b):
     pass
 
 
-#
-# Returns the number of occurrences of substring s2 in string s1.
-# WARNING: Does not match Python's behavior if s1 contains a null character.
-#
+## Returns the number of occurrences of substring s2 in string s1.
+# @param s1 String object.
+# @param s2 String object.
+# @return The number of times \p s2 occurred in \p s1.
+# @warning Does not match Python's behavior if s1 contains a null character.
 def count(s1, s2):
     """__NATIVE__
     pPmObj_t ps1;
@@ -191,10 +206,11 @@ def count(s1, s2):
     pass
 
 
-#
-# Returns the lowest index in s1 where substring s2 is found or -1 on failure.
-# WARNING: Does not accept optional start,end arguments.
-#
+## Returns the lowest index in s1 where substring s2 is found or -1 on failure.
+# @param s1 String object.
+# @param s2 String object.
+# @return Start of \p s2 in \p s1 or -1
+# @warning Does not accept optional start,end arguments.
 def find(s1, s2):
     """__NATIVE__
     pPmObj_t ps1;
@@ -253,7 +269,10 @@ def find(s1, s2):
     """
     pass
 
-
+## Join a sequence of string with a separator.
+# @param s String object.
+# @param sep Separator, defaults to a space.
+# @return A string object.
 def join(s, sep=' '):
     len_s = len(s)
     if len_s == 0:
@@ -265,5 +284,6 @@ def join(s, sep=' '):
         i += 1
     return rs
 
+## @}
 
 # :mode=c:

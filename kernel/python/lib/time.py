@@ -16,15 +16,29 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+## @addtogroup python-time
+# @{
+
+## @package time
+#  @brief Provides PyMite's time module, time
+#
+#  USAGE
+#  -----
+#
+#  import time
+#
+
 """__NATIVE__
 #include <etaos/time.h>
 """
 
 __name__ = "time"
 
+## Time period object
 class TimePeriod(object):
 	_unused, SECONDS, MINUTES, HOURS, DAYS, MONTHS, YEARS = range(7)
 
+## Time object
 class Time(object):
 	date = [0, 0, 0, 0, 0, 0]
 	# 0: years
@@ -34,12 +48,16 @@ class Time(object):
 	# 4: mins
 	# 5: seconds
 
+	## Create a new time object.
+	# @param init Initializes the new object to \p now.
 	def __init__(self, init = False):
 		if init:
 			self.now()
 		else:
 			pass
 
+	## Set the timestamp of \p this object to \p now.
+	# @return None.
 	def now(self):
 		"""__NATIVE__
 		time_t now;
@@ -86,30 +104,47 @@ class Time(object):
 		"""
 		pass
 
+	## Return the years since 1900.
+	# @return Number of years since 1900.
 	def years(self):
 		return self.date[0]
 
+	## Return the month of the year.
+	# @return Month.
 	def months(self):
 		return self.date[1]
 
+	## Return the day of the month.
+	# @return Day of the month.
 	def days(self):
 		return self.date[2]
 
+	## Return the hour of the day.
+	# @return Hour.
 	def hours(self):
 		return self.date[3]
 
+	## Return the minutes of the hour.
+	# @return Minutes.
 	def minutes(self):
 		return self.date[4]
 
+	## Return the seconds of the minute.
+	# @return Seconds.
 	def seconds(self):
 		return self.date[5]
 
-	# Return a (civilized) date format (days/months/years hours:minutes:seconds)
+	## Return a (civilized) date format
+	# (days/months/years hours:minutes:seconds)
+	# @return String representation of \p this object.
 	def to_string(self):
 		return "%d/%d/%d %d:%d:%d" % (self.days(), self.months(),
 				self.years(), self.hours(), self.minutes(),
 				self.seconds())
 
+## Get the current time stamp.
+# @return The current timestamp in a list, with the least significant part of
+#         timestamp in position 0.
 def timestamp():
 	"""__NATIVE__
 	time_t now;
@@ -130,4 +165,6 @@ def timestamp():
 	return PM_RET_OK;
 	"""
 	pass
+
+## @}
 

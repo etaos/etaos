@@ -16,8 +16,22 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+## @addtogroup python-cpu
+# @{
+
+## @package cpu
+#  @brief Python CPU API.
+#
+#  <b>USAGE</b>
+#
+# import cpu
+
 __name__ = "cpu"
 
+## Write \p value to \p pin.
+# @param pin GPIO pin number.
+# @param value Boolean value.
+# @return None
 def write(pin, value):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -47,6 +61,10 @@ def write(pin, value):
 	"""
 	pass
 
+## Set \p pin as output.
+# @param pin GPIO pin number.
+# @param value Boolean value.
+# @return None
 def set_output(pin, value):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -76,6 +94,9 @@ def set_output(pin, value):
 	"""
 	pass
 
+## Set \p pin as input.
+# @param pin GPIO pin number.
+# @return None
 def set_input(pin):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -101,6 +122,9 @@ def set_input(pin):
 	"""
 	pass
 
+## Read from GPIO pin \p pin.
+# @param pin GPIO pin number.
+# @return Boolean value of \p pin.
 def read(pin):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -128,6 +152,9 @@ def read(pin):
 	"""
 	pass
 
+## Read from an analog port.
+# @param pin Analog pin number.
+# @return The value read from \p pin.
 def analog_read(pin):
 	"""__NATIVE__
 	PmReturn_t retval = PM_RET_OK;
@@ -156,4 +183,6 @@ def analog_read(pin):
 	return retval;
 	"""
 	pass
+
+## @}
 

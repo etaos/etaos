@@ -1,16 +1,29 @@
-# This file is Copyright 2009 Dean Hall.
-# This file is part of the Python-on-a-Chip libraries.
-# This software is licensed under the MIT License.
-# See the LICENSE file for details.
+#
+#   ETA/OS - CPU class
+#   Copyright (C) 2017  Dean Hall
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-## @file
-#  @copybrief dict
+## @addtogroup python-dict
+# @{
 
 ## @package dict
 #  @brief Provides PyMite's dict module.
 
-__name__ = "dict"
 
+__name__ = "dict"
 
 class _Autobox:
     def clear(self):
@@ -25,7 +38,9 @@ class _Autobox:
     def values(self):
         return values(self.obj)
 
-
+## Clear a dictionary.
+# @param d Dictionary to clear.
+# @return None.
 def clear(d):
     """__NATIVE__
     pPmObj_t pd;
@@ -49,7 +64,9 @@ def clear(d):
     """
     pass
 
-
+## Return a list of keys in \p d.
+# @param d Dictionary
+# @return Keys of \p d.
 def keys(d):
     """__NATIVE__
     pPmObj_t pd;
@@ -92,11 +109,16 @@ def keys(d):
     """
     pass
 
-
+## Check if \p k is in \p d.
+# @param d Dictionary to check.
+# @param k Key to check for.
+# @return Boolean value.
 def has_key(d, k):
     return k in d
 
-
+## Return the value list of \p d.
+# @param d Dictionary to get the values for.
+# @return The values found in \p d.
 def values(d):
     """__NATIVE__
     pPmObj_t pd;
@@ -139,9 +161,11 @@ def values(d):
     """
     pass
 
-
+## Update \p d1 with the contents of \p d2.
+# @param d1 Dictionary
+# @param d2 Dictionary
+# @return None
 def update(d1, d2):
-    # Updates dict d1 with the contents of d2.  Returns None
     """__NATIVE__
     pPmObj_t pd1;
     pPmObj_t pd2;
@@ -163,5 +187,6 @@ def update(d1, d2):
     """
     pass
 
+## @}
 
 # :mode=c:

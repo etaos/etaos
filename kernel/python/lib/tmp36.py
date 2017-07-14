@@ -16,17 +16,30 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+## @addtogroup python-lm36
+# @{
+
+## @package LM36
+#  @brief Provides PyMite's LM36 sensor driver.
+
 __name__ = "tmp36"
 
+## LM36 class.
 class TMP36:
 	pin = 0
 
+	## Create a new LM36 object.
+	# @param pin Pin to which an LM36 device is connected.
 	def __init__(self, pin):
 		self.pin = pin
 
+	## Read from the LM36 device.
+	# @return The temperature as indicated by \p this device (in celcius).
 	def read(self):
 		t = cpu.analog_read(self.pin)
 		t *= 5000.0 / 1024.0
 		t -= 500
 		return t / 10
+
+## @}
 

@@ -1,10 +1,23 @@
-# This file is Copyright 2002 Dean Hall.
-# This file is part of the Python-on-a-Chip libraries.
-# This software is licensed under the MIT License.
-# See the LICENSE file for details.
+#
+#   ETA/OS - CPU class
+#   Copyright (C) 2017  Dean Hall, Michel Megens <dev@bietje.net>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-## @file
-#  @copybrief __bi
+## @addtogroup python-builtin
+# @{
 
 ## @package __bi
 #  @brief Provides PyMite's builtins module, __bi.
@@ -14,12 +27,16 @@
 #  The builtins are loaded by the interpreter.
 #  The user SHOULD NOT import this module directly.
 
-
+## Return the absolute value of \p n.
+# @param n Integer to calculate the absolute value for.
+# @return The absolute value of \p n.
 def abs(n):
 #    return n > 0 and n or -n
     return (n, -n)[n < 0]
 
-
+## Return a string of one single character whose ASCII code is \p n.
+# @param n ASCII code to convert to a character / string.
+# @return The string value of the ACII character \p n.
 def chr(n):
     """__NATIVE__
     pPmObj_t ps;
@@ -57,7 +74,12 @@ def chr(n):
     """
     pass
 
-
+## Return a list of attributes for a scope.
+# @param o Scope to retrieve attributes for.
+# @return List of attributes in \p o.
+#
+# Without arguments, return the list of names in the current local scope.
+# With an argument, attempt to return a list of valid attributes for that object.
 def dir(o):
     """__NATIVE__
     PmReturn_t retval = PM_RET_OK;
@@ -144,11 +166,13 @@ def dir(o):
     pass
 
 
+## Evaluates a given code object (created by Co()).
 #
-# Evaluates a given code object (created by Co()).
-# Optionally accepts a globals dict as the second parameter
-# Optionally accepts a locals dict as the third parameter
-#
+# @see Co
+# @param co Code object
+# @param g A globals dictionary (optional).
+# @param l Locals dictionary (optional).
+# @return The result of the execution of \p co.
 def eval(co, g, l):
     """__NATIVE__
     PmReturn_t retval;
@@ -248,11 +272,15 @@ def eval(co, g, l):
     """
     pass
 
-
+## Constructs a list from those elements in \p s for which \p f is true.
+# @param f Call back hook returning a boolean.
+# @param s Iterable object.
+# @return Subset of \p s for which \p f is true.
 def filter(f, s):
     return [x for x in s if f(x)]
 
-
+## Return a list of globals
+# @return Dictionary of globals
 def globals():
     """__NATIVE__
     pPmObj_t pr = C_NULL;
@@ -274,10 +302,9 @@ def globals():
     pass
 
 
-#def hex(n):
-#    return "0x" + "%x" % n
-
-
+## Return the identity of an object.
+# @param o Object to return the identiy for.
+# @return Identity for \p o.
 def id(o):
     """__NATIVE__
     PmReturn_t retval;
@@ -299,12 +326,9 @@ def id(o):
     pass
 
 
-# Yields every (i)tem in the (s)equence; requires HAVE_GENERATORS
-#def iter(s):
-#    for i in s:
-#        yield i
-
-
+## Return the length of \p s.
+# @param s Sequence or collection to count.
+# @return The number of objects in \p s.
 def len(s):
     """__NATIVE__
     PmReturn_t retval;
@@ -371,7 +395,8 @@ def len(s):
     """
     pass
 
-
+## Return a dictionary of locals.
+# @return Dictionary of locals.
 def locals():
     """__NATIVE__
     pPmObj_t pr = C_NULL;
@@ -392,7 +417,10 @@ def locals():
     """
     pass
 
-
+## Apply \p f to every item of \p s and return a list of results.
+# @param f callback hook.
+# @param s Iterable object.
+# @return List of result objects.
 def map(f, s):
     # Allocate the array
     r = [None,] * len(s)
@@ -406,7 +434,10 @@ def map(f, s):
     # Return list of results
     return r
 
-
+## Return the ASCII code of a charactor.
+# @param s Single character string to convert to ASCII.
+# @return ASCII code of \p s.
+# @note Reverse of \p chr.
 def ord(s):
     """__NATIVE__
     pPmObj_t ps;
@@ -440,11 +471,18 @@ def ord(s):
     """
     pass
 
-
+## Rase \p x to the power of \p y.
+# @param x Base number.
+# @param y Exponent.
+# @return The result of x^y.
 def pow(x, y):
     return x ** y
 
-
+## Create list of arithmic progression.
+# @param a
+# @param b
+# @param c
+# @return Arithmic progression list.
 def range(a, b, c):
     """__NATIVE__
     PmReturn_t retval;
@@ -541,7 +579,9 @@ def range(a, b, c):
     """
     pass
 
-
+## Sum the items of an iterable.
+# @param s Iterable to sum.
+# @return The sum of all elements of \p s.
 def sum(s):
     """__NATIVE__
     pPmObj_t ps;
@@ -645,7 +685,9 @@ def sum(s):
     """
     pass
 
-
+## Get the type of an object.
+# @param o Object to get the type for.
+# @return The type object for \p o.
 def type(o):
     """__NATIVE__
     PmReturn_t retval;
@@ -670,19 +712,9 @@ def type(o):
     pass
 
 
-# At this time, xrange() works in a for loop, but not in a generator expression
-# Yes: for i in xrange(42): pass
-# No:  [x for x in xrange(42)]
-#def xrange(n):
-#    i = 0
-#    while i < n:
-#        yield i
-#        i += 1
-
-
-#
-# Creates a code object from the given image object
-#
+## Creates a code object from the given image object
+# @param i Object image.
+# @return The Code object for \p i.
 def Co(i):
     """__NATIVE__
     PmReturn_t retval;
@@ -721,32 +753,23 @@ def Co(i):
 __name__ = "TBD"
 
 
-#
-# Root object
+## Root object
 #
 class object():
     pass
 
 
-#
-# Exception classes
+## Base exception
 #
 class Exception(object):
     pass
 
+## AssertionError
+#
 class AssertionError(Exception):
     pass
 AssertionError.code = 0xE4
 
-
-#
-# Generator class - used by the vm for generator-iterators,
-# generator-expressions and generator-coroutines
-#
-# #207: Add support for the yield keyword
-#
-# WARNING: unsupported methods: throw, close, __del__
-#
 class Generator(object):
 
     def __init__(self, fa):
@@ -906,9 +929,10 @@ class Generator(object):
 #        pass
 
 
+## Returns Check if a module is being run an the main module.
 #
-# Returns True if called within a module being run as the main; False otherwise
-#
+# @return Boolean value indication whether a module is run as the main module
+#         or not.
 def ismain():
     """__NATIVE__
 
@@ -917,7 +941,6 @@ def ismain():
     return PM_RET_OK;
     """
     pass
-
 
 class bytearray(object):
     def __init__(self, o):
@@ -968,5 +991,6 @@ class bytearray(object):
 # A Dict to hold imported modules (used like a cache so modules can be reused)
 __md = {}
 
+## @}
 
 #:mode=c:
