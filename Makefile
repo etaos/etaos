@@ -2,11 +2,11 @@
 # ETA/OS root Makefile
 #
 
-VERSION = 4
-PATCHLEVEL = 6
-SUBLEVEL = 4
+VERSION = 5
+PATCHLEVEL = 0
+SUBLEVEL = 0
 EXTRAVERSION =
-NAME = Fiery Desert Rose
+NAME = Blazing Phoenix
 
 MAKEFLAGS += -rR --no-print-directory
 
