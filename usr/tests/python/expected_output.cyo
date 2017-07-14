@@ -1,4 +1,4 @@
-Application started!
-Write to SRAM: [OK]
-Read from SRAM: [OK]
+SRAM read: Some piece of text
+EEPROM read:
+[100, 50, 10]
 calypso_exit

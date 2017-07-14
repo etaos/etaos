@@ -24,8 +24,11 @@ sram_len = len(sram_str)
 ram.write_string(0x40, sram_str)
 ee.write(0x60, data_ary, len(data_ary))
 
+print "SRAM read: %s" % ram.read_string(0x40, sram_len)
+print "EEPROM read:"
+print ee.read(0x60, len(data_ary))
+print "calypso_exit"
+
 while True:
-	print "SRAM read:"
-	print ram.read_string(0x40, sram_len)
-	sys.wait(1000)
+	pass
 
