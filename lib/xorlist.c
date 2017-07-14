@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup xorlist
+ * @ {
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/xorlist.h>
@@ -26,6 +31,13 @@ static inline void *xlist_create_pointer(size_t a, size_t b)
 	return (void*)(a ^ b);
 }
 
+/**
+ * @brief Add a new node the the list.
+ * @param prev Previous pointer.
+ * @param curr Pointer to add \p node to.
+ * @param node List node to add.
+ * @return An error code.
+ */
 int xlist_add(struct xorlist_head *prev, struct xorlist_head *curr,
 		struct xorlist_head *node)
 {
@@ -54,6 +66,12 @@ int xlist_add(struct xorlist_head *prev, struct xorlist_head *curr,
 	return -EOK;
 }
 
+/**
+ * @brief Remove a node from a XOR list.
+ * @param prev Previous node.
+ * @param node Node to remove.
+ * @return An error code.
+ */
 int xlist_remove(struct xorlist_head *prev, struct xorlist_head *node)
 {
 	struct xorlist_head *next;
@@ -80,6 +98,12 @@ int xlist_remove(struct xorlist_head *prev, struct xorlist_head *node)
 	return -EINVAL;
 }
 
+/**
+ * @brief Get the next node of \p cur.
+ * @param prev Node to the left of \p cur.
+ * @param cur Node to get the next of.
+ * @return The node after \p cur.
+ */
 struct xorlist_head *xlist_next(struct xorlist_head *prev,
 		struct xorlist_head *cur)
 {
@@ -95,6 +119,12 @@ struct xorlist_head *xlist_next(struct xorlist_head *prev,
 
 }
 
+/**
+ * @brief Get the preceding node of \p this.
+ * @param this Node to get the preceding node for.
+ * @param next Node after \p this.
+ * @return The node preceding \p this.
+ */
 struct xorlist_head *xlist_prev(struct xorlist_head *this,
 		struct xorlist_head *next)
 {
@@ -102,4 +132,6 @@ struct xorlist_head *xlist_prev(struct xorlist_head *this,
 		(this ?
 		 xlist_create_pointer((size_t)this->ptr, (size_t)next) : NULL);
 }
+
+/** @} */
 

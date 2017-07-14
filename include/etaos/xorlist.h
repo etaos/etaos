@@ -16,13 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup xorlist
+ * @{
+ */
+
 #ifndef __XORLIST_H__
 #define __XORLIST_H__
 
 #include <etaos/kernel.h>
 
+/**
+ * @brief XOR list structure.
+ */
 struct xorlist_head {
-	struct xorlist_head *ptr;
+	struct xorlist_head *ptr; //!< List pointer.
 };
 
 CDECL
@@ -37,11 +45,29 @@ extern struct xorlist_head *xlist_prev(struct xorlist_head *this,
 
 CDECL_END
 
+/**
+ * @brief Iterate of a xlist.
+ * @param p Prev pointer.
+ * @param h List head.
+ * @param c Carriage pointer.
+ * @param t Temporary variable.
+ */
 #define xlist_for_each(p, h, c, t) \
 	for(c = h; c; t = c, c = xlist_next(p, c), p = t)
+
+/**
+ * @brief Iterate of a xlist safely.
+ * @param p Prev pointer.
+ * @param h List head.
+ * @param c Carriage pointer.
+ * @param t Temporary variable.
+ * @param s Temporary variable.
+ */
 #define xlist_for_each_safe(p, h, c, t, s) \
 	for(c = h, s = xlist_next(p, h); c; t = c, c = s, \
 			s = xlist_next(t, c), p = t)
 
 #endif /* __XORLIST_H__ */
+
+/** @} */
 
