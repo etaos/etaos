@@ -1,5 +1,6 @@
 /**
 @defgroup stl C++ runtime library
+@ingroup lib
 @brief The C++ standard library for ETA/OS.
 @note This library can be used by linking with -letaos
 
