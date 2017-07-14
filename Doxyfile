@@ -773,6 +773,7 @@ INPUT                  = . \
                          Documentation/kernel/sched.txt \
                          Documentation/kernel/timer.txt \
                          Documentation/kernel/kernel.txt \
+                         Documentation/kernel/python.txt \
                          Documentation/drivers/eeprom/24c02.txt \
                          Documentation/drivers/device-core.txt \
                          Documentation/drivers/eeprom/eeprom.txt \
