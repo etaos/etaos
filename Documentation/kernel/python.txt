@@ -1,0 +1,86 @@
+/**
+ * @defgroup python Python STL
+ * @brief Python standard library documentation.
+ */
+
+/**
+ * @defgroup python-avr Python AVR
+ * @ingroup python
+ * @brief Python AVR module.
+ */
+
+/**
+ * @defgroup python-builtin Builtin functions
+ * @ingroup python
+ * @brief Python built-in functions.
+ * @note The user does not have to import this module manually.
+ */
+
+/**
+ * @defgroup python-cpu CPU
+ * @ingroup python
+ * @brief Python CPU module.
+ *
+ * This module brings support for GPIO and analog port operations.
+ */
+
+/**
+ * @defgroup python-dict Dictionaries
+ * @ingroup python
+ * @brief Python dictionary module.
+ */
+
+/**
+ * @defgroup python-eeprom EEPROM
+ * @ingroup python
+ * @brief Python EEPROM drivers..
+ */
+
+/**
+ * @defgroup python-list Lists
+ * @ingroup python
+ * @brief List API.
+ */
+
+/**
+ * @defgroup python-tmp35 TMP35 driver
+ * @ingroup python
+ * @brief TMP35 temperature driver.
+ */
+
+/**
+ * @defgroup python-lm36 LM36 driver
+ * @ingroup python
+ * @brief LM36 temperature driver.
+ */
+
+/**
+ * @defgroup python-string String API
+ * @ingroup python
+ * @brief String API.
+ */
+
+/**
+ * @defgroup python-time Time API
+ * @ingroup python
+ * @brief Python time functions / classes.
+ */
+
+/**
+ * @defgroup python-sys System API
+ * @ingroup python
+ * @brief Python system API.
+ *
+ * Usage:
+@code{main.py}
+import sys
+@endcode
+ */
+
+/**
+ * @defgroup python-func Function support
+ * @ingroup python
+ * @brief Function (pointer) support.
+ *
+ * The func module implements function pointer / function object support.
+ */
