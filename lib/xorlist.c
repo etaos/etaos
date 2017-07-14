@@ -21,19 +21,85 @@
 #include <etaos/xorlist.h>
 #include <etaos/error.h>
 
+static inline void *xlist_create_pointer(size_t a, size_t b)
+{
+	return (void*)(a ^ b);
+}
+
 int xlist_add(struct xorlist_head *prev, struct xorlist_head *curr,
 		struct xorlist_head *node)
 {
-	return -1;
+	size_t uprev, ucurr, unode, unext, unext_next;
+	struct xorlist_head *next;
+
+	uprev = (size_t)prev;
+	ucurr = (size_t)curr;
+	unode = (size_t)node;
+	next = xlist_next(prev, curr);
+	unext = (size_t)next;
+
+	unext_next = (next) ? (size_t)next->ptr ^ ucurr : ucurr;
+
+	if(!next) {
+		curr->ptr = xlist_create_pointer(uprev, unode);
+		node->ptr = curr;
+		return -EOK;
+	}
+
+	curr->ptr = xlist_create_pointer(uprev, unode);
+	node->ptr = xlist_create_pointer(ucurr, unext);
+	next->ptr = unext_next ? xlist_create_pointer(unode, unext_next) :
+		xlist_create_pointer(unode, 0);
+
+	return -EOK;
 }
 
 int xlist_remove(struct xorlist_head *prev, struct xorlist_head *node)
 {
-	return -1;
+	struct xorlist_head *next;
+	size_t uprev_prev, unext, uprev, unode, unext_next;
+
+	if(!node)
+		return -EINVAL;
+
+	uprev = (size_t)prev;
+	unode = (size_t)node;
+	next = xlist_next(prev, node);
+	unext = (size_t)next;
+	uprev_prev = prev ? (size_t)xlist_prev(prev, node) : 0;
+	unext_next = next ? (size_t)xlist_create_pointer((size_t)next->ptr,
+			unode) : 0;
+
+	if(prev)
+		prev->ptr = xlist_create_pointer(uprev_prev, unext);
+
+	if(next)
+		next->ptr = xlist_create_pointer(unext_next, uprev);
+
+	node->ptr = NULL;
+	return -EINVAL;
 }
 
 struct xorlist_head *xlist_next(struct xorlist_head *prev,
 		struct xorlist_head *cur)
 {
-	return NULL;
+	size_t uprev, ucur;
+
+	if(!cur)
+		return NULL;
+
+	uprev = (size_t)prev;
+	ucur = (size_t)cur->ptr;
+
+	return xlist_create_pointer(uprev, ucur);
+
 }
+
+struct xorlist_head *xlist_prev(struct xorlist_head *this,
+		struct xorlist_head *next)
+{
+	return (struct xorlist_head*)
+		(this ?
+		 xlist_create_pointer((size_t)this->ptr, (size_t)next) : NULL);
+}
+

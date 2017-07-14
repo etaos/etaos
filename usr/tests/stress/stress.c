@@ -24,6 +24,7 @@
 #include <etaos/lm35.h>
 #include <etaos/ipm.h>
 #include <etaos/panic.h>
+#include <etaos/xorlist.h>
 
 #include <etaos/sram/23k256.h>
 
@@ -176,6 +177,42 @@ THREAD(test_th_handle, arg)
 	}
 }
 
+struct xorlist_test_entry {
+	struct xorlist_head entry;
+	int i;
+};
+
+static void test_xorlist(void)
+{
+	struct xorlist_head *head, *prev, *cur, *tmphead;
+	struct xorlist_test_entry *entry;
+	int i, total;
+
+	entry = kzalloc(sizeof(*entry));
+	entry->i = 0;
+	cur = head = &entry->entry;
+	prev = NULL;
+
+	for(total = 0, i = 1; i < 20; i++) {
+		entry = kzalloc(sizeof(*entry));
+		entry->i = i;
+		xlist_add(prev, cur, &entry->entry);
+		prev = cur;
+		cur = &entry->entry;
+		total += i;
+	}
+
+	/* Iterate back over */
+	prev = cur = NULL;
+	xlist_for_each(prev, head, cur, tmphead) {
+		entry = container_of(cur, struct xorlist_test_entry, entry);
+		total -= entry->i;
+	}
+
+	if(total)
+		fprintf(stderr, "xlist test failed!\n");
+}
+
 #define PREEMPT_PIN 11
 static volatile unsigned long preempt_counter;
 THREAD(preempt_thread, arg)
@@ -217,6 +254,7 @@ int main(void)
 
 	printf_P(PSTR("Application started (m: %u)\n"), mm_heap_available());
 
+	test_xorlist();
 	ipm_queue_init(&ipm_q, 2);
 	ee_stress_write_byte(EE_BYTE_ADDR, 0xAC);
 	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);

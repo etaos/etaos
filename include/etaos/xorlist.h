@@ -20,7 +20,6 @@
 #define __XORLIST_H__
 
 #include <etaos/kernel.h>
-#include <etaos/types.h>
 
 struct xorlist_head {
 	struct xorlist_head *ptr;
@@ -33,10 +32,16 @@ extern int xlist_add(struct xorlist_head *prev,
 extern int xlist_remove(struct xorlist_head *prev, struct xorlist_head *node);
 extern struct xorlist_head *xlist_next(struct xorlist_head *prev,
 		struct xorlist_head *cur);
+extern struct xorlist_head *xlist_prev(struct xorlist_head *this,
+		struct xorlist_head *next);
 
-#define xlist_for_each
-#define xlist_for_each_safe
 CDECL_END
+
+#define xlist_for_each(p, h, c, t) \
+	for(c = h; c; t = c, c = xlist_next(p, c), p = t)
+#define xlist_for_each_safe(p, h, c, t, s) \
+	for(c = h, s = xlist_next(p, h); c; t = c, c = s, \
+			s = xlist_next(t, c), p = t)
 
 #endif /* __XORLIST_H__ */
 
