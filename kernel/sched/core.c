@@ -131,7 +131,11 @@ static void irq_thread_wait(void)
 void irq_thread_signal(struct irq_thread_data *data)
 {
 	struct thread *tp, *current;
+	struct rq *rq;
+	unsigned long flags;
 
+	rq = sched_get_cpu_rq();
+	raw_spin_lock_irq(&rq->lock, &flags);
 	tp = data->owner;
 	current = current_thread();
 
@@ -143,6 +147,7 @@ void irq_thread_signal(struct irq_thread_data *data)
 	rq_add_thread_no_lock(tp);
 
 	set_bit(PREEMPT_NEED_RESCHED_FLAG, &current->flags);
+	raw_spin_unlock_irq(&rq->lock, &flags);
 }
 
 /**

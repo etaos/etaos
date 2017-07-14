@@ -1,3 +1,14 @@
 source "lib/crt/Kconfig"
 source "lib/etaos/Kconfig"
 
+menu "Libraries"
+
+config XORLIST
+	tristate "Exclusive OR list"
+	default m
+	help
+	  Say 'y' here to built support of the exclusive OR list
+	  library.
+
+endmenu
+
