@@ -35,6 +35,12 @@
 
 #define MM_MAGIC_BYTE 0x99
 
+#ifdef CONFIG_PYTHON
+#define MM_ALIGNMENT 4
+#else
+#define MM_ALIGNMENT 1
+#endif
+
 /**
  * @brief Heap node structure
  */
@@ -65,6 +71,7 @@ extern void raw_mm_heap_add_block(void *start, size_t size);
 extern size_t mm_node_size(void *ptr);
 
 extern MEM void* mm_alloc(size_t);
+extern MEM void *mm_alloc_aligned(size_t size, size_t alignment);
 
 extern void *kzalloc(size_t num);
 extern void *kmalloc(size_t num);

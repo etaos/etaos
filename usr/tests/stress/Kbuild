@@ -1,4 +1,5 @@
 obj-y += stress.o eeprom.o sram.o
+pyusrlib-y += main.py
 crurom-y := data
 crurom-obj := romfs.o
 
@@ -8,4 +9,4 @@ ETAOS_LIBS += -l24c02 -leeprom -latmega-i2c -li2c-core -latmega-gpio -lgpio \
 		-ldevfs -ldriver-core -lplatform -llm35 -lc
 ETAOS_LIB_DIR := usr/lib/etaos
 APP_TARGET := test-app.img
-clean-files += test-app.img test-app.hex romfs.c
+clean-files += test-app.img test-app.hex romfs.c pyusrlib.c pyusrlib-img.c

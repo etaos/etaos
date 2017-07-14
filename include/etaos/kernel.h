@@ -43,6 +43,8 @@
 #define ERR_PTR ((void*)-1)
 #endif
 
+#define USED(__x__) ((void)__x__)
+
 #define FALSE 0
 #define TRUE !FALSE
 

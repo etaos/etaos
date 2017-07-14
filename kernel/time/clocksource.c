@@ -57,6 +57,7 @@ int clocksource_init(const char *name, struct clocksource *cs,
 	cs->tc_update = 0UL;
 	spinlock_init(&cs->lock);
 	list_add(&cs->list, &sources);
+	list_head_init(&cs->timers);
 	return -EOK;
 }
 
@@ -95,43 +96,6 @@ struct clocksource *clocksource_get_by_name(const char *name)
 	return NULL;
 }
 
-void raw_clocksource_add_timer(struct clocksource *cs, struct timer *timer)
-{
-	struct timer *_timer;
-
-	for(_timer = cs->thead; _timer; _timer = _timer->next) {
-		if(timer->tleft < _timer->tleft) {
-			_timer->tleft -= timer->tleft;
-			break;
-		}
-
-		timer->tleft -= _timer->tleft;
-		timer->prev = _timer;
-	}
-
-	timer->next = _timer;
-	if(timer->next)
-		timer->next->prev = timer;
-	if(timer->prev)
-		timer->prev->next = timer;
-	else
-		cs->thead = timer;
-}
-
-/**
- * @brief Add a new timer to a clocksource.
- * @param cs Clocksource to add \p timer to.
- * @param timer Timer to add.
- */
-void clocksource_add_timer(struct clocksource *cs, struct timer *timer)
-{
-	unsigned long flags;
-
-	raw_spin_lock_irqsave(&cs->lock, flags);
-	raw_clocksource_add_timer(cs, timer);
-	raw_spin_unlock_irqrestore(&cs->lock, flags);
-}
-
 /**
  * @brief Update the clockskew of a clocksource.
  * @param cs Clocksource to update.
@@ -148,25 +112,54 @@ tick_t clocksource_update(struct clocksource *cs)
 	return diff;
 }
 
-/**
- * @brief Remove a timer from a clocksource.
- * @param cs Clocksource to remove \p timer from.
- * @param timer Timer to remove.
- */
-void clocksource_delete_timer(struct clocksource *cs, struct timer *timer)
+void raw_clocksource_insert_timer(struct clocksource *cs,
+		struct list_head *lh, list_comparator_t comp)
+{
+	struct list_head *carriage;
+
+	if(list_empty(&cs->timers)) {
+		list_add(lh, &cs->timers);
+		return;
+	}
+
+	list_for_each(carriage, &cs->timers) {
+		if(list_is_last(carriage, &cs->timers)) {
+			list_add(lh, carriage);
+			break;
+		}
+
+		if(comp(lh, carriage) <= 0) {
+			list_add_tail(lh, carriage);
+			break;
+		}
+	}
+}
+
+void clocksource_insert_timer(struct clocksource *cs, struct list_head *lh,
+				list_comparator_t comp)
 {
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&cs->lock, flags);
-	if(timer->prev)
-		timer->prev->next = timer->next;
-	else
-		cs->thead = timer->next;
-	if(timer->next) {
-		timer->next->prev = timer->prev;
-		timer->next->tleft += timer->tleft;
-	}
+	raw_clocksource_insert_timer(cs, lh, comp);
 	raw_spin_unlock_irqrestore(&cs->lock, flags);
+}
+
+int raw_clocksource_remove_timer(struct list_head *lh)
+{
+	list_del(lh);
+	return -EOK;
+}
+
+int clocksource_remove_timer(struct clocksource *cs, struct list_head *lh)
+{
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&cs->lock, flags);
+	raw_clocksource_remove_timer(lh);
+	raw_spin_unlock_irqrestore(&cs->lock, flags);
+
+	return -EOK;
 }
 
 /** @} */

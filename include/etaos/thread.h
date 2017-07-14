@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Thread header
- *  Copyright (C) 2014, 2015, 2016  Michel Megens <dev@bietje.net>
+ *  Copyright (C) 2014, 2015, 2016, 2017  Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -99,10 +99,10 @@ struct lottery_ticket {
 struct rr_entity {
 	struct thread *next; //!< List entry pointer.
 #ifdef CONFIG_LOTTERY
-	struct list_head tickets;
+	struct list_head tickets; //!< Lotery tickets.
 #endif
 #ifdef CONFIG_EDF
-	time_t deadline;
+	time_t deadline; //!< EDF deadline timestamp.
 #endif
 };
 
@@ -138,7 +138,7 @@ struct rq;
  */
 struct thread {
 	struct thread *volatile*queue; //!< Queue root pointer.
-	struct thread *rq_next; //!< Wake/Kill list entry.
+	struct list_head entry; //!< Wake / kill queue entry.
 
 #ifdef CONFIG_PREEMPT
 	unsigned int slice; //!< Time slice.
@@ -151,6 +151,10 @@ struct thread {
 	bool on_rq; //!< Run queue enable.
 	struct rq *rq; //!< Run queue pointer.
 	unsigned long flags; //!< Thread flags
+
+#ifdef CONFIG_SCHED_FAIR
+	time_t cputime; //!< Total CPU time.
+#endif
 
 	void    *stack; //!< Root stack pointer.
 	stack_t *sp; //!< Run time stack pointer.
@@ -196,6 +200,7 @@ typedef struct thread_attr {
 #define PREEMPT_NEED_RESCHED_FLAG 5 //!< Thread has used its full time slice.
 #define THREAD_IDLE_FLAG	 6 //!< Thread is the idle thread.
 #define THREAD_SYSTEM_STACK      7 //!< Stack is allocated by the system.
+#define THREAD_REMOTE_KILL	 8 //!< Thread has been killed by someone else
 /** @} */
 
 /**
@@ -226,6 +231,8 @@ extern void sched_init_idle(struct thread *tp, const char *name,
 		void *stack);
 extern struct thread *current_thread();
 
+extern int thread_destroy(struct thread *tp);
+extern int thread_destroy_by_name(const char *name);
 extern void yield(void);
 extern void sleep(unsigned ms);
 extern void kill(void);
@@ -239,6 +246,10 @@ extern int join(struct thread *tp);
 
 #ifdef CONFIG_THREAD_QUEUE
 extern void thread_queue_init(struct thread_queue *qp);
+#endif
+
+#ifdef CONFIG_SCHED_DBG
+extern void print_rq(void);
 #endif
 
 CDECL_END

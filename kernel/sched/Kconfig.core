@@ -18,6 +18,15 @@ config THREAD_QUEUE
 	  You can select a storage mechanism (aka scheduling
 	  algorithm) above.
 
+config SCHED_FAIR
+	bool "Fair scheduling"
+	depends on SYS_EDF
+	help
+	  Say 'y' here to to take counter measures against threads
+	  that take up allot of CPU time. Threads that have not
+	  received as much CPU time will be accepted over
+	  the currently running thread.
+
 
 config DYN_PRIO
 	bool "Dynamic priorities"

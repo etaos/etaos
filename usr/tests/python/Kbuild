@@ -1,0 +1,10 @@
+obj-y += python.o
+pyusrlib-y += main.py
+
+ETAOS_LIBS += -l24c02 -leeprom -latmega-i2c -li2c-core -latmega-gpio \
+		-lgpio -lusart-atmega -lusart -lspi-core -latmega-spi \
+		-lsram -l23k256 -ldriver-core -ldevfs -lanalog \
+		-latmega-analog -lc
+ETAOS_LIB_DIR := usr/lib/etaos
+APP_TARGET := test-app.img
+clean-files += test-app.img test-app.hex pyusrlib.c pyusrlib-img.c

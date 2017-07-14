@@ -97,6 +97,8 @@ static inline int list_is_last(const struct list_head *list,
 
 CDECL_END
 
+typedef int (*list_comparator_t)(struct list_head *lh1, struct list_head *lh2);
+
 /**
  * @brief Loop through a list.
  * @param pos Carriage pointer.

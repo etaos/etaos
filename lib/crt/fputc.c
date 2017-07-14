@@ -36,11 +36,18 @@
  */
 int fputc(int c, struct file * stream)
 {
-	int rc = -1;
+	if(!test_bit(STREAM_WRITE_FLAG, &stream->flags))
+		return -EOF;
 
-	if(test_bit(STREAM_WRITE_FLAG, &stream->flags))
-		rc = stream->put(c, stream);
-	return rc;
+	if(test_bit(STREAM_RW_BUFFER_FLAG, &stream->flags)) {
+		if(stream->index < stream->length) {
+			stream->buff[stream->index] = c;
+			stream->index++;
+			return c;
+		}
+	}
+
+	return stream->put(c, stream);
 }
 
 /** @} */

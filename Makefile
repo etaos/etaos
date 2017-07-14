@@ -53,6 +53,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 HOSTCC       = gcc
 HOSTCXX      = g++
 CRUROM       = $(srctree)/scripts/crurom/crurom
+PYLIBCREATOR = $(srctree)/scripts/pm-img-creator.py
+PYLIBLIST    = $(srctree)/scripts/pylib-list.py
 CRUROMFLAGS  = -r
 HOSTCFLAGS   = -Wall -Wno-char-subscripts -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOSTCXXFLAGS = -O2
@@ -112,6 +114,7 @@ include $(srctree)/arch/$(SRCARCH)/Makefile
 
 export CONFIG_SHELL HOSTCC HOSTCXX HOSTCFLAGS HOSTCXXFLAGS
 export CRUROM CRUROMFLAGS
+export PYLIBCREATOR PYLIBLIST
 export KBUILD_BUILTIN KBUILD_MODULES
 export KBUILD_CFLAGS KBUILD_CXXFLAGS KBUILD_AFLAGS
 

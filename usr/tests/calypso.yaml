@@ -19,6 +19,19 @@ unit-tests:
     baud: 9600
     libdir: usr/lib
 
+  python-test:
+    hardware: ard-mega
+    autorun: true
+    mode: auto
+    name: "Python VM test"
+    path: usr/tests/python
+    execute: clean all hex upload
+    config: config-atmega2560.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
   irqthread-test: 
     hardware: ard-mega
     autorun: true

@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Sched header
- *  Copyright (C) 2014, 2015, 2016  Michel Megens <dev@bietje.net>
+ *  Copyright (C) 2014, 2015, 2016, 2017  Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -34,6 +34,7 @@
 #include <etaos/time.h>
 #include <etaos/thread.h>
 #include <etaos/bitops.h>
+#include <etaos/list.h>
 
 struct rq;
 struct thread_queue;
@@ -122,6 +123,13 @@ struct sched_class {
 	 */
 	void (*queue_rm)(struct thread_queue *q, struct thread *tp);
 #endif
+#ifdef CONFIG_SCHED_DBG
+	/**
+	 * @brief Print run queue information.
+	 * @param rq Run queue to print..
+	 */
+	void (*print_rq)(struct rq *rq);
+#endif
 };
 
 #ifdef CONFIG_RR_ENTITY
@@ -132,6 +140,8 @@ struct sched_class {
 	struct rq __name = {				\
 		.sched_class = __class,			\
 		.lock = SPIN_LOCK_INIT(__name.lock),	\
+		.wake_head = STATIC_INIT_LIST_HEAD(__name.wake_head), \
+		.kill_head = STATIC_INIT_LIST_HEAD(__name.kill_head), \
 		__DEFINE_RQ,				\
 	}
 
@@ -168,9 +178,6 @@ struct rq {
 	 * this queue. Whenever an interrupt signals the queue, the scheduler
 	 * will notice by checking this queue.
 	 */
-	struct thread *wake_queue;
-	/** @brief Kill queue. */
-	struct thread *kill_queue;
 	/** @brief Thread currently running on this run queue */
 	struct thread *current;
 
@@ -181,6 +188,9 @@ struct rq {
 	struct clocksource *source;
 	/** @brief Run queue lock */
 	spinlock_t lock;
+
+	struct list_head wake_head;
+	struct list_head kill_head;
 };
 
 /**
@@ -192,6 +202,18 @@ struct rq {
 				&__t->flags)
 
 CDECL
+
+#if defined(CONFIG_RR) || defined(CONFIG_FIFO) || defined(CONFIG_LOTTERY)
+/**
+ * @brief Get the run queue head.
+ * @param rq Run queue to get the head for.
+ * @return A pointer to the head of \p rq.
+ */
+static inline struct thread *rq_get_head(struct rq *rq)
+{
+	return rq->rr_rq.run_queue;
+}
+#endif
 
 extern unsigned char prio(struct thread *tp);
 extern void schedule(void);
@@ -280,11 +302,13 @@ extern int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp);
 extern int rq_remove_thread(struct thread *tp);
 extern int rq_add_thread(struct rq *rq, struct thread *tp);
 extern void rq_add_thread_no_lock(struct thread *tp);
+extern struct thread *sched_find_thread_by_name(const char *name);
 
-extern void rq_update_clock(void);
+extern void sched_mark_remote_kill(struct thread *tp);
 extern void sched_setup_sleep_thread(struct thread *tp, unsigned ms);
 extern void sched_yield(struct rq *rq);
 extern void sched_start(void);
+extern void current_thread_nolock(void);
 
 #ifdef CONFIG_IRQ_THREAD
 extern void irq_thread_signal(struct irq_thread_data *data);

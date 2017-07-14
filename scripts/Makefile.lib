@@ -42,6 +42,17 @@ subdir-m	+= $(__subdir-m)
 obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
 obj-m		:= $(filter-out %/, $(obj-m))
 
+# PyMite stuff
+ifneq ($(pylib-y),)
+pylib-y := $(addprefix $(obj)/, $(pylib-y))
+endif
+
+ifneq ($(pyusrlib-y),)
+pyusrlib-y := $(addprefix $(obj)/, $(pyusrlib-y))
+pyusrlib-target := $(obj)/pyusrlib.c $(obj)/pyusrlib-img.c
+pyusrlib-obj-target := $(obj)/pyusrlib.o $(obj)/pyusrlib-img.o
+endif
+
 ifneq ($(crurom-obj),)
 crurom-obj := $(addprefix $(obj)/, $(crurom-obj))
 endif

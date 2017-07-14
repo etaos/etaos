@@ -81,6 +81,10 @@ CDECL
 
 extern void vfs_init(void);
 
+extern struct file *raw_vfs_init_buffered_file(struct file *f,
+		size_t n, void *buf);
+extern struct file *vfs_create_buffered_file(size_t bufsize);
+extern struct file *vfs_init_buffered_file(struct file *f, size_t bufsize);
 extern struct file *vfs_find_file(const char *path);
 extern struct fs_driver *vfs_path_to_fs(const char *path);
 extern int vfs_add_file(const char *path, struct file *file);

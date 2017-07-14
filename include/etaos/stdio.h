@@ -1,6 +1,6 @@
 /*
- *  Eta/OS - ETA/OS stdio header
- *  Copyright (C) 2014   Michel Megens <dev@bietje.net>
+ *  ETA/OS - ETA/OS stdio header
+ *  Copyright (C) 2014, 2015, 2016, 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -154,11 +154,13 @@ extern struct file * __iob[];
 #define filep(__idx) __iob[__idx]
 
 extern int putc(int c, struct file * stream);
+extern int puts(const char *string);
 extern int fputc(int c, struct file * stream);
 extern int fputs(char *c, struct file * stream);
 extern int fprintf(struct file * stream, const char*, ...);
 extern int printf(const char *, ...);
 extern int vfprintf(struct file * stream, const char *fmt, va_list va);
+extern int snprintf(char *s, size_t length, const char *fmt, ...);
 extern int iob_add(struct file * iob);
 extern int iob_remove(int fd);
 extern void close(int fd);
@@ -172,10 +174,12 @@ extern char *fgets(char *buf, int count, struct file *stream);
 extern size_t ftell(struct file *file);
 
 #ifdef CONFIG_HARVARD
+extern int puts_P(const char *string);
 extern int printf_P(const char *fmt, ...);
 extern int fprintf_P(struct file *stream, const char *fmt, ...);
 extern int vfprintf_P(struct file * stream, const char *fmt, va_list ap);
 #else
+#define puts_P(__str__) puts(__str__)
 #define printf_P(__fmt, args...) printf(__fmt, args)
 #define fprintf_P(__iostream, __fmt, args...) fprintf(__iostream, __fmt, args)
 #define vfprintf_P(__iostream, __fmt, __ap) vfprintf(__iostream, __fmt, __ap)

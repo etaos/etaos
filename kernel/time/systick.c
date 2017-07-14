@@ -45,18 +45,26 @@ struct clocksource *sys_clk;
 static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
 {
 	struct clocksource *cs = (struct clocksource*)data;
-#ifdef CONFIG_PREEMPT
+#if defined(CONFIG_SCHED_FAIR) || defined(CONFIG_PREEMPT)
 	struct rq *rq = sched_get_cpu_rq();
 	struct thread *tp = rq->current;
 
-	if(--tp->slice == 0) {
-		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
-		tp->slice = CONFIG_TIME_SLICE;
-	}
+#ifdef CONFIG_SCHED_FAIR
+	tp->cputime += 1ULL;
+#endif
 #endif
 
 	time_inc(); /* Handle system time */
 	timer_source_inc(cs); /* Increase the system / sched clock */
+
+#ifdef CONFIG_PREEMPT
+	if(--tp->slice == 0) {
+		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
+		tp->slice = CONFIG_TIME_SLICE;
+	}
+	preempt_schedule_irq();
+#endif
+
 	return IRQ_HANDLED;
 }
 

@@ -19,6 +19,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/irq.h>
+#include <etaos/preempt.h>
 
 #include <asm/io.h>
 #include <asm/irq.h>
@@ -27,5 +28,6 @@ SIGNAL(ADC_COMPLETED_VECTOR)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
 	chip->chip_handle(ADC_COMPLETED_NUM);
+	preempt_schedule_irq();
 }
 

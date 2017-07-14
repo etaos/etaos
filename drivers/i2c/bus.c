@@ -25,6 +25,7 @@
 #include <etaos/time.h>
 #include <etaos/tick.h>
 #include <etaos/init.h>
+#include <etaos/string.h>
 
 /**
  * @addtogroup i2c
@@ -134,6 +135,23 @@ void i2c_add_client(struct i2c_bus *bus, struct i2c_client *client)
 
 	list_add(&client->list_entry, &bus->clients);
 	client->bus = bus;
+}
+
+struct i2c_client *i2c_find_client(struct i2c_bus *bus, const char *name)
+{
+	struct list_head *entry;
+	bool equal;
+	struct i2c_client *client;
+
+	list_for_each(entry, &bus->clients) {
+		client = list_entry(entry, struct i2c_client, list_entry);
+		equal = strcmp(client->dev.name, name) == 0;
+
+		if(equal)
+			return client;
+	}
+
+	return NULL;
 }
 
 static void __used i2c_core_init(void)

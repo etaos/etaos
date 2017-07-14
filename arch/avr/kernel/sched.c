@@ -87,7 +87,7 @@ struct avr_stack_frame {
 	uint8_t r31, r30,
 		r29, r28, r27, r26, r25, r24, r23, r22, r21, r20,
 		r19, r18, r17, r16, r15, r14, r13, r12, r11, r10,
-		r9, r8, r7, r6, r5, r4, r3, r2, r1, status;
+		r9, r8, r7, r6, r5, r4, r3, r2, r1;
 #ifdef AVR_HAVE_RAMPX
 	uint8_t rampx;
 #endif
@@ -100,9 +100,7 @@ struct avr_stack_frame {
 #ifdef AVR_HAVE_RAMPD
 	uint8_t rampd;
 #endif
-#ifdef AVR_HAVE_EIND
-	uint8_t eind;
-#endif
+	uint8_t status;
 	uint8_t r0;
 
 #ifdef AVR_22BIT_PC

@@ -32,8 +32,7 @@ static struct timer *tmtest_init_timers(void)
 	struct clocksource *cs = sys_clk;
 
 	printf("Adding 1 timer: ");
-	tm1 = timer_create_timer(cs, 500, &print_timer, 
-			tm1_name, 0);
+	tm1 = timer_create(cs, 500, &print_timer, tm1_name, 0);
 	
 	if(tm1)
 		printf("[OK]\n");
@@ -43,7 +42,6 @@ static struct timer *tmtest_init_timers(void)
 
 int main(void)
 {
-	unsigned int diff;
 	struct clocksource *cs;
 	struct timer *timer1;
 
@@ -51,14 +49,12 @@ int main(void)
 
 	cs = sys_clk;
 	timer1 = tmtest_init_timers();
-	diff = clocksource_update(cs);
 
 	while(timer_cnt < 5) {
-		timer_process_clock(cs, diff);
-		diff = clocksource_update(cs);
+		timer_process(cs);
 	}
 
-	timer_stop_timer(timer1);
+	timer_stop(timer1);
 	printf(CALYPSO_EXIT);
 	return 0;
 }

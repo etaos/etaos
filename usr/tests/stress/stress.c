@@ -25,6 +25,7 @@
 #include <etaos/ipm.h>
 #include <etaos/panic.h>
 #include <etaos/xorlist.h>
+#include <etaos/python.h>
 
 #include <etaos/sram/23k256.h>
 
@@ -124,6 +125,7 @@ THREAD(test_th_handle2, arg)
 		kfree(romdata);
 		now = time(NULL);
 		tm = localtime(&now);
+
 		printf_P(PSTR("[2][%s]: Date: %i-%i-%i, %i:%i\n"),
 				current_thread_name(),
 					tm->tm_mday,
@@ -235,13 +237,12 @@ THREAD(preempt_thread, arg)
 }
 
 static struct gpio_pin *led_pin;
+static bool led_pin_value = true;
 
 static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
 {
-	static bool value = true;
-
-	__raw_gpio_pin_write(led_pin, value);
-	value = !value;
+	__raw_gpio_pin_write(led_pin, led_pin_value);
+	led_pin_value = !led_pin_value;
 }
 
 int main(void)
@@ -263,15 +264,18 @@ int main(void)
 	thread_create("test-2", &test_th_handle2, NULL, NULL);
 	thread_create("preempt", &preempt_thread, NULL, NULL);
 
+	python_init();
+	python_start("main");
+
 	read(to_fd(stdin), &buff[0], 10);
 	buff[10] = 0;
 	now = (time_t)atol(buff);
 	stime(now);
 
-	pgpio_pin_request(13);
-	pgpio_direction_output(13, false);
-	led_pin = platform_pin_to_gpio(13);
-	pgpio_pin_release(13);
+	pgpio_pin_request(12);
+	pgpio_direction_output(12, false);
+	led_pin = platform_pin_to_gpio(12);
+	pgpio_pin_release(12);
 	hrtimer_create(hr_sys_clk, 2000000, hrtimer1_handle_func,
 			NULL, 0UL);
 

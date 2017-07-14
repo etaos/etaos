@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Scheduling core
- *  Copyright (C) 2014, 2015, 2016   Michel Megens <dev@bietje.net>
+ *  Copyright (C) 2014, 2015, 2016, 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,7 @@
 #include <etaos/init.h>
 #include <etaos/list.h>
 #include <etaos/error.h>
+#include <etaos/string.h>
 #include <etaos/mem.h>
 #include <etaos/thread.h>
 #include <etaos/sched.h>
@@ -103,6 +104,20 @@ static void sched_set_current_thread(struct thread *tp)
 	__sched_set_current_thread(rq, tp);
 }
 
+/**
+ * @brief Return the current thread for a given run queue.
+ * @param rq Run queue to get the current thread for.
+ * @return The current thread of \p rq.
+ * @see current_thread
+ */
+static struct thread *current_thread_for(struct rq *rq)
+{
+	if(!rq)
+		return NULL;
+
+	return rq->current;
+}
+
 #ifdef CONFIG_IRQ_THREAD
 /**
  * @brief Put an IRQ thread in a waiting state.
@@ -131,11 +146,7 @@ static void irq_thread_wait(void)
 void irq_thread_signal(struct irq_thread_data *data)
 {
 	struct thread *tp, *current;
-	struct rq *rq;
-	unsigned long flags;
 
-	rq = sched_get_cpu_rq();
-	raw_spin_lock_irq(&rq->lock, &flags);
 	tp = data->owner;
 	current = current_thread();
 
@@ -147,7 +158,6 @@ void irq_thread_signal(struct irq_thread_data *data)
 	rq_add_thread_no_lock(tp);
 
 	set_bit(PREEMPT_NEED_RESCHED_FLAG, &current->flags);
-	raw_spin_unlock_irq(&rq->lock, &flags);
 }
 
 /**
@@ -224,8 +234,8 @@ void thread_queue_wait(struct thread_queue *qp, unsigned int ms)
 {
 	struct thread *current = current_thread();
 
-	current->timer = timer_create_timer(current->rq->source, ms,
-			&queue_wait_tmo, current, TIMER_ONESHOT_MASK);
+	current->timer = timer_create(current->rq->source, ms, &queue_wait_tmo,
+			              current, TIMER_ONESHOT_MASK);
 	queue_add_thread(qp, current);
 	schedule();
 }
@@ -312,33 +322,12 @@ void queue_remove_thread(struct thread_queue *qp, struct thread *tp)
 /**
  * @brief Remove a thread from the rq_list.
  * @param tp Thread to remove.
- * @param tpp Root queue pointer.
  * @return Error code.
  * @retval -EOK on success.
  */
-static int rq_list_remove(struct thread *tp, struct thread *volatile*tpp)
+static int rq_list_remove(struct thread *tp)
 {
-	struct thread *carriage;
-
-	/* get the queue head */
-	carriage = *tpp;
-	if(carriage == SIGNALED)
-		return -EINVAL;
-
-	/* loop through all threads in the queue */
-	while(carriage) {
-		if(carriage == tp) {
-			*tpp = tp->rq_next;
-			tp->rq_next = NULL;
-			tp->queue = NULL;
-			break;
-		}
-
-		tpp = &carriage->rq_next;
-		carriage = carriage->rq_next;
-		continue;
-	}
-
+	list_del(&tp->entry);
 	return -EOK;
 }
 
@@ -353,7 +342,7 @@ void raw_rq_remove_wake_thread(struct rq *rq, struct thread *tp)
 	unsigned long flags;
 
 	irq_save_and_disable(&flags);
-	rq_list_remove(tp, &rq->wake_queue);
+	rq_list_remove(tp);
 	irq_restore(&flags);
 }
 
@@ -367,7 +356,7 @@ void raw_rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 	unsigned long flags;
 
 	irq_save_and_disable(&flags);
-	rq_list_remove(tp, &rq->kill_queue);
+	rq_list_remove(tp);
 	irq_restore(&flags);
 }
 
@@ -401,12 +390,12 @@ void rq_remove_kill_thread(struct rq *rq, struct thread *tp)
 
 /**
  * @brief Add a thread to rq_list.
- * @param new Thread to add.
- * @param head New is add after this thread
+ * @param lh List head to add \p tp to.
+ * @param tp Thread to addd to \p lh.
  */
-static inline void rq_list_add(struct thread *new, struct thread *head)
+static inline void rq_list_add(struct list_head *lh, struct thread *tp)
 {
-	new->rq_next = head;
+	list_add(&tp->entry, lh);
 }
 
 /**
@@ -417,8 +406,7 @@ static inline void rq_list_add(struct thread *new, struct thread *head)
 static void rq_add_wake_thread(struct rq *rq, struct thread *new)
 {
 	new->rq = rq;
-	rq_list_add(new, rq->wake_queue);
-	rq->wake_queue = new;
+	rq_list_add(&rq->wake_head, new);
 }
 
 /**
@@ -429,8 +417,7 @@ static void rq_add_wake_thread(struct rq *rq, struct thread *new)
 static void rq_add_kill_thread(struct rq *rq, struct thread *new)
 {
 	new->rq = rq;
-	rq_list_add(new, rq->kill_queue);
-	rq->kill_queue = new;
+	rq_list_add(&rq->kill_head, new);
 }
 
 /**
@@ -634,6 +621,36 @@ int rq_remove_thread(struct thread *tp)
 	return err;
 }
 
+static inline struct clocksource *rq_get_clock(struct rq *rq)
+{
+	return rq->source;
+}
+
+#ifdef CONFIG_SCHED_FAIR
+/**
+ * Check which of two threads has received the most time on the CPU.
+ *
+ * @param tp First thread, most likely the current thread.
+ * @param nxt A contestant for the CPU.
+ * @return True only iff the CPU time \p nxt has received is less or equal to
+ *         the CPU time received by \p tp.
+ */
+static inline bool should_resched_cputime(struct thread *tp, struct thread *nxt)
+{
+	if(test_bit(THREAD_IDLE_FLAG, &nxt->flags))
+		return false;
+	else if(test_bit(THREAD_IDLE_FLAG, &tp->flags))
+		return true;
+
+	return nxt->cputime <= tp->cputime;
+}
+#else
+static inline bool should_resched_cputime(struct thread *tp, struct thread *nxt)
+{
+	return false;
+}
+#endif
+
 /**
  * @brief Update a run queue.
  * @param rq Run queue to update.
@@ -694,8 +711,8 @@ void sched_setup_sleep_thread(struct thread *tp, unsigned ms)
 	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
 
-	tp->timer = timer_create_timer(rq->source, ms, &sched_sleep_timeout,
-			tp, TIMER_ONESHOT_MASK);
+	tp->timer = timer_create(rq->source, ms, &sched_sleep_timeout,
+			         tp, TIMER_ONESHOT_MASK);
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
@@ -727,22 +744,18 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
  */
 static void rq_destroy_kill_q(struct rq *rq)
 {
-	struct thread *walker, *tmp;
+	struct thread *walker;
 	unsigned long flags;
+	struct list_head *carriage, *x;
 
 	raw_spin_lock_irq(&rq->lock, &flags);
-	walker = rq->kill_queue;
-	if(!walker) {
-		raw_spin_unlock_irq(&rq->lock, &flags);
-		return;
-	}
-
-	for(tmp = walker->rq_next; walker; 
-			walker = tmp, tmp = walker->rq_next) {
+	list_for_each_safe(carriage, x, &rq->kill_head) {
+		walker = list_entry(carriage, struct thread, entry);
 		raw_rq_remove_kill_thread(rq, walker);
 
 		if(test_bit(THREAD_SYSTEM_STACK, &walker->flags))
 			sched_free_stack_frame(walker);
+
 	}
 	raw_spin_unlock_irq(&rq->lock, &flags);
 }
@@ -865,7 +878,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		qp->qhead = SIGNALED;
 
 	if(tp->timer && tp->timer != SIGNALED) {
-		timer_stop_timer(tp->timer);
+		timer_stop(tp->timer);
 	}
 
 	if(unlikely(current != tp)) {
@@ -892,26 +905,25 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
  */
 static void rq_signal_threads(struct rq *rq)
 {
-	struct thread *carriage, 
+	struct thread *iterator,
 		      *tp,
 		      *volatile*tpp;
 	unsigned char events;
+	struct list_head *carriage, *x;
 
-	carriage = rq->wake_queue;
-	while(carriage) {
-		events = carriage->ec;
+	list_for_each_safe(carriage, x, &rq->wake_head) {
+		iterator = list_entry(carriage, struct thread, entry);
+		events = iterator->ec;
 
 		if(events) {
-			tpp = carriage->queue;
-			carriage->ec--;
+			tpp = iterator->queue;
+			iterator->ec--;
 			tp = *tpp;
 			if(tp != SIGNALED)
 				rq_signal_event_queue(rq, tp);
 		}
-		carriage = carriage->rq_next;
-	}
 
-	return;
+	}
 }
 #else
 static void rq_signal_threads(struct rq *rq)
@@ -938,29 +950,68 @@ static inline void preempt_reset_slice(struct thread *tp)
 #endif
 
 /**
- * @brief Update the scheduling clock.
- * @param rq Run queue (AKA CPU) to update.
+ * @brief Search a given run queue for a thread with a name \p name.
+ * @param rq Run queue to search.
+ * @param name Name to look for.
+ * @return Either NULL or a thread by the name of \p name.
+ * @see sched_find_thread_by_name
  */
-static void __rq_update_clock(struct rq *rq)
+static struct thread *rq_find_thread(struct rq *rq, const char *name)
 {
-	unsigned int tdelta = 0;
+	unsigned long flags;
+	struct thread *tp;
 
-	tdelta = clocksource_update(rq->source);
-	timer_process_clock(rq->source, tdelta);
+	raw_spin_lock_irqsave(&rq->lock, flags);
+	tp = rq_get_head(rq);
+
+	while(tp != NULL) {
+		if(strcmp(tp->name, name) == 0) {
+			raw_spin_unlock_irqrestore(&rq->lock, flags);
+			return tp;
+		}
+	}
+
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+	return NULL;
 }
 
 /**
- * @brief API version of #__rq_update_clock.
+ * @brief Search all available run queue's for a thread by name.
+ * @param name Name to look for.
+ * @return Either NULL or a thread by the name of \p name.
+ * @see rq_find_thread
+ */
+struct thread *sched_find_thread_by_name(const char *name)
+{
+	struct rq *rq;
+#ifndef CONFIG_SQS
+	struct thread *tp = NULL;
+
+	RQ_FOREACH(rq) {
+		tp = rq_find_thread(rq, name);
+		if(tp != NULL)
+			break;
+	}
+
+	return tp;
+#else
+	rq = sched_get_grq();
+	return rq_find_thread(rq, name);
+#endif
+}
+
+/**
+ * @brief Update the system clock.
  * @see __rq_update_clock
  */
-void rq_update_clock(void)
+static void rq_update_clock(void)
 {
 	int cpu;
 	struct rq *rq;
 
 	cpu = cpu_get_id();
 	rq = cpu_to_rq(cpu);
-	__rq_update_clock(rq);
+	timer_process(rq_get_clock(rq));
 }
 
 /**
@@ -1001,6 +1052,83 @@ static inline void __schedule_prepare(struct rq *rq,
 	cpu_get_state(&flags);
 	prev->cpu_state = flags;
 	prev->irq_state = *irqs;
+}
+
+/**
+ * @brief Mark a thread for termination.
+ * @param tp Thread to be terminated.
+ * @see sched_remote_kill_if thread_destroy
+ *
+ * The thread will be removed from the system the next time the
+ * scheduler attempts to run it.
+ */
+void sched_mark_remote_kill(struct thread *tp)
+{
+	struct thread *cur;
+	struct rq *rq;
+	unsigned long flags;
+	struct sched_class *class;
+
+	rq = tp->rq;
+	cur = current_thread_for(rq);
+
+	if(cur == tp) {
+		class = rq->sched_class;
+		set_bit(THREAD_EXIT_FLAG, &tp->flags);
+		set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+		clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+#ifdef CONFIG_EXTENDED_THREAD
+		raw_event_notify_broadcast(&tp->joinq);
+#endif
+		raw_spin_lock_irqsave(&rq->lock, flags);
+		rq_add_kill_thread(rq, tp);
+		raw_spin_unlock_irqrestore(&rq->lock, flags);
+
+		if(class->kill)
+			class->kill(tp);
+
+		return;
+	}
+
+	set_bit(THREAD_REMOTE_KILL, &tp->flags);
+
+	if(!test_bit(THREAD_SLEEPING_FLAG, &tp->flags) &&
+			!test_bit(THREAD_WAITING_FLAG, &tp->flags)) {
+		cur = current_thread();
+		set_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
+	}
+}
+
+/**
+ * @brief Kill the current thread if its marked for removal.
+ * @param rq The run queue that we're on.
+ * @see __schedule sched_mark_remote_kill thread_destroy
+ *
+ * Appends the current thread to the kill queue and prepares it for
+ * a reschedule.
+ */
+static void sched_remote_kill_if(struct rq *rq)
+{
+	struct thread *tp;
+	struct sched_class *class;
+
+	tp = current_thread_for(rq);
+	if(likely(!test_bit(THREAD_REMOTE_KILL, &tp->flags)))
+		return;
+
+	set_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	set_bit(THREAD_EXIT_FLAG, &tp->flags);
+	clear_bit(THREAD_RUNNING_FLAG, &tp->flags);
+
+	rq_add_kill_thread(rq, tp);
+	class = rq->sched_class;
+
+	if(class->kill)
+		class->kill(tp);
+
+#ifdef CONFIG_EXTENDED_THREAD
+	raw_event_notify_broadcast(&tp->joinq);
+#endif
 }
 
 /**
@@ -1059,15 +1187,17 @@ static int __schedule_need_resched(struct thread *curr, struct thread *next)
  * When the algorithm wants to preempt the current thread, the
  * \p PREEMPT_NEED_RESCHED_FLAG will be set.
  */
-static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
+static void preempt_check(struct rq *rq, struct thread *cur, struct thread *nxt)
 {
 	struct sched_class *class = rq->sched_class;
 
-	if(class->preempt_chk(rq, cur, nxt))
+	if(class->preempt_chk(rq, cur, nxt) ||
+			should_resched_cputime(cur, nxt)) {
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+	}
 }
 #else
-#define preempt_chk(__rq, __cur, __nxt)
+#define preempt_check(__rq, __cur, __nxt)
 #endif
 
 /**
@@ -1080,15 +1210,17 @@ static void preempt_chk(struct rq *rq, struct thread *cur, struct thread *nxt)
  * 	   - threads which have used up their time slice;
  * 	   - the kill queue of the run queue;
  * @see __schedule_need_resched
+ * @return Boolean value indicating whether a reschedule occurred or not.
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static void __hot __schedule(int cpu, bool preempt)
+static bool __hot __schedule(int cpu, bool preempt)
 {
 	struct rq *rq;
 	struct thread *next,
 		      *prev;
 	unsigned long flags;
+	bool rescheduled = false;
 
 	cpu_notify(SCHED_ENTER);
 	rq = cpu_to_rq(cpu);
@@ -1105,7 +1237,7 @@ static void __hot __schedule(int cpu, bool preempt)
 	next = sched_get_next_runnable(rq);
 
 	if(preempt)
-		preempt_chk(rq, prev, next);
+		preempt_check(rq, prev, next);
 
 	/*
 	 * Only reschedule if we have to. The decision is based on the
@@ -1115,6 +1247,7 @@ static void __hot __schedule(int cpu, bool preempt)
 	if(likely(__schedule_need_resched(prev, next) && prev != next)) {
 		__sched_set_current_thread(rq, next);
 		rq->switch_count++;
+		rescheduled = true;
 
 		__schedule_prepare(rq, prev, &flags);
 		rq_switch_context(rq, prev, next);
@@ -1125,8 +1258,10 @@ static void __hot __schedule(int cpu, bool preempt)
 	}
 
 	rq_destroy_kill_q(rq);
+	sched_remote_kill_if(rq);
 	cpu_notify(SCHED_EXIT);
-	return;
+
+	return rescheduled;
 }
 
 /**
@@ -1350,20 +1485,11 @@ void sched_yield(struct rq *rq)
  */
 bool preempt_should_resched(void)
 {
-	struct rq *rq;
-	tick_t diff;
-	struct thread *tp = current_thread();
+	struct thread *tp;
 
-	rq = tp->rq;
-	diff = clocksource_get_tick(rq->source);
-	diff -= cs_last_update(rq->source);
-
-	if(diff >= tp->slice) {
-		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
-		return true;
-	}
-
-	return test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
+	tp = current_thread();
+	return test_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags) ||
+		should_resched();
 }
 #else
 bool preempt_should_resched(void)
@@ -1381,12 +1507,21 @@ bool preempt_should_resched(void)
 bool should_resched(void)
 {
 	struct thread *tp = current_thread();
-
-	if(test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags))
-		return true;
-	else
-		return false;
+	return test_bit(THREAD_NEED_RESCHED_FLAG, &tp->flags);
 }
+
+#ifdef CONFIG_SCHED_DBG
+/**
+ * @brief Print the threads on the run queue of \p this CPU.
+ */
+void print_rq(void)
+{
+	struct rq *rq;
+
+	rq = sched_get_cpu_rq();
+	rq->sched_class->print_rq(rq);
+}
+#endif
 
 #ifdef CONFIG_DYN_PRIO
 /**

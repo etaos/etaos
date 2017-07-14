@@ -1,6 +1,5 @@
 ETAOS=$(shell pwd)/../../..
-SIMULAVR=/usr/bin/simulavr
-AVRDUDE=/usr/bin/avrdude
+AVRUPLOAD=../../../scripts/avr_upload
 OBJCOPY=/usr/bin/avr-objcopy
 RD=0x21
 WR=0x20
@@ -26,5 +25,5 @@ hex: all
 	@$(OBJCOPY) -R .eeprom -O ihex test-app.img test-app.hex 
 
 upload:
-	@$(AVRDUDE) -q -V -p $(MCU) -c $(PROGRAMMER) -b $(BAUD) -P $(PORT) \
-		-C /etc/avrdude.conf -U flash:w:test-app.hex:i
+	@$(AVRUPLOAD) -fH test-app.hex -m $(MCU) -p $(PROGRAMMER) -P $(PORT) \
+		-b $(BAUD) -c /etc/avrdude.conf

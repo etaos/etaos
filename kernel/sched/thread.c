@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - Scheduling core
- *  Copyright (C) 2014, 2015, 2016  Michel Megens <dev@bietje.net>
+ *  Copyright (C) 2014, 2015, 2016, 2017  Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -23,6 +23,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/stdlib.h>
+#include <etaos/stdio.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
 #include <etaos/thread.h>
@@ -33,6 +34,7 @@
 #include <etaos/mem.h>
 #include <etaos/bitops.h>
 #include <etaos/string.h>
+#include <etaos/list.h>
 
 /**
  * @brief Thread initialise backend.
@@ -60,7 +62,6 @@ static void raw_thread_init(struct thread *tp, const char *name,
 	tp->ec = 0;
 #endif
 
-	tp->rq_next = NULL;
 	tp->queue = NULL;
 	tp->timer = NULL;
 #ifdef CONFIG_PREEMPT
@@ -77,6 +78,7 @@ static void raw_thread_init(struct thread *tp, const char *name,
 	thread_queue_init(&tp->joinq);
 #endif
 
+	list_head_init(&tp->entry);
 	irq_store_flags(&tp->irq_state);
 	sched_create_stack_frame(tp, stack, stack_size, handle);
 
@@ -290,6 +292,41 @@ void kill(void)
 		class->kill(tp);
 
 	schedule();
+}
+
+/**
+ * @brief Kill another thread identified by its name.
+ * @param name Name of the thread to destroy.
+ * @return An error code.
+ * @see thread_destroy
+ */
+int thread_destroy_by_name(const char *name)
+{
+	return thread_destroy(sched_find_thread_by_name(name));
+}
+
+/**
+ * Destroy another thread.
+ * @param tp Thread to destroy.
+ * @return An error code.
+ * @see thread_destroy_by_name
+ */
+int thread_destroy(struct thread *tp)
+{
+	if(!tp)
+		return -EINVAL;
+
+	if(test_bit(THREAD_EXIT_FLAG, &tp->flags))
+		return 1;
+
+#ifdef CONFIG_SCHED_DBG
+	if(test_bit(THREAD_IDLE_FLAG, &tp->flags)) {
+		fprintf(stderr, PSTR("Attemped to kill idle thread!\n"));
+		return -EINVAL;
+	}
+#endif
+	sched_mark_remote_kill(tp);
+	return -EOK;
 }
 
 /**
