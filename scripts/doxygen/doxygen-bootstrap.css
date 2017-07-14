@@ -16,6 +16,12 @@ font-size: 1.15em !important;
 table{
     white-space:pre-wrap !important;
 }
+
+img.logo {
+	viewBox: 0 0 512 512;
+	width: 150px;
+	height: 150px;
+}
 /*
  ===========================
  */
