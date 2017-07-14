@@ -1,6 +1,7 @@
 /*
  *  ETA/OS - Python VM initialization
  *  Copyright (C) 2017   Michel Megens <dev@bietje.net>
+ *  Copyright (C) 2017   Dean Hall
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
