@@ -5,8 +5,8 @@ RD=0x21
 WR=0x20
 EX=0x22
 
-MCU=atmega2560
-PROGRAMMER=stk500v2
+MCU=atmega328p
+PROGRAMMER=arduino
 BAUD=115200
 PORT=/dev/ttyACM0
 
