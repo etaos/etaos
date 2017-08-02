@@ -19,6 +19,9 @@
 #ifndef __ASSERT_H__
 #define __ASSERT_H__
 
+#include <etaos/kernel.h>
+#include <etaos/panic.h>
+
 #define ASSERT(__condi__) \
 	(__condi) ? (void)0 : panic_P(PSTR("Assert failed in %s:%s at %i"), \
 			__FILE__, __func__, __LINE__)
