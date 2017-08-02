@@ -88,6 +88,14 @@ extern "C" void __cxa_pure_virtual(void);
 #define CDECL_END
 #endif
 
+#define DEBUG_ON(__condi__) \
+	(__condi__) ? fprintf_P(stderr, PSTR("[ASSERTION FAILED] %s: %s: %d: %s\n"), \
+			__FILE__, __func__, __LINE__, #__condi__) : (void)0
+
+#define DEBUG_ON_STR(__condi__, msg) \
+	(__condi__) ? fprintf_P(stderr, PSTR("[ASSERTION FAILED]: %s - %s: %s: %d: %s\n"), \
+			msg, __FILE__, __func__, __LINE__, #__condi__) : (void)0
+
 /**
  * @brief sysctl settings type.
  */
