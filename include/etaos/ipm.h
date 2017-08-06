@@ -58,7 +58,7 @@ struct ipm_queue {
 CDECL
 
 extern void ipm_queue_init(struct ipm_queue *qp, size_t len);
-extern void ipm_post_msg(struct ipm_queue *qp, const void *data, size_t len);
+extern int ipm_post_msg(struct ipm_queue *qp, const void *data, size_t len);
 extern void ipm_get_msg(struct ipm_queue *qp, struct ipm *msg);
 extern bool ipm_reset_queue(struct ipm_queue *iq);
 
