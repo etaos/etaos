@@ -183,6 +183,7 @@ extern int fread(FILE *file, void *buff, size_t len);
 extern unsigned long fmode(const char *);
 extern int fflush(FILE *file);
 extern int flush(int fd);
+extern int fileno(FILE *file);
 
 #ifdef CONFIG_HARVARD
 extern int puts_P(const char *string);
