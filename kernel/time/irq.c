@@ -31,7 +31,7 @@
 #include <etaos/irq.h>
 #include <etaos/tick.h>
 #include <etaos/stdio.h>
-#include <etaos/math.h>
+#include <etaos/hrtimer.h>
 
 struct clocksource *sys_clk;
 
@@ -42,7 +42,7 @@ struct clocksource *sys_clk;
  * @return IRQ handle status.
  * @retval IRQ_HANDLED
  */
-static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
+static irqreturn_t timer_irq_handle(struct irq_data *irq, void *data)
 {
 	struct clocksource *cs = (struct clocksource*)data;
 
@@ -70,7 +70,25 @@ time_t systick_get_seconds(void)
  */
 void systick_setup(int irq, struct clocksource *src)
 {
-	irq_request(irq, &systick_irq_handle, IRQ_RISING_MASK, src);
+	irq_request(irq, &timer_irq_handle, IRQ_RISING_MASK, src);
+}
+
+/**
+ * @brief High resolution timer interrupt.
+ * @param data IRQ data.
+ * @param arg IRQ argument (clocksource).
+ * @return IRQ handle status.
+ * @retval IRQ_HANDLED
+ */
+irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
+{
+	struct clocksource *src;
+
+	src = arg;
+	
+	timer_source_inc(src);
+	hrtimer_handle(src);
+	return IRQ_HANDLED;
 }
 
 /** @} */
