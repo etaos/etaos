@@ -30,12 +30,28 @@
 #include <etaos/types.h>
 #include <etaos/time.h>
 
+/**
+ * @brief Get the system tick.
+ *
+ * The sys_tick variable gets the tick count of the system clock and returns
+ * it to the user.
+ */
+#define sys_tick clocksource_get_tick(sys_clk)
+
 CDECL
 
 extern void systick_setup(int irq, struct clocksource *src);
-
 extern struct clocksource *sys_clk;
-extern time_t systick_get_seconds(void);
+
+/**
+ * @brief Get the system tick in seconds.
+ * @return The system tick in seconds.
+ */
+static inline time_t systick_get_seconds(void)
+{
+	time_t now = (time_t)sys_tick;
+	return (time_t)(now / 1000);
+}
 
 /**
  * @brief Get the system clock.
@@ -49,13 +65,6 @@ static inline struct clocksource *sys_get_clock(void)
 
 CDECL_END
 
-/**
- * @brief Get the system tick.
- *
- * The sys_tick variable gets the tick count of the system clock and returns
- * it to the user.
- */
-#define sys_tick clocksource_get_tick(sys_clk)
 
 /**
  * @brief Calculate if a certain time unit has passed.
@@ -71,7 +80,11 @@ CDECL_END
  * @param b Time 2.
  */
 #define time_before(a, b) ((a) < (b))
-
+/**
+ * Calculate if \p x is the same as or later than \p y.
+ * @param x Time stamp 1.
+ * @param y Time stamp 2.
+ */
 #define time_at_or_after(x, y) ((x) >= (y))
 
 #endif /* __TICK_H__ */

@@ -54,16 +54,6 @@ static irqreturn_t timer_irq_handle(struct irq_data *irq, void *data)
 }
 
 /**
- * @brief Get the system tick in seconds.
- * @return The system tick in seconds.
- */
-time_t systick_get_seconds(void)
-{
-	time_t now = (time_t)sys_tick;
-	return (time_t)(now / 1000);
-}
-
-/**
  * @brief Setup the system tick.
  * @param irq IRQ bound to the system tick.
  * @param src Clock source handling the system tick.
