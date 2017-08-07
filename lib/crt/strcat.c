@@ -43,5 +43,35 @@ char *strcat(char *dst, const char *src)
 	return rv;
 }
 
+/**
+ * @brief Concatinate two strings.
+ * @param dst Destination string.
+ * @param src Source string.
+ * @param size Number of characters to append.
+ * @return The destination string.
+ *
+ * The string \p src will be appended to the \p dst string.
+ */
+char *strncat(char *dst, const char *src, size_t size)
+{
+	char *d = dst;
+	const char *s = src;
+
+	if(!size)
+		return dst;
+
+	while(*d != '\0')
+		d++;
+
+	do {
+		if((*d = *s++) == '\0')
+			break;
+		d++;
+	} while(--size);
+
+	*d = '\0';
+	return dst;
+}
+
 /** @} */
 
