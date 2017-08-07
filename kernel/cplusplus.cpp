@@ -24,6 +24,8 @@
 #include <etaos/preempt.h>
 #include <etaos/panic.h>
 
+#include <asm/pgm.h>
+
 /**
  * @brief Create a new object and call the constructor.
  * @param num Number of bytes to allocate.
@@ -86,7 +88,8 @@ void __cxa_guard_release (__guard *g)
  */
 void __cxa_pure_virtual(void)
 {
-	panic_P("Virtual function not implemented (%s:%i)", __FILE__, __LINE__);
+	panic_P(PSTR("Virtual function not implemented (%s:%i)"),
+			__FILE__, __LINE__);
 }
 
 /**
