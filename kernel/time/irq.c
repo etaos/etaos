@@ -17,7 +17,7 @@
  */
 
 /**
- * @file kernel/time/systick.c
+ * @file kernel/time/irq.c
  * @addtogroup tm
  * @{
  */
