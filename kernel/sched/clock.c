@@ -76,10 +76,6 @@ void sched_clock_tick(int ms)
 	sched_clock_preempt();
 #endif
 }
-#else /* CONFIG_SCHED_FAIR || CONFIG_PREEMPT */
-void sched_tick(int ms)
-{
-}
-#endif
+#endif /* CONFIG_SCHED_FAIR || CONFIG_PREEMPT */
 
 /** @} */
