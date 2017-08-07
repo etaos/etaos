@@ -190,6 +190,7 @@ typedef char prog_char;
 typedef char __attribute__((__progmem__)) prog_char;
 #endif
 
+CDECL
 /**
  * @ingroup atmega
  * @brief Copy memory from program memroy in data memory.
@@ -201,8 +202,8 @@ typedef char __attribute__((__progmem__)) prog_char;
 static inline void *memcpy_P(void *_dest, const void *_src, size_t size)
 {
 	size_t idx;
-	char *dest = _dest;
-	const char *src = _src;
+	char *dest = (char*)_dest;
+	const char *src = (const char*)_src;
 
 	for(idx = 0; idx < size; idx++)
 		dest[idx] = pgm_read_byte(src+idx);
@@ -217,5 +218,6 @@ static inline size_t strlen_P(const char *s)
 	for(c = s; pgm_read_byte(c); ++c);
 	return (size_t)(c - s);
 }
+CDECL_END
 
 #endif
