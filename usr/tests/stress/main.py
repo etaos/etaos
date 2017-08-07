@@ -39,8 +39,8 @@ def print_temperature(sensor):
 		sys.wait(1000)
 
 def print_eeprom_and_sram():
-	sram_data = ram.read_string(addr, len(sram_string))
 	while True:
+		sram_data = ram.read_string(addr, len(sram_string))
 		ee_data = ee.read(addr, num)
 		print "[python]:    EEPROM: %d and %d" % (ee_data[0], ee_data[1])
 		print "[python]:    SRAM: " + sram_data
