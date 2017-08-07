@@ -65,6 +65,7 @@ class SRAM(object):
 
 def write(name, addr, data, num):
 	"""__NATIVE__
+#ifdef CONFIG_PYTHON_SRAM
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t addr, data, num, name;
 	const char *cname;
@@ -101,11 +102,15 @@ def write(name, addr, data, num):
 	kfree(cdata);
 
 	return retval;
+#else
+	return PM_RET_OK;
+#endif
 	"""
 	pass
 
 def read(name, addr, num):
 	"""__NATIVE__
+#ifdef CONFIG_PYTHON_SRAM
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t addr, data, num, name;
 	const char *cname;
@@ -140,11 +145,15 @@ def read(name, addr, num):
 
 	NATIVE_SET_TOS(data);
 	return retval;
+#else
+	return PM_RET_OK;
+#endif
 	"""
 	pass
 
 def write_string(name, addr, string, length):
 	"""__NATIVE__
+#ifdef CONFIG_PYTHON_SRAM
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t addr, data, num, name;
 	const char *cname;
@@ -177,11 +186,15 @@ def write_string(name, addr, string, length):
 
 	pm_sram_write(cname, caddr, cdata, cnum);
 	return retval;
+#else
+	return PM_RET_OK;
+#endif
 	"""
 	pass
 
 def read_string(name, addr, length):
 	"""__NATIVE__
+#ifdef CONFIG_PYTHON_SRAM
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t name, addr, num, text;
 	const char *cname;
@@ -217,6 +230,9 @@ def read_string(name, addr, length):
 
 	NATIVE_SET_TOS(text);
 	return retval;
+#else
+	return PM_RET_OK;
+#endif
 	"""
 	pass
 

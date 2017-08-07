@@ -52,6 +52,7 @@ class EEPROM(object):
 
 def read(name, addr, num):
 	"""__NATIVE__
+#ifdef CONFIG_PYTHON_EEPROM
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t addr, num, list, name;
 	uint8_t rawaddr;
@@ -86,11 +87,15 @@ def read(name, addr, num):
 
 	NATIVE_SET_TOS(list);
 	return retval;
+#else
+	return PM_RET_OK;
+#endif
 	"""
 	pass
 
 def write(name, addr, data, num):
 	"""__NATIVE__
+#ifdef CONFIG_PYTHON_EEPROM
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t addr, data, len, name;
 	uint8_t rawaddr;
@@ -126,6 +131,9 @@ def write(name, addr, data, num):
 
 	kfree(dst);
 	return retval;
+#else
+	return PM_RET_OK;
+#endif
 	"""
 	pass
 

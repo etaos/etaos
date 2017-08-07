@@ -99,5 +99,19 @@ config HAVE_DEBUG_INFO
 	  Say 'y' here to print debug information (stacktraces etc.)
 	  when an error / exception occurs. If you are unsure, say 'y'
 	  here.
+
+config PYTHON_SRAM
+	bool "Python SRAM driver"
+	default n
+	depends on SRAM
+	help
+	  Say 'y' here to build support for SRAM drivers.
+
+config PYTHON_EEPROM
+	bool "Python EEPROM driver"
+	default n
+	depends on EEPROM
+	help
+	  Say 'y' here to build support for EEPROM drivers.
 endif
 
