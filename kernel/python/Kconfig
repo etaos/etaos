@@ -1,5 +1,6 @@
 menuconfig PYTHON
 	bool "Python virtual machine (PyMite)"
+	depends on CRT && MALLOC
 	help
 	  Say 'y' here if you want to let ETA/OS applications
 	  use the Python language. Please note that ETA/OS only
@@ -94,7 +95,6 @@ config HAVE_BYTEARRAY
 config HAVE_DEBUG_INFO
 	bool "Debug info"
 	default y
-	depends on CRT
 	help
 	  Say 'y' here to print debug information (stacktraces etc.)
 	  when an error / exception occurs. If you are unsure, say 'y'
