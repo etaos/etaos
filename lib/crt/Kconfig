@@ -5,3 +5,10 @@ config CRT
 	help
 	  Say 'y' here to build the standard C library. If unsure,
 	  say 'y' here.
+
+config EXT_STRING
+	tristate "Extended string functions"
+	depends on m && CRT
+	default n
+	help
+	  Say 'y' here to build the extended string function library.

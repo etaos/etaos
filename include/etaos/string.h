@@ -43,7 +43,8 @@ extern char *strtok_r(char *s, const char *delimeter, char **last);
 extern char *strtok(char *s, const char *delimeter);
 extern char *strdup(const char *s);
 
-#define ERROR_MSG_THINGY "Wtf bitch"
+extern int stricmp(const char *s1, const char *s2);
+extern int strnicmp(const char *s1, const char *s2, int n);
 
 CDECL_END
 

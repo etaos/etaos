@@ -1,4 +1,5 @@
 libc-files-$(CONFIG_CRT) += memcpy.o memcmp.o rand.o
+libc-files-$(CONFIG_CRT) += stricmp.o
 libc-files-$(CONFIG_CRT) += strtol.o ctype.o atoi.o
 libc-files-$(CONFIG_CRT) += abs.o labs.o
 libc-files-$(CONFIG_CRT) += itoa.o ltoa.o
