@@ -50,8 +50,8 @@ struct clocksource {
 	spinlock_t lock; //!< Clocksource lock.
 
 	struct list_head list; //!< List of clocksources.
-	struct list_head timers;
-	struct timer *thead;
+	struct list_head timers; //!< Timer list head.
+	struct timer *thead; //!< Timer list head.
 };
 
 CDECL

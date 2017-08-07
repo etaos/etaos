@@ -37,7 +37,7 @@
  * @brief Describes a single (virtual) timer.
  */
 struct timer {
-	struct list_head entry;
+	struct list_head entry; //!< Timer list entry.
 	struct clocksource *source; //!< Source of the timer.
 	/**
 	 * @brief Timer trigger.
@@ -48,8 +48,8 @@ struct timer {
 	 */
 	void (*handle)(struct timer *timer, void *arg);
 	void *priv_data; //!< Private timer data.
-	time_t expire_at;
-	unsigned int interval;
+	time_t expire_at; //!< Expiry time stamp.
+	unsigned int interval; //!< Timer interval.
 };
 
 /**
