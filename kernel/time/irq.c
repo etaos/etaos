@@ -63,6 +63,7 @@ void systick_setup(int irq, struct clocksource *src)
 	irq_request(irq, &timer_irq_handle, IRQ_RISING_MASK, src);
 }
 
+#ifdef CONFIG_HRTIMER
 /**
  * @brief High resolution timer interrupt.
  * @param data IRQ data.
@@ -80,6 +81,7 @@ irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
 	hrtimer_handle(src);
 	return IRQ_HANDLED;
 }
+#endif
 
 /** @} */
 

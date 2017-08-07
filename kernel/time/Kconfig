@@ -28,6 +28,7 @@ config DST_BIAS
 
 config HRTIMER
 	bool "High resolution timers"
+	depends on TIMER
 	default n
 	help
 	  Say 'y' here if your application needs high resolution timers
