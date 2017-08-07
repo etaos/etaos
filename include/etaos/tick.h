@@ -47,7 +47,7 @@ extern struct clocksource *sys_clk;
  * @brief Get the system tick in seconds.
  * @return The system tick in seconds.
  */
-static inline time_t systick_get_seconds(void)
+static inline time_t tick_get_seconds(void)
 {
 	time_t now = (time_t)sys_tick;
 	return (time_t)(now / 1000);
