@@ -23,8 +23,8 @@
 #include <etaos/panic.h>
 
 #define ASSERT(__condi__) \
-	(__condi) ? (void)0 : panic_P(PSTR("Assert failed in %s:%s at %i"), \
-			__FILE__, __func__, __LINE__)
+	(__condi__) ? (void)0 : panic_P(PSTR("Assert (%s) failed in %s:%i in %s"), \
+			#__condi__, __FILE__, __LINE__, __func__)
 
 #endif
 
