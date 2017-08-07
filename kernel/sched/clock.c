@@ -29,6 +29,14 @@
 #include <etaos/cpu.h>
 
 #ifdef CONFIG_PREEMPT
+/**
+ * @brief Preempt the CPU based on the context.
+ * @see preempt_schedule_irq
+ * @see preempt_schedule
+ *
+ * Check in what context the CPU is running (IRQ or non-IRQ) and preempt using
+ * preempt_schedule_irq() or preempt_schedule() respectively.
+ */
 static void sched_clock_preempt(void)
 {
 	unsigned long flags;
@@ -42,6 +50,11 @@ static void sched_clock_preempt(void)
 #endif
 
 #if defined(CONFIG_SCHED_FAIR) || defined(CONFIG_PREEMPT)
+/**
+ * @brief Update the sched clock.
+ * @param ms Number of miliseconds since last call.
+ * @note This function should not be called more than once per milisecond.
+ */
 void sched_clock_tick(int ms)
 {
 	struct rq *rq;
