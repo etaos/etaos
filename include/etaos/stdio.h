@@ -181,6 +181,8 @@ extern int fclose(FILE *file);
 extern int fwrite(FILE *file, const void *buff, size_t len);
 extern int fread(FILE *file, void *buff, size_t len);
 extern unsigned long fmode(const char *);
+extern int fflush(FILE *file);
+extern int flush(int fd);
 
 #ifdef CONFIG_HARVARD
 extern int puts_P(const char *string);
