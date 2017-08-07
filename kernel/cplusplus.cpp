@@ -21,6 +21,8 @@
 #include <etaos/types.h>
 #include <etaos/mem.h>
 #include <etaos/irq.h>
+#include <etaos/preempt.h>
+#include <etaos/panic.h>
 
 /**
  * @brief Create a new object and call the constructor.
@@ -84,10 +86,7 @@ void __cxa_guard_release (__guard *g)
  */
 void __cxa_pure_virtual(void)
 {
-	fprintf(stderr, "FATAL: Virtual funtion not implemented (%s at %i)!",
-			__FILE__, __LINE__);
-	irq_disable();
-	for(;;);
+	panic_P("Virtual function not implemented (%s:%i)", __FILE__, __LINE__);
 }
 
 /**
@@ -95,5 +94,8 @@ void __cxa_pure_virtual(void)
  */
 void __cxa_guard_abort (__guard *g)
 {
+	preempt_disable();
+	irq_disable();
+	for(;;);
 }
 

@@ -23,6 +23,8 @@
 #ifndef __PANIC_H__
 #define __PANIC_H__
 
+#include <etaos/kernel.h>
+
 /**
  * @addtogroup kernel
  * @{
