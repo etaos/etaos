@@ -51,7 +51,10 @@
 
 #define O_RDONLY __SRD
 #define O_WRONLY __SWR
-#define O_RDWR   (__SRD | SWR)
+#define O_RDWR   (__SRD | __SWR)
+#define O_CREAT  0x100
+#define O_TRUNC  0x200
+#define O_APPEND __SAPP
 
 #define STREAM_READ_FLAG 	0
 #define STREAM_WRITE_FLAG 	1
@@ -172,6 +175,15 @@ extern int getc(struct file *stream);
 extern int fgetc(struct file *stream);
 extern char *fgets(char *buf, int count, struct file *stream);
 extern size_t ftell(struct file *file);
+
+extern FILE *fopen(const char *, const char *);
+extern int fclose(FILE *file);
+extern int fwrite(FILE *file, const void *buff, size_t len);
+extern int fread(FILE *file, void *buff, size_t len);
+extern unsigned long fmode(const char *);
+extern int fflush(FILE *file);
+extern int flush(int fd);
+extern int fileno(FILE *file);
 
 #ifdef CONFIG_HARVARD
 extern int puts_P(const char *string);
