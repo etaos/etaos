@@ -110,7 +110,7 @@ static inline bool hrtimer_is_expired(struct hrtimer *timer)
 	return time_at_or_after(now, timer->expire_at);
 }
 
-static void hrtimer_handle(struct clocksource *cs)
+void hrtimer_handle(struct clocksource *cs)
 {
 	unsigned long flags;
 	struct list_head *carriage, *x;
@@ -142,24 +142,6 @@ static void hrtimer_handle(struct clocksource *cs)
 	}
 
 	raw_spin_unlock_irqrestore(&cs->lock, flags);
-}
-
-/**
- * @brief High resolution timer interrupt.
- * @param data IRQ data.
- * @param arg IRQ argument (clocksource).
- * @return IRQ handle status.
- * @retval IRQ_HANDLED
- */
-irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
-{
-	struct clocksource *src;
-
-	src = arg;
-	
-	timer_source_inc(src);
-	hrtimer_handle(src);
-	return IRQ_HANDLED;
 }
 
 /**

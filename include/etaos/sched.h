@@ -339,6 +339,14 @@ extern void raw_queue_remove_thread(struct thread_queue *qp, struct thread *tp);
 extern void raw_queue_add_thread(struct thread_queue *qp, struct thread *tp);
 #endif
 
+#if defined(CONFIG_SCHED_FAIR) || defined(CONFIG_PREEMPT)
+extern void sched_clock_tick(int ms);
+#else
+static inline void sched_clock_tick(int ms)
+{
+}
+#endif
+
 /**
  * @brief Remove a thread from its wake queue.
  * @param tp Thrad to remove

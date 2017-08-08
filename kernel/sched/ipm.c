@@ -22,6 +22,7 @@
 /* @{ */
 
 #include <etaos/kernel.h>
+#include <etaos/error.h>
 #include <etaos/thread.h>
 #include <etaos/types.h>
 #include <etaos/ipm.h>
@@ -62,14 +63,15 @@ void ipm_queue_init(struct ipm_queue *iq, size_t len)
  * @param iq Queue to post the message to.
  * @param buff Message to send.
  * @param len Length of \p buff.
+ * @return An error code.
  */
-void ipm_post_msg(struct ipm_queue *iq, const void *buff, size_t len)
+int ipm_post_msg(struct ipm_queue *iq, const void *buff, size_t len)
 {
 	unsigned long flags;
 	struct ipm *msg;
 
 	if(ipm_queue_is_full(iq))
-		return;
+		return -EINVAL;
 
 	spin_lock_irqsave(&iq->lock, flags);
 	msg = &iq->msgs[iq->wr_idx];
@@ -80,14 +82,16 @@ void ipm_post_msg(struct ipm_queue *iq, const void *buff, size_t len)
 	msg->len = len;
 
 	event_notify(&iq->qp);
+	return -EOK;
 }
 
 /**
  * @brief Get a message from a queue.
  * @param iq Queue to get the message from.
  * @param msg Memory to store the message into.
+ * @return An error code.
  */
-void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
+int ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 {
 	unsigned long flags;
 
@@ -95,7 +99,7 @@ void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 
 	spin_lock_irqsave(&iq->lock, flags);
 	if(iq->wr_idx == iq->rd_idx)
-		return;
+		return -EINVAL;
 
 	*msg = iq->msgs[iq->rd_idx];
 	iq->rd_idx += 1;
@@ -107,7 +111,7 @@ void ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 	}
 
 	spin_unlock_irqrestore(&iq->lock, flags);
-	return;
+	return -EOK;
 }
 
 /**

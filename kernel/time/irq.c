@@ -17,7 +17,7 @@
  */
 
 /**
- * @file kernel/time/systick.c
+ * @file kernel/time/irq.c
  * @addtogroup tm
  * @{
  */
@@ -31,7 +31,7 @@
 #include <etaos/irq.h>
 #include <etaos/tick.h>
 #include <etaos/stdio.h>
-#include <etaos/math.h>
+#include <etaos/hrtimer.h>
 
 struct clocksource *sys_clk;
 
@@ -42,40 +42,15 @@ struct clocksource *sys_clk;
  * @return IRQ handle status.
  * @retval IRQ_HANDLED
  */
-static irqreturn_t systick_irq_handle(struct irq_data *irq, void *data)
+static irqreturn_t timer_irq_handle(struct irq_data *irq, void *data)
 {
 	struct clocksource *cs = (struct clocksource*)data;
-#if defined(CONFIG_SCHED_FAIR) || defined(CONFIG_PREEMPT)
-	struct rq *rq = sched_get_cpu_rq();
-	struct thread *tp = rq->current;
-
-#ifdef CONFIG_SCHED_FAIR
-	tp->cputime += 1ULL;
-#endif
-#endif
 
 	time_inc(); /* Handle system time */
 	timer_source_inc(cs); /* Increase the system / sched clock */
-
-#ifdef CONFIG_PREEMPT
-	if(--tp->slice == 0) {
-		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
-		tp->slice = CONFIG_TIME_SLICE;
-	}
-	preempt_schedule_irq();
-#endif
+	sched_clock_tick((1.0f / cs->freq) * 1000);
 
 	return IRQ_HANDLED;
-}
-
-/**
- * @brief Get the system tick in seconds.
- * @return The system tick in seconds.
- */
-time_t systick_get_seconds(void)
-{
-	time_t now = (time_t)sys_tick;
-	return (time_t)(now / 1000);
 }
 
 /**
@@ -85,8 +60,28 @@ time_t systick_get_seconds(void)
  */
 void systick_setup(int irq, struct clocksource *src)
 {
-	irq_request(irq, &systick_irq_handle, IRQ_RISING_MASK, src);
+	irq_request(irq, &timer_irq_handle, IRQ_RISING_MASK, src);
 }
+
+#ifdef CONFIG_HRTIMER
+/**
+ * @brief High resolution timer interrupt.
+ * @param data IRQ data.
+ * @param arg IRQ argument (clocksource).
+ * @return IRQ handle status.
+ * @retval IRQ_HANDLED
+ */
+irqreturn_t hrtimer_tick(struct irq_data *data, void *arg)
+{
+	struct clocksource *src;
+
+	src = arg;
+	
+	timer_source_inc(src);
+	hrtimer_handle(src);
+	return IRQ_HANDLED;
+}
+#endif
 
 /** @} */
 
