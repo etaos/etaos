@@ -31,7 +31,7 @@
  * @param file File to check.
  * @return 0 if no EOF was found yet.
  */
-int ferror(FILE *file)
+int feof(FILE *file)
 {
 	if(!file)
 		return -EBADF;
