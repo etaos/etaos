@@ -47,8 +47,9 @@ PmReturn_t interpret(const uint8_t returnOnNoThreads)
 	PM_RETURN_IF_ERROR(retval);
 
 	/* Interpret loop */
+	preempt_disable();
 	for (;;) {
-		schedule();
+		preempt_enable();
 		if (gVmGlobal.pthread == C_NULL) {
 			if (returnOnNoThreads) {
 				/* User chose to return on no threads left */
@@ -70,6 +71,7 @@ PmReturn_t interpret(const uint8_t returnOnNoThreads)
 			PM_BREAK_IF_ERROR(retval);
 		}
 
+		preempt_disable();
 		/* Get byte; the func post-incrs PM_IP */
 		bc = mem_getByte(PM_FP->fo_memspace, &PM_IP);
 		switch (bc) {
