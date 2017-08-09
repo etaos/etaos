@@ -34,6 +34,7 @@ __name__ = "cpu"
 # @return None
 def write(pin, value):
 	"""__NATIVE__
+#if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t pin, value;
 	int32_t _pin;
@@ -58,6 +59,9 @@ def write(pin, value):
 
 	pm_cpu_pin_write(_pin, _value);
 	return retval;
+#else
+	return PM_RET_OK
+#endif
 	"""
 	pass
 
@@ -67,6 +71,7 @@ def write(pin, value):
 # @return None
 def set_output(pin, value):
 	"""__NATIVE__
+#if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t pin, value;
 	int32_t _pin;
@@ -91,6 +96,9 @@ def set_output(pin, value):
 
 	pm_cpu_direction_output(_pin, _value);
 	return retval;
+#else
+	return PM_RET_OK
+#endif
 	"""
 	pass
 
@@ -99,6 +107,7 @@ def set_output(pin, value):
 # @return None
 def set_input(pin):
 	"""__NATIVE__
+#if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t pin;
 	int32_t _pin;
@@ -119,6 +128,9 @@ def set_input(pin):
 
 	pm_cpu_direction_input(_pin);
 	return retval;
+#else
+	return PM_RET_OK
+#endif
 	"""
 	pass
 
@@ -127,6 +139,7 @@ def set_input(pin):
 # @return Boolean value of \p pin.
 def read(pin):
 	"""__NATIVE__
+#if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t pin;
 	int32_t _pin;
@@ -149,6 +162,9 @@ def read(pin):
 	NATIVE_SET_TOS(rv);
 
 	return retval;
+#else
+	return PM_RET_OK
+#endif
 	"""
 	pass
 
@@ -157,6 +173,7 @@ def read(pin):
 # @return The value read from \p pin.
 def analog_read(pin):
 	"""__NATIVE__
+#if defined(CONFIG_ANALOG) || defined(CONFIG_ANALOG_MODULE)
 	PmReturn_t retval = PM_RET_OK;
 	pPmObj_t pin;
 	int32_t _pin;
@@ -181,6 +198,9 @@ def analog_read(pin):
 	NATIVE_SET_TOS(rv);
 
 	return retval;
+#else
+	return PM_RET_OK
+#endif
 	"""
 	pass
 

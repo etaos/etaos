@@ -27,6 +27,7 @@
 #include <etaos/gpio.h>
 #include <etaos/analog.h>
 
+#if defined(CONFIG_GPIO) || defined(CONFIG_GPIO_MODULE)
 bool pm_cpu_pin_read(int32_t _pin)
 {
 	struct gpio_pin *pin;
@@ -77,7 +78,9 @@ void pm_cpu_pin_write(int32_t _pin, bool value)
 	gpio_pin_write(pin, value);
 	gpio_pin_release(pin);
 }
+#endif
 
+#if defined(CONFIG_ANALOG) || defined(CONFIG_ANALOG_MODULE)
 float pm_cpu_analog_pin_read(int32_t _pin)
 {
 	int __pin = (int)_pin & 0x7FF;
@@ -90,4 +93,5 @@ float pm_cpu_analog_pin_read(int32_t _pin)
 	pin = &chip->pins[__pin];
 	return (float)analog_read(pin);
 }
+#endif
 
