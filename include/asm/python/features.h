@@ -85,5 +85,7 @@
 #define HAVE_BYTEARRAY
 #endif
 
+#define HAVE_AUTOBOX
+
 #endif /* __FEATURES_H__ */
 

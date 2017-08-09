@@ -82,7 +82,7 @@ config HAVE_CLOSURES
 
 config HAVE_GENERATORS
 	bool
-	depends on HAVE_CLASSES
+	depends on CLASSES
 	default y
 
 config HAVE_IMPORTS
