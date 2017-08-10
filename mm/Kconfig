@@ -34,6 +34,12 @@ config FIRST_FIT
 	help
 	  Say 'y' here to compile the first-fit allocator.
 
+config WORST_FIT
+	bool "Worst fit allocator"
+	select MALLOC
+	help
+	  Say 'y' here to compile the worst-fit allocator.
+
 choice
 	prompt "Default allocation algorithm"
 
@@ -48,6 +54,12 @@ config SYS_FF
 	depends on FIRST_FIT
 	help
 	  Select the first-fit allocator as default allocator.
+
+config SYS_WF
+	bool "Worst-fit allocator"
+	depends on WORST_FIT
+	help
+	  Select the worst-fit allocator as default allocator.
 endchoice
 
 endmenu

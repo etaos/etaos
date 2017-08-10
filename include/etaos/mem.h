@@ -62,6 +62,9 @@ struct heap_node {
 #elif defined(CONFIG_SYS_FF)
 #define mm_node_compare(_n_, _s_) mm_first_fit_compare(_n_, _s_)
 #define mm_node_compare_ptr &mm_first_fit_compare
+#elif defined(CONFIG_SYS_WF)
+#define mm_node_compare(_n_, _s_) mm_worst_fit_compare(_n_, _s_)
+#define mm_node_compare_ptr &mm_worst_fit_compare
 #endif
 
 typedef enum allocator {
@@ -81,6 +84,9 @@ extern int mm_best_fit_compare(struct heap_node *prev, struct heap_node *current
 
 extern int mm_first_fit_compare(struct heap_node *prev, struct heap_node *current);
 extern MEM void *mm_first_fit_alloc(size_t size);
+
+extern MEM void *mm_worst_fit_alloc(size_t size);
+extern int mm_worst_fit_compare(struct heap_node *prev, struct heap_node *current);
 
 #ifdef CONFIG_MM_DEBUG
 extern int mm_free(void*, const char *, int);
