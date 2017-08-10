@@ -56,7 +56,26 @@ struct heap_node {
 
 #define MEM __attribute__((malloc))
 
+#if defined(CONFIG_SYS_BF)
+#define mm_node_compare(_n_, _s_) mm_best_fit_compare(_n_, _s_)
+#define mm_node_compare_ptr &mm_best_fit_compare
+#endif
+
+typedef enum allocator {
+	BEST_FIT,
+	FIRST_FIT,
+	WORST_FIT,
+	SYSTEM_ALLOCATOR,
+} allocator_t;
+
+extern spinlock_t mlock;
+extern struct heap_node *mm_free_list;
+
+
 CDECL
+extern MEM void *mm_best_fit_alloc(size_t size);
+extern int mm_best_fit_compare(struct heap_node *prev, struct heap_node *current);
+
 #ifdef CONFIG_MM_DEBUG
 extern int mm_free(void*, const char *, int);
 #define kfree(__p) mm_free(__p, __FILE__, __LINE__)
@@ -64,6 +83,11 @@ extern int mm_free(void*, const char *, int);
 extern int mm_free(void*);
 extern void kfree(void *);
 #endif
+
+extern void *raw_mm_heap_alloc(struct heap_node **root,
+		               size_t size,
+			       int (compare)(struct heap_node*, struct heap_node*));
+extern MEM void *mm_heap_alloc(size_t size, allocator_t allocator);
 
 extern void mm_init(void);
 extern void mm_heap_add_block(void *start, size_t size);
