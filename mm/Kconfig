@@ -28,13 +28,26 @@ config BEST_FIT
 	help
 	  Say 'y' here to compile the best-fit allocator.
 
+config FIRST_FIT
+	bool "First fit allocator"
+	select MALLOC
+	help
+	  Say 'y' here to compile the first-fit allocator.
+
 choice
 	prompt "Default allocation algorithm"
 
 config SYS_BF
 	bool "Best-fit allocator"
+	depends on BEST_FIT
 	help
-	  Select to use the best-fit allocator by default.
+	  Select to use the best-fit allocator as default allocator.
+
+config SYS_FF
+	bool "First-fit allocator"
+	depends on FIRST_FIT
+	help
+	  Select the first-fit allocator as default allocator.
 endchoice
 
 endmenu

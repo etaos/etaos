@@ -270,6 +270,7 @@ MEM void *mm_heap_alloc(size_t size, allocator_t allocator)
 		break;
 
 	case FIRST_FIT:
+		rv = mm_first_fit_alloc(size);
 		break;
 
 	case WORST_FIT:

@@ -17,7 +17,7 @@
  */
 
 /**
- * @addtogroup bf
+ * @addtogroup ff
  * @{
  */
 
@@ -30,15 +30,9 @@
 
 #include "mm.h"
 
-int mm_best_fit_compare(struct heap_node *prev, struct heap_node *current)
+int mm_first_fit_compare(struct heap_node *prev, struct heap_node *current)
 {
-	if(!prev)
-		return MM_PREFER_NODE;
-
-	if(prev->size > current->size)
-		return MM_PREFER_NODE;
-
-	return MM_REJECT_NODE;
+	return MM_ACCEPT_NODE;
 }
 
 /**
@@ -46,13 +40,13 @@ int mm_best_fit_compare(struct heap_node *prev, struct heap_node *current)
  * @param size Number of bytes to allocate.
  * @return The allocated memory region of size \p size or \p NULL.
  */
-MEM void *mm_best_fit_alloc(size_t size)
+MEM void *mm_first_fit_alloc(size_t size)
 {
 	unsigned long flags;
 	void *rv;
 
 	raw_spin_lock_irqsave(&mlock, flags);
-	rv = raw_mm_heap_alloc(&mm_free_list, size, &mm_best_fit_compare);
+	rv = raw_mm_heap_alloc(&mm_free_list, size, &mm_first_fit_compare);
 	raw_spin_unlock_irqrestore(&mlock, flags);
 
 	return rv;
