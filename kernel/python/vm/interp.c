@@ -47,9 +47,7 @@ PmReturn_t interpret(const uint8_t returnOnNoThreads)
 	PM_RETURN_IF_ERROR(retval);
 
 	/* Interpret loop */
-	preempt_disable();
 	for (;;) {
-		preempt_enable();
 		if (gVmGlobal.pthread == C_NULL) {
 			if (returnOnNoThreads) {
 				/* User chose to return on no threads left */
@@ -71,7 +69,6 @@ PmReturn_t interpret(const uint8_t returnOnNoThreads)
 			PM_BREAK_IF_ERROR(retval);
 		}
 
-		preempt_disable();
 		/* Get byte; the func post-incrs PM_IP */
 		bc = mem_getByte(PM_FP->fo_memspace, &PM_IP);
 		switch (bc) {
@@ -751,6 +748,7 @@ PmReturn_t interpret(const uint8_t returnOnNoThreads)
 			/* Fallthrough */
 
 		case PRINT_ITEM:
+			preempt_disable();
 			if (gVmGlobal.needSoftSpace && (bc == PRINT_ITEM)) {
 				retval = plat_putByte(' ');
 				PM_BREAK_IF_ERROR(retval);
@@ -764,16 +762,22 @@ PmReturn_t interpret(const uint8_t returnOnNoThreads)
 			PM_BREAK_IF_ERROR(retval);
 			PM_SP--;
 			if (bc != PRINT_EXPR) {
+				preempt_enable_no_resched();
 				continue;
 			}
 			/* If PRINT_EXPR, Fallthrough to print a newline */
 
 		case PRINT_NEWLINE:
+			if(bc == PRINT_NEWLINE)
+				preempt_disable();
+
 			gVmGlobal.needSoftSpace = C_FALSE;
 			if (gVmGlobal.somethingPrinted) {
 				retval = plat_putByte('\n');
 				gVmGlobal.somethingPrinted = C_FALSE;
 			}
+
+			preempt_enable_no_resched();
 			PM_BREAK_IF_ERROR(retval);
 			continue;
 #endif				/* HAVE_PRINT */
