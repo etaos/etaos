@@ -32,10 +32,7 @@
 
 int mm_best_fit_compare(struct heap_node *prev, struct heap_node *current)
 {
-	if(!prev)
-		return MM_PREFER_NODE;
-
-	if(prev->size > current->size)
+	if(!prev || prev->size > current->size)
 		return MM_PREFER_NODE;
 
 	return MM_REJECT_NODE;
