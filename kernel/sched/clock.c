@@ -54,6 +54,11 @@ static void sched_clock_preempt(void)
  * @brief Update the sched clock.
  * @param ms Number of miliseconds since last call.
  * @note This function should not be called more than once per milisecond.
+ * @see sched_clock_preempt
+ *
+ * Increment the time that the current thread has spent on the CPU by \p ms.
+ * If the current threads time slice reaches 0, the thread will be setup
+ * for preemption.
  */
 void sched_clock_tick(int ms)
 {
