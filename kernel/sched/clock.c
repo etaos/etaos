@@ -68,7 +68,8 @@ void sched_clock_tick(int ms)
 #endif
 
 #ifdef CONFIG_PREEMPT
-	if(--tp->slice == 0) {
+	tp->slice -= ms;
+	if(!tp->slice) {
 		tp->slice = CONFIG_TIME_SLICE;
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
 	}
