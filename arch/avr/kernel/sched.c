@@ -100,6 +100,9 @@ struct avr_stack_frame {
 #ifdef AVR_HAVE_RAMPD
 	uint8_t rampd;
 #endif
+#ifdef AVR_HAVE_EIND
+	uint8_t eind;
+#endif
 	uint8_t status;
 	uint8_t r0;
 
@@ -152,8 +155,6 @@ void avr_save_stack(stack_t *sp, struct thread *current)
 
 void cpu_switch_context(struct rq *rq, struct thread *prev, struct thread *next)
 {
-	irq_enter_critical();
 	avr_switch_context(next->sp, prev);
-	irq_exit_critical();
 }
 
