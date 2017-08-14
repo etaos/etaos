@@ -30,6 +30,12 @@
 #include <etaos/python.h>
 #include <etaos/preempt.h>
 
+#define PM_PREEMPT_ENABLE_BREAK(value) \
+	if(value != PM_RET_OK) { \
+		preempt_enable_no_resched(); \
+		break; \
+	}
+
 PmReturn_t interpret(const uint8_t returnOnNoThreads)
 {
 	PmReturn_t retval = PM_RET_OK;
@@ -751,7 +757,7 @@ PmReturn_t interpret(const uint8_t returnOnNoThreads)
 			preempt_disable();
 			if (gVmGlobal.needSoftSpace && (bc == PRINT_ITEM)) {
 				retval = plat_putByte(' ');
-				PM_BREAK_IF_ERROR(retval);
+				PM_PREEMPT_ENABLE_BREAK(retval);
 			}
 			gVmGlobal.needSoftSpace = C_TRUE;
 
@@ -759,7 +765,7 @@ PmReturn_t interpret(const uint8_t returnOnNoThreads)
 			retval =
 			    obj_print(TOS, (uint8_t) (bc == PRINT_EXPR),
 				      C_FALSE);
-			PM_BREAK_IF_ERROR(retval);
+			PM_PREEMPT_ENABLE_BREAK(retval);
 			PM_SP--;
 			if (bc != PRINT_EXPR) {
 				preempt_enable_no_resched();
