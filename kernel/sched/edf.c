@@ -307,7 +307,21 @@ static struct thread *edf_next_runnable(struct rq *rq)
 static bool edf_preempt_chk(struct rq *rq,
 		struct thread *cur, struct thread *nxt)
 {
-	return edf_sort_before(deadline(&cur->se), deadline(&nxt->se));
+	time_t d1, d2;
+
+	d1 = deadline(&cur->se);
+	d2 = deadline(&nxt->se);
+
+	/*
+	 * Do not preempt if currents deadline is smaller than
+	 * the next deadline
+	 */
+	if(d1 < d2)
+		return false;
+	else if(d2 < d1)
+		return true;
+	else
+		return prio(nxt) < prio(cur);
 }
 #endif
 
@@ -342,7 +356,12 @@ static void edf_print_rq(struct rq *rq)
 	tp = rr->run_queue;
 
 	while(tp) {
+#ifdef CONFIG_PREEMPT
+		printf("Name: %s - Preempt count: %i - Flags: %lu\n",
+				tp->name, tp->preempt_cnt, tp->flags);
+#else
 		printf("Name: %s - Flags: %lu\n", tp->name, tp->flags);
+#endif
 		tp = tp->se.next;
 	}
 }
