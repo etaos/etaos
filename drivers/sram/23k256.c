@@ -107,9 +107,10 @@ static int __sram_put(struct sram *ram, int c)
 		(uint8_t)(ram->file->index & 0xFF), byte
 	};
 
-	sram_set_mode(SPI_BYTE_MODE);
 	msg = spi_alloc_msg(write_seq, write_seq, 4);
+
 	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
+	sram_set_mode(SPI_BYTE_MODE);
 	rv = spi_transfer(&sram_23k256_dev, msg);
 	dev_sync_unlock(&sram_23k256_dev.dev);
 	spi_free_msg(msg);
@@ -133,8 +134,8 @@ static int __sram_write(struct sram *ram, const void *_buff, size_t len)
 	buff[2] = (uint8_t)(ram->file->index & 0xFF);
 	msg = spi_alloc_msg(buff, buff, len+3);
 
-	sram_set_mode(SPI_SEQ_MODE);
 	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
+	sram_set_mode(SPI_SEQ_MODE);
 	rv = spi_transfer(&sram_23k256_dev, msg);
 	dev_sync_unlock(&sram_23k256_dev.dev);
 	spi_free_msg(msg);
@@ -158,6 +159,7 @@ static int __sram_get(struct sram *ram)
 	struct spi_msg *msg = spi_alloc_msg(read_seq, read_seq, 4);
 
 	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
+	sram_set_mode(SPI_BYTE_MODE);
 	spi_transfer(&sram_23k256_dev, msg);
 	dev_sync_unlock(&sram_23k256_dev.dev);
 	spi_free_msg(msg);
@@ -180,8 +182,8 @@ static int __sram_read(struct sram *sram, void *_buff, size_t len)
 	buff[2] = (uint8_t)(sram->file->index & 0xFF);
 	msg = spi_alloc_msg(buff, buff, len+3);
 
-	sram_set_mode(SPI_SEQ_MODE);
 	dev_sync_lock(&sram_23k256_dev.dev, SRAM_SYNC);
+	sram_set_mode(SPI_SEQ_MODE);
 	rv = spi_transfer(&sram_23k256_dev, msg);
 	dev_sync_unlock(&sram_23k256_dev.dev);
 	spi_free_msg(msg);

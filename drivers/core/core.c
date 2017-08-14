@@ -79,20 +79,11 @@ static void dev_release(struct device *dev)
 void dev_sync_lock(struct device *dev, unsigned ms)
 {
 	sync_t *syn = &dev->sync_lock;
-#ifdef CONFIG_SCHED
-	unsigned int time;
-#endif
 
 	if(syn->last_rw_op == NEVER)
 		return;
-#ifdef CONFIG_SCHED
-	if(time_before(sys_tick, syn->last_rw_op+ms)) {
-		time = (syn->last_rw_op+ms) - sys_tick;
-		sleep(time);
-	}
-#else
+
 	while(time_before(sys_tick, syn->last_rw_op+ms));
-#endif
 }
 
 /**
@@ -106,20 +97,9 @@ void dev_sync_lock(struct device *dev, unsigned ms)
 void dev_sync_wait(struct device *dev, unsigned ms)
 {
 	sync_t *syn = &dev->sync_lock;
-#ifdef CONFIG_SCHED
-	unsigned int time;
-#endif
-
 	syn->last_rw_op = sys_tick;
 
-#ifdef CONFIG_SCHED
-	if(time_before(sys_tick, syn->last_rw_op+ms)) {
-		time = (syn->last_rw_op+ms) - sys_tick;
-		sleep(time);
-	}
-#else
 	while(time_before(sys_tick, syn->last_rw_op+ms));
-#endif
 }
 
 /**
