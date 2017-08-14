@@ -223,7 +223,7 @@ def read_string(name, addr, length):
 	cnum = ((pPmInt_t)num)->val + 1;
 	cpy = cdata = kzalloc(cnum);
 
-	pm_sram_read(cname, caddr, cdata, cnum);
+	pm_sram_read(cname, caddr, cdata, cnum - 1);
 
 	string_new((uint8_t const **)&cdata, &text);
 	kfree(cpy);
