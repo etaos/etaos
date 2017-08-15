@@ -67,12 +67,25 @@ struct heap_node {
 #define mm_node_compare_ptr &mm_worst_fit_compare
 #endif
 
+/**
+ * @brief Allocator type.
+ * @see mm_heap_alloc
+ */
 typedef enum allocator {
-	BEST_FIT,
-	FIRST_FIT,
-	WORST_FIT,
-	SYSTEM_ALLOCATOR,
+	BEST_FIT, //!< Best fit allocator
+	FIRST_FIT, //!< First fit allocator
+	WORST_FIT, //!< Worst fit allocator
+	SYSTEM_ALLOCATOR, //!< Default allocator
 } allocator_t;
+
+/**
+ * @brief Heap comparator.
+ */
+typedef int (mm_comparator_t)(struct heap_node *, struct heap_node *);
+
+/**
+ * @}
+ */
 
 extern spinlock_t mlock;
 extern struct heap_node *mm_free_list;
@@ -98,7 +111,7 @@ extern void kfree(void *);
 
 extern void *raw_mm_heap_alloc(struct heap_node **root,
 		               size_t size,
-			       int (compare)(struct heap_node*, struct heap_node*));
+			       mm_comparator_t compare);
 extern MEM void *mm_heap_alloc(size_t size, allocator_t allocator);
 
 extern void mm_init(void);
@@ -117,6 +130,5 @@ extern void *krealloc(void *old, size_t newsize);
 extern size_t mm_heap_available(void);
 CDECL_END
 
-/** @} */
 #endif
 

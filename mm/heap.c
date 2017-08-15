@@ -17,7 +17,7 @@
  */
 
 /**
- * @addtogroup bf
+ * @addtogroup mm
  * @{
  */
 
@@ -76,9 +76,16 @@ static int mm_validate_user_area(struct heap_node *node)
 	return -EOK;
 }
 
+/**
+ * @brief Allocate a new memory region.
+ * @param root Free list root.
+ * @param size Number of bytes to allocate.
+ * @param compare Heap comparator.
+ * @return `NULL` or an allocated region of memory.
+ */
 void *raw_mm_heap_alloc(struct heap_node **root,
 		               size_t size,
-			       int (compare)(struct heap_node*, struct heap_node*))
+			       mm_comparator_t compare)
 {
 	struct heap_node *node,
 			 **npp,
@@ -94,7 +101,6 @@ void *raw_mm_heap_alloc(struct heap_node **root,
 
 	need = MM_TOP_ALIGN(need);
 
-	/* Now we need to find the best fitting node */
 	node = *root;
 	npp = root;
 	while(node) {
@@ -260,6 +266,12 @@ static int raw_mm_heap_free(struct heap_node **root, void *block)
 	return -EOK;
 }
 
+/**
+ * @brief Allocate a new memory region using a specific allocator.
+ * @param size Number of bytes to allocate.
+ * @param allocator Allocator to use for the allocation.
+ * @return An allocated region of memory.
+ */
 MEM void *mm_heap_alloc(size_t size, allocator_t allocator)
 {
 	void *rv = NULL;

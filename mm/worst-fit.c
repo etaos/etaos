@@ -30,6 +30,13 @@
 
 #include "mm.h"
 
+/**
+ * @brief First fit comparator.
+ * @param prev Previously selected node.
+ * @param current Node to compare.
+ * @return Error code.
+ * @see raw_mm_heap_alloc
+ */
 int mm_worst_fit_compare(struct heap_node *prev, struct heap_node *current)
 {
 	if(!prev || current->size > prev->size)
