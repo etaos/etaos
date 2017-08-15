@@ -278,15 +278,21 @@ MEM void *mm_heap_alloc(size_t size, allocator_t allocator)
 
 	switch(allocator) {
 	case BEST_FIT:
+#ifdef CONFIG_BEST_FIT
 		rv = mm_best_fit_alloc(size);
+#endif
 		break;
 
 	case FIRST_FIT:
+#ifdef CONFIG_FIRST_FIT
 		rv = mm_first_fit_alloc(size);
+#endif
 		break;
 
 	case WORST_FIT:
+#ifdef CONFIG_WORST_FIT
 		rv = mm_worst_fit_alloc(size);
+#endif
 		break;
 
 	/* case SYSTEM_ALLOCATOR: */
