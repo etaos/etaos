@@ -14,7 +14,7 @@
 /**
  * @defgroup bf Best fit allocator
  * @ingroup mm
- * @brief Best fit memeory allocation algorithm.
+ * @brief Best fit memory allocation algorithm.
  * 
  * The best fit allocator is a variant to the first-fit algorithm. It is
  * slightly slower, but spills less memory and therefore reduces the amount of
@@ -26,3 +26,25 @@
  * If a memeory region gets free'd up, the region is added back into the list
  * of available memory.
  */
+
+/**
+ * @defgroup ff First fit allocator
+ * @ingroup mm
+ * @brief First fit memory allocation algorithm.
+ * 
+ * The first fit allocator is the simplest and fastest flat memory algorithm.
+ * This algorithm will allocate the first region it finds that is big enough
+ * to contain an allocation. If the region is too big, it will be split up.
+ * A down side of this algorithm is the potential to cause fragmentation.
+ */
+
+/**
+ * @defgroup wf Worst fit allocator
+ * @ingroup mm
+ * @brief Worst fit memory allocation algorithm.
+ *
+ * The worst fit allocation algorithm looks to reduce the amount of
+ * fragmentation by attempting to fit allocations in the largest available
+ * blocks. Doing so reduces the amount of very small heap blocks.
+ */
+
