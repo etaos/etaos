@@ -33,7 +33,13 @@
 /**
  * @defgroup python-eeprom EEPROM
  * @ingroup python
- * @brief Python EEPROM drivers..
+ * @brief Python EEPROM drivers.
+ */
+
+/**
+ * @defgroup python-sram SRAM
+ * @ingroup python
+ * @brief Python SRAM device driver.
  */
 
 /**
