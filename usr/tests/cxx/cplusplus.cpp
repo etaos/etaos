@@ -72,7 +72,6 @@ void ThreadTest::run(void *arg)
 
 	delete sram;
 	delete tc;
-	kill();
 }
 
 int main(void)
@@ -100,6 +99,7 @@ int main(void)
 		Kernel::sleep(500);
 	}
 
+	tp->join();
 	delete ee;
 	delete tp;
 	printf(CALYPSO_EXIT);
