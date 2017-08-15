@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-## @addtogroup python-tmp35
+## @addtogroup python-sram
 # @{
 
 ## @package SRAM
