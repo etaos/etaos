@@ -40,6 +40,18 @@
  * @defgroup python-sram SRAM
  * @ingroup python
  * @brief Python SRAM device driver.
+ *
+ * ### Usage
+ *
+@code{.py}
+read_example(addr):
+	ram = SRAM("23K256")
+	return ram.read_float(addr)
+
+write_example(addr, flt):
+	ram = SRAM("23K256")
+	ram.write_float(addr, flt)
+@endcode
  */
 
 /**
