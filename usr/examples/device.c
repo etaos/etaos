@@ -22,7 +22,7 @@ int main(void)
 	struct file *stream;
 	int fd;
 
-	fd = open("24C02", _FDEV_SETUP_RW);
+	fd = open("/dev/24C02", _FDEV_SETUP_RW);
 	
 	if(fd < 0)
 		panic("could not open 24C02 device file\n");
