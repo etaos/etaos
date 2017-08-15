@@ -45,14 +45,25 @@ class SRAM(object):
 	# @param length Length of \p data.
 	# @return None
 	def write(self, addr, data, length):
-		write(self.name, addr, data, length)
+		return write(self.name, addr, data, length)
+
+	## Write a floating point number to \p this SRAM chip.
+	# @param addr Address to write to.
+	# @param flt Floating point number to write.
+	def write_float(self, addr, flt):
+		return write_float(self.name, addr, flt)
+
+	## Read a floating point number.
+	# @param addr Address to read from.
+	def read_float(self, addr):
+		return read_float(self.name, addr)
 
 	## Write to \p this SRAM chip.
 	# @param addr Address to start writing.
 	# @param string List of bytes to write.
 	# @return None
 	def write_string(self, addr, string):
-		write_string(self.name, addr, string, len(string))
+		return write_string(self.name, addr, string, len(string))
 
 	## Read from \p this SRAM chip.
 	# @param addr Address to start reading.
@@ -101,6 +112,80 @@ def write(name, addr, data, num):
 	pm_sram_write(cname, caddr, cdata, cnum);
 	kfree(cdata);
 
+	return retval;
+#else
+	return PM_RET_OK;
+#endif
+	"""
+	pass
+
+def write_float(name, addr, flt):
+	"""__NATIVE__
+#ifdef CONFIG_PYTHON_SRAM
+	PmReturn_t retval = PM_RET_OK;
+	pPmObj_t addr, flt, name;
+	const char *cname;
+	uint16_t caddr;
+	float cfloat;
+
+	if (NATIVE_GET_NUM_ARGS() != 3) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	name = NATIVE_GET_LOCAL(0);
+	addr = NATIVE_GET_LOCAL(1);
+	flt = NATIVE_GET_LOCAL(2);
+
+	if(OBJ_GET_TYPE(name) != OBJ_TYPE_STR ||
+		OBJ_GET_TYPE(addr) != OBJ_TYPE_INT ||
+		OBJ_GET_TYPE(flt) != OBJ_TYPE_FLT) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	cname = (const char*)((pPmString_t)name)->val;
+	caddr = ((pPmInt_t)addr)->val;
+	cfloat = ((pPmFloat_t)flt)->val;
+
+	pm_sram_write_float(cname, caddr, cfloat);
+	return retval;
+#else
+	return PM_RET_OK;
+#endif
+	"""
+	pass
+
+def read_float(name, addr):
+	"""__NATIVE__
+#ifdef CONFIG_PYTHON_SRAM
+	PmReturn_t retval = PM_RET_OK;
+	pPmObj_t addr, flt, name;
+	const char *cname;
+	uint16_t caddr;
+	float cfloat;
+
+	if (NATIVE_GET_NUM_ARGS() != 2) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	name = NATIVE_GET_LOCAL(0);
+	addr = NATIVE_GET_LOCAL(1);
+
+	if(OBJ_GET_TYPE(name) != OBJ_TYPE_STR ||
+		OBJ_GET_TYPE(addr) != OBJ_TYPE_INT) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	cname = (const char*)((pPmString_t)name)->val;
+	caddr = ((pPmInt_t)addr)->val;
+
+	cfloat = pm_sram_read_float(cname, caddr);
+	retval = float_new(cfloat, &flt);
+
+	NATIVE_SET_TOS(flt);
 	return retval;
 #else
 	return PM_RET_OK;
@@ -223,7 +308,7 @@ def read_string(name, addr, length):
 	cnum = ((pPmInt_t)num)->val + 1;
 	cpy = cdata = kzalloc(cnum);
 
-	pm_sram_read(cname, caddr, cdata, cnum);
+	pm_sram_read(cname, caddr, cdata, cnum - 1);
 
 	string_new((uint8_t const **)&cdata, &text);
 	kfree(cpy);

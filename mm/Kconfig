@@ -1,8 +1,8 @@
 menu "Memory Allocation"
 
 config MALLOC
-	bool "Memory allocator"
-	default y
+	bool
+	default n
 	help
 	  Enable or disable the memory allocator. If you're not
 	  sure, say 'Y' here.
@@ -21,5 +21,45 @@ config MM_DESTRUCTIVE_ALLOC
 	  Say 'y' here to turn the memory allocator into a
 	  destructive allocator. This means that whenever an
 	  allocation fails, a kernel panic is thrown up.
+
+config BEST_FIT
+	bool "Best fit allocator"
+	select MALLOC
+	help
+	  Say 'y' here to compile the best-fit allocator.
+
+config FIRST_FIT
+	bool "First fit allocator"
+	select MALLOC
+	help
+	  Say 'y' here to compile the first-fit allocator.
+
+config WORST_FIT
+	bool "Worst fit allocator"
+	select MALLOC
+	help
+	  Say 'y' here to compile the worst-fit allocator.
+
+choice
+	prompt "Default allocation algorithm"
+
+config SYS_BF
+	bool "Best-fit allocator"
+	depends on BEST_FIT
+	help
+	  Select to use the best-fit allocator as default allocator.
+
+config SYS_FF
+	bool "First-fit allocator"
+	depends on FIRST_FIT
+	help
+	  Select the first-fit allocator as default allocator.
+
+config SYS_WF
+	bool "Worst-fit allocator"
+	depends on WORST_FIT
+	help
+	  Select the worst-fit allocator as default allocator.
+endchoice
 
 endmenu

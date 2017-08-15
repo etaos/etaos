@@ -119,12 +119,10 @@ static int atmega_spi_setspeed(struct spidev *dev, uint32_t rate)
 		clear_bit(SPI_2X_FLAG, &dev->flags);
 	}
 	
-	irq_enter_critical();
 	spcr = SPCR;
 	spcr &= ~0x3;
 	spcr |= div | 0x3;
 	SPCR = spcr;
-	irq_exit_critical();
 
 	return -EOK;
 }
@@ -183,7 +181,6 @@ static int atmega_spi_control(struct spidev *dev, spi_ctrl_t ctrl, void *data)
  */
 static int atmega_spi_xfer(struct spidev *dev, struct spi_msg *msg)
 {
-	irq_enter_critical();
 	master_rx_buff = msg->rx;
 	master_tx_buff = msg->tx;
 	master_length = msg->len;
@@ -192,12 +189,13 @@ static int atmega_spi_xfer(struct spidev *dev, struct spi_msg *msg)
 	   initialise the transfer. */
 	master_index = 1;
 
-	SPCR |= SPE | SPIE;
+	SPCR |= SPIE;
 	SPDR = master_tx_buff[0];
-	irq_exit_critical();
 
 	if(mutex_wait_tmo(&master_xfer_mutex, ATMEGA_SPI_TMO))
 		return -EAGAIN;
+
+	SPCR &= ~SPIE;
 
 	return msg->len;
 }
@@ -250,6 +248,7 @@ static void __used atmega_spi_init(void)
 
 	SPCR |= SPR1;
 	SPCR |= MSTR;
+	SPCR |= SPE;
 	spi_sysbus = &atmega_spi_driver;
 }
 

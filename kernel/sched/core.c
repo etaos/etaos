@@ -647,7 +647,7 @@ static inline bool should_resched_cputime(struct thread *tp, struct thread *nxt)
 #else
 static inline bool should_resched_cputime(struct thread *tp, struct thread *nxt)
 {
-	return false;
+	return true;
 }
 #endif
 
@@ -1203,7 +1203,6 @@ static void preempt_check(struct rq *rq, struct thread *cur, struct thread *nxt)
 /**
  * @brief Reschedule the current run queue.
  * @param cpu ID of the CPU which should be rescheduled.
- * @param preempt Boolean indicating if we can preempt a thread or not.
  * @note This function also updates:
  * 	   - threads signaled from an IRQ;
  * 	   - timers;
@@ -1214,7 +1213,7 @@ static void preempt_check(struct rq *rq, struct thread *cur, struct thread *nxt)
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static bool __hot __schedule(int cpu, bool preempt)
+static bool __hot __schedule(int cpu)
 {
 	struct rq *rq;
 	struct thread *next,
@@ -1235,9 +1234,7 @@ static bool __hot __schedule(int cpu, bool preempt)
 	rq_signal_threads(rq);
 
 	next = sched_get_next_runnable(rq);
-
-	if(preempt)
-		preempt_check(rq, prev, next);
+	preempt_check(rq, prev, next);
 
 	/*
 	 * Only reschedule if we have to. The decision is based on the
@@ -1299,7 +1296,7 @@ void __hot schedule(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu, preemptible());
+		__schedule(cpu);
 	} while(need_resched());
 }
 
@@ -1322,7 +1319,7 @@ void __hot preempt_schedule_irq(void)
 
 	do {
 		cpu = cpu_get_id();
-		__schedule(cpu, true);
+		__schedule(cpu);
 	} while(need_resched());
 	return;
 }

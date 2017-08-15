@@ -28,33 +28,11 @@
 #include <etaos/preempt.h>
 #include <etaos/cpu.h>
 
-#ifdef CONFIG_PREEMPT
-/**
- * @brief Preempt the CPU based on the context.
- * @see preempt_schedule_irq
- * @see preempt_schedule
- *
- * Check in what context the CPU is running (IRQ or non-IRQ) and preempt using
- * preempt_schedule_irq() or preempt_schedule() respectively.
- */
-static void sched_clock_preempt(void)
-{
-	unsigned long flags;
-
-	cpu_get_state(&flags);
-	if(likely(test_bit(CPU_IRQ_EXEC_FLAG, &flags)))
-		preempt_schedule_irq();
-	else
-		preempt_schedule();
-}
-#endif
-
 #if defined(CONFIG_SCHED_FAIR) || defined(CONFIG_PREEMPT)
 /**
  * @brief Update the sched clock.
  * @param ms Number of miliseconds since last call.
  * @note This function should not be called more than once per milisecond.
- * @see sched_clock_preempt
  *
  * Increment the time that the current thread has spent on the CPU by \p ms.
  * If the current threads time slice reaches 0, the thread will be setup
@@ -73,12 +51,13 @@ void sched_clock_tick(int ms)
 #endif
 
 #ifdef CONFIG_PREEMPT
-	if(--tp->slice == 0) {
+	tp->slice -= ms;
+	if(!tp->slice) {
 		tp->slice = CONFIG_TIME_SLICE;
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
 	}
 
-	sched_clock_preempt();
+	preempt_schedule_irq();
 #endif
 }
 #endif /* CONFIG_SCHED_FAIR || CONFIG_PREEMPT */

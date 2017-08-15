@@ -53,6 +53,47 @@ int pm_sram_write(const char *name, uint16_t addr,
 	return rc;
 }
 
+int pm_sram_write_float(const char *name, uint16_t addr, float flt)
+{
+	char namebuff[SRAM_NAME_BUFFER_SIZE];
+	int fd, rc;
+	FILE *stream;
+
+	snprintf(namebuff, SRAM_NAME_BUFFER_SIZE, "/dev/%s", name);
+	fd = open(namebuff, _FDEV_SETUP_RW);
+
+	if(fd < 0)
+		return fd;
+
+	stream = filep(fd);
+	lseek(stream, addr, SEEK_SET);
+	rc = write(fd, &flt, sizeof(float));
+	close(fd);
+
+	return rc;
+}
+
+float pm_sram_read_float(const char *name, uint16_t addr)
+{
+	char namebuff[SRAM_NAME_BUFFER_SIZE];
+	int fd;
+	float flt;
+	FILE *stream;
+
+	snprintf(namebuff, SRAM_NAME_BUFFER_SIZE, "/dev/%s", name);
+	fd = open(namebuff, _FDEV_SETUP_RW);
+
+	if(fd < 0)
+		return fd;
+
+	stream = filep(fd);
+	lseek(stream, addr, SEEK_SET);
+	read(fd, &flt, sizeof(float));
+	close(fd);
+
+	return flt;
+}
+
 int pm_sram_read(const char *name, uint16_t addr, void *buff, size_t length)
 {
 	char namebuff[SRAM_NAME_BUFFER_SIZE];

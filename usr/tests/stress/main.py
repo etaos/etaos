@@ -24,7 +24,7 @@ from time import Time
 
 ee = EEPROM("24C02")
 ram = SRAM("23K256")
-sram_string = "Sample data: %f" % 2.718280
+sram_write_data = 2.718280
 addr = 0x60
 num = 2
 
@@ -46,17 +46,17 @@ def print_temperature(sensor):
 
 def print_eeprom_and_sram():
 	while True:
-		sram_data = ram.read_string(addr, len(sram_string))
+		sram_data = ram.read_float(addr)
 		ee_data = ee.read(addr, num)
 		print "[python]:    EEPROM: %d and %d" % (ee_data[0], ee_data[1])
-		print "[python]:    SRAM: " + sram_data
+		print "[python]:    SRAM: %f" % sram_data
 		sys.wait(1000)
 
 def main():
 	lm = LM35(0)
 	data_ary = [155, 120, 10, 20, 52, 80]
 	ee.write(addr, data_ary, len(data_ary))
-	ram.write_string(addr, sram_string)
+	ram.write_float(addr, sram_write_data)
 
 	# Setup the LED pin
 	avr.port_direction_or(avr.portb, 0x80)

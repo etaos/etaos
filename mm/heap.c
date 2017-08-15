@@ -17,7 +17,7 @@
  */
 
 /**
- * @addtogroup bf
+ * @addtogroup mm
  * @{
  */
 
@@ -29,10 +29,12 @@
 #include <etaos/stdio.h>
 #include <etaos/panic.h>
 
+#include "mm.h"
+
 #include <asm/pgm.h>
 
-static struct heap_node *mm_free_list = NULL;
-static DEFINE_SPINLOCK(mlock);
+struct heap_node *mm_free_list = NULL;
+DEFINE_SPINLOCK(mlock);
 
 #ifdef CONFIG_MM_GUARD
 #define MM_GUARD_PATTERN 0xDEADBEEF
@@ -74,13 +76,23 @@ static int mm_validate_user_area(struct heap_node *node)
 	return -EOK;
 }
 
-static void *raw_mm_heap_alloc(struct heap_node **root, size_t size)
+/**
+ * @brief Allocate a new memory region.
+ * @param root Free list root.
+ * @param size Number of bytes to allocate.
+ * @param compare Heap comparator.
+ * @return `NULL` or an allocated region of memory.
+ */
+void *raw_mm_heap_alloc(struct heap_node **root,
+		               size_t size,
+			       mm_comparator_t compare)
 {
 	struct heap_node *node,
 			 **npp,
 			 *fit = NULL,
 			 **fpp = NULL;
 	size_t need;
+	int state;
 
 	/* Determine the actual allocation size */
 	need = size + HEAP_OVERHEAD + 2 * MM_GUARD_BYTES;
@@ -89,20 +101,21 @@ static void *raw_mm_heap_alloc(struct heap_node **root, size_t size)
 
 	need = MM_TOP_ALIGN(need);
 
-	/* Now we need to find the best fitting node */
 	node = *root;
 	npp = root;
 	while(node) {
 		if(node->size >= need) {
 			/* This node fits! */
-			if(fit == NULL || fit->size > node->size) {
+			state = compare(fit, node);
+			if(state) {
 				/*
 				 * This node fits better than the one
 				 * we found previously
 				 */
 				fit = node;
 				fpp = npp;
-				if(node->size == need)
+				if(node->size == need ||
+						state == MM_ACCEPT_NODE)
 					break;
 			}
 		}
@@ -142,13 +155,13 @@ static void *raw_mm_heap_alloc(struct heap_node **root, size_t size)
 	return fit;
 }
 
-static void *raw_mm_heal_alloc_aligned(struct heap_node **root,
+static void *raw_mm_heap_alloc_aligned(struct heap_node **root,
 		size_t size, size_t alignment)
 {
 	size_t real_size;
 
 	real_size = __MM_TOP_ALIGN__(size, alignment);
-	return raw_mm_heap_alloc(root, real_size);
+	return raw_mm_heap_alloc(root, real_size, mm_node_compare_ptr);
 }
 
 static inline struct heap_node *mm_region_to_node(void *ptr)
@@ -254,6 +267,44 @@ static int raw_mm_heap_free(struct heap_node **root, void *block)
 }
 
 /**
+ * @brief Allocate a new memory region using a specific allocator.
+ * @param size Number of bytes to allocate.
+ * @param allocator Allocator to use for the allocation.
+ * @return An allocated region of memory.
+ */
+MEM void *mm_heap_alloc(size_t size, allocator_t allocator)
+{
+	void *rv = NULL;
+
+	switch(allocator) {
+	case BEST_FIT:
+#ifdef CONFIG_BEST_FIT
+		rv = mm_best_fit_alloc(size);
+#endif
+		break;
+
+	case FIRST_FIT:
+#ifdef CONFIG_FIRST_FIT
+		rv = mm_first_fit_alloc(size);
+#endif
+		break;
+
+	case WORST_FIT:
+#ifdef CONFIG_WORST_FIT
+		rv = mm_worst_fit_alloc(size);
+#endif
+		break;
+
+	/* case SYSTEM_ALLOCATOR: */
+	default:
+		rv = mm_alloc(size);
+		break;
+	}
+
+	return rv;
+}
+
+/**
  * @brief Allocate a new memory region.
  * @param size Number of bytes to allocate.
  * @return The allocated memory region of size \p size or \p NULL.
@@ -264,7 +315,7 @@ MEM void *mm_alloc(size_t size)
 	void *rv;
 
 	raw_spin_lock_irqsave(&mlock, flags);
-	rv = raw_mm_heap_alloc(&mm_free_list, size);
+	rv = raw_mm_heap_alloc(&mm_free_list, size, mm_node_compare_ptr);
 	raw_spin_unlock_irqrestore(&mlock, flags);
 
 	return rv;
@@ -282,7 +333,7 @@ MEM void *mm_alloc_aligned(size_t size, size_t alignment)
 	void *rv;
 
 	raw_spin_lock_irqsave(&mlock, flags);
-	rv = raw_mm_heal_alloc_aligned(&mm_free_list, size, alignment);
+	rv = raw_mm_heap_alloc_aligned(&mm_free_list, size, alignment);
 	raw_spin_unlock_irqrestore(&mlock, flags);
 
 	return rv;

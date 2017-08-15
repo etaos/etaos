@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - SRAM header
+ *  ETA/OS - Memory allocation helper
  *  Copyright (C) 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,18 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PYTHON_SRAM_H__
-#define __PYTHON_SRAM_H__
+#ifndef __MM_HELPER_H__
+#define __MM_HELPER_H__
 
-#include <etaos/kernel.h>
-
-CDECL
-extern int pm_sram_write(const char *name, uint16_t addr,
-			 const void *buff, size_t length);
-extern int pm_sram_read(const char *name, uint16_t addr,
-		void *buff, size_t length);
-extern int pm_sram_write_float(const char *name, uint16_t addr, float flt);
-extern float pm_sram_read_float(const char *name, uint16_t addr);
-CDECL_END
+#define MM_PREFER_NODE  2
+#define MM_ACCEPT_NODE  1
+#define MM_REJECT_NODE  0
 
 #endif
+

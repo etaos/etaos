@@ -56,7 +56,51 @@ struct heap_node {
 
 #define MEM __attribute__((malloc))
 
+#if defined(CONFIG_SYS_BF)
+#define mm_node_compare(_n_, _s_) mm_best_fit_compare(_n_, _s_)
+#define mm_node_compare_ptr &mm_best_fit_compare
+#elif defined(CONFIG_SYS_FF)
+#define mm_node_compare(_n_, _s_) mm_first_fit_compare(_n_, _s_)
+#define mm_node_compare_ptr &mm_first_fit_compare
+#elif defined(CONFIG_SYS_WF)
+#define mm_node_compare(_n_, _s_) mm_worst_fit_compare(_n_, _s_)
+#define mm_node_compare_ptr &mm_worst_fit_compare
+#endif
+
+/**
+ * @brief Allocator type.
+ * @see mm_heap_alloc
+ */
+typedef enum allocator {
+	BEST_FIT, //!< Best fit allocator
+	FIRST_FIT, //!< First fit allocator
+	WORST_FIT, //!< Worst fit allocator
+	SYSTEM_ALLOCATOR, //!< Default allocator
+} allocator_t;
+
+/**
+ * @brief Heap comparator.
+ */
+typedef int (mm_comparator_t)(struct heap_node *, struct heap_node *);
+
+/**
+ * @}
+ */
+
+extern spinlock_t mlock;
+extern struct heap_node *mm_free_list;
+
+
 CDECL
+extern MEM void *mm_best_fit_alloc(size_t size);
+extern int mm_best_fit_compare(struct heap_node *prev, struct heap_node *current);
+
+extern int mm_first_fit_compare(struct heap_node *prev, struct heap_node *current);
+extern MEM void *mm_first_fit_alloc(size_t size);
+
+extern MEM void *mm_worst_fit_alloc(size_t size);
+extern int mm_worst_fit_compare(struct heap_node *prev, struct heap_node *current);
+
 #ifdef CONFIG_MM_DEBUG
 extern int mm_free(void*, const char *, int);
 #define kfree(__p) mm_free(__p, __FILE__, __LINE__)
@@ -64,6 +108,11 @@ extern int mm_free(void*, const char *, int);
 extern int mm_free(void*);
 extern void kfree(void *);
 #endif
+
+extern void *raw_mm_heap_alloc(struct heap_node **root,
+		               size_t size,
+			       mm_comparator_t compare);
+extern MEM void *mm_heap_alloc(size_t size, allocator_t allocator);
 
 extern void mm_init(void);
 extern void mm_heap_add_block(void *start, size_t size);
@@ -81,6 +130,5 @@ extern void *krealloc(void *old, size_t newsize);
 extern size_t mm_heap_available(void);
 CDECL_END
 
-/** @} */
 #endif
 
