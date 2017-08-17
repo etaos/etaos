@@ -25,14 +25,18 @@
 #include <etaos/thread.h>
 #include <etaos/spinlock.h>
 
+/**
+ * @brief Recursive mutex data structure.
+ */
 typedef struct mutex {
 #ifdef CONFIG_MUTEX_EVENT_QUEUE
-	struct thread_queue qp;
+	struct thread_queue qp; //!< Thread queue to wait on.
+	int count; //!< Recursion count.
 #else
-	spinlock_t lock;
+	spinlock_t lock; //!< Spinlock if `qp` cannot be used.
 #endif
 #ifdef CONFIG_SCHED
-	struct thread *owner;
+	struct thread *owner; //!< Owner of the mutex.
 #endif
 } mutex_t;
 
@@ -41,6 +45,7 @@ typedef struct mutex {
 #define STATIC_MUTEX_INIT { \
 		.qp = INIT_THREAD_QUEUE, \
 		.owner = NULL, \
+		.count = 0, \
 	}
 #define DEFINE_MUTEX(__n) mutex_t __n = STATIC_MUTEX_INIT
 
@@ -56,6 +61,7 @@ static inline void mutex_init(mutex_t *mutex)
 {
 	thread_queue_init(&mutex->qp);
 	mutex->owner = NULL;
+	mutex->count = 0;
 }
 
 CDECL_END

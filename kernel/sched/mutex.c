@@ -22,33 +22,31 @@
 #include <etaos/thread.h>
 #include <etaos/event.h>
 #include <etaos/mutex.h>
+#include <etaos/panic.h>
+
+#include <asm/pgm.h>
 
 void mutex_wait(mutex_t *mutex)
 {
-	struct thread *tp = current_thread();
-
-	if(mutex->owner != tp)
-		event_wait(&mutex->qp, EVENT_WAIT_INFINITE);
+	event_wait(&mutex->qp, EVENT_WAIT_INFINITE);
 }
 
 int mutex_wait_tmo(mutex_t *mutex, unsigned int tmo)
 {
-	struct thread *tp = current_thread();
-
-	if(mutex->owner != tp)
-		return event_wait(&mutex->qp, tmo);
-	return -EINVAL;
+	return event_wait(&mutex->qp, tmo);
 }
 
 void mutex_lock(mutex_t *mutex)
 {
 	struct thread *tp = current_thread();
 
-	if(tp == mutex->owner)
-		return;
+	if(mutex->owner != tp) {
+		while(mutex->count != 0)
+			raw_event_wait(&mutex->qp, EVENT_WAIT_INFINITE);
+	} 
 
 	preempt_disable();
-	raw_event_wait(&mutex->qp, EVENT_WAIT_INFINITE);
+	mutex->count++;
 	mutex->owner = tp;
 }
 
@@ -56,17 +54,19 @@ void mutex_unlock(mutex_t *mutex)
 {
 	struct thread *tp = current_thread();
 
-	if(tp != mutex->owner)
-		return;
+	if(mutex->owner != tp)
+		panic_P(PSTR("Invalid mutex unlock\n"));
 
-	mutex->owner = NULL;
-	event_notify(&mutex->qp);
+	if(--mutex->count == 0) {
+		mutex->owner = NULL;
+		event_notify(&mutex->qp);
+	}
+
 	preempt_enable();
 }
 
 void mutex_unlock_irq(mutex_t *mutex)
 {
-	mutex->owner = NULL;
 	event_notify_irq(&mutex->qp);
 }
 
