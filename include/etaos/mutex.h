@@ -42,11 +42,26 @@ typedef struct mutex {
 
 #ifdef CONFIG_MUTEX_EVENT_QUEUE
 
+/**
+ * @brief Initialise a new mutex.
+ * @see DEFINE_MUTEX
+ *
+ * Initialises a mutex variable. Usage is as following:
+@code{.c}
+mutex_t lock = STATIC_MUTEX_INIT;
+@endcode
+ */
 #define STATIC_MUTEX_INIT { \
 		.qp = INIT_THREAD_QUEUE, \
 		.owner = NULL, \
 		.count = 0, \
 	}
+
+/**
+ * @brief Define a new mutex.
+ * @param __n Variable name.
+ * @see STATIC_MUTEX_INIT
+ */
 #define DEFINE_MUTEX(__n) mutex_t __n = STATIC_MUTEX_INIT
 
 CDECL
@@ -57,6 +72,12 @@ extern void mutex_lock(mutex_t *mutex);
 extern void mutex_unlock(mutex_t *mutex);
 extern void mutex_unlock_irq(mutex_t *mutex);
 
+/**
+ * @brief Initialise a mutex.
+ * @param mutex Mutex to initialise.
+ * @see DEFINE_MUTEX
+ * @see STATIC_MUTEX_INIT
+ */
 static inline void mutex_init(mutex_t *mutex)
 {
 	thread_queue_init(&mutex->qp);
