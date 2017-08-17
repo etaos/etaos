@@ -54,6 +54,16 @@
  */
 
 /**
+ * @defgroup mutex Recursive mutex
+ * @ingroup sched
+ * @brief Thread synchronization support.
+ *
+ * Threads can use these functions to assert mutual access to shared
+ * data. Threads can lock a mutex several times recursively without blocking,
+ * as long as that thread already owns the mutex.
+ */
+
+/**
  * @defgroup ipm Message queue management
  * @ingroup sched
  * @brief Inter-Process messages.
