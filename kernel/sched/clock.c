@@ -55,9 +55,8 @@ void sched_clock_tick(int ms)
 	if(!tp->slice) {
 		tp->slice = CONFIG_TIME_SLICE;
 		set_bit(PREEMPT_NEED_RESCHED_FLAG, &tp->flags);
+		preempt_schedule_irq();
 	}
-
-	preempt_schedule_irq();
 #endif
 }
 #endif /* CONFIG_SCHED_FAIR || CONFIG_PREEMPT */
