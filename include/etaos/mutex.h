@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup mutex
+ * @{
+ */
+
 #ifndef __MUTEX_H__
 #define __MUTEX_H__
 
@@ -130,4 +135,6 @@ CDECL_END
 #define mutex_unlock_from_irq(__m) mutex_unlock_irq(__m)
 
 #endif
+
+/** @} */
 
