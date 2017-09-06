@@ -491,28 +491,20 @@ static void raw_rq_add_thread(struct rq *rq, struct thread *tp)
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	tp->on_rq = true;
 	tp->rq = rq;
-
-	return;
 }
 
 /**
  * @brief Add a thread to a run queue.
  * @param tp Thread to add.
  * @note No locks are aquired.
+ * @see raw_rq_add_thread
  */
 void rq_add_thread_no_lock(struct thread *tp)
 {
 	struct rq *rq;
-	struct sched_class *class;
 
 	rq = sched_get_cpu_rq();
-	class = rq->sched_class;
-	class->add_thread(rq, tp);
-	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-	tp->on_rq = true;
-	tp->rq = rq;
-
-	return;
+	raw_rq_add_thread(rq, tp);
 }
 
 /**
@@ -590,7 +582,7 @@ static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 
 	if(err > 0) {
 		schedule();
-		err = 0;
+		err = -EOK;
 	}
 
 	return err;
@@ -727,7 +719,7 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
 	struct thread *next;
 	struct sched_class *class = rq->sched_class;
 
-	if(class) {
+	if(likely(class)) {
 		next = class->next_runnable(rq);
 		if(!next)
 			next = current_thread();
@@ -768,12 +760,13 @@ static void rq_destroy_kill_q(struct rq *rq)
 static unsigned long __sched_switch_count(int cpu)
 {
 	struct rq *rq;
+	unsigned long flags;
 	unsigned long num;
 
 	rq = cpu_to_rq(cpu);
-	spin_lock(&rq->lock);
+	spin_lock_irqsave(&rq->lock, flags);
 	num = rq->switch_count;
-	spin_unlock(&rq->lock);
+	spin_unlock_irqrestore(&rq->lock, flags);
 
 	return num;
 }
@@ -834,8 +827,8 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 {
 	struct sched_class *class = rq->sched_class;
 
-	if(prev) {
-		if(test_bit(THREAD_RUNNING_FLAG, &prev->flags)) {
+	if(likely(prev)) {
+		if(likely(test_bit(THREAD_RUNNING_FLAG, &prev->flags))) {
 			prev->rq = rq;
 			prev->on_rq = true;
 			class->add_thread(rq, prev);
@@ -881,7 +874,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		timer_stop(tp->timer);
 	}
 
-	if(unlikely(current != tp)) {
+	if(current != tp) {
 		raw_rq_add_thread(rq, tp);
 		if(prio(tp) <= prio(current))
 			set_bit(THREAD_NEED_RESCHED_FLAG, &current->flags);
@@ -940,7 +933,7 @@ static void rq_signal_threads(struct rq *rq)
  */
 static inline void preempt_reset_slice(struct thread *tp)
 {
-	if(tp)
+	if(likely(tp))
 		tp->slice = CONFIG_TIME_SLICE;
 }
 #else
