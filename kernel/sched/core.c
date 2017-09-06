@@ -1010,6 +1010,7 @@ static void rq_update_clock(struct rq *rq)
  * @brief Prepare the a reschedule.
  * @param rq Runqueue that is about to be rescheduled.
  * @param prev Thread that lost the CPU.
+ * @param next Thread that is about to receive CPU time.
  * @param irqs IRQ flags of the thread that is being scheduled out.
  *
  * This function is responsible for handling the dynamic priority and time
