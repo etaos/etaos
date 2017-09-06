@@ -165,7 +165,7 @@ void irq_thread_signal(struct irq_thread_data *data)
  * @param data IRQ data.
  * @note This function is a thread handle.
  *
- * Threaded IRQ's will be handled in this thread. Calls 
+ * Threaded IRQ's will be handled in this thread. Calls
  * struct irq_data::handler.
  */
 void irq_handle_fn(void *data)
@@ -587,7 +587,7 @@ static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 	int err;
 
 	err = raw_rq_remove_thread_noresched(rq, tp);
-	
+
 	if(err > 0) {
 		schedule();
 		err = 0;
@@ -1025,12 +1025,11 @@ static void rq_update_clock(void)
  */
 static inline void __schedule_prepare(struct rq *rq,
 				      struct thread *prev,
-				      unsigned long *irqs)
+				      struct thread *next,
+				      unsigned long irqs)
 {
-	struct thread *next;
 	unsigned long flags = 0UL;
 
-	next = current_thread();
 	/*
 	 * Update the dynamic priorities of all threads that still
 	 * reside on the run queue.
@@ -1051,7 +1050,7 @@ static inline void __schedule_prepare(struct rq *rq,
 	preempt_reset_slice(prev);
 	cpu_get_state(&flags);
 	prev->cpu_state = flags;
-	prev->irq_state = *irqs;
+	prev->irq_state = irqs;
 }
 
 /**
@@ -1246,7 +1245,7 @@ static bool __hot __schedule(int cpu)
 		rq->switch_count++;
 		rescheduled = true;
 
-		__schedule_prepare(rq, prev, &flags);
+		__schedule_prepare(rq, prev, next, flags);
 		rq_switch_context(rq, prev, next);
 		rq_update(rq); /* restores CPU / IRQ states */
 
@@ -1572,4 +1571,3 @@ static void __used sched_init(void)
 subsys_init(sched_init);
 
 /* @} */
-
