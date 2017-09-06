@@ -204,7 +204,7 @@ static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 			thread = thread->se.next;
 		}
 	}
-	
+
 	se->next = thread;
 	*tpp = tp;
 
@@ -267,7 +267,7 @@ static int edf_rm_thread(struct rq *rq, struct thread *tp)
 
 	if((rc = rr_shared_queue_remove(&rq->rr_rq.run_queue, tp)) == -EOK)
 		rq->num--;
-	
+
 	return rc;
 }
 
@@ -281,14 +281,14 @@ static struct thread *edf_next_runnable(struct rq *rq)
 {
 	struct thread *runnable;
 
-	for(runnable = rq->rr_rq.run_queue; runnable; 
+	for(runnable = rq->rr_rq.run_queue; runnable;
 			runnable = runnable->se.next) {
 		if(!test_bit(THREAD_RUNNING_FLAG, &runnable->flags))
 			continue;
 		else
 			break;
 	}
-	
+
 	return runnable;
 }
 
@@ -308,6 +308,9 @@ static bool edf_preempt_chk(struct rq *rq,
 		struct thread *cur, struct thread *nxt)
 {
 	time_t d1, d2;
+
+	if(unlikely(thread_is_idle(nxt)))
+		return false;
 
 	d1 = deadline(&cur->se);
 	d2 = deadline(&nxt->se);
