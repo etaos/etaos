@@ -1125,8 +1125,8 @@ static void sched_remote_kill_if(struct rq *rq)
 
 /**
  * @brief Reschedule policy.
- * @param curr Current thread.
- * @param next Thread which is supposed to be running after \p curr.
+ * @param cur Current thread.
+ * @param next Thread which is supposed to be running after \p cur.
  * @return an integer indicating whether to reschedule or not.
  * @retval 1 if __schedule should reschedule.
  * @retval 0 if __schedule should not reschedule.
@@ -1138,34 +1138,35 @@ static void sched_remote_kill_if(struct rq *rq)
  * If the next thread is _not_ the idle thread, the return value \p rv
  * will be:\n\n
  *
- * \f$ f(rv) = x \lor y\f$\n\n
+ * \f$ f(rv) = y \lor (x \land \neg f(n))\f$\n\n
  * Where:
- * * \f$x\f$ is the \p PREEMPT_NEED_RESCHED_FLAG
- * * \f$y\f$ is the \p THREAD_NEED_RESCHED_FLAG
+ * * \f$x\f$ is the `PREEMPT_NEED_RESCHED_FLAG`
+ * * \f$y\f$ is the `THREAD_NEED_RESCHED_FLAG`
+ * * \f$f(n)\f$ is the `THREAD_IDLE_FLAG` flag of the `next` thread
  *
- * When preemption is not enabled the value of THREAD_NEED_RESCHED_FLAG is
+ * When preemption is not enabled the value of \p THREAD_NEED_RESCHED_FLAG is
  * returned.
  */
-static int __schedule_need_resched(struct thread *curr, struct thread *next)
+static int schedule_decide(struct thread *cur, struct thread *next)
 {
 #ifdef CONFIG_PREEMPT
-	int preempt;
+	int resched;
 
-	if(likely(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
-					&curr->flags))) {
-		clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
-		return true;
+	resched = test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
+	if(unlikely(resched)) {
+		clear_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+	} else {
+		resched = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+
+		if(unlikely(thread_is_idle(next) && resched)) {
+			resched = false;
+			preempt_reset_slice(cur);
+		}
 	}
 
-	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
-	if(unlikely(thread_is_idle(next) && preempt)) {
-		preempt_reset_slice(curr);
-		return false;
-	}
-
-	return preempt;
+	return resched;
 #else
-	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
 #endif
 }
 
@@ -1233,7 +1234,7 @@ static bool __hot __schedule(int cpu)
 	 * THREAD_NEED_RESCHED_FLAG and the PREEMPT_NEED_RESCHED_FLAG. Also,
 	 * if prev == next a reschedule is redundant.
 	 */
-	if(likely(__schedule_need_resched(prev, next) && prev != next)) {
+	if(likely(schedule_decide(prev, next) && prev != next)) {
 		__sched_set_current_thread(rq, next);
 		rq->switch_count++;
 		rescheduled = true;
@@ -1255,10 +1256,10 @@ static bool __hot __schedule(int cpu)
 
 /**
  * @brief Check if a reschedule is required.
- * @see __schedule_need_resched
+ * @see schedule_decide
  * @return true if a reschedule is required, false otherwise.
  *
- * For a more extensive check, use #__schedule_need_resched.
+ * For a more extensive check, use #schedule_decide.
  */
 static inline bool need_resched()
 {
