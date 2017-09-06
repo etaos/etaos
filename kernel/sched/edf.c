@@ -197,7 +197,7 @@ static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 #ifdef CONFIG_EVENT_MUTEX
 		tp->ec++;
 #endif
-	} else if(thread) {
+	} else if(likely(thread)) {
 		while(thread &&
 			!edf_sort_before(deadline(&thread->se), deadline(se))) {
 			tpp = &thread->se.next;
@@ -209,7 +209,7 @@ static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 	*tpp = tp;
 
 #ifdef CONFIG_EVENT_MUTEX
-	if(se->next && se->next->ec) {
+	if(unlikely(se->next && se->next->ec)) {
 		tp->ec += se->next->ec;
 		se->next->ec = 0;
 	}
