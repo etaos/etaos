@@ -1002,16 +1002,15 @@ struct thread *sched_find_thread_by_name(const char *name)
 
 /**
  * @brief Update the system clock.
- * @see __rq_update_clock
+ * @param rq Update the clock of `rq`.
+ * @see timer_process
  */
-static void rq_update_clock(void)
+static void rq_update_clock(struct rq *rq)
 {
-	int cpu;
-	struct rq *rq;
+	struct clocksource *src;
 
-	cpu = cpu_get_id();
-	rq = cpu_to_rq(cpu);
-	timer_process(rq_get_clock(rq));
+	src = rq_get_clock(rq);
+	timer_process(src);
 }
 
 /**
@@ -1229,7 +1228,7 @@ static bool __hot __schedule(int cpu)
 	 * Run the sched clock and wake up threads that received an event
 	 * from an IRQ.
 	 */
-	rq_update_clock();
+	rq_update_clock(rq);
 	rq_signal_threads(rq);
 
 	next = sched_get_next_runnable(rq);
