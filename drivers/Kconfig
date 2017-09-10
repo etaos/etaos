@@ -18,4 +18,6 @@ source "drivers/eeprom/Kconfig"
 
 source "drivers/sram/Kconfig"
 
+source "drivers/pwm/Kconfig"
+
 endmenu

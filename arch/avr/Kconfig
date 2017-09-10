@@ -21,6 +21,17 @@ config EXT_MEM_ENABLE_PIN
 	  Note that this pin is _not_ a platform pin!
 endif
 
+config HAVE_PWM0
+	bool
+config HAVE_PWM1
+	bool
+config HAVE_PWM2
+	bool
+config HAVE_PWM3
+	bool
+config ARCH_PWM
+	bool
+
 config INIT_STACK_SIZE
 	int "Init stack size"
 	depends on SCHED
@@ -118,6 +129,7 @@ config ATMEGA328
 	select ARCH_SET_BIT
 	select ARCH_TEST_BIT
 	select ARCH_HRTIMER
+	select HAVE_PWM0
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega328p
@@ -131,6 +143,10 @@ config ATMEGA1280
 	select ARCH_SET_BIT
 	select ARCH_TEST_BIT
 	select ARCH_HRTIMER
+	select HAVE_PWM0
+	select HAVE_PWM1
+	select HAVE_PWM2
+	select HAVE_PWM3
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega1280
@@ -144,6 +160,10 @@ config ATMEGA2560
 	select ARCH_SET_BIT
 	select ARCH_TEST_BIT
 	select ARCH_HRTIMER
+	select HAVE_PWM0
+	select HAVE_PWM1
+	select HAVE_PWM2
+	select HAVE_PWM3
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega2560
@@ -171,4 +191,3 @@ source "drivers/Kconfig"
 source "mm/Kconfig"
 source "lib/Kconfig"
 source "fs/Kconfig"
-
