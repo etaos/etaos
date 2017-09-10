@@ -35,7 +35,12 @@
 #define USART_RX_STC_NUM	   18
 #define ADC_COMPLETED_NUM	   21
 #define TIMER2_OVERFLOW_VECTOR_NUM  9
+#define TIMER1_CAPT_VECTOR_NUM  10
+#define TIMER1_OCA_VECTOR_NUM 11
+#define TIMER1_OCB_VECTOR_NUM 12
 
+#define TIMER1_OCA_VECTOR irq_vector(11)
+#define TIMER1_OCB_VECTOR irq_vector(12)
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(16)
 #define USART_RX_STC_VECTOR irq_vector(18)
@@ -43,6 +48,9 @@
 #define TWI_STC_VECTOR irq_vector(24)
 #define ADC_COMPLETED_VECTOR irq_vector(21)
 #define TIMER2_OVERFLOW_VECTOR irq_vector(9)
+
+#define COMB 5
+#define COMA 7
 
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
@@ -84,7 +92,7 @@
 #define STDIN_PORT SIMI
 #endif /* CONFIG_SIMUL_AVR */
 
-/* TIMER 0 */ 
+/* TIMER 0 */
 #define TCCR0A MEM_IO8(0x44)
 #define WGM00  0x1
 #define WGM01  0x2
@@ -147,6 +155,55 @@
 #define OCF2B		2
 
 #define GTCCR		IO_ADDR(0x43)
+
+#define TCCR1A MEM_IO8(0x80)
+#define WGM10 0
+#define WGM11 1
+#define COM1B0 4
+#define COM1B1 5
+#define COM1A0 6
+#define COM1A1 7
+
+#define TCCR1B MEM_IO8(0x81)
+#define CS10 0
+#define CS11 1
+#define CS12 2
+#define WGM12 3
+#define WGM13 4
+#define ICES1 6
+#define ICNC1 7
+
+#define TCCR1C MEM_IO8(0x82)
+#define FOC1B 6
+#define FOC1A 7
+
+#define TCNT1 MEM_IO16(0x84)
+
+#define TCNT1L MEM_IO8(0x84)
+#define TCNT1H MEM_IO8(0x85)
+
+
+#define ICR1 MEM_IO16(0x86)
+
+#define ICR1L MEM_IO8(0x86)
+#define ICR1H MEM_IO8(0x87)
+
+
+#define OCR1A MEM_IO16(0x88)
+#define OCR1AL MEM_IO8(0x88)
+
+#define OCR1AH MEM_IO8(0x89)
+
+#define OCR1B MEM_IO16(0x8A)
+
+#define OCR1BL MEM_IO8(0x8A)
+#define OCR1BH MEM_IO8(0x8B)
+
+#define TIMSK1 MEM_IO8(0x6F)
+#define TOIE1 0
+#define OCIE1A 1
+#define OCIE1B 2
+#define ICIE1 5
 
 /* GPIO defs */
 #define PINB MEM_IO8(0x23)
@@ -243,4 +300,3 @@
 #define SM2		3
 
 #endif /* __IOM328_H_ */
-
