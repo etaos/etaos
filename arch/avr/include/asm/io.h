@@ -28,6 +28,7 @@
 #define CPU_CORE_NUM 1
 
 #define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
+#define MEM_IO16(addr) (*(volatile unsigned short*)(addr))
 #define IO_ADDR(addr) (*(volatile unsigned char*)(addr))
 #define F_CPU CONFIG_FCPU
 
