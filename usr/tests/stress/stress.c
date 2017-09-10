@@ -26,11 +26,13 @@
 #include <etaos/panic.h>
 #include <etaos/xorlist.h>
 #include <etaos/python.h>
+#include <etaos/pwm.h>
 
 #include <etaos/sram/23k256.h>
 
 #include <asm/pgm.h>
 #include <asm/io.h>
+#include <asm/pwm.h>
 
 static struct ipm_queue ipm_q;
 static uint8_t ee_value = 0x0;
@@ -215,7 +217,7 @@ static void test_xorlist(void)
 		fprintf(stderr, "xlist test failed!\n");
 }
 
-#define PREEMPT_PIN 11
+#define PREEMPT_PIN 9
 static volatile unsigned long preempt_counter;
 THREAD(preempt_thread, arg)
 {
@@ -245,6 +247,32 @@ static void hrtimer1_handle_func(struct hrtimer *hrt, void *arg)
 	led_pin_value = !led_pin_value;
 }
 
+static void setup_pwm(void)
+{
+	struct pwm_state state;
+	struct pwm *pwm;
+
+	pgpio_pin_request(12);
+	pgpio_direction_output(12, false);
+	pgpio_pin_release(12);
+
+	pgpio_pin_request(11);
+	pgpio_direction_output(11, false);
+	pgpio_pin_release(11);
+
+	set_bit(PWM_DUTY_CYCLE_FRACTION_FLAG, &state.flags);
+	set_bit(PWM_ENABLED_FLAG, &state.flags);
+	set_bit(PWM_USE_OC_PINS, &state.flags);
+	state.cycle.fraction = 2.0/3.0;
+
+	pwm = pwm_get_chip(0);
+	pwm_start(pwm, 5000);
+	pwm_update_channel(pwm, 0, &state);
+
+	state.cycle.fraction = 1.0/3.0;
+	pwm_update_channel(pwm, 1, &state);
+}
+
 int main(void)
 {
 	const char * ip_msg = "IPM message\n";
@@ -256,6 +284,7 @@ int main(void)
 	printf_P(PSTR("Application started (m: %u)\n"), mm_heap_available());
 
 	test_xorlist();
+	setup_pwm();
 	ipm_queue_init(&ipm_q, 2);
 	ee_stress_write_byte(EE_BYTE_ADDR, 0xAC);
 	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);
@@ -272,10 +301,10 @@ int main(void)
 	now = (time_t)atol(buff);
 	stime(now);
 
-	pgpio_pin_request(12);
-	pgpio_direction_output(12, false);
-	led_pin = platform_pin_to_gpio(12);
-	pgpio_pin_release(12);
+	pgpio_pin_request(10);
+	pgpio_direction_output(10, false);
+	led_pin = platform_pin_to_gpio(10);
+	pgpio_pin_release(10);
 	hrtimer_create(hr_sys_clk, 2000000, hrtimer1_handle_func,
 			NULL, 0UL);
 
