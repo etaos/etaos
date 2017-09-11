@@ -309,7 +309,7 @@ static bool edf_preempt_chk(struct rq *rq,
 {
 	time_t d1, d2;
 
-	if(unlikely(thread_is_idle(nxt)))
+	if(unlikely(test_bit(THREAD_IDLE_FLAG, &nxt->flags)))
 		return false;
 
 	d1 = deadline(&cur->se);
