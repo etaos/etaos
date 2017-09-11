@@ -192,12 +192,12 @@ static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 	if(test_bit(THREAD_IDLE_FLAG, &tp->flags))
 		se->deadline += 15778463000000LL;
 
-	if(thread == SIGNALED) {
+	if(unlikely(thread == SIGNALED)) {
 		thread = NULL;
 #ifdef CONFIG_EVENT_MUTEX
 		tp->ec++;
 #endif
-	} else if(likely(thread)) {
+	} else if(thread) {
 		while(thread &&
 			!edf_sort_before(deadline(&thread->se), deadline(se))) {
 			tpp = &thread->se.next;
