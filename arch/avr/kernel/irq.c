@@ -20,13 +20,16 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/error.h>
 #include <etaos/irq.h>
 #include <etaos/bitops.h>
 #include <etaos/list.h>
 #include <etaos/stdio.h>
+#include <etaos/gpio.h>
 
 #include <asm/io.h>
 #include <asm/irq.h>
+#include <asm/pgm.h>
 
 void arch_irq_disable(void)
 {
@@ -96,12 +99,14 @@ void cpu_request_irq(struct irq_data *data)
 {
 	uint8_t flags;
 
-	if(test_bit(IRQ_FALLING_FLAG, &data->flags))
+	if(test_bit(IRQ_FALLING_FLAG, &data->flags)) {
 		flags = 0x2;
-	else if(test_bit(IRQ_RISING_FLAG, &data->flags))
+	} else if(test_bit(IRQ_RISING_FLAG, &data->flags)) {
 		flags = 0x3;
-	else
+	} else {
 		flags = 0x1;
+		data->flags |= IRQ_RISING_MASK | IRQ_FALLING_MASK;
+	}
 
 	switch(data->irq) {
 #ifdef EXT_IRQ0_VECTOR_NUM
@@ -163,4 +168,35 @@ void cpu_request_irq(struct irq_data *data)
 	default:
 		return;
 	}
+}
+
+int cpu_trigger_irq(struct irq_data *data)
+{
+	struct gpio_pin *pin = data->pin;
+	int falling, rising;
+
+	if(!pin)
+		return -EINVAL;
+
+	falling = test_bit(IRQ_FALLING_FLAG, &data->flags);
+	rising = test_bit(IRQ_RISING_FLAG, &data->flags);
+
+	if(falling && rising) {
+		gpio_pin_write(pin, !data->value);
+		data->value = !data->value;
+	} else if(falling) {
+		if(!data->value)
+			gpio_pin_write(pin, true);
+
+		gpio_pin_write(pin, false);
+		data->value = false;
+	} else if(rising) {
+		if(data->value)
+			gpio_pin_write(pin, false);
+
+		gpio_pin_write(pin, true);
+		data->value = true;
+	}
+	
+	return -EOK;
 }

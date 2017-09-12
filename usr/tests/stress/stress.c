@@ -145,6 +145,7 @@ THREAD(test_th_handle, arg)
 	float sram_data;
 	char ee_string[sizeof(ee_test)];
 	int fd;
+	time_t now;
 
 	fd = open(IRQ_THREAD_FILENAME, _FDEV_SETUP_RW);
 	if(fd > 0) {
@@ -154,8 +155,10 @@ THREAD(test_th_handle, arg)
 		panic_P(PSTR("Couldn't open RAMFS file!\n"));
 	}
 
-	irq_request(EXT_IRQ0_NUM, &threaded_irq_handle, IRQ_FALLING_MASK |
-			IRQ_THREADED_MASK, IRQ_THREAD_FILENAME);
+	irq_request(EXT_IRQ2_VECTOR_NUM, &threaded_irq_handle,
+			IRQ_THREADED_MASK | IRQ_RISING_MASK, IRQ_THREAD_FILENAME);
+	irq_assign_pin(EXT_IRQ2_VECTOR_NUM, platform_pin_to_gpio(19));
+	time(&now);
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
@@ -174,6 +177,12 @@ THREAD(test_th_handle, arg)
 		printf_P(PSTR("[1][%s]: SRAM::EEPROM %f::%s\n"), 
 				current_thread_name(),
 				sram_data, ee_string);
+
+
+		if(time_after(time(NULL), now + 5ULL)) {
+			time(&now);
+			irq_soft_trigger(EXT_IRQ2_VECTOR_NUM);
+		}
 
 		sleep(500);
 	}

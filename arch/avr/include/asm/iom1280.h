@@ -108,6 +108,15 @@
 #define STDIN_PORT SIMI
 #endif /* CONFIG_SIMUL_AVR */
 
+#define EXT_IRQ0_PIN 24
+#define EXT_IRQ1_PIN 25
+#define EXT_IRQ2_PIN 26
+#define EXT_IRQ3_PIN 27
+#define EXT_IRQ4_PIN 36
+#define EXT_IRQ5_PIN 37
+#define EXT_IRQ6_PIN 38
+#define EXT_IRQ7_PIN 39
+
 /* External interrupts */
 #define EICRA   MEM_IO8(0x69)
 #define ISC31   7

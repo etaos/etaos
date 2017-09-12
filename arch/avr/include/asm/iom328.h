@@ -86,6 +86,9 @@
 #define STDIN_PORT SIMI
 #endif /* CONFIG_SIMUL_AVR */
 
+#define EXT_IRQ0_PIN 18
+#define EXT_IRQ1_PIN 19
+
 /* External interrupts */
 #define EIMSK MEM_IO8(0x3D)
 #define INT0 0
