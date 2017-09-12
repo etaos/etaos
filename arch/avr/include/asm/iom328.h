@@ -28,7 +28,8 @@
 
 #define _VECTORS_SIZE (26*4)
 
-#define EXT_IRQ0_NUM		    1
+#define EXT_IRQ0_VECTOR_NUM			 1
+#define EXT_IRQ1_VECTOR_NUM			 2
 #define TIMER0_OVERFLOW_VECTOR_NUM 16
 #define SPI_STC_VECTOR_NUM	   17
 #define TWI_STC_VECTOR_NUM	   24
@@ -37,6 +38,7 @@
 #define TIMER2_OVERFLOW_VECTOR_NUM  9
 
 #define EXT_IRQ0_VECTOR irq_vector(1)
+#define EXT_IRQ1_VECTOR irq_vector(2)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(16)
 #define USART_RX_STC_VECTOR irq_vector(18)
 #define SPI_STC_VECTOR irq_vector(17)
@@ -84,7 +86,18 @@
 #define STDIN_PORT SIMI
 #endif /* CONFIG_SIMUL_AVR */
 
-/* TIMER 0 */ 
+/* External interrupts */
+#define EIMSK MEM_IO8(0x3D)
+#define INT0 0
+#define INT1 1
+
+#define EICRA MEM_IO8(0x69)
+#define ISC00 0
+#define ISC01 1
+#define ISC10 2
+#define ISC11 3
+
+/* TIMER 0 */
 #define TCCR0A MEM_IO8(0x44)
 #define WGM00  0x1
 #define WGM01  0x2
@@ -243,4 +256,3 @@
 #define SM2		3
 
 #endif /* __IOM328_H_ */
-

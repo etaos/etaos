@@ -135,7 +135,7 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 	test_sys_tick++;
 
 	if(test_sys_tick == 5000) {
-		chip->chip_handle(EXT_IRQ0_NUM);
+		chip->chip_handle(EXT_IRQ0_VECTOR_NUM);
 		test_sys_tick = 0;
 	}
 #endif
@@ -146,4 +146,3 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 subsys_init(avr_timer_init);
 
 /* @} */
-

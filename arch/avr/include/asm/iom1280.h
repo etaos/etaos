@@ -33,7 +33,14 @@
 
 #define _VECTORS_SIZE (57*4)
 
-#define EXT_IRQ0_NUM			 1
+#define EXT_IRQ0_VECTOR_NUM			 1
+#define EXT_IRQ1_VECTOR_NUM			 2
+#define EXT_IRQ2_VECTOR_NUM			 3
+#define EXT_IRQ3_VECTOR_NUM			 4
+#define EXT_IRQ4_VECTOR_NUM			 5
+#define EXT_IRQ5_VECTOR_NUM			 6
+#define EXT_IRQ6_VECTOR_NUM			 7
+#define EXT_IRQ7_VECTOR_NUM			 8
 #define TIMER0_OVERFLOW_VECTOR_NUM	23
 #define SPI_STC_VECTOR_NUM		24
 #define TWI_STC_VECTOR_NUM		39
@@ -42,6 +49,13 @@
 #define TIMER2_OVERFLOW_VECTOR_NUM	15
 
 #define EXT_IRQ0_VECTOR irq_vector(1)
+#define EXT_IRQ1_VECTOR irq_vector(2)
+#define EXT_IRQ2_VECTOR irq_vector(3)
+#define EXT_IRQ3_VECTOR irq_vector(4)
+#define EXT_IRQ4_VECTOR irq_vector(5)
+#define EXT_IRQ5_VECTOR irq_vector(6)
+#define EXT_IRQ6_VECTOR irq_vector(7)
+#define EXT_IRQ7_VECTOR irq_vector(8)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(23)
 #define SPI_STC_VECTOR irq_vector(24)
 #define TWI_STC_VECTOR irq_vector(39)
@@ -94,7 +108,38 @@
 #define STDIN_PORT SIMI
 #endif /* CONFIG_SIMUL_AVR */
 
-/* TIMER 0 */ 
+/* External interrupts */
+#define EICRA   MEM_IO8(0x69)
+#define ISC31   7
+#define ISC30   6
+#define ISC21   5
+#define ISC20   4
+#define ISC11   3
+#define ISC10   2
+#define ISC01   1
+#define ISC00   0
+
+#define EICRB   MEM_IO8(0x6A)
+#define ISC71   7
+#define ISC70   6
+#define ISC61   5
+#define ISC60   4
+#define ISC51   3
+#define ISC50   2
+#define ISC41   1
+#define ISC40   0
+
+#define EIMSK   MEM_IO8(0x3D)
+#define INT7    7
+#define INT6    6
+#define INT5    5
+#define INT4    4
+#define INT3    3
+#define INT2    2
+#define INT1    1
+#define INT0    0
+
+/* TIMER 0 */
 #define TCCR0A MEM_IO8(0x44)
 #define WGM00  0x1
 #define WGM01  0x2
@@ -313,4 +358,3 @@ CDECL_END
 #endif
 
 #endif /* __IO1280_H__ */
-
