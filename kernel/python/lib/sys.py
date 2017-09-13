@@ -264,9 +264,18 @@ def clock():
 
 ## Yield the PythonVM.
 # @return None.
-def thread_yield():
+def sys_yield():
 	"""__NATIVE__
 	yield();
+	return PM_RET_OK;
+	"""
+	pass
+
+## Yield the current python thread.
+# @return None
+def thread_yield():
+	"""__NATIVE__
+	interp_setRescheduleFlag(true);
 	return PM_RET_OK;
 	"""
 	pass
@@ -278,7 +287,7 @@ def thread_yield():
 def wait(ms):
 	t = clock() + ms
 	while clock() < t:
-		pass
+		thread_yield()
 
 ## @}
 
