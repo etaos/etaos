@@ -24,6 +24,7 @@
 #include <etaos/mutex.h>
 #include <etaos/condition.h>
 #include <etaos/assert.h>
+#include <etaos/preempt.h>
 
 void condition_init(struct condition *cond)
 {
