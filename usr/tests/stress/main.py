@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys, cpu, string, avr
+import sys, cpu, string, avr, math
 from lm35 import LM35
 from eeprom import EEPROM
 from sram import SRAM
@@ -24,7 +24,7 @@ from time import Time
 
 ee = EEPROM("24C02")
 ram = SRAM("23K256")
-sram_write_data = 2.718280
+sram_write_data = math.pi
 addr = 0x60
 num = 2
 
@@ -42,6 +42,7 @@ def print_temperature(sensor):
 		else:
 			avr.port_or(avr.portb, 0x80)
 			high = True
+
 		sys.wait(1000)
 
 def print_eeprom_and_sram():
@@ -49,7 +50,7 @@ def print_eeprom_and_sram():
 		sram_data = ram.read_float(addr)
 		ee_data = ee.read(addr, num)
 		print "[python]:    EEPROM: %d and %d" % (ee_data[0], ee_data[1])
-		print "[python]:    SRAM: %f" % sram_data
+		print "[python]:    SRAM: %f" % math.sin(sram_data / 2.0)
 		sys.wait(1000)
 
 def main():

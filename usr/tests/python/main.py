@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys, sram
+import sys, sram, math
 from sram import SRAM
 from eeprom import EEPROM
 
@@ -30,6 +30,7 @@ sram_len = len(sram_str)
 ram.write_string(0x40, sram_str)
 ee.write(0x60, data_ary, len(data_ary))
 
+print math.atan2(1, 0)
 print "SRAM read: %s" % ram.read_string(0x40, sram_len)
 print "EEPROM read:"
 print ee.read(0x60, len(data_ary))
