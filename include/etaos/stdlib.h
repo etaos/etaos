@@ -40,16 +40,32 @@ extern char *ltoa(long num, char *str, int base);
 extern char *itoa(int num, char *str, int base);
 CDECL_END
 
+/**
+ * @ingroup libc
+ * @brief Allocate new memory
+ * @param __num Number of bytes to allocate.
+ * @return Allocated memory region of \p bytes.
+ */
 #define malloc(__num) kmalloc(__num)
+/**
+ * @ingroup libc
+ * @brief Allocate new memory
+ * @param __num Number of bytes to allocate.
+ * @note The allocated memory region will be zeroed out before returning.
+ * @return Allocated memory region of \p bytes.
+ */
 #define zalloc(__num) kzalloc(__num)
 #define realloc(__old, __new) krealloc(__old, __new)
 #define calloc(__s1, __s2) kcalloc(__s1, __s2)
 
 #ifdef CONFIG_MM_DEBUG
+/**
+ * @brief Release an allocated memory region.
+ * @param __p Memory region to release.
+ */
 #define free(__p) mm_free(__p, __FILE__, __LINE__)
 #else
 #define free(__num)   kfree(__num)
 #endif
 
 #endif /* __STDLIB_H__ */
-

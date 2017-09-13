@@ -28,11 +28,11 @@
 /**
  * @brief Close a file.
  * @param fd File descriptor to close.
+ * @return An error code.
  */
-void close(int fd)
+int close(int fd)
 {
-	vfs_close(fd);
+	return vfs_close(fd);
 }
 
 /** @} */
-
