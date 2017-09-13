@@ -33,8 +33,17 @@
 #include "rr_shared.h"
 
 #ifdef CONFIG_EDF_LOOKUP_TABLE
+/**
+ * @brief Calculate the EDF priority ratio.
+ * @param __p priority to calculate the ratio for.
+ */
 #define edf_prio_ratio(__p) (((13 * __p) / 24) + 10)
 
+/**
+ * @brief EDF priority lookup table.
+ *
+ * Lookup table for EDF priority time offsets.
+ */
 static const unsigned char __pgm __prio_array[] = {
 	edf_prio_ratio(0), edf_prio_ratio(1), edf_prio_ratio(2),
 	edf_prio_ratio(3), edf_prio_ratio(4), edf_prio_ratio(5),
@@ -204,7 +213,7 @@ static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 			thread = thread->se.next;
 		}
 	}
-	
+
 	se->next = thread;
 	*tpp = tp;
 
@@ -267,7 +276,7 @@ static int edf_rm_thread(struct rq *rq, struct thread *tp)
 
 	if((rc = rr_shared_queue_remove(&rq->rr_rq.run_queue, tp)) == -EOK)
 		rq->num--;
-	
+
 	return rc;
 }
 
@@ -281,14 +290,14 @@ static struct thread *edf_next_runnable(struct rq *rq)
 {
 	struct thread *runnable;
 
-	for(runnable = rq->rr_rq.run_queue; runnable; 
+	for(runnable = rq->rr_rq.run_queue; runnable;
 			runnable = runnable->se.next) {
 		if(!test_bit(THREAD_RUNNING_FLAG, &runnable->flags))
 			continue;
 		else
 			break;
 	}
-	
+
 	return runnable;
 }
 
@@ -304,7 +313,7 @@ static struct thread *edf_next_runnable(struct rq *rq)
  * to the EDF principles. It has no regard to the time slice (__schedule
  * handles time slice preemption).
  */
-static bool edf_preempt_chk(struct rq *rq,
+static bool edf_preempt_check(struct rq *rq,
 		struct thread *cur, struct thread *nxt)
 {
 	time_t d1, d2;
@@ -375,7 +384,7 @@ struct sched_class edf_class = {
 	.add_thread = &edf_add_thread,
 	.next_runnable = &edf_next_runnable,
 #ifdef CONFIG_PREEMPT
-	.preempt_chk = &edf_preempt_chk,
+	.preempt_chk = &edf_preempt_check,
 #endif
 #ifdef CONFIG_EVENT_MUTEX
 	.thread_after = &edf_thread_after,
