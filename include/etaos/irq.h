@@ -47,9 +47,9 @@ extern void cpu_request_irq(struct irq_data *data);
  * @ingroup archAPI
  * @brief Attempt to software trigger an interrupt.
  * @param data IRQ to soft-trigger.
+ * @note This function is allowed to return before the interrupt triggered.
  * @return An error code.
  * @retval 0 On success.
- * @notice This function is allowed to return before the interrupt triggered.
  */
 extern int cpu_trigger_irq(struct irq_data *data);
 /**
