@@ -10,6 +10,7 @@
 #include <etaos/string.h>
 #include <etaos/mem.h>
 #include <etaos/thread.h>
+#include <etaos/condition.h>
 #include <etaos/event.h>
 #include <etaos/hrtimer.h>
 #include <etaos/irq.h>
@@ -138,6 +139,9 @@ THREAD(test_th_handle2, arg)
 	}
 }
 
+static struct condition dbg_condi;
+static float main_thr_data = 0.0f;
+
 THREAD(test_th_handle, arg)
 {
 	struct ipm msg;
@@ -146,6 +150,7 @@ THREAD(test_th_handle, arg)
 	char ee_string[sizeof(ee_test)];
 	int fd;
 	time_t now;
+	float local;
 
 	fd = open(IRQ_THREAD_FILENAME, _FDEV_SETUP_RW);
 	if(fd > 0) {
@@ -165,10 +170,18 @@ THREAD(test_th_handle, arg)
 		printf_P(PSTR("[%u][%s]: ee-byte read: %u\n"), 1, 
 				current_thread_name(), readback);
 
+		condition_lock(&dbg_condi);
+		while(main_thr_data == 0.0f)
+			condition_wait(&dbg_condi);
+
+		local = main_thr_data;
+		condition_unlock(&dbg_condi);
+
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
 
-		printf_P(PSTR("[1][%s]: "), current_thread_name());
+		printf_P(PSTR("[1][%s]: main-data: %f - "),
+				current_thread_name(), local);
 		write(to_fd(stdout), msg.data, msg.len);
 
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
@@ -265,6 +278,7 @@ int main(void)
 	printf_P(PSTR("Application started (m: %u)\n"), mm_heap_available());
 
 	test_xorlist();
+	condition_init(&dbg_condi);
 	ipm_queue_init(&ipm_q, 2);
 	ee_stress_write_byte(EE_BYTE_ADDR, 0xAC);
 	ee_stress_write(EE_STRING_ADDR, ee_test, strlen(ee_test)+1);
@@ -289,6 +303,11 @@ int main(void)
 			NULL, 0UL);
 
 	while(true) {
+		condition_lock(&dbg_condi);
+		main_thr_data = 12.3456f;
+		condition_signal(&dbg_condi);
+		condition_unlock(&dbg_condi);
+
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));
 
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
