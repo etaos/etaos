@@ -1,5 +1,5 @@
 /*
- *  ETA/OS - GPIO driver
+ *  ETA/OS - Condition variables
  *  Copyright (C) 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ASSERT_H__
-#define __ASSERT_H__
+#ifndef __CONDITION_H__
+#define __CONDITION_H__
 
 #include <etaos/kernel.h>
-#include <etaos/panic.h>
+#include <etaos/types.h>
+#include <etaos/thread.h>
+#include <etaos/mutex.h>
 
-#include <asm/pgm.h>
+struct condition {
+	mutex_t lock;
+	struct thread_queue qp;
+};
 
-#define ASSERT(__condi__) \
-	(__condi__) ? (void)0 : panic_P(PSTR("Assert (%s) failed in %s:%i in %s"), \
-			#__condi__, __FILE__, __LINE__, __func__)
+extern void condition_init(struct condition *c);
+extern int condition_wait(struct condition *c);
+extern int condition_wait_for(struct condition *c, unsigned int ms);
+extern void condition_signal(struct condition *c);
+extern int condition_bcast(struct condition *c);
+extern void condition_lock(struct condition *c);
+extern void condition_unlock(struct condition *c);
 
 #endif
