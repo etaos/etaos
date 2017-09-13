@@ -1,0 +1,15 @@
+/**
+ * @defgroup pwm PWM drivers
+ * @ingroup dev
+ * @brief PWM core driver.
+ *
+ * Pulse-With Modulation is a method to control the amount of power that
+ * is fed to a device. The PWM core attempts to provide a universal interface
+ * to the many different PWM devices available.
+ */
+
+/**
+ * @defgroup atmpwm ATmega PWM
+ * @ingroup pwm
+ * @brief ATmega PWM drivers
+ */
