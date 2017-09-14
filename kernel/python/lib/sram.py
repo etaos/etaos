@@ -24,6 +24,7 @@
 
 __name__ = "sram"
 
+## SRAM class
 class SRAM(object):
 	name = ""
 
@@ -50,11 +51,13 @@ class SRAM(object):
 	## Write a floating point number to \p this SRAM chip.
 	# @param addr Address to write to.
 	# @param flt Floating point number to write.
+	# @return None
 	def write_float(self, addr, flt):
 		return write_float(self.name, addr, flt)
 
 	## Read a floating point number.
 	# @param addr Address to read from.
+	# @return The float read from SRAM address \p addr.
 	def read_float(self, addr):
 		return read_float(self.name, addr)
 

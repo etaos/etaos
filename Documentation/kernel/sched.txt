@@ -4,12 +4,12 @@
  * @defgroup thread Thread management
  * @ingroup kernel
  * @brief Cooperative multi-threading support.
- * 
- * Typically ETA/OS is at its most useful where there are several concurrent 
- * tasks that need to be undertaken at the same time. To support this 
- * requirement, ETA/OS offers some kind of light processes called threads. 
+ *
+ * Typically ETA/OS is at its most useful where there are several concurrent
+ * tasks that need to be undertaken at the same time. To support this
+ * requirement, ETA/OS offers some kind of light processes called threads.
  * In this context a thread is a sequence of executing software that can be
- * considered to be logically independent from other software that is running 
+ * considered to be logically independent from other software that is running
  * on the same CPU.
  *
  * The thread management API contains all functions which are used to
@@ -64,6 +64,48 @@
  */
 
 /**
+ * @defgroup condition Condition variables
+ * @ingroup sched
+ * @brief Variable synchronization principle.
+ *
+ * To avoid busy waiting states and / or manual fiddling with locks and event
+ * queues, an application can use condition variables to signal each other
+ * about events. Threads are removed from the run queue when waiting for
+ * a condition to come true using condition variables. This means that
+ * other threads get a chance to use the CPU more often.
+ *
+ * Usage example:
+@code{.c}
+static struct condition condi;
+static uint32_t data = 0;
+
+static void get_data(void)
+{
+        condition_lock(&condi);
+        data = random();
+        condition_signal(&condi);
+        condition_unlock(&condi);
+}
+
+static uint32_t use_data(void)
+{
+        uint32_t rv;
+
+        condition_lock(&condi);
+        while(!data)
+                condition_wait(&condi);
+
+        rv = data;
+        data = 0UL;
+        condition_unlock();
+
+        printf("Data received: %lu\n", rv);
+        return rv;
+}
+@endcode
+ */
+
+/**
  * @defgroup ipm Message queue management
  * @ingroup sched
  * @brief Inter-Process messages.
@@ -99,8 +141,8 @@
  * * It is extremely hard if not impossible to know before hand how long threads need to execute
  *
  * Therefore, it is a better solution to using virtual deadlines. This means
- * that there is no guarantee whatsoever that the thread will be executed by 
- * the time the deadline expires, it is merely used to select the next thread 
+ * that there is no guarantee whatsoever that the thread will be executed by
+ * the time the deadline expires, it is merely used to select the next thread
  * for execution.
  *
  * @section prios Priorities
@@ -148,7 +190,7 @@
  * of tickets does not need to be uniform; granting a process more tickets
  * provides it a relative higher chance of execution. A user based priority is
  * transformed into a ticket number using the following function: \n
- * 
+ *
  * \f$f(x) = \frac{1}{25}x+10\f$ \n
  * where \f$x\f$ is the priority assigned by a user.
  */
