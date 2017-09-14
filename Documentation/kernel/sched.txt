@@ -78,7 +78,9 @@
  * @ingroup sched
  * @brief Preemption API
  *
- * API to manage the CPU preemption.
+ * Preemption is the act of (temporarily) interrupting a task to give other
+ * tasks the chance at CPU time. How often the scheduler steps in with preemption
+ * can be defined at compile time by changing the time slice.
  */
 
 /**
