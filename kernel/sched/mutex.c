@@ -63,12 +63,12 @@ void mutex_lock(mutex_t *mutex)
 {
 	struct thread *tp = current_thread();
 
+	preempt_disable();
 	if(mutex->owner != tp) {
 		while(mutex->count != 0)
 			raw_event_wait(&mutex->qp, EVENT_WAIT_INFINITE);
-	} 
+	}
 
-	preempt_disable();
 	mutex->count++;
 	mutex->owner = tp;
 }
@@ -84,7 +84,7 @@ void mutex_unlock(mutex_t *mutex)
 	struct thread *tp = current_thread();
 
 	if(mutex->owner != tp)
-		panic_P(PSTR("Invalid mutex unlock\n"));
+		return;
 
 	if(--mutex->count == 0) {
 		mutex->owner = NULL;
@@ -106,4 +106,3 @@ void mutex_unlock_irq(mutex_t *mutex)
 }
 
 /** @} */
-
