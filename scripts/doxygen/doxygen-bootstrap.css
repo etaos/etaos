@@ -52,6 +52,10 @@ body {
     background-color: #f5f5f5;
 }
 
+pre.fragment.well {
+    display: none;
+}
+
 .footer-row {
     line-height: 44px;
 }
