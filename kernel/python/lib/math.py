@@ -92,6 +92,8 @@ static float float_get_args(int num, int n)
 }
 """
 
+__name__ = "math"
+
 pi = 3.141592
 e = 2.718281
 
@@ -200,6 +202,11 @@ def sqrt(n):
     return retval;
     """
     pass
+
+def hypot(x, y):
+    m = x*x
+    n = y*y
+    return sqrt(m+n)
 
 def ceil(n):
     """__NATIVE__
