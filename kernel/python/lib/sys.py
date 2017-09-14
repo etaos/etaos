@@ -276,6 +276,7 @@ def sys_yield():
 def thread_yield():
 	"""__NATIVE__
 	interp_setRescheduleFlag(true);
+	NATIVE_SET_TOS(PM_NONE);
 	return PM_RET_OK;
 	"""
 	pass
@@ -287,6 +288,7 @@ def thread_yield():
 def wait(ms):
 	t = clock() + ms
 	while clock() < t:
+		gc()
 		thread_yield()
 
 ## @}
