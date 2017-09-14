@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup pwm
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -31,16 +36,36 @@
 
 static struct pwm *pwm_chips[MAX_PWM_CHIPS];
 
+/**
+ * @brief Register a new PWM chip.
+ * @param pwm PWM to register.
+ * @param id PWM id.
+ */
 void pwm_register_chip(struct pwm *pwm, int id)
 {
 	pwm_chips[id] = pwm;
 }
 
+/**
+ * @brief Search for a registered PWM device.
+ * @param id ID to search for.
+ * @return The PWM for \p id.
+ * @retval NULL If \p id is unknown.
+ */
 struct pwm *pwm_get_chip(int id)
 {
-	return pwm_chips[id];
+	if(id < MAX_PWM_CHIPS)
+		return pwm_chips[id];
+	else
+		return NULL;
 }
 
+/**
+ * @brief Update a PWM channel.
+ * @param pwm PWM device.
+ * @param chanid Channel ID to update.
+ * @param state PWM state to apply to \p chanid.
+ */
 void pwm_update_channel(struct pwm *pwm, int chanid, struct pwm_state *state)
 {
 	unsigned long flags;
@@ -50,6 +75,11 @@ void pwm_update_channel(struct pwm *pwm, int chanid, struct pwm_state *state)
 	spin_unlock_irqrestore(&pwm->lock, flags);
 }
 
+/**
+ * @brief Start a PWM device.
+ * @param pwm PWM to start.
+ * @param frequency Frequency to start \p pwm on.
+ */
 void pwm_start(struct pwm *pwm, uint32_t frequency)
 {
 	unsigned long flags;
@@ -59,6 +89,11 @@ void pwm_start(struct pwm *pwm, uint32_t frequency)
 	spin_unlock_irqrestore(&pwm->lock, flags);
 }
 
+/**
+ * @brief Stop a PWM device.
+ * @param pwm PWM to stop.
+ * @note All PWM channels of \p pwm will be stopped.
+ */
 void pwm_stop(struct pwm *pwm)
 {
 	unsigned long flags;
@@ -68,6 +103,12 @@ void pwm_stop(struct pwm *pwm)
 	spin_unlock_irqrestore(&pwm->lock, flags);
 }
 
+/**
+ * @brief Update the frequency of a PWM device.
+ * @param pwm PWM to update.
+ * @param frequency Frequency to tune \p pwm to.
+ * @return An error code.
+ */
 int pwm_update_frequency(struct pwm *pwm, uint32_t frequency)
 {
 	unsigned long flags;
@@ -79,3 +120,5 @@ int pwm_update_frequency(struct pwm *pwm, uint32_t frequency)
 
 	return rc;
 }
+
+/** @} */
