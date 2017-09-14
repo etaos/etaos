@@ -97,6 +97,9 @@ __name__ = "math"
 pi = 3.141592
 e = 2.718281
 
+## Round a number.
+# @param n Integer or floating point number.
+# @return Rounded value of \p n.
 def round(n):
     """__NATIVE__
     float rv;
@@ -112,6 +115,9 @@ def round(n):
     """
     pass
 
+## Calculate the cosine of \p n.
+# @param n Integer or floating point number.
+# @return Cosine of \p n.
 def cos(n):
     """__NATIVE__
     float rv;
@@ -127,6 +133,9 @@ def cos(n):
     """
     pass
 
+## Calculate the sine of \p n.
+# @param n Integer or floating point number.
+# @return Sine of \p n.
 def sin(n):
     """__NATIVE__
     float rv;
@@ -142,6 +151,9 @@ def sin(n):
     """
     pass
 
+## Calculate the tangent of \p n.
+# @param n Integer or floating point number.
+# @return Tangent of \p n.
 def tan(n):
     """__NATIVE__
     float rv;
@@ -157,6 +169,9 @@ def tan(n):
     """
     pass
 
+## Calculate the arc tangent of \p n.
+# @param n Integer or floating point number.
+# @return Arc tangent of \p n.
 def atan(n):
     """__NATIVE__
     float rv;
@@ -172,6 +187,10 @@ def atan(n):
     """
     pass
 
+## Calculate the arc tangent of m/n.
+# @param n Integer or floating point number.
+# @param m Integer or floating point number.
+# @return The angle between the x-plane and the given coordinates \p n, \p m.
 def atan2(n, m):
     """__NATIVE__
     float n, m, rv;
@@ -188,6 +207,9 @@ def atan2(n, m):
     """
     pass
 
+## Calculate the square root of n.
+# @param n Integer or floating point number.
+# @return The square root of \p n.
 def sqrt(n):
     """__NATIVE__
     float rv;
@@ -203,11 +225,19 @@ def sqrt(n):
     """
     pass
 
+## Calculate the hypotenuse of \p x and \p y.
+# @param x Integer or floating point number.
+# @param y Integer or floating point number.
+# @return The hypotenuse.
 def hypot(x, y):
     m = x*x
     n = y*y
     return sqrt(m+n)
 
+
+## Round a number up.
+# @param n Integer or floating point number.
+# @return Rounded value of \p n.
 def ceil(n):
     """__NATIVE__
     float rv;
@@ -223,6 +253,9 @@ def ceil(n):
     """
     pass
 
+## Round a number down.
+# @param n Integer or floating point number.
+# @return Rounded value of \p n.
 def floor(n):
     """__NATIVE__
     float rv;
@@ -238,6 +271,9 @@ def floor(n):
     """
     pass
 
+## Calculate the exponent of \p n.
+# @param n Integer or floating point number.
+# @return The base \p e exponential function of \p n.
 def exp(n):
     """__NATIVE__
     float rv;
@@ -253,6 +289,9 @@ def exp(n):
     """
     pass
 
+## Calculate the base 10 log.
+# @param n Integer or floating point number.
+# @return The base 10 log of \p n.
 def log10(n):
     """__NATIVE__
     float rv;
@@ -268,6 +307,9 @@ def log10(n):
     """
     pass
 
+## Calculate the natural logarithm of \p n.
+# @param n Integer or floating point number.
+# @return The natural logarithm of \p n.
 def log(n):
     """__NATIVE__
     float rv;
@@ -283,6 +325,10 @@ def log(n):
     """
     pass
 
+## Calculate the modulo of \p n and \p m.
+# @param n Integer or floating point number.
+# @param m Integer or floating point number.
+# @return The modulo of \p n and \p m.
 def mod(n, m):
     """__NATIVE__
     float rv, n, m;
@@ -299,6 +345,10 @@ def mod(n, m):
     """
     pass
 
+## Calculate \p n to the power of \p m.
+# @param n Integer or floating point number.
+# @param m Integer or floating point number.
+# @return The result of \p n to the mth power.
 def pow(n, m):
     """__NATIVE__
     float rv, n, m;
