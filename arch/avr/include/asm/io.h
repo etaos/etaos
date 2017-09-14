@@ -27,9 +27,23 @@
 
 #define CPU_CORE_NUM 1
 
+/**
+ * @brief 8-bit I/O memory accessor.
+ * @param addr Memory address.
+ */
 #define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
+/**
+ * @brief 8-bit I/O memory accessor.
+ * @param addr Memory address.
+ */
 #define IO_ADDR(addr) (*(volatile unsigned char*)(addr))
 
+/**
+ * @brief 8-bit I/O memory accessor.
+ * @param addr Memory address.
+ * @note Used to access the memory below address 0x21, which cannot
+ *       be accessed directly.
+ */
 #define LOW_MEM_IO8(addr) (*(volatile unsigned char*)(addr+0x20))
 #define F_CPU CONFIG_FCPU
 
