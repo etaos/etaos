@@ -1,6 +1,6 @@
 /*
  *  ETA/OS - IRQ header
- *  Copyright (C) 2014   Michel Megens
+ *  Copyright (C) 2014, 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -153,7 +153,7 @@ typedef irqreturn_t (*irq_vector_t)(struct irq_data *irq, void *data);
  */
 struct irq_data {
 	unsigned int irq; //!< IRQ vector number.
-	struct list_head irq_list; //!< List of IRQ's.
+	struct list_head irq_list; //!< IRQ entry.
 
 	unsigned long flags; //!< IRQ flags.
 	uint64_t num; //!< Number of triggers.
@@ -241,7 +241,7 @@ extern struct irq_chip *arch_get_irq_chip(void);
 /**
  * @brief Set the sleep function for an IRQ chip.
  * @param chip to set sleep for.
- * @param sleep Function pointer.
+ * @param sleep Function sleep pointer.
  */
 static inline void irq_chip_set_sleep(struct irq_chip *chip,
 				      void (*sleep)(struct irq_chip *))
@@ -252,7 +252,7 @@ static inline void irq_chip_set_sleep(struct irq_chip *chip,
 /**
  * @brief Set the resume function for an IRQ chip.
  * @param chip to set resume for.
- * @param resume Function pointer.
+ * @param resume Function resume pointer.
  */
 static inline void irq_chip_set_resume(struct irq_chip *chip,
 				      void (*resume)(struct irq_chip *))
