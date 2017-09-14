@@ -49,8 +49,10 @@ def print_eeprom_and_sram():
 	while True:
 		sram_data = ram.read_float(addr)
 		ee_data = ee.read(addr, num)
+		vlength = math.hypot(2.0, 2.0)
+		sram_data = math.sin(sram_data / 2.0)
 		print "[python]:    EEPROM: %d and %d" % (ee_data[0], ee_data[1])
-		print "[python]:    SRAM: %f" % math.sin(sram_data / 2.0)
+		print "[python]:    SRAM: %f :: Length of (2, 2): %f" % (sram_data, vlength)
 		sys.wait(1000)
 
 def main():
@@ -67,4 +69,3 @@ def main():
 		print_temperature(lm)
 
 main()
-
