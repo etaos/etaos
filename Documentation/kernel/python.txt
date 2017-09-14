@@ -17,6 +17,17 @@
  */
 
 /**
+ * @defgroup python-math Mathematical functions
+ * @ingroup python
+ * @brief Math package which provides mathematical functions defined by
+ *        the C standard.
+ *
+ * All functions accept either floating point or integer numbers as input. If
+ * an integer number is given as input, the package will convert it to a
+ * floating point as required.
+ */
+
+/**
  * @defgroup python-cpu CPU
  * @ingroup python
  * @brief Python CPU module.
