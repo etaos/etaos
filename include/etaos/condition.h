@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup condition
+ * @{
+ */
+
 #ifndef __CONDITION_H__
 #define __CONDITION_H__
 
@@ -24,9 +29,12 @@
 #include <etaos/thread.h>
 #include <etaos/mutex.h>
 
+/**
+ * @brief Condition variable datastructure.
+ */
 struct condition {
-	mutex_t lock;
-	struct thread_queue qp;
+	mutex_t lock; //!< Mutex lock.
+	struct thread_queue qp; //!< Event queue to wait on.
 };
 
 extern void condition_init(struct condition *c);
@@ -38,3 +46,5 @@ extern void condition_lock(struct condition *c);
 extern void condition_unlock(struct condition *c);
 
 #endif
+
+/** @} */
