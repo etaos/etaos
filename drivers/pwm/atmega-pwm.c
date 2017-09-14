@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup atmpwm
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/bitops.h>
@@ -33,24 +38,30 @@
 #include <asm/pgm.h>
 #include <asm/pwm.h>
 
-#define ATMEGA_MAX_FREQ 8e6
-#define ATMEGA_MIN_FREQ 1
+#define ATMEGA_MAX_FREQ 8e6 //!< Maximum PWM frequency
+#define ATMEGA_MIN_FREQ 1   //!< Minimum PWM frequency
 
+/**
+ * @brief ATmega PWM I/O registers.
+ */
 struct atmega_pwm_iobase {
-	volatile uint16_t *icr;
-	volatile uint8_t *tccra,
-			 *tccrb,
-			 *timsk;
-	uint8_t prescaler;
-	uint16_t top;
+	volatile uint16_t *icr; //!< Input compare
+	volatile uint8_t *tccra, //!< Control A
+			 *tccrb, //!< Control B
+			 *timsk; //!< Interrupt mask
+	uint8_t prescaler; //!< Prescaler bits
+	uint16_t top; //!< OCR top value
 };
 
+/**
+ * @brief ATmega PWM channel datastructure.
+ */
 struct atmega_pwm_channel {
-	uint8_t irq_flag;
-	uint8_t oc_pin;
-	uint8_t irq;
-	volatile uint16_t *ocr;
-	struct pwm_channel channel;
+	uint8_t irq_flag; //!< IRQ enable flag
+	uint8_t oc_pin; //!< Output compare flag
+	uint8_t irq; //!< IRQ number
+	volatile uint16_t *ocr; //!< Output compare register.
+	struct pwm_channel channel; //!< PWM channel
 };
 
 static const uint16_t prescaler_data[] = {
@@ -450,3 +461,5 @@ static void __used atmega_pwm_init(void)
 }
 
 device_init(atmega_pwm_init);
+
+/** @} */
