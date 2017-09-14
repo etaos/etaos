@@ -38,8 +38,7 @@ class TMP36:
 	def read(self):
 		t = cpu.analog_read(self.pin)
 		t *= 5000.0 / 1024.0
-		t -= 500
-		return t / 10
+		t -= 500.0
+		return t / 10.0
 
 ## @}
-

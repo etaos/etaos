@@ -111,6 +111,7 @@ def write(name, addr, data, num):
 
 	pm_sram_write(cname, caddr, cdata, cnum);
 	kfree(cdata);
+	NATIVE_SET_TOS(PM_NONE);
 
 	return retval;
 #else
@@ -149,6 +150,7 @@ def write_float(name, addr, flt):
 	cfloat = ((pPmFloat_t)flt)->val;
 
 	pm_sram_write_float(cname, caddr, cfloat);
+	NATIVE_SET_TOS(PM_NONE);
 	return retval;
 #else
 	return PM_RET_OK;
@@ -270,6 +272,7 @@ def write_string(name, addr, string, length):
 	cdata = (void*)((pPmString_t)data)->val;
 
 	pm_sram_write(cname, caddr, cdata, cnum);
+	NATIVE_SET_TOS(PM_NONE);
 	return retval;
 #else
 	return PM_RET_OK;
@@ -320,4 +323,3 @@ def read_string(name, addr, length):
 #endif
 	"""
 	pass
-
