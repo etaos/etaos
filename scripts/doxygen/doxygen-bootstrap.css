@@ -52,7 +52,7 @@ body {
     background-color: #f5f5f5;
 }
 
-pre.fragment.well {
+pre.nodisplay {
     display: none;
 }
 

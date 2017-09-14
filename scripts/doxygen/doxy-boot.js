@@ -1,4 +1,6 @@
 $( document ).ready(function() {
+    var docname = window.location.pathname;
+    docname = docname.split("/").pop();
 
     $("div.headertitle").addClass("page-header");
     $("div.title").addClass("h1");
@@ -34,6 +36,11 @@ $( document ).ready(function() {
     $("table.directory").addClass("table table-striped");
     $("div.summary > a").addClass("btn btn-default btn-xs");
     $("table.fieldtable").addClass("table");
+
+    if(docname !== "index.html") {
+        $(".fragment").addClass("nodisplay");
+    }
+
     $(".fragment").addClass("well");
     $(".memitem").addClass("panel panel-default");
     $(".memproto").addClass("panel-heading");
