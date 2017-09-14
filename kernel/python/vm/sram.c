@@ -73,11 +73,10 @@ int pm_sram_write_float(const char *name, uint16_t addr, float flt)
 	return rc;
 }
 
-float pm_sram_read_float(const char *name, uint16_t addr)
+int pm_sram_read_float(const char *name, uint16_t addr, float *flt)
 {
 	char namebuff[SRAM_NAME_BUFFER_SIZE];
-	int fd;
-	float flt;
+	int fd, rv;
 	FILE *stream;
 
 	snprintf(namebuff, SRAM_NAME_BUFFER_SIZE, "/dev/%s", name);
@@ -88,11 +87,10 @@ float pm_sram_read_float(const char *name, uint16_t addr)
 
 	stream = filep(fd);
 	lseek(stream, addr, SEEK_SET);
-	if(read(fd, &flt, sizeof(float)) < 0)
-		flt = 0.0f;
+	rv = read(fd, flt, sizeof(float));
 	close(fd);
 
-	return flt;
+	return rv;
 }
 
 int pm_sram_read(const char *name, uint16_t addr, void *buff, size_t length)

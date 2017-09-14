@@ -169,6 +169,7 @@ def read_float(name, addr):
 	const char *cname;
 	uint16_t caddr;
 	float cfloat;
+	int rv;
 
 	if (NATIVE_GET_NUM_ARGS() != 2) {
 		PM_RAISE(retval, PM_RET_EX_TYPE);
@@ -187,9 +188,14 @@ def read_float(name, addr):
 	cname = (const char*)((pPmString_t)name)->val;
 	caddr = ((pPmInt_t)addr)->val;
 
-	cfloat = pm_sram_read_float(cname, caddr);
-	retval = float_new(cfloat, &flt);
+	rv = pm_sram_read_float(cname, caddr, &cfloat);
 
+	if(rv < 0) {
+		NATIVE_SET_TOS(PM_NONE);
+		return retval;
+	}
+
+	retval = float_new(cfloat, &flt);
 	NATIVE_SET_TOS(flt);
 	return retval;
 #else
