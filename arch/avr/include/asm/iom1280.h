@@ -41,6 +41,20 @@
 #define ADC_COMPLETED_NUM		29
 #define TIMER2_OVERFLOW_VECTOR_NUM	15
 
+#define TIMER1_CAPT_VECTOR_NUM 16
+#define TIMER1_OCA_VECTOR_NUM 17
+#define TIMER1_OCB_VECTOR_NUM 18
+#define TIMER1_OCC_VECTOR_NUM 19
+#define TIMER3_OCA_VECTOR_NUM 32
+#define TIMER3_OCB_VECTOR_NUM 33
+#define TIMER3_OCC_VECTOR_NUM 34
+#define TIMER4_OCA_VECTOR_NUM 42
+#define TIMER4_OCB_VECTOR_NUM 43
+#define TIMER4_OCC_VECTOR_NUM 44
+#define TIMER5_OCA_VECTOR_NUM 47
+#define TIMER5_OCB_VECTOR_NUM 48
+#define TIMER5_OCC_VECTOR_NUM 49
+
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(23)
 #define SPI_STC_VECTOR irq_vector(24)
@@ -48,6 +62,24 @@
 #define USART_RX_STC_VECTOR irq_vector(25)
 #define ADC_COMPLETED_VECTOR irq_vector(29)
 #define TIMER2_OVERFLOW_VECTOR irq_vector(15)
+
+#define TIMER1_CAPT_VECTOR irq_vector(16)
+#define TIMER1_OCA_VECTOR irq_vector(17)
+#define TIMER1_OCB_VECTOR irq_vector(18)
+#define TIMER1_OCC_VECTOR irq_vector(19)
+#define TIMER3_OCA_VECTOR irq_vector(32)
+#define TIMER3_OCB_VECTOR irq_vector(33)
+#define TIMER3_OCC_VECTOR irq_vector(34)
+#define TIMER4_OCA_VECTOR irq_vector(42)
+#define TIMER4_OCB_VECTOR irq_vector(43)
+#define TIMER4_OCC_VECTOR irq_vector(44)
+#define TIMER5_OCA_VECTOR irq_vector(47)
+#define TIMER5_OCB_VECTOR irq_vector(48)
+#define TIMER5_OCC_VECTOR irq_vector(49)
+
+#define COMC 3
+#define COMB 5
+#define COMA 7
 
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
@@ -94,7 +126,7 @@
 #define STDIN_PORT SIMI
 #endif /* CONFIG_SIMUL_AVR */
 
-/* TIMER 0 */ 
+/* TIMER 0 */
 #define TCCR0A MEM_IO8(0x44)
 #define WGM00  0x1
 #define WGM01  0x2
@@ -157,6 +189,190 @@
 #define OCF2B		2
 
 #define GTCCR		IO_ADDR(0x43)
+
+/* TIMER 1, 3, 4, 5 (PWM) */
+
+/* OCR registers */
+#define OCR1A   MEM_IO16(0x88)
+#define OCR1B   MEM_IO16(0x8A)
+#define OCR1C   MEM_IO16(0x8C)
+
+#define OCR3A   MEM_IO16(0x98)
+#define OCR3B   MEM_IO16(0x9A)
+#define OCR3C   MEM_IO16(0x9C)
+
+#define OCR4A   MEM_IO16(0xA8)
+#define OCR4B   MEM_IO16(0xAA)
+#define OCR4C   MEM_IO16(0xAC)
+
+#define OCR5A   MEM_IO16(0x128)
+#define OCR5B   MEM_IO16(0x12A)
+#define OCR5C   MEM_IO16(0x12C)
+
+#define TCCR1A  MEM_IO8(0x80)
+#define COM1A1  7
+#define COM1A0  6
+#define COM1B1  5
+#define COM1B0  4
+#define COM1C1  3
+#define COM1C0  2
+#define WGM11   1
+#define WGM10   0
+
+#define TCCR1B  MEM_IO8(0x81)
+#define ICNC1   7
+#define ICES1   6
+#define WGM13   4
+#define WGM12   3
+#define CS12    2
+#define CS11    1
+#define CS10    0
+
+#define TCCR1C  MEM_IO8(0x82)
+#define FOC1A   7
+#define FOC1B   6
+#define FOC1C   5
+
+#define TCCR3A  MEM_IO8(0x90)
+#define COM3A1  7
+#define COM3A0  6
+#define COM3B1  5
+#define COM3B0  4
+#define COM3C1  3
+#define COM3C0  2
+#define WGM31   1
+#define WGM30   0
+
+#define TCCR3B  MEM_IO8(0x91)
+#define ICNC3   7
+#define ICES3   6
+#define WGM33   4
+#define WGM32   3
+#define CS32    2
+#define CS31    1
+#define CS30    0
+
+#define TCCR3C  MEM_IO8(0x92)
+#define FOC3A   7
+#define FOC3B   6
+#define FOC3C   5
+
+#define TCCR4A  MEM_IO8(0xA0)
+#define COM4A1  7
+#define COM4A0  6
+#define COM4B1  5
+#define COM4B0  4
+#define COM4C1  3
+#define COM4C0  2
+#define WGM41   1
+#define WGM40   0
+
+#define TCCR4B  MEM_IO8(0xA1)
+#define ICNC4   7
+#define ICES4   6
+#define WGM43   4
+#define WGM42   3
+#define CS42    2
+#define CS41    1
+#define CS40    0
+
+#define TCCR4C  MEM_IO8(0xA2)
+#define FOC4A   7
+#define FOC4B   6
+#define FOC4C   5
+
+#define TCCR5A  MEM_IO8(0x120)
+#define COM5A1  7
+#define COM5A0  6
+#define COM5B1  5
+#define COM5B0  4
+#define COM5C1  3
+#define COM5C0  2
+#define WGM51   1
+#define WGM50   0
+
+#define TCCR5B  MEM_IO8(0x121)
+#define ICNC5   7
+#define ICES5   6
+#define WGM53   4
+#define WGM52   3
+#define CS52    2
+#define CS51    1
+#define CS50    0
+
+#define TCCR5C  MEM_IO8(0x122)
+#define FOC5A   7
+#define FOC5B   6
+#define FOC5C   5
+
+/* Interrupt flags for timer 1, 3, 4, 5 */
+#define TIFR1   MEM_IO8(0x16)
+#define ICF1    5
+#define OCF1C   3
+#define OCF1B   2
+#define OCF1A   1
+#define TOV1    0
+
+#define TIFR3   MEM_IO8(0x18)
+#define ICF3    5
+#define OCF3C   3
+#define OCF3B   2
+#define OCF3A   1
+#define TOV3    0
+
+#define TIFR4   MEM_IO8(0x19)
+#define ICF4    5
+#define OCF4C   3
+#define OCF4B   2
+#define OCF4A   1
+#define TOV4    0
+
+#define TIFR5   MEM_IO8(0x1A)
+#define ICF5    5
+#define OCF5C   3
+#define OCF5B   2
+#define OCF5A   1
+#define TOV5    0
+
+#define TIMSK1  MEM_IO8(0x6F)
+#define ICIE1   5
+#define OCIE1C  3
+#define OCIE1B  2
+#define OCIE1A  1
+#define TOIE1   0
+
+#define TIMSK3  MEM_IO8(0x71)
+#define ICIE3   5
+#define OCIE3C  3
+#define OCIE3B  2
+#define OCIE3A  1
+#define TOIE3   0
+
+#define TIMSK4  MEM_IO8(0x72)
+#define ICIE4   5
+#define OCIE4C  3
+#define OCIE4B  2
+#define OCIE4A  1
+#define TOIE4   0
+
+#define TIMSK5  MEM_IO8(0x73)
+#define ICIE5   5
+#define OCIE5C  3
+#define OCIE5B  2
+#define OCIE5A  1
+#define TOIE5   0
+
+#define TCNT1   MEM_IO16(0x84)
+#define ICR1    MEM_IO16(0x86)
+
+#define ICR3    MEM_IO16(0x96)
+#define TCNT3   MEM_IO16(0x94)
+
+#define TCNT4   MEM_IO16(0xA4)
+#define ICR4    MEM_IO16(0xA6)
+
+#define TCNT5   MEM_IO16(0x124)
+#define ICR5    MEM_IO16(0x126)
 
 /* External memory interface */
 #define XMCRA MEM_IO8(0x74)
@@ -313,4 +529,3 @@ CDECL_END
 #endif
 
 #endif /* __IO1280_H__ */
-

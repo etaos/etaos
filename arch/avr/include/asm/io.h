@@ -32,6 +32,8 @@
  * @param addr Memory address.
  */
 #define MEM_IO8(addr) (*(volatile unsigned char*)(addr))
+#define MEM_IO16(addr) (*(volatile unsigned short*)(addr))
+
 /**
  * @brief 8-bit I/O memory accessor.
  * @param addr Memory address.

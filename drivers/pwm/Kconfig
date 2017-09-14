@@ -1,0 +1,32 @@
+menuconfig PWM
+	tristate "PWM drivers"
+	depends on GPIO
+	help
+	  Say 'y' here to build support for the PWM bus. If your chip doesn't
+	  support PWM, say 'n' here.
+
+if PWM
+config ATMEGA_PWM
+	tristate "ATmega PWM driver"
+	select ARCH_PWM
+	help
+	  Say 'y' here to build support for the ATmega PWM bus.
+if ATMEGA_PWM
+config PWM0
+	depends on HAVE_PWM0
+	bool "Enable PWM0"
+
+config PWM1
+	depends on HAVE_PWM1
+	bool "Enable PWM1"
+
+config PWM2
+	depends on HAVE_PWM2
+	bool "Enable PWM2"
+
+config PWM3
+	depends on HAVE_PWM3
+	bool "Enable PWM3"
+
+endif
+endif

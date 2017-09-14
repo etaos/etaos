@@ -1,0 +1,7 @@
+obj-y += pwm.o
+ETAOS_LIBS += -latmega-gpio -lgpio \
+		-lusart-atmega -lusart \
+		-ldriver-core -lplatform -lpwm-core -latmega-pwm -lc
+ETAOS_LIB_DIR := usr/lib/etaos
+APP_TARGET := test-app.img
+clean-files += test-app.img test-app.hex
