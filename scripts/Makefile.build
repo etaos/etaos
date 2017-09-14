@@ -206,7 +206,7 @@ $(crurom-obj):
 	$(call cmd,gen_romfs)
 	$(call cmd,cc_crurom_o_c)
 
-quiet_cmd_gen_pylib = GEN     pylib.c\n  GEN     pylib-img.c
+quiet_cmd_gen_pylib = GEN     $(obj)/pylib.c\n  GEN     $(obj)/pylib-img.c
       cmd_gen_pylib = $(PYLIBCREATOR) -f kernel/python/lib/pmfeatures.py \
 		      -c -s --memspace=flash -o kernel/python/vm/pylib-img.c \
 		      --native-file=kernel/python/vm/pylib.c $(pythonlibs)
@@ -214,7 +214,7 @@ quiet_cmd_gen_pylib = GEN     pylib.c\n  GEN     pylib-img.c
 kernel/python/vm/pylib.c kernel/python/vm/pylib-img.c: $(pythonlibs) $(PYLIBCREATOR)
 	$(call cmd,gen_pylib)
 
-quiet_cmd_gen_pyusrlib = GEN     pyusrlib.c\n  GEN     pyusrlib-img.c
+quiet_cmd_gen_pyusrlib = GEN     $(obj)/pyusrlib.c\n  GEN     $(obj)/pyusrlib-img.c
       cmd_gen_pyusrlib = $(PYLIBCREATOR) -f kernel/python/lib/pmfeatures.py \
 		      -c -u --memspace=flash -o $(obj)/pyusrlib-img.c \
 		      --native-file=$(obj)/pyusrlib.c $(pyusrlib-y)
