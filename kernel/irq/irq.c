@@ -194,6 +194,12 @@ int irq_set_handle(int irq, irq_vector_t vector)
 }
 
 #ifdef CONFIG_SOFT_IRQ
+/**
+ * @brief Brief trigger a software IRQ.
+ * @param irq IRQ to trigger.
+ * @return An error code.
+ * @note The IRQ will only be triggered if \p irq supports software triggering.
+ */
 int irq_soft_trigger(int irq)
 {
 	struct irq_data *data;
@@ -218,6 +224,12 @@ int irq_soft_trigger(int irq)
 	return -EINVAL;
 }
 
+/**
+ * @brief Assign a GPIO pin to an IRQ.
+ * @param irq Interrupt to assign \p pin to.
+ * @param pin GPIO pin to assign to \p irq.
+ * @return An error code.
+ */
 int irq_assign_pin(int irq, struct gpio_pin *pin)
 {
 	int err;
@@ -238,6 +250,11 @@ int irq_assign_pin(int irq, struct gpio_pin *pin)
 	return -EOK;
 }
 
+/**
+ * @brief Release the GPIO pin assigned to \p irq.
+ * @param irq IRQ to release the GPIO for.
+ * @return An error code.
+ */
 int irq_remove_pin(int irq)
 {
 	struct irq_data *data;

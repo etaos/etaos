@@ -175,8 +175,8 @@ struct irq_data {
 	void *private_data; //!< IRQ private data.
 
 	struct {
-		struct gpio_pin *pin;
-		uint8_t value;
+		struct gpio_pin *pin; //!< Assigned GPIO pin.
+		uint8_t value; //!< Value of \p pin.
 	};
 };
 
