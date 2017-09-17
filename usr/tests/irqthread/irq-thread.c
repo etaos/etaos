@@ -37,7 +37,7 @@ int main(void)
 {
 	printf_P(PSTR("Application started!\n"));
 
-	irq_request(EXT_IRQ0_NUM, &threaded_irq_handle, IRQ_FALLING_MASK | 
+	irq_request(EXT_IRQ0_VECTOR_NUM, &threaded_irq_handle, IRQ_FALLING_MASK | 
 			IRQ_THREADED_MASK, NULL);
 	
 	while(counter < 2) {
