@@ -170,6 +170,7 @@ void cpu_request_irq(struct irq_data *data)
 	}
 }
 
+#ifdef CONFIG_SOFT_IRQ
 int cpu_trigger_irq(struct irq_data *data)
 {
 	struct gpio_pin *pin = data->pin;
@@ -197,6 +198,7 @@ int cpu_trigger_irq(struct irq_data *data)
 		gpio_pin_write(pin, true);
 		data->value = true;
 	}
-	
+
 	return -EOK;
 }
+#endif
