@@ -25,8 +25,11 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/spinlock.h>
+#include <etaos/bitops.h>
 
 struct irq_data;
+struct gpio_pin;
 
 CDECL
 
@@ -40,6 +43,15 @@ extern void irq_restore(unsigned long *flags);
  * @param data IRQ data structure.
  */
 extern void cpu_request_irq(struct irq_data *data);
+/**
+ * @ingroup archAPI
+ * @brief Attempt to software trigger an interrupt.
+ * @param data IRQ to soft-trigger.
+ * @note This function is allowed to return before the interrupt triggered.
+ * @return An error code.
+ * @retval 0 On success.
+ */
+extern int cpu_trigger_irq(struct irq_data *data);
 /**
  * @ingroup archAPI
  * @brief Restore the IRQ flags.
@@ -161,6 +173,11 @@ struct irq_data {
 
 	irq_vector_t handler; //!< IRQ handler.
 	void *private_data; //!< IRQ private data.
+
+	struct {
+		struct gpio_pin *pin; //!< Assigned GPIO pin.
+		uint8_t value; //!< Value of \p pin.
+	};
 };
 
 #ifdef CONFIG_SCHED
@@ -182,7 +199,7 @@ struct irq_thread_data {
 /**
  * @brief Enable mask.
  */
-#define IRQ_ENABLE_MASK (1 << IRQ_ENABLE_FLAG) 
+#define IRQ_ENABLE_MASK (1 << IRQ_ENABLE_FLAG)
 /**
  * @brief Rising edge mask.
  */
@@ -207,6 +224,7 @@ struct irq_thread_data {
  * the CPU.
  */
 struct irq_chip {
+	spinlock_t lock; //!< Chip lock;
 	const char *name; //!< Chip name.
 	struct list_head irqs; //!< Assigned irqs.
 
@@ -225,6 +243,8 @@ extern int irq_request(int irq, irq_vector_t vector, unsigned long flags,
 extern void irq_handle_fn(void *data);
 extern int irq_set_handle(int irq, irq_vector_t vector);
 extern struct irq_data *irq_to_data(int irq);
+extern int irq_soft_trigger(int irq);
+extern int irq_assign_pin(int irq, struct gpio_pin *pin);
 
 /* IRQ HANDLE FUNCTIONS */
 extern void irq_handle(int irq);

@@ -30,6 +30,7 @@
 #include <etaos/cpu.h>
 #include <etaos/mem.h>
 #include <etaos/thread.h>
+#include <etaos/gpio.h>
 
 #include <asm/io.h>
 
@@ -44,7 +45,7 @@ struct irq_data *irq_to_data(int irq)
 {
 	if(irq >= CONFIG_ARCH_VECTORS)
 		return NULL;
-	
+
 	return arch_irqs[irq];
 }
 
@@ -60,7 +61,7 @@ static inline int irq_store_data(int irq, struct irq_data *data)
 {
 	if(irq >= CONFIG_ARCH_VECTORS)
 		return -EINVAL;
-	
+
 	arch_irqs[irq] = data;
 	return -EOK;
 }
@@ -192,5 +193,82 @@ int irq_set_handle(int irq, irq_vector_t vector)
 	return -EOK;
 }
 
-/** @} */
+#ifdef CONFIG_SOFT_IRQ
+/**
+ * @brief Brief trigger a software IRQ.
+ * @param irq IRQ to trigger.
+ * @return An error code.
+ * @note The IRQ will only be triggered if \p irq supports software triggering.
+ */
+int irq_soft_trigger(int irq)
+{
+	struct irq_data *data;
+	struct irq_chip *chip;
+	unsigned long flags;
+	struct list_head *irqitem;
 
+	chip = arch_get_irq_chip();
+
+	spin_lock_irqsave(&chip->lock, flags);
+	list_for_each(irqitem, &chip->irqs) {
+		data = list_entry(irqitem, struct irq_data, irq_list);
+		if(likely(data->irq != irq)) {
+			continue;
+		} else {
+			spin_unlock_irqrestore(&chip->lock, flags);
+			return cpu_trigger_irq(data);
+		}
+	}
+	spin_unlock_irqrestore(&chip->lock, flags);
+
+	return -EINVAL;
+}
+
+/**
+ * @brief Assign a GPIO pin to an IRQ.
+ * @param irq Interrupt to assign \p pin to.
+ * @param pin GPIO pin to assign to \p irq.
+ * @return An error code.
+ */
+int irq_assign_pin(int irq, struct gpio_pin *pin)
+{
+	int err;
+	struct irq_data *data;
+
+	data = irq_to_data(irq);
+	if(!data)
+		return -EINVAL;
+
+	if((err = gpio_pin_request(pin)) != -EOK)
+		return err;
+
+	gpio_direction_output(pin, false);
+
+	data->pin = pin;
+	data->value = 0;
+
+	return -EOK;
+}
+
+/**
+ * @brief Release the GPIO pin assigned to \p irq.
+ * @param irq IRQ to release the GPIO for.
+ * @return An error code.
+ */
+int irq_remove_pin(int irq)
+{
+	struct irq_data *data;
+
+	data = irq_to_data(irq);
+	if(!data || data->pin)
+		return -EINVAL;
+
+	gpio_pin_release(data->pin);
+	data->value = 0;
+	data->pin = NULL;
+
+	return -EOK;
+}
+#endif
+
+/** @} */

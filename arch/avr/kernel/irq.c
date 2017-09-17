@@ -20,12 +20,16 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/error.h>
 #include <etaos/irq.h>
 #include <etaos/bitops.h>
 #include <etaos/list.h>
+#include <etaos/stdio.h>
+#include <etaos/gpio.h>
 
 #include <asm/io.h>
 #include <asm/irq.h>
+#include <asm/pgm.h>
 
 void arch_irq_disable(void)
 {
@@ -82,11 +86,117 @@ void raw_irq_enabled_flags(unsigned long *flags)
 	*flags = (status & (1UL << AVR_INTERRUPT_FLAG)) != 0;
 }
 
+#define EXT_IRQ0_SHIFT 0
+#define EXT_IRQ1_SHIFT 2
+#define EXT_IRQ2_SHIFT 4
+#define EXT_IRQ3_SHIFT 6
+#define EXT_IRQ4_SHIFT 0
+#define EXT_IRQ5_SHIFT 2
+#define EXT_IRQ6_SHIFT 4
+#define EXT_IRQ7_SHIFT 6
+
 void cpu_request_irq(struct irq_data *data)
 {
+	uint8_t flags;
+
+	if(test_bit(IRQ_FALLING_FLAG, &data->flags)) {
+		flags = 0x2;
+	} else if(test_bit(IRQ_RISING_FLAG, &data->flags)) {
+		flags = 0x3;
+	} else {
+		flags = 0x1;
+		data->flags |= IRQ_RISING_MASK | IRQ_FALLING_MASK;
+	}
+
 	switch(data->irq) {
-	default:
+#ifdef EXT_IRQ0_VECTOR_NUM
+	case EXT_IRQ0_VECTOR_NUM:
+		EICRA |= flags << EXT_IRQ0_SHIFT;
+		EIMSK |= 1;
 		break;
+#endif
+
+#ifdef EXT_IRQ1_VECTOR_NUM
+	case EXT_IRQ1_VECTOR_NUM:
+		EICRA |= flags << EXT_IRQ1_SHIFT;
+		EIMSK |= 2;
+		break;
+#endif
+
+#ifdef EXT_IRQ2_VECTOR_NUM
+	case EXT_IRQ2_VECTOR_NUM:
+		EICRA |= flags << EXT_IRQ2_SHIFT;
+		EIMSK |= 4;
+		break;
+#endif
+
+#ifdef EXT_IRQ3_VECTOR_NUM
+	case EXT_IRQ3_VECTOR_NUM:
+		EICRA |= flags << EXT_IRQ3_SHIFT;
+		EIMSK |= 8;
+		break;
+#endif
+
+#ifdef EXT_IRQ4_VECTOR_NUM
+	case EXT_IRQ4_VECTOR_NUM:
+		EICRB |= flags << EXT_IRQ4_SHIFT;
+		EIMSK |= 16;
+		break;
+#endif
+
+#ifdef EXT_IRQ5_VECTOR_NUM
+	case EXT_IRQ5_VECTOR_NUM:
+		EICRB |= flags << EXT_IRQ5_SHIFT;
+		EIMSK |= 32;
+		break;
+#endif
+
+#ifdef EXT_IRQ6_VECTOR_NUM
+	case EXT_IRQ6_VECTOR_NUM:
+		EICRB |= flags << EXT_IRQ6_SHIFT;
+		EIMSK |= 64;
+		break;
+#endif
+
+#ifdef EXT_IRQ7_VECTOR_NUM
+	case EXT_IRQ7_VECTOR_NUM:
+		EICRB |= flags << EXT_IRQ7_SHIFT;
+		EIMSK |= 128;
+		break;
+#endif
+
+	default:
+		return;
 	}
 }
 
+int cpu_trigger_irq(struct irq_data *data)
+{
+	struct gpio_pin *pin = data->pin;
+	int falling, rising;
+
+	if(!pin)
+		return -EINVAL;
+
+	falling = test_bit(IRQ_FALLING_FLAG, &data->flags);
+	rising = test_bit(IRQ_RISING_FLAG, &data->flags);
+
+	if(falling && rising) {
+		gpio_pin_write(pin, !data->value);
+		data->value = !data->value;
+	} else if(falling) {
+		if(!data->value)
+			gpio_pin_write(pin, true);
+
+		gpio_pin_write(pin, false);
+		data->value = false;
+	} else if(rising) {
+		if(data->value)
+			gpio_pin_write(pin, false);
+
+		gpio_pin_write(pin, true);
+		data->value = true;
+	}
+	
+	return -EOK;
+}

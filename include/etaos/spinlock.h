@@ -30,10 +30,14 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/irq.h>
 #include <etaos/preempt.h>
 
 #include <asm/irq.h>
+
+CDECL
+extern void irq_save_and_disable(unsigned long *flags);
+extern void irq_restore(unsigned long *flags);
+CDECL_END
 
 typedef struct spinlock {
 	uint8_t lock;
@@ -249,4 +253,3 @@ CDECL_END
 #endif /* __SPINLOCK_H__ */
 
 /** @} */
-

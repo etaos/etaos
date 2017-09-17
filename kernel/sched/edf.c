@@ -201,7 +201,7 @@ static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 	if(test_bit(THREAD_IDLE_FLAG, &tp->flags))
 		se->deadline += 15778463000000LL;
 
-	if(thread == SIGNALED) {
+	if(unlikely(thread == SIGNALED)) {
 		thread = NULL;
 #ifdef CONFIG_EVENT_MUTEX
 		tp->ec++;
@@ -218,7 +218,7 @@ static int raw_edf_insert(struct thread *volatile*tpp, struct thread *tp)
 	*tpp = tp;
 
 #ifdef CONFIG_EVENT_MUTEX
-	if(se->next && se->next->ec) {
+	if(unlikely(se->next && se->next->ec)) {
 		tp->ec += se->next->ec;
 		se->next->ec = 0;
 	}
@@ -317,6 +317,9 @@ static bool edf_preempt_check(struct rq *rq,
 		struct thread *cur, struct thread *nxt)
 {
 	time_t d1, d2;
+
+	if(unlikely(test_bit(THREAD_IDLE_FLAG, &nxt->flags)))
+		return false;
 
 	d1 = deadline(&cur->se);
 	d2 = deadline(&nxt->se);

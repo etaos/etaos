@@ -46,7 +46,7 @@
 
 #define HOLD 0x1
 
-#define SRAM_SYNC 5
+#define SRAM_SYNC 15
 
 #define SPI_BYTE_MODE HOLD
 #define SPI_PAGE_MODE HOLD | 0x80
@@ -215,4 +215,3 @@ void sram_23k256_init(void)
 chip_init(sram_23k256_init);
 
 /** @} */
-

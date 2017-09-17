@@ -30,6 +30,7 @@
 
 #include <etaos/kernel.h>
 #include <etaos/types.h>
+#include <etaos/bitops.h>
 #include <etaos/spinlock.h>
 #include <etaos/device.h>
 #include <etaos/bitops.h>
@@ -110,7 +111,7 @@ struct gpio_chip {
 
 CDECL
 extern void gpio_pin_init(struct gpio_chip *chp,
-		struct gpio_pin *pin, uint16_t nr, 
+		struct gpio_pin *pin, uint16_t nr,
 		unsigned long flags);
 extern int gpio_chip_init(struct gpio_chip *chip, uint16_t pins);
 extern struct gpio_pin *gpio_chip_to_pin(struct gpio_chip *chip, uint16_t nr);
@@ -175,4 +176,3 @@ CDECL_END
 
 #endif
 /* @} */
-

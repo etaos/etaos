@@ -30,6 +30,14 @@
  * @return The rounded number.
  */
 extern double round(double __x);
+
+/**
+ * @brief Calculate the hypotenuse of a right angled triangle.
+ * @param x Floating point value.
+ * @param y Floating point value.
+ * @return The square root of the sum of x and y squared.
+ */
+extern double hypot(double x, double y);
 /**
  * @brief Compute the cosine of \p __x.
  * @param __x Number to compute the cosine of.
@@ -138,4 +146,3 @@ extern double pow(double x, double y);
 /** @} */
 
 #endif
-

@@ -16,6 +16,13 @@ config IRQ_THREAD
 	  these kind of interrupts arrive delayed and have extra
 	  overhead in the kernel. If unsure say 'n' here.
 
+config SOFT_IRQ
+	bool "Software IRQs"
+	depends on GPIO
+	help
+	  Say 'y' here to build support for software IRQ triggering. If
+	  you are unsure, say 'n' here.
+
 config IRQ_DEBUG
 	bool "Threaded IRQ debug support"
 	depends on IRQ_THREAD

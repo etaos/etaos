@@ -41,7 +41,9 @@ int irq_chip_add_irq(struct irq_chip *chip, struct irq_data *irq)
 		return -ENOTINITIALISED;
 
 	irq->chip = chip;
+	spin_lock(&chip->lock);
 	list_add(&irq->irq_list, &chip->irqs);
+	spin_unlock(&chip->lock);
 	return 0;
 }
 
@@ -62,9 +64,9 @@ int irq_chip_init(struct irq_chip *chip, const char *name)
 	chip->sleep = NULL;
 	chip->resume = NULL;
 	chip->chip_handle = &irq_handle;
+	spinlock_init(&chip->lock);
 	return -EOK;
 }
 
 /* @} */
 /* @} */
-

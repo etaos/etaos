@@ -88,7 +88,8 @@ float pm_sram_read_float(const char *name, uint16_t addr)
 
 	stream = filep(fd);
 	lseek(stream, addr, SEEK_SET);
-	read(fd, &flt, sizeof(float));
+	if(read(fd, &flt, sizeof(float)) < 0)
+		flt = 0.0f;
 	close(fd);
 
 	return flt;
@@ -113,4 +114,3 @@ int pm_sram_read(const char *name, uint16_t addr, void *buff, size_t length)
 
 	return rc;
 }
-

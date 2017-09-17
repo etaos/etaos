@@ -32,7 +32,7 @@ class EEPROM(object):
 	# @param name Driver name.
 	def __init__(self, name):
 		self.name = name
-	
+
 	## Read from \p this EEPROM chip.
 	# @param addr Address to start reading.
 	# @param num Number of bytes to read.
@@ -130,10 +130,10 @@ def write(name, addr, data, num):
 	pm_ee_write(cname, rawaddr, dst, rawsize);
 
 	kfree(dst);
+	NATIVE_SET_TOS(PM_NONE);
 	return retval;
 #else
 	return PM_RET_OK;
 #endif
 	"""
 	pass
-

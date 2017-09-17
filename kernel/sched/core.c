@@ -165,7 +165,7 @@ void irq_thread_signal(struct irq_thread_data *data)
  * @param data IRQ data.
  * @note This function is a thread handle.
  *
- * Threaded IRQ's will be handled in this thread. Calls 
+ * Threaded IRQ's will be handled in this thread. Calls
  * struct irq_data::handler.
  */
 void irq_handle_fn(void *data)
@@ -491,28 +491,20 @@ static void raw_rq_add_thread(struct rq *rq, struct thread *tp)
 	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
 	tp->on_rq = true;
 	tp->rq = rq;
-
-	return;
 }
 
 /**
  * @brief Add a thread to a run queue.
  * @param tp Thread to add.
  * @note No locks are aquired.
+ * @see raw_rq_add_thread
  */
 void rq_add_thread_no_lock(struct thread *tp)
 {
 	struct rq *rq;
-	struct sched_class *class;
 
 	rq = sched_get_cpu_rq();
-	class = rq->sched_class;
-	class->add_thread(rq, tp);
-	set_bit(THREAD_RUNNING_FLAG, &tp->flags);
-	tp->on_rq = true;
-	tp->rq = rq;
-
-	return;
+	raw_rq_add_thread(rq, tp);
 }
 
 /**
@@ -587,10 +579,10 @@ static int raw_rq_remove_thread(struct rq *rq, struct thread *tp)
 	int err;
 
 	err = raw_rq_remove_thread_noresched(rq, tp);
-	
+
 	if(err > 0) {
 		schedule();
-		err = 0;
+		err = -EOK;
 	}
 
 	return err;
@@ -727,7 +719,7 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
 	struct thread *next;
 	struct sched_class *class = rq->sched_class;
 
-	if(class) {
+	if(likely(class)) {
 		next = class->next_runnable(rq);
 		if(!next)
 			next = current_thread();
@@ -768,12 +760,13 @@ static void rq_destroy_kill_q(struct rq *rq)
 static unsigned long __sched_switch_count(int cpu)
 {
 	struct rq *rq;
+	unsigned long flags;
 	unsigned long num;
 
 	rq = cpu_to_rq(cpu);
-	spin_lock(&rq->lock);
+	spin_lock_irqsave(&rq->lock, flags);
 	num = rq->switch_count;
-	spin_unlock(&rq->lock);
+	spin_unlock_irqrestore(&rq->lock, flags);
 
 	return num;
 }
@@ -834,8 +827,8 @@ static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
 {
 	struct sched_class *class = rq->sched_class;
 
-	if(prev) {
-		if(test_bit(THREAD_RUNNING_FLAG, &prev->flags)) {
+	if(likely(prev)) {
+		if(likely(test_bit(THREAD_RUNNING_FLAG, &prev->flags))) {
 			prev->rq = rq;
 			prev->on_rq = true;
 			class->add_thread(rq, prev);
@@ -881,7 +874,7 @@ static void rq_signal_event_queue(struct rq *rq, struct thread *tp)
 		timer_stop(tp->timer);
 	}
 
-	if(unlikely(current != tp)) {
+	if(current != tp) {
 		raw_rq_add_thread(rq, tp);
 		if(prio(tp) <= prio(current))
 			set_bit(THREAD_NEED_RESCHED_FLAG, &current->flags);
@@ -940,7 +933,7 @@ static void rq_signal_threads(struct rq *rq)
  */
 static inline void preempt_reset_slice(struct thread *tp)
 {
-	if(tp)
+	if(likely(tp))
 		tp->slice = CONFIG_TIME_SLICE;
 }
 #else
@@ -1002,22 +995,22 @@ struct thread *sched_find_thread_by_name(const char *name)
 
 /**
  * @brief Update the system clock.
- * @see __rq_update_clock
+ * @param rq Update the clock of `rq`.
+ * @see timer_process
  */
-static void rq_update_clock(void)
+static void rq_update_clock(struct rq *rq)
 {
-	int cpu;
-	struct rq *rq;
+	struct clocksource *src;
 
-	cpu = cpu_get_id();
-	rq = cpu_to_rq(cpu);
-	timer_process(rq_get_clock(rq));
+	src = rq_get_clock(rq);
+	timer_process(src);
 }
 
 /**
  * @brief Prepare the a reschedule.
  * @param rq Runqueue that is about to be rescheduled.
  * @param prev Thread that lost the CPU.
+ * @param next Thread that is about to receive CPU time.
  * @param irqs IRQ flags of the thread that is being scheduled out.
  *
  * This function is responsible for handling the dynamic priority and time
@@ -1025,12 +1018,11 @@ static void rq_update_clock(void)
  */
 static inline void __schedule_prepare(struct rq *rq,
 				      struct thread *prev,
-				      unsigned long *irqs)
+				      struct thread *next,
+				      unsigned long irqs)
 {
-	struct thread *next;
 	unsigned long flags = 0UL;
 
-	next = current_thread();
 	/*
 	 * Update the dynamic priorities of all threads that still
 	 * reside on the run queue.
@@ -1051,7 +1043,7 @@ static inline void __schedule_prepare(struct rq *rq,
 	preempt_reset_slice(prev);
 	cpu_get_state(&flags);
 	prev->cpu_state = flags;
-	prev->irq_state = *irqs;
+	prev->irq_state = irqs;
 }
 
 /**
@@ -1133,8 +1125,8 @@ static void sched_remote_kill_if(struct rq *rq)
 
 /**
  * @brief Reschedule policy.
- * @param curr Current thread.
- * @param next Thread which is supposed to be running after \p curr.
+ * @param cur Current thread.
+ * @param next Thread which is supposed to be running after \p cur.
  * @return an integer indicating whether to reschedule or not.
  * @retval 1 if __schedule should reschedule.
  * @retval 0 if __schedule should not reschedule.
@@ -1146,34 +1138,35 @@ static void sched_remote_kill_if(struct rq *rq)
  * If the next thread is _not_ the idle thread, the return value \p rv
  * will be:\n\n
  *
- * \f$ f(rv) = x \lor y\f$\n\n
+ * \f$ f(rv) = y \lor (x \land \neg f(n))\f$\n\n
  * Where:
- * * \f$x\f$ is the \p PREEMPT_NEED_RESCHED_FLAG
- * * \f$y\f$ is the \p THREAD_NEED_RESCHED_FLAG
+ * * \f$x\f$ is the `PREEMPT_NEED_RESCHED_FLAG`
+ * * \f$y\f$ is the `THREAD_NEED_RESCHED_FLAG`
+ * * \f$f(n)\f$ is the `THREAD_IDLE_FLAG` flag of the `next` thread
  *
- * When preemption is not enabled the value of THREAD_NEED_RESCHED_FLAG is
+ * When preemption is not enabled the value of \p THREAD_NEED_RESCHED_FLAG is
  * returned.
  */
-static int __schedule_need_resched(struct thread *curr, struct thread *next)
+static int schedule_decide(struct thread *cur, struct thread *next)
 {
 #ifdef CONFIG_PREEMPT
-	int preempt;
+	int resched;
 
-	if(likely(test_and_clear_bit(THREAD_NEED_RESCHED_FLAG,
-					&curr->flags))) {
-		clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
-		return true;
+	resched = test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
+	if(unlikely(resched)) {
+		clear_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+	} else {
+		resched = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+
+		if(unlikely(thread_is_idle(next) && resched)) {
+			resched = false;
+			preempt_reset_slice(cur);
+		}
 	}
 
-	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &curr->flags);
-	if(unlikely(thread_is_idle(next) && preempt)) {
-		preempt_reset_slice(curr);
-		return false;
-	}
-
-	return preempt;
+	return resched;
 #else
-	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &curr->flags);
+	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
 #endif
 }
 
@@ -1230,7 +1223,7 @@ static bool __hot __schedule(int cpu)
 	 * Run the sched clock and wake up threads that received an event
 	 * from an IRQ.
 	 */
-	rq_update_clock();
+	rq_update_clock(rq);
 	rq_signal_threads(rq);
 
 	next = sched_get_next_runnable(rq);
@@ -1241,12 +1234,12 @@ static bool __hot __schedule(int cpu)
 	 * THREAD_NEED_RESCHED_FLAG and the PREEMPT_NEED_RESCHED_FLAG. Also,
 	 * if prev == next a reschedule is redundant.
 	 */
-	if(likely(__schedule_need_resched(prev, next) && prev != next)) {
+	if(likely(schedule_decide(prev, next) && prev != next)) {
 		__sched_set_current_thread(rq, next);
 		rq->switch_count++;
 		rescheduled = true;
 
-		__schedule_prepare(rq, prev, &flags);
+		__schedule_prepare(rq, prev, next, flags);
 		rq_switch_context(rq, prev, next);
 		rq_update(rq); /* restores CPU / IRQ states */
 
@@ -1263,10 +1256,10 @@ static bool __hot __schedule(int cpu)
 
 /**
  * @brief Check if a reschedule is required.
- * @see __schedule_need_resched
+ * @see schedule_decide
  * @return true if a reschedule is required, false otherwise.
  *
- * For a more extensive check, use #__schedule_need_resched.
+ * For a more extensive check, use #schedule_decide.
  */
 static inline bool need_resched()
 {
@@ -1572,4 +1565,3 @@ static void __used sched_init(void)
 subsys_init(sched_init);
 
 /* @} */
-
