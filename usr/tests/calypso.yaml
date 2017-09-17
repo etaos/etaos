@@ -1,13 +1,13 @@
-hardware: 
-  ard-mega: 
+hardware:
+  ard-mega:
     cpu: ATmega2560
     name: "Arduino Mega"
-  ard-uno: 
+  ard-uno:
     cpu: ATmega328p
     name: "Arduino Uno"
 
-unit-tests: 
-  stress-test: 
+unit-tests:
+  stress-test:
     hardware: ard-mega
     autorun: false
     mode: manual
@@ -32,7 +32,7 @@ unit-tests:
     libdir: usr/lib
     compare: expected_output.cyo
 
-  irqthread-test: 
+  irqthread-test:
     hardware: ard-mega
     autorun: true
     mode: auto
@@ -174,6 +174,19 @@ unit-tests:
     libdir: usr/lib
     compare: expected_output.cyo
 
+  pwm-test:
+    autorun: true
+    hardware: ard-uno
+    mode: auto
+    name: "PWM test"
+    path: usr/tests/dev
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
   timer-test:
     autorun: true
     hardware: ard-uno
@@ -199,4 +212,3 @@ unit-tests:
     baud: 9600
     libdir: usr/lib
     compare: expected_output.cyo
-
