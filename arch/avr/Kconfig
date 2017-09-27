@@ -31,6 +31,8 @@ config HAVE_PWM3
 	bool
 config ARCH_PWM
 	bool
+config HAVE_ATMEGA_EEPROM
+	bool
 
 config INIT_STACK_SIZE
 	int "Init stack size"
@@ -131,6 +133,7 @@ config ATMEGA328
 	select ARCH_HRTIMER
 	select HAVE_PWM0
 	select HARVARD
+	select HAVE_ATMEGA_EEPROM
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega328p
 	  AVR core.
@@ -148,6 +151,7 @@ config ATMEGA1280
 	select HAVE_PWM2
 	select HAVE_PWM3
 	select HARVARD
+	select HAVE_ATMEGA_EEPROM
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega1280
 	  AVR core.
@@ -165,6 +169,7 @@ config ATMEGA2560
 	select HAVE_PWM2
 	select HAVE_PWM3
 	select HARVARD
+	select HAVE_ATMEGA_EEPROM
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega2560
 	  AVR core.
