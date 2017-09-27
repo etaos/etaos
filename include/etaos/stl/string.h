@@ -68,8 +68,8 @@ public:
 	bool operator==(const char *other) const { return equals(other); }
 
 
-	//char &operator[](size_t pos);
-	//const char &operator[](size_t pos) const;
+	char &operator[](size_t pos);
+	const char &operator[](size_t pos) const;
 	const char *c_str() const;
 
 protected:

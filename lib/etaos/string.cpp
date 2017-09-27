@@ -222,3 +222,22 @@ const char *String::c_str() const
 {
 	return this->buffer;
 }
+
+static char null_terminator = '\0';
+const char &String::operator[](size_t index) const
+{
+	if(index < this->length()) {
+		return this->buffer[index];
+	}
+
+	return null_terminator;
+}
+
+char &String::operator[](size_t index)
+{
+	if(index < this->length()) {
+		return this->buffer[index];
+	}
+
+	return null_terminator;
+}
