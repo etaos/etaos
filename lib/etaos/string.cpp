@@ -203,6 +203,21 @@ void String::concat(float f)
 	this->concat(buf);
 }
 
+bool String::equals(const String &s) const
+{
+	return equals(s.c_str());
+}
+
+bool String::equals(const char *s) const
+{
+	return strcmp(this->buffer, s) == 0;
+}
+
+int String::compareTo(const String &s) const
+{
+	return strcmp(this->buffer, s.c_str());
+}
+
 const char *String::c_str() const
 {
 	return this->buffer;

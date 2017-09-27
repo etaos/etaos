@@ -59,13 +59,13 @@ public:
 	void concat(unsigned long x);
 	void concat(float x);
 
-	/*size_t length() const { return strlen(this->buffer); }
+	size_t length() const { return strlen(this->buffer); }
 	bool equals(const String &s) const;
 	bool equals(const char *str) const;
-	int compareTo(const String &s) const;*/
+	int compareTo(const String &s) const;
 
-	//bool operator==(const String& other) const { return equals(other); }
-	//bool operator==(const char *other) const { return equals(other); }
+	bool operator==(const String& other) const { return equals(other); }
+	bool operator==(const char *other) const { return equals(other); }
 
 
 	//char &operator[](size_t pos);
