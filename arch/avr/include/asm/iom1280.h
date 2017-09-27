@@ -95,6 +95,22 @@
 #define COMB 5
 #define COMA 7
 
+/* EEPROM REGISTERS */
+#define EEPROM_SIZE 4096
+#define EECR MEM_IO8(0x3F)
+#define EERE  0
+#define EEPE  1
+#define EEMPE 2
+#define EERIE 3
+#define EEPM0 4
+#define EEPM1 5
+
+#define EEDR MEM_IO8(0x40)
+
+#define EEAR MEM_IO16(0x41)
+#define EEARH MEM_IO8(0x42)
+#define EEARL MEM_IO8(0x41)
+
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
 
