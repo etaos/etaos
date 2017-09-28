@@ -225,6 +225,9 @@ def run(f):
 	"""
 	pass
 
+## Return the number of bytes a given object takes in memory.
+# @param obj Object to get the size for.
+# @return Number of bytes \p obj takes up in memory.
 def sizeof(obj):
     """__NATIVE__
     pPmObj_t pobj;
@@ -298,6 +301,9 @@ def sizeof(obj):
     """
     pass
 
+## Return the raw size of \p var.
+# @param var Object to get the raw size of.
+# @return The raw size of \p var.
 def raw_sizeof(var):
         """__NATIVE__
         PmReturn_t retval;
