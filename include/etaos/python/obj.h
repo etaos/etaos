@@ -70,6 +70,8 @@
 /** Gets the size in bytes of the object. */
 #define PM_OBJ_GET_SIZE(pobj) (((pPmObj_t)pobj)->od & OD_SIZE_MASK)
 
+#define OBJ_GET_SIZE(pobj) PM_OBJ_GET_SIZE(pobj)
+
 /**
  * Gets the type of the object
  * This MUST NOT be called on objects that are free.
