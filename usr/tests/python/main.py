@@ -20,8 +20,24 @@ import sys, sram, math
 from sram import SRAM
 from eeprom import EEPROM
 
+class A(object):
+	def __init__(self):
+		self.name = "Hello"
+
+def change_name(obj, name):
+	"""__NATIVE__
+	pPmObj_t obj, name;
+
+	obj = NATIVE_GET_LOCAL(0);
+	name = NATIVE_GET_LOCAL(1);
+
+	return class_set_attr_cstr(obj, \"name\", name);
+	"""
+	pass
+
 ram = SRAM("23K256")
 ee = EEPROM("24C02")
+aobj = A()
 
 data_ary = [100, 50, 33]
 sram_str = "Some piece of text"
@@ -29,7 +45,9 @@ sram_len = len(sram_str)
 
 ram.write_string(0x40, sram_str)
 ee.write(0x60, data_ary, len(data_ary))
+change_name(aobj, "Hello, World")
 
+print aobj.name
 print math.atan2(1, 0)
 print "SRAM read: %s" % ram.read_string(0x40, sram_len)
 print "EEPROM read:"
@@ -38,4 +56,3 @@ print "calypso_exit"
 
 while True:
 	pass
-
