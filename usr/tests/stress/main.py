@@ -25,9 +25,9 @@ from sram import SRAM
 
 ee = EEPROM("24C02")
 ram = SRAM("23K256")
-sram_write_data = math.pi
 addr = 0x60
 data_ary = [155.0, 121.3, 3.1415, 12.2, 90.0, 8.91]
+ram_lst = [3.1415, 12.1, math.pi]
 
 def print_temperature(sensor):
 	tm = Time(True)
@@ -48,6 +48,10 @@ def print_temperature(sensor):
 
 def print_eeprom_and_sram():
 	while True:
+		ram.open()
+		sram_data = ram.read_list(len(ram_lst), True, addr)
+		ram.close()
+
 		ee.open()
 		ee_data = ee.read_list(len(data_ary), True, addr)
 		ee.close()
@@ -56,9 +60,8 @@ def print_eeprom_and_sram():
 			continue
 
 		vlength = math.hypot(2.0, 2.0)
-		sram_data = ram.read_float(addr)
-		if sram_data is not None:
-			sram_data = math.sin(sram_data / 2.0)
+		if len(sram_data) is not 0:
+			sram_data = math.sin(sram_data[2] / 2.0)
 		else:
 			sram_data = 0.0
 
@@ -71,7 +74,10 @@ def main():
 	ee.open()
 	ee.write_list(data_ary, True, addr)
 	ee.close()
-	ram.write_float(addr, sram_write_data)
+
+	ram.open()
+	ram.write_list(ram_lst, True, addr)
+	ram.close()
 
 	# Setup the LED pin
 	avr.port_direction_or(avr.portb, 0x80)
