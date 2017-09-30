@@ -38,6 +38,12 @@ class EEPROM(Device):
 		self.close()
 		return rv
 
+	def read_string(self, addr, length):
+		self.open()
+		rv = self.read(length, addr)
+		self.close()
+		return rv
+
 	def read_float(self, addr):
 		self.open()
 		rv = self.read_numeral(addr, True)

@@ -53,13 +53,14 @@ class Device(object):
         def close(self):
                 dev_close(self, self.desc)
                 self.is_open = False
+                self.desc = -1
 
         def write_list(self, ary, flt = False, addr = None):
                 if not self.is_open:
                         return None
                 return dev_write_list(self.desc, ary, len(ary), flt, addr)
 
-        def read_list(self, num, flt = False, addr = False):
+        def read_list(self, num, flt = False, addr = None):
                 if not self.is_open:
                         return None
                 return dev_read_list(self.desc, num, flt, addr)
@@ -173,8 +174,9 @@ def dev_read_list(desc, num, flt, addr):
                 size = length * sizeof(int32_t);
         }
 
-        iarry = buf = kzalloc(size);
+        buf = kzalloc(size);
         farry = buf;
+        iarry = buf;
 
         if(paddr != PM_NONE) {
                 address = ((pPmInt_t)paddr)->val;
@@ -226,7 +228,7 @@ def dev_write_list(desc, ary, length, flt, addr):
                         farry[idx] = ((pPmFloat_t)obj)->val;
                 }
 
-                length = length * sizeof(float);
+                length *= sizeof(float);
                 buf = farry;
         } else {
                 iarry = kzalloc(length * sizeof(int32_t));
@@ -235,7 +237,7 @@ def dev_write_list(desc, ary, length, flt, addr):
                         iarry[idx] = ((pPmInt_t)obj)->val;
                 }
 
-                length = length * sizeof(float);
+                length *= sizeof(int32_t);
                 buf = iarry;
         }
 
