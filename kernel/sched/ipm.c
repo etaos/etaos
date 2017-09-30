@@ -47,6 +47,7 @@ void ipm_queue_init(struct ipm_queue *iq, size_t len)
 	void *ptr;
 
 	thread_queue_init(&iq->qp);
+	spinlock_init(&iq->lock);
 	iq->qp.qhead = NULL;
 	ptr = kzalloc(sizeof(*iq->msgs) * len);
 	if(!ptr)
@@ -98,8 +99,10 @@ int ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 	raw_event_wait(&iq->qp, EVM_WAIT_INFINITE);
 
 	spin_lock_irqsave(&iq->lock, flags);
-	if(iq->wr_idx == iq->rd_idx)
+	if(iq->wr_idx == iq->rd_idx) {
+		spin_unlock_irqrestore(&iq->lock, flags);
 		return -EINVAL;
+	}
 
 	*msg = iq->msgs[iq->rd_idx];
 	iq->rd_idx += 1;
@@ -107,7 +110,7 @@ int ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 	if(iq->rd_idx != iq->wr_idx) {
 		spin_unlock_irqrestore(&iq->lock, flags);
 		event_notify(&iq->qp);
-		spin_lock_irqsave(&iq->lock, flags);
+		return -EOK;
 	}
 
 	spin_unlock_irqrestore(&iq->lock, flags);
@@ -139,4 +142,3 @@ bool ipm_reset_queue(struct ipm_queue *iq)
 	return true;
 }
 /* @} */
-
