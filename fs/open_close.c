@@ -57,7 +57,7 @@ int vfs_open(const char *path, int mode)
 		}
 	} else {
 		dir = basepath(path);
-		err = -EINVAL;
+		err = -EBADF;
 
 		fs = vfs_path_to_fs(dir);
 
@@ -101,4 +101,3 @@ int vfs_close(int fd)
 }
 
 /** @} */
-
