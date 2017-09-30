@@ -111,7 +111,7 @@ def dev_read_numeral(desc, flt, addr):
         pPmObj_t desc, numeral, address, flt;
         int fd, rv;
         size_t addr, size;
-        uint8_t buf[8];
+        uint8_t *buf;
         float *f;
         int32_t *i;
 
@@ -121,6 +121,7 @@ def dev_read_numeral(desc, flt, addr):
 
         fd = ((pPmInt_t)desc)->val;
         size = (flt == PM_TRUE) ? sizeof(float) : sizeof(int32_t);
+        buf = kzalloc(size);
         if(address != PM_NONE) {
                 addr = ((pPmInt_t)address)->val;
                 rv = device_read(fd, buf, size, &addr);
@@ -129,6 +130,7 @@ def dev_read_numeral(desc, flt, addr):
         }
 
         if(rv != -EOK) {
+                kfree(buf);
                 NATIVE_SET_TOS(PM_NONE);
                 return PM_RET_OK;
         }
@@ -141,6 +143,7 @@ def dev_read_numeral(desc, flt, addr):
                 int_new(*i, &numeral);
         }
 
+        kfree(buf);
         NATIVE_SET_TOS(numeral);
         return PM_RET_OK;
         """
