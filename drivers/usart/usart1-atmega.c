@@ -93,7 +93,7 @@ static int atmega_usart_write(struct usart *uart, const void *tx,
 	irq_exit_critical();
 	mutex_wait(&usart_mtx);
 
-	return txlen;
+	return -EOK;
 }
 
 static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
