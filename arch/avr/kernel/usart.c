@@ -29,3 +29,19 @@ SIGNAL(USART_RX_STC_VECTOR)
 	chip->chip_handle(USART_RX_STC_NUM);
 }
 
+#ifdef USART1_UDRE_VECTOR
+SIGNAL(USART1_UDRE_VECTOR)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+	chip->chip_handle(USART1_UDRE_VECTOR_NUM);
+
+}
+#endif
+
+#ifdef USART1_RX_COMPLETE_VECTOR
+SIGNAL(USART1_RX_COMPLETE_VECTOR)
+{
+	struct irq_chip *chip = arch_get_irq_chip();
+	chip->chip_handle(USART1_RX_COMPLETE_VECTOR_NUM);
+}
+#endif

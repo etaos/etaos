@@ -11,4 +11,16 @@ config ATMEGA_USART
 	help
 	  Say 'y' here if you are planning on using the USART
 	  controller on an ATmega AVR.
+
+config ATMEGA_USART1
+	tristate "ATmega USART1 module"
+	depends on USART && HAVE_USART1
+	help
+	  Say 'y' or 'm' here to build the USART1 drivers.
+
+config USART1_BAUD
+	int "USART1 baud rate"
+	depends on ATMEGA_USART1
+	help
+	  Set the default USART1 baudrate in bits/s.
 endif
