@@ -98,4 +98,3 @@ extern void avr_setup_usart_streams(void);
 CDECL_END
 
 #endif /* __ATMEGA_USART_H */
-
