@@ -123,7 +123,7 @@ THREAD(test_th_handle2, arg)
 			close(fd);
 		}
 
-		printf_P(PSTR("[2][%s]: ROMFS: %s\n"), 
+		printf_P(PSTR("[2][%s]: ROMFS: %s\n"),
 				current_thread_name(), romdata);
 		kfree(romdata);
 		now = time(NULL);
@@ -162,14 +162,14 @@ THREAD(test_th_handle, arg)
 		panic_P(PSTR("Couldn't open RAMFS file!\n"));
 	}
 
-	irq_request(EXT_IRQ2_VECTOR_NUM, &threaded_irq_handle,
+	irq_request(EXT_IRQ4_VECTOR_NUM, &threaded_irq_handle,
 			IRQ_THREADED_MASK | IRQ_RISING_MASK, IRQ_THREAD_FILENAME);
-	irq_assign_pin(EXT_IRQ2_VECTOR_NUM, platform_pin_to_gpio(19));
+	irq_assign_pin(EXT_IRQ4_VECTOR_NUM, platform_pin_to_gpio(2));
 	time(&now);
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
-		printf_P(PSTR("[%u][%s]: ee-byte read: %u\n"), 1, 
+		printf_P(PSTR("[%u][%s]: ee-byte read: %u\n"), 1,
 				current_thread_name(), readback);
 
 		condition_lock(&dbg_condi);
@@ -189,14 +189,14 @@ THREAD(test_th_handle, arg)
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
 				sizeof(sram_data));
 		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
-		printf_P(PSTR("[1][%s]: SRAM::EEPROM %f::%s\n"), 
+		printf_P(PSTR("[1][%s]: SRAM::EEPROM %f::%s\n"),
 				current_thread_name(),
 				sram_data, ee_string);
 
 
 		if(time_after(time(NULL), now + 5ULL)) {
 			time(&now);
-			irq_soft_trigger(EXT_IRQ2_VECTOR_NUM);
+			irq_soft_trigger(EXT_IRQ4_VECTOR_NUM);
 		}
 
 		sleep(500);
