@@ -21,9 +21,12 @@ test:
 		-e $(EX) -F $(CPUFREQ)
 
 hex: all
-	@$(OBJCOPY) -R .eeprom -O ihex test-app.img test-app.hex 
+	@$(OBJCOPY) -R .eeprom -O ihex test-app.img test-app.hex
+	@$(OBJCOPY) -j .eeprom --change-section-lma .eeprom=0 -O ihex test-app.img eeprom.hex 
 
 upload:
 	@$(AVRUPLOAD) -fH test-app.hex -m $(MCU) -p $(PROGRAMMER) -P $(PORT) \
 		-b $(BAUD) -c /etc/avrdude.conf
-
+upload_eeprom:
+	@$(AVRUPLOAD) -feH eeprom.hex -m $(MCU) -p $(PROGRAMMER) -P $(PORT) \
+		-b $(BAUD) -c /etc/avrdude.conf

@@ -1,0 +1,7 @@
+timestamp:
+        value: 1234567890
+        type: time_t
+
+datatest:
+        value: some data
+        type: string

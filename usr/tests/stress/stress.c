@@ -35,6 +35,8 @@
 #include <asm/io.h>
 #include <asm/pwm.h>
 
+#include "eepromify.h"
+
 static struct ipm_queue ipm_q;
 static uint8_t ee_value = 0x0;
 
@@ -123,7 +125,7 @@ THREAD(test_th_handle2, arg)
 			close(fd);
 		}
 
-		printf_P(PSTR("[2][%s]: ROMFS: %s\n"), 
+		printf_P(PSTR("[2][%s]: ROMFS: %s\n"),
 				current_thread_name(), romdata);
 		kfree(romdata);
 		now = time(NULL);
@@ -169,7 +171,7 @@ THREAD(test_th_handle, arg)
 
 	while(true) {
 		ee_stress_read_byte(EE_BYTE_ADDR, &readback);
-		printf_P(PSTR("[%u][%s]: ee-byte read: %u\n"), 1, 
+		printf_P(PSTR("[%u][%s]: ee-byte read: %u\n"), 1,
 				current_thread_name(), readback);
 
 		condition_lock(&dbg_condi);
@@ -189,7 +191,7 @@ THREAD(test_th_handle, arg)
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
 				sizeof(sram_data));
 		ee_stress_read(EE_STRING_ADDR, ee_string, sizeof(ee_string));
-		printf_P(PSTR("[1][%s]: SRAM::EEPROM %f::%s\n"), 
+		printf_P(PSTR("[1][%s]: SRAM::EEPROM %f::%s\n"),
 				current_thread_name(),
 				sram_data, ee_string);
 
@@ -295,11 +297,27 @@ static void setup_pwm(void)
 	pwm_update_channel(pwm, 1, &state);
 }
 
+static time_t read_time_from_config(void)
+{
+	int fd;
+	time_t rv;
+
+	fd = open("/dev/atmega-eeprom", _FDEV_SETUP_RW);
+
+	if(fd < 0)
+		panic_P(PSTR("Couldn't open ATmega EEPROM!"));
+
+	lseek(filep(fd), (size_t)&timestamp, SEEK_SET);
+	read(fd, &rv, sizeof(time_t));
+	close(fd);
+
+	return rv;
+}
+
 int main(void)
 {
 	const char * ip_msg = "IPM message\n";
 	uint8_t readback = 0;
-	char buff[16];
 	time_t now;
 	float temperature;
 
@@ -319,9 +337,8 @@ int main(void)
 	python_init();
 	python_start("main");
 
-	read(to_fd(stdin), &buff[0], 10);
-	buff[10] = 0;
-	now = (time_t)atol(buff);
+	getc(stdin);
+	now = read_time_from_config();
 	stime(now);
 
 	pgpio_pin_request(10);
