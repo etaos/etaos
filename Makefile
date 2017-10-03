@@ -55,7 +55,9 @@ HOSTCXX      = g++
 CRUROM       = $(srctree)/scripts/crurom/crurom
 PYLIBCREATOR = $(srctree)/scripts/pm-img-creator.py
 PYLIBLIST    = $(srctree)/scripts/pylib-list.py
+EEPROMIFY    = $(PYTHON) $(srctree)/scripts/crurom/eepromify.py
 CRUROMFLAGS  = -r
+PYTHON       = python
 HOSTCFLAGS   = -Wall -Wno-char-subscripts -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOSTCXXFLAGS = -O2
 DOXYGEN      = doxygen
@@ -95,8 +97,8 @@ ifeq ($(MAKECMDGOALS),)
 endif
 
 # Basic helpers built in scripts/
-PHONY += scripts_basic 
-scripts_basic: 
+PHONY += scripts_basic
+scripts_basic:
 	$(Q)$(MAKE) $(build)=scripts/basic
 	$(Q)rm -f .tmp_quiet_recordmcount
 
@@ -114,7 +116,7 @@ include $(srctree)/arch/$(SRCARCH)/Makefile
 
 export CONFIG_SHELL HOSTCC HOSTCXX HOSTCFLAGS HOSTCXXFLAGS
 export CRUROM CRUROMFLAGS
-export PYLIBCREATOR PYLIBLIST
+export PYLIBCREATOR PYLIBLIST EEPROMIFY PYTHON
 export KBUILD_BUILTIN KBUILD_MODULES
 export KBUILD_CFLAGS KBUILD_CXXFLAGS KBUILD_AFLAGS
 
@@ -129,7 +131,7 @@ export KBUILD_CFLAGS KBUILD_CXXFLAGS KBUILD_AFLAGS
 #         cmd_cc_o_c       = $(CC) $(c_flags) -c -o $@ $<
 #
 # If $(quiet) is empty, the whole command will be printed.
-# If it is set to "quiet_", only the short version will be printed. 
+# If it is set to "quiet_", only the short version will be printed.
 # If it is set to "silent_", nothing will be printed at all, since
 # the variable $(silent_cmd_cc_o_c) doesn't exist.
 #
@@ -420,4 +422,3 @@ FORCE:
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
-
