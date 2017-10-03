@@ -21,6 +21,8 @@
 
 #include <etaos/kernel.h>
 
+#define __eeprom __attribute__((section(".eeprom")))
+
 CDECL
 extern void eeprom_write_block(uint16_t addr, const void *buff, size_t num);
 extern void eeprom_read_block(uint16_t addr, void *buff, size_t num);
