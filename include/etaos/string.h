@@ -47,6 +47,10 @@ extern char *strdup(const char *s);
 extern int stricmp(const char *s1, const char *s2);
 extern int strnicmp(const char *s1, const char *s2, int n);
 
+#ifdef CONFIG_EXT_STRING
+extern const char **strsplit(const char *str, const char delim);
+#endif
+
 CDECL_END
 
 #ifndef __HARVARD__
