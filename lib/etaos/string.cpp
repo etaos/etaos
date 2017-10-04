@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup stl
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/mem.h>
@@ -261,3 +266,5 @@ char &String::operator[](size_t index)
 
 	return null_terminator;
 }
+
+/** @} */
