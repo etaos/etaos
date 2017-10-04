@@ -1,0 +1,16 @@
+/**
+ * @defgroup flash FLASH drivers
+ * @ingroup dev
+ * @brief FLASH core API.
+ *
+ * This module provides an interface to the program memory flash on
+ * harvard architectures.
+ */
+
+/**
+ * @defgroup atmega-flash ATmega FLASH drivers
+ * @ingroup flash
+ * @brief Flash drivers for the ATmega architecture.
+ * @note If possible place constants in the lower 64KiB of program memory as
+ *       this will greatly increase the performance of this subsystem.
+ */
