@@ -60,6 +60,13 @@ public:
 	void concat(float x);
 
 	size_t length() const { return strlen(this->buffer); }
+	bool empty() const { return this->length() == 0; }
+	char& back();
+	const char& back() const;
+
+	char& front();
+	const char& front() const;
+
 	bool equals(const String &s) const;
 	bool equals(const char *str) const;
 	int compareTo(const String &s) const;

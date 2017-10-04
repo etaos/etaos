@@ -137,6 +137,26 @@ String &String::operator=(const char *str)
 	return *this;
 }
 
+char &String::front()
+{
+	return (*this)[0];
+}
+
+const char &String::front() const
+{
+	return (*this)[0];
+}
+
+char &String::back()
+{
+	return (*this)[this->length() - 1];
+}
+
+const char &String::back() const
+{
+	return (*this)[this->length() - 1];
+}
+
 /* String concat */
 void String::concat(const char *str)
 {
