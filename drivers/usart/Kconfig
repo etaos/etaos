@@ -12,6 +12,13 @@ config ATMEGA_USART
 	  Say 'y' here if you are planning on using the USART
 	  controller on an ATmega AVR.
 
+config USART_BAUD
+	int "ATmega USART baud"
+	default 9600
+	depends on ATMEGA_USART
+	help
+	  Set the baud rate of the default USART.
+
 config ATMEGA_USART1
 	tristate "ATmega USART1 module"
 	depends on USART && HAVE_USART1
