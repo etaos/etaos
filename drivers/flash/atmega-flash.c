@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup atmega-flash
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/error.h>
 #include <etaos/device.h>
@@ -25,6 +30,9 @@
 #include <asm/io.h>
 #include <asm/pgm.h>
 
+/**
+ * @brief Block read size
+ */
 #define BLOCK_SIZE 2
 
 static int atmega_flash_read(struct flash_chip *flash, size_t addr, void *buff, size_t len)
@@ -67,3 +75,5 @@ static __used void atmega_flash_init(void)
 }
 
 module_init(atmega_flash_init);
+
+/** @} */

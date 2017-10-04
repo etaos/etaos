@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup flash
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
@@ -90,6 +95,9 @@ static int flash_getc(struct file *stream)
 	return rc;
 }
 
+/**
+ * @brief Flash file operations.
+ */
 struct dev_file_ops flash_ops = {
 	.read = &flash_read,
 	.get = &flash_getc,
@@ -97,6 +105,11 @@ struct dev_file_ops flash_ops = {
 	.close = &flash_close,
 };
 
+/**
+ * @brief Initialise a new flash chip.
+ * @param flash Flash chip to initialise.
+ * @see device_initialize
+ */
 void flash_chip_init(struct flash_chip *flash)
 {
 	if(!flash)
@@ -111,3 +124,5 @@ static __used void flash_init(void)
 }
 
 subsys_init(flash_init);
+
+/** @} */
