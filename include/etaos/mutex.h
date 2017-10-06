@@ -29,6 +29,7 @@
 #include <etaos/irq.h>
 #include <etaos/thread.h>
 #include <etaos/spinlock.h>
+#include <etaos/trace.h>
 
 /**
  * @brief Recursive mutex data structure.
@@ -44,8 +45,7 @@ typedef struct mutex {
 	struct thread *owner; //!< Owner of the mutex.
 #endif
 #ifdef CONFIG_MUTEX_TRACE
-	char *lock_file;
-	int lock_line;
+	trace_info_t trace;
 #endif
 } mutex_t;
 

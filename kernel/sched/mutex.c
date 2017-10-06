@@ -30,8 +30,7 @@
 #include <etaos/panic.h>
 
 #ifdef CONFIG_MUTEX_TRACE
-#include <etaos/mem.h>
-#include <etaos/string.h>
+#include <etaos/trace.h>
 #endif
 
 #include <asm/pgm.h>
@@ -79,10 +78,8 @@ void mutex_lock(mutex_t *mutex)
 	}
 
 #ifdef CONFIG_MUTEX_TRACE
-	if(!mutex->count) {
-		mutex->lock_file = strdup(file);
-		mutex->lock_line = line;
-	}
+	if(!mutex->count)
+		__trace_set(&mutex->trace, file, line, true);
 #endif
 	mutex->count++;
 	mutex->owner = tp;
@@ -101,12 +98,15 @@ void mutex_unlock(mutex_t *mutex)
 #endif
 {
 	struct thread *tp = current_thread();
+#ifdef CONFIG_MUTEX_TRACE
+	trace_info_t *trace = &mutex->trace;
+#endif
 
 	if(mutex->owner != tp) {
 #ifdef CONFIG_MUTEX_TRACE
 		panic("Faulty mutex unlock! From: {%s in %s:%i} By: {%s in %s:%i}",
-			mutex->owner ? mutex->owner->name : "null", mutex->lock_file,
-			mutex->lock_line, tp->name, file, line);
+			trace->owner ? trace->owner->name : "null", trace->file,
+			trace->line, tp->name, file, line);
 #else
 		panic("Faulty mutex unlock!");
 #endif
@@ -115,10 +115,7 @@ void mutex_unlock(mutex_t *mutex)
 	mutex->count -= 1;
 	if(mutex->count == 0) {
 #ifdef CONFIG_MUTEX_TRACE
-		if(mutex->lock_file) {
-			kfree(mutex->lock_file);
-			mutex->lock_line = -1;
-		}
+		trace_unset(&mutex->trace);
 #endif
 		mutex->owner = NULL;
 		event_notify(&mutex->qp);
