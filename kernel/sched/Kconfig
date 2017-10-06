@@ -35,6 +35,7 @@ config EVENT_MUTEX
 
 config MUTEX_TRACE
 	bool "Mutex tracers"
+	select TRACE_INFO
 	depends on MUTEX_EVENT_QUEUE
 	help
 	  Say 'y' here to enable the mutex tracers. The system will
