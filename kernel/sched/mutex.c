@@ -59,9 +59,12 @@ int mutex_wait_tmo(mutex_t *mutex, unsigned int tmo)
 /**
  * @brief Lock a mutex.
  * @param mutex Mutex to lock.
+ * @param file File from which the mutex is locked.
+ * @param line Line number within \p file.
  * @see mutex_unlock
  *
- * This function can be used recursively by the same thread without blocking.
+ * This function can be used recursively by the same thread without blocking. The
+ * \p file and \p line arguments are used for mutex tracing.
  */
 #ifdef CONFIG_MUTEX_TRACE
 void __mutex_lock(mutex_t *mutex, const char *file, int line)
@@ -88,8 +91,12 @@ void mutex_lock(mutex_t *mutex)
 /**
  * @brief Unlock a mutex.
  * @param mutex Mutex to unlock.
+ * @param file File from which the unlock was called.
+ * @param line Line number within \p file.
  * @see mutex_lock
  * @see mutex_unlock_irq
+ *
+ * The \p file and \p line arguments are used for mutex tracing.
  */
 #ifdef CONFIG_MUTEX_TRACE
 void __mutex_unlock(mutex_t *mutex, const char *file, int line)
