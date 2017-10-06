@@ -48,13 +48,8 @@ def print_temperature(sensor):
 
 def print_eeprom_and_sram():
 	while True:
-		ram.open()
 		sram_data = ram.read_list(len(ram_lst), True, addr)
-		ram.close()
-
-		ee.open()
 		ee_data = ee.read_list(len(data_ary), True, addr)
-		ee.close()
 
 		if len(ee_data) is 0:
 			continue
@@ -71,13 +66,8 @@ def print_eeprom_and_sram():
 
 def main():
 	lm = LM35(0)
-	ee.open()
 	ee.write_list(data_ary, True, addr)
-	ee.close()
-
-	ram.open()
 	ram.write_list(ram_lst, True, addr)
-	ram.close()
 
 	# Setup the LED pin
 	avr.port_direction_or(avr.portb, 0x80)

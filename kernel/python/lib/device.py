@@ -29,56 +29,29 @@ __name__ = "device"
 class Device(object):
         def __init__(self, name):
                 self.path = "/dev/%s" % name
-                self.desc = -1
-                self.is_open = False
-
-        def open(self):
-                self.desc = dev_open(self, self.path)
-                if self.desc >= 0:
-                        self.is_open = True
 
         def read(self, num, addr = None):
-                if self.is_open:
-                        return dev_read(self.desc, num, addr)
-                else:
-                        return None
-
+                return dev_read(self.path, num, addr)
 
         def write(self, data, addr = None):
-                if self.is_open:
-                        return dev_write(self.desc, data, len(data), addr)
-                else:
-                        return None
-
-        def close(self):
-                dev_close(self, self.desc)
-                self.is_open = False
-                self.desc = -1
+                return dev_write(self.path, data, len(data), addr)
 
         def write_list(self, ary, flt = False, addr = None):
-                if not self.is_open:
-                        return None
-                return dev_write_list(self.desc, ary, len(ary), flt, addr)
+                return dev_write_list(self.path, ary, len(ary), flt, addr)
 
         def read_list(self, num, flt = False, addr = None):
-                if not self.is_open:
-                        return None
-                return dev_read_list(self.desc, num, flt, addr)
+                return dev_read_list(self.path, num, flt, addr)
 
         def write_numeral(self, num, addr = None):
-                if not self.is_open:
-                        return None
-                return dev_write_numeral(self.desc, num, addr)
+                return dev_write_numeral(self.path, num, addr)
 
         def read_numeral(self, addr = None, flt = False):
-                if not self.is_open:
-                        return None
-                return dev_read_numeral(self.desc, flt, addr)
+                return dev_read_numeral(self.path, flt, addr)
 
 def dev_write_numeral(desc, num, addr):
         """__NATIVE__
         pPmObj_t desc, numeral, address;
-        int fd;
+        const uint8_t *fd;
         size_t addr, size;
         const void *buf;
 
@@ -94,7 +67,7 @@ def dev_write_numeral(desc, num, addr):
                 size = sizeof(int32_t);
         }
 
-        fd = ((pPmInt_t)desc)->val;
+        fd = ((pPmString_t)desc)->val;
         if(address != PM_NONE) {
                 addr = ((pPmInt_t)address)->val;
                 device_write(fd, buf, size, &addr);
@@ -110,7 +83,8 @@ def dev_write_numeral(desc, num, addr):
 def dev_read_numeral(desc, flt, addr):
         """__NATIVE__
         pPmObj_t desc, numeral, address, flt;
-        int fd, rv;
+        int rv;
+        const uint8_t *fd;
         size_t addr, size;
         uint8_t *buf;
         float *f;
@@ -120,7 +94,7 @@ def dev_read_numeral(desc, flt, addr):
         flt = NATIVE_GET_LOCAL(1);
         address = NATIVE_GET_LOCAL(2);
 
-        fd = ((pPmInt_t)desc)->val;
+        fd = ((pPmString_t)desc)->val;
         size = (flt == PM_TRUE) ? sizeof(float) : sizeof(int32_t);
         buf = kzalloc(size);
         if(address != PM_NONE) {
@@ -153,7 +127,8 @@ def dev_read_numeral(desc, flt, addr):
 def dev_read_list(desc, num, flt, addr):
         """__NATIVE__
         pPmObj_t pdesc, pary, plength, paddr, obj, pflt;
-        int fd, idx, rv;
+        int idx, rv;
+        const uint8_t *fd;
         size_t address, length, size;
         float *farry;
         int32_t *iarry;
@@ -164,7 +139,7 @@ def dev_read_list(desc, num, flt, addr):
         pflt = NATIVE_GET_LOCAL(2);
         paddr = NATIVE_GET_LOCAL(3);
 
-        fd = ((pPmInt_t)pdesc)->val;
+        fd = ((pPmString_t)pdesc)->val;
         length = ((pPmInt_t)plength)->val;
         list_new(&pary);
 
@@ -206,7 +181,8 @@ def dev_read_list(desc, num, flt, addr):
 def dev_write_list(desc, ary, length, flt, addr):
         """__NATIVE__
         pPmObj_t pdesc, pary, plength, paddr, obj, retval, pflt;
-        int fd, idx, rv;
+        int idx, rv;
+        const uint8_t *fd;
         size_t address, length;
         float *farry;
         int32_t *iarry;
@@ -218,7 +194,7 @@ def dev_write_list(desc, ary, length, flt, addr):
         pflt = NATIVE_GET_LOCAL(3);
         paddr = NATIVE_GET_LOCAL(4);
 
-        fd = ((pPmInt_t)pdesc)->val;
+        fd = ((pPmString_t)pdesc)->val;
         length = ((pPmInt_t)plength)->val;
 
         if(pflt == PM_TRUE) {
@@ -254,42 +230,11 @@ def dev_write_list(desc, ary, length, flt, addr):
         """
         pass
 
-def dev_open(self, path):
-        """__NATIVE__
-        pPmObj_t path, desc;
-        const char *filepath;
-        int fd;
-        PmReturn_t retval;
-
-        path = NATIVE_GET_LOCAL(1);
-        filepath = (char*)((pPmString_t)path)->val;
-        fd = open(filepath, _FDEV_SETUP_RW);
-        retval = int_new(fd, &desc);
-        NATIVE_SET_TOS(desc);
-        return retval;
-        """
-        pass
-
-def dev_close(self, fd):
-        """__NATIVE__
-        pPmObj_t desc;
-        int fd;
-
-        desc = NATIVE_GET_LOCAL(1);
-
-        fd = (int)((pPmInt_t)desc)->val;
-        if(fd > 0)
-                fd = close(fd);
-
-        NATIVE_SET_TOS(PM_NONE);
-        return PM_RET_OK;
-        """
-        pass
-
 def dev_write(desc, data, num, addr):
         """__NATIVE__
         pPmObj_t desc, data, num, addr, retval;
-        int rv, fd;
+        int rv;
+        const uint8_t *fd;
         void *buf;
         size_t address, nbytes;
 
@@ -298,7 +243,7 @@ def dev_write(desc, data, num, addr):
         num = NATIVE_GET_LOCAL(2);
         addr = NATIVE_GET_LOCAL(3);
 
-        fd = ((pPmInt_t)desc)->val;
+        fd = ((pPmString_t)desc)->val;
         buf = ((pPmString_t)data)->val;
         nbytes = ((pPmInt_t)num)->val + 1;
 
@@ -318,7 +263,8 @@ def dev_write(desc, data, num, addr):
 def dev_read(desc, num, addr):
         """__NATIVE__
         pPmObj_t desc, data, num, addr;
-        int fd, rv;
+        int rv;
+        const uint8_t *fd;
         char *buf;
         size_t address, nbytes;
 
@@ -326,7 +272,7 @@ def dev_read(desc, num, addr):
         num = NATIVE_GET_LOCAL(1);
         addr = NATIVE_GET_LOCAL(2);
 
-        fd = ((pPmInt_t)desc)->val;
+        fd = ((pPmString_t)desc)->val;
         nbytes = ((pPmInt_t)num)->val;
         buf = kzalloc(nbytes + 1);
 

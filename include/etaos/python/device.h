@@ -22,8 +22,8 @@
 #include <etaos/kernel.h>
 
 CDECL
-extern int device_write(int fd, const void *buffer, size_t num, size_t *addr);
-extern int device_read(int fd, void *buffer, size_t num, size_t *addr);
+extern int device_write(const uint8_t *path, const void *buffer, size_t num, size_t *addr);
+extern int device_read(const uint8_t *path, void *buffer, size_t num, size_t *addr);
 CDECL_END
 
 #endif /* end of include guard: __PYTHON_DEVICE_H__ */

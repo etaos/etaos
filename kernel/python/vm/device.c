@@ -24,10 +24,12 @@
 #include <etaos/vfs.h>
 #include <etaos/assert.h>
 
-int device_write(int fd, const void *buffer, size_t num, size_t *addr)
+int device_write(const uint8_t *path, const void *buffer, size_t num, size_t *addr)
 {
 	struct file *fp;
+	int fd, rv;
 
+	fd = open((const char*)path, _FDEV_SETUP_RW);
 	ASSERT(buffer != NULL);
 	ASSERT(fd >= 0);
 
@@ -36,13 +38,18 @@ int device_write(int fd, const void *buffer, size_t num, size_t *addr)
 		lseek(fp, *addr, SEEK_SET);
 	}
 
-	return write(fd, buffer, num) >= 0 ? -EOK : -EINVAL;
+	rv = write(fd, buffer, num) >= 0 ? -EOK : -EINVAL;
+	close(fd);
+
+	return rv;
 }
 
-int device_read(int fd, void *buffer, size_t num, size_t *addr)
+int device_read(const uint8_t *path, void *buffer, size_t num, size_t *addr)
 {
 	struct file *fp;
+	int fd, rv;
 
+	fd = open((const char*)path, _FDEV_SETUP_RW);
 	ASSERT(buffer != NULL);
 	ASSERT(fd >= 0);
 
@@ -51,5 +58,7 @@ int device_read(int fd, void *buffer, size_t num, size_t *addr)
 		lseek(fp, *addr, SEEK_SET);
 	}
 
-	return read(fd, buffer, num) >= 0 ? -EOK : -EINVAL;
+	rv = read(fd, buffer, num) >= 0 ? -EOK : -EINVAL;
+	close(fd);
+	return rv;
 }

@@ -33,25 +33,19 @@ class EEPROM(Device):
 		self.size = -1
 
 	def write_string(self, addr, string):
-		self.open()
 		rv = self.write(string, addr)
-		self.close()
 		return rv
 
 	def read_string(self, addr, length):
-		self.open()
 		rv = self.read(length, addr)
-		self.close()
 		return rv
 
 	def read_float(self, addr):
-		self.open()
 		rv = self.read_numeral(addr, True)
-		self.close()
 		return rv
 
 	def write_float(self, addr, num):
-		self.open()
 		rv = self.write_numeral(num, addr)
-		self.close()
 		return rv
+
+## @}
