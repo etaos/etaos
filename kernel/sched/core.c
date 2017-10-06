@@ -541,6 +541,12 @@ int rq_add_thread(struct rq *rq, struct thread *tp)
  * @param rq RQ to remove from.
  * @param tp Thread to remove.
  * @return An error code.
+ * @retval 1 if a reschedule is required (\p tp is the current thread).
+ * @retval 0 on success.
+ *
+ * No run queue locks will be acquired prior to attempting to remove
+ * \p tp from the run queue. There will be no forced reschedule after \p
+ * tp has been removed. If \p tp is the current thread \p 1 will be returned.
  */
 int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp)
 {
