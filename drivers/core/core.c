@@ -215,7 +215,7 @@ static int _dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 	file->close = fops->close;
 	file->flush = fops->flush;
 	file->ioctl = fops->ioctl;
-	
+
 	return -EOK;
 }
 
@@ -237,6 +237,7 @@ int dev_set_fops(struct device *dev, struct dev_file_ops *fops)
 	return -EOK;
 }
 
+#ifndef CONFIG_MUTEX_TRACE
 /**
  * @brief Lock a device mutex.
  * @param dev Device which mutex has to be locked.
@@ -254,6 +255,7 @@ void dev_unlock(struct device *dev)
 {
 	mutex_unlock(&dev->dev_lock);
 }
+#endif
 
 static struct device *dev_allocate(const char *name, struct dev_file_ops *fops)
 {
@@ -307,9 +309,8 @@ int dev_register_pdev(struct platform_device *pdev, struct dev_file_ops *fops)
 
 	dev = dev_allocate(pdev->name, fops);
 	dev->pdev = pdev;
-	
+
 	return -EOK;
 }
 
 /** @} */
-

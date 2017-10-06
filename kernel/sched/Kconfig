@@ -33,6 +33,14 @@ config EVENT_MUTEX
 	  context) the thread will be released into the run queue
 	  again. If unsure say 'y' here.
 
+config MUTEX_TRACE
+	bool "Mutex tracers"
+	depends on MUTEX_EVENT_QUEUE
+	help
+	  Say 'y' here to enable the mutex tracers. The system will
+	  keep track of who is locking and unlocking mutexes, which
+	  will make debugging mutexes ALLOT easier.
+
 config IPM
 	bool "Inter-Process Messages"
 	depends on EVENT_MUTEX
@@ -54,4 +62,3 @@ config SCHED_DBG
 	  function is only useful for ETAO/OS developers. If you
 	  are unsure say 'n' here.
 endif
-

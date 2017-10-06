@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** 
+/**
  * @file etaos/device.h Device header
  * @addtogroup dev-core
  * @{
@@ -104,13 +104,19 @@ extern void dev_sync_wait(struct device *dev, unsigned ms);
 extern struct device *device_create(const char *name, void *data,
 		struct dev_file_ops *fops);
 extern int device_initialize(struct device *dev, struct dev_file_ops *fops);
-extern int dev_register_pdev(struct platform_device *pdev, 
+extern int dev_register_pdev(struct platform_device *pdev,
 		struct dev_file_ops *fops);
 extern void dev_core_init();
 extern int dev_set_fops(struct device *dev, struct dev_file_ops *fops);
 extern struct device *dev_get_by_name(const char *name);
+
+#if CONFIG_MUTEX_TRACE
+#define dev_lock(_dev_) __mutex_lock(&(_dev_)->dev_lock, __FILE__, __LINE__)
+#define dev_unlock(_dev_) __mutex_unlock(&(_dev_)->dev_lock, __FILE__, __LINE__)
+#else
 extern void dev_unlock(struct device *dev);
 extern void dev_lock(struct device *dev);
+#endif
 
 /**
  * @brief Return the IOBASE of a platform device.
@@ -144,4 +150,3 @@ CDECL_END
 #endif
 
 /** @} */
-

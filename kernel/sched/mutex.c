@@ -29,6 +29,11 @@
 #include <etaos/mutex.h>
 #include <etaos/panic.h>
 
+#ifdef CONFIG_MUTEX_TRACE
+#include <etaos/mem.h>
+#include <etaos/string.h>
+#endif
+
 #include <asm/pgm.h>
 
 /**
@@ -59,7 +64,11 @@ int mutex_wait_tmo(mutex_t *mutex, unsigned int tmo)
  *
  * This function can be used recursively by the same thread without blocking.
  */
+#ifdef CONFIG_MUTEX_TRACE
+void __mutex_lock(mutex_t *mutex, const char *file, int line)
+#else
 void mutex_lock(mutex_t *mutex)
+#endif
 {
 	struct thread *tp = current_thread();
 
@@ -69,6 +78,12 @@ void mutex_lock(mutex_t *mutex)
 			raw_event_wait(&mutex->qp, EVENT_WAIT_INFINITE);
 	}
 
+#ifdef CONFIG_MUTEX_TRACE
+	if(!mutex->count) {
+		mutex->lock_file = strdup(file);
+		mutex->lock_line = line;
+	}
+#endif
 	mutex->count++;
 	mutex->owner = tp;
 }
@@ -79,14 +94,32 @@ void mutex_lock(mutex_t *mutex)
  * @see mutex_lock
  * @see mutex_unlock_irq
  */
+#ifdef CONFIG_MUTEX_TRACE
+void __mutex_unlock(mutex_t *mutex, const char *file, int line)
+#else
 void mutex_unlock(mutex_t *mutex)
+#endif
 {
 	struct thread *tp = current_thread();
 
-	if(mutex->owner != tp)
-		return;
+	if(mutex->owner != tp) {
+#ifdef CONFIG_MUTEX_TRACE
+		panic("Faulty mutex unlock! From: {%s in %s:%i} By: {%s in %s:%i}",
+			mutex->owner ? mutex->owner->name : "null", mutex->lock_file,
+			mutex->lock_line, tp->name, file, line);
+#else
+		panic("Faulty mutex unlock!");
+#endif
+	}
 
-	if(--mutex->count == 0) {
+	mutex->count -= 1;
+	if(mutex->count == 0) {
+#ifdef CONFIG_MUTEX_TRACE
+		if(mutex->lock_file) {
+			kfree(mutex->lock_file);
+			mutex->lock_line = -1;
+		}
+#endif
 		mutex->owner = NULL;
 		event_notify(&mutex->qp);
 	}
