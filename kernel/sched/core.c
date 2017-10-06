@@ -733,6 +733,9 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
 /**
  * @brief Destroy the kill queue.
  * @param rq Run queue containing the kill queue head.
+ *
+ * Destroy all threads on the kill queue. Memory objects they own will be
+ * returned to the heap.
  */
 static void rq_destroy_kill_q(struct rq *rq)
 {
