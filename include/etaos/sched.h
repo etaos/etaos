@@ -46,7 +46,7 @@ struct thread_queue;
  * insert and remove threads or to get the next runnable task.
  */
 struct sched_class {
-	/** 
+	/**
 	 * @brief Get the next runnable task.
 	 * @param rq Run queue to get the next runnable task from
 	 */
@@ -61,7 +61,7 @@ struct sched_class {
 	 * @note Do not free up the memory yet. Leave this to the scheduler.
 	 */
 	void (*kill)(struct thread *tp);
-	/** 
+	/**
 	 * @brief Post schedule.
 	 * @param rq RQ which has just received a schedule call.
 	 *
@@ -70,20 +70,20 @@ struct sched_class {
 	 */
 	void (*post_schedule)(struct rq*);
 #ifdef CONFIG_DYN_PRIO
-	/** 
+	/**
 	 * @brief update the dynamic priority of all threads on the given rq.
 	 * @param rq Run queue to update.
 	 * @param num Numeral value that is added to struct thread::dprio.
 	 */
 	void (*dyn_prio_update)(struct rq* rq, int num);
 #endif
-	/** 
+	/**
 	 * @brief Add a new thread to the run queue.
 	 * @param rq RQ to add to.
 	 * @param tp Thread to add.
 	 */
 	void (*add_thread)(struct rq *rq, struct thread *tp);
-	/** 
+	/**
 	 * @brief Remove a thread from the run queue.
 	 * @param rq Run queue to remove from.
 	 * @param tp Thread to remove.
@@ -93,7 +93,7 @@ struct sched_class {
 	 */
 	int (*rm_thread)(struct rq *rq, struct thread *tp);
 #ifdef CONFIG_EVENT_MUTEX
-	/** 
+	/**
 	 * @brief Get the next thread after \p tp.
 	 * @param tp Thread to get the 'next' of.
 	 */
@@ -110,13 +110,13 @@ struct sched_class {
 	bool (*preempt_chk)(struct rq *rq, struct thread *cur, struct thread *nxt);
 #endif
 #ifdef CONFIG_THREAD_QUEUE
-	/** 
+	/**
 	 * @brief Add a thread to the queue
 	 * @param q Queue to add to.
 	 * @param tp Thread to add.
 	 */
 	void (*queue_add)(struct thread_queue *q, struct thread *tp);
-	/** 
+	/**
 	 * @brief Remove a thread from a queue.
 	 * @param q Queue to remove from.
 	 * @param tp Thread to remove.
@@ -184,7 +184,7 @@ struct rq {
 	/** @brief Amount of thread switches done */
 	unsigned long switch_count;
 
-	/** @brief CPU clock source */	
+	/** @brief CPU clock source */
 	struct clocksource *source;
 	/** @brief Run queue lock */
 	spinlock_t lock;
@@ -192,6 +192,8 @@ struct rq {
 	struct list_head wake_head;
 	struct list_head kill_head;
 };
+
+#define __sched__ __hot
 
 /**
  * @def sched_need_resched
@@ -266,8 +268,8 @@ extern struct rq *sched_select_rq(void);
  *
  * Do a context switch to the new given thread.
  */
-extern void cpu_switch_context(struct rq *rq, 
-				struct thread *prev, 
+extern void cpu_switch_context(struct rq *rq,
+				struct thread *prev,
 				struct thread *next);
 /**
  * @ingroup archAPI
@@ -370,4 +372,3 @@ CDECL_END
 
 /* @} */
 #endif
-
