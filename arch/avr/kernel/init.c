@@ -67,14 +67,17 @@ void avr_init(void)
 			((size_t)mm_heap_start));
 #endif
 
+	post_early_init = true;
 	dev_init();
+	post_dev_init = true;
+
 	kinit();
 	while(1);
 }
 
 void finalize_init(void)
 {
+	post_init = true;
 }
 
 /* @} */
-

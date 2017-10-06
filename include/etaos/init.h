@@ -22,6 +22,10 @@
 #include <etaos/compiler.h>
 #include <asm/init.h>
 
+extern bool post_early_init;
+extern bool post_dev_init;
+extern bool post_init;
+
 #ifndef SUBSYS_ATTRIB
 #define SUBSYS_ATTRIB
 #endif
