@@ -15,6 +15,9 @@ export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
 			  -name CVS -o -name .pc -o -name .hg -o -name .git \) \
 			  -prune -o
 
+export CLEAN_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
+			  -name CVS -o -name .pc -o -name scripts -o -name .hg -o -name .git \) \
+			  -prune -o
 _all: all
 
 # To put more focus on warnings, be less verbose as default
@@ -95,8 +98,8 @@ ifeq ($(MAKECMDGOALS),)
 endif
 
 # Basic helpers built in scripts/
-PHONY += scripts_basic 
-scripts_basic: 
+PHONY += scripts_basic
+scripts_basic:
 	$(Q)$(MAKE) $(build)=scripts/basic
 	$(Q)rm -f .tmp_quiet_recordmcount
 
@@ -129,7 +132,7 @@ export KBUILD_CFLAGS KBUILD_CXXFLAGS KBUILD_AFLAGS
 #         cmd_cc_o_c       = $(CC) $(c_flags) -c -o $@ $<
 #
 # If $(quiet) is empty, the whole command will be printed.
-# If it is set to "quiet_", only the short version will be printed. 
+# If it is set to "quiet_", only the short version will be printed.
 # If it is set to "silent_", nothing will be printed at all, since
 # the variable $(silent_cmd_cc_o_c) doesn't exist.
 #
@@ -386,7 +389,7 @@ $(clean-dirs):
 clean: $(clean-dirs)
 	$(call cmd,rmdirs)
 	$(call cmd,rmfiles)
-	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(CLEAN_IGNORE) \
 		\( -name '*.[oas]' -o -name '*.a' -o -name '.*.cmd' \
 		-o -name '*.a.*' \
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
@@ -420,4 +423,3 @@ FORCE:
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
-
