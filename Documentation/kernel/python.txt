@@ -36,6 +36,14 @@
  */
 
 /**
+ * @defgroup python-device Device
+ * @ingroup python
+ * @brief Python device module.
+ *
+ * This module provides an API to the device file system.
+ */
+
+/**
  * @defgroup python-dict Dictionaries
  * @ingroup python
  * @brief Python dictionary module.
