@@ -47,17 +47,13 @@ sram_str = "Some piece of text"
 sram_len = len(sram_str)
 
 ram.write_string(0x40, sram_str)
-ee.open()
 ee.write_list(data_ary, True, 0x10)
-ee.close()
 
 change_name(aobj, "Hello, World")
 print aobj.name
 print math.atan2(1, 0)
 
-ee.open()
 readback = ee.read_list(data_len, True, 0x10)
-ee.close()
 
 print "EEPROM read:"
 print "SRAM read: %s" % ram.read_string(0x40, sram_len)
