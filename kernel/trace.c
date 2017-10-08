@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup trace
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/stdlib.h>
@@ -25,6 +30,15 @@
 #include <etaos/trace.h>
 #include <etaos/init.h>
 
+/**
+ * @brief Store information into a trace info structure.
+ * @param info Trace info structure.
+ * @param file File name.
+ * @param line Line number.
+ * @param alloc Indicates whether or not file a pointer to stack variable.
+ * @note If \p alloc is set to true the file name will be copied to a locally
+ *       allocated buffer.
+ */
 void trace_info_set(trace_info_t *info, const char *file, int line, bool alloc)
 {
 #ifdef CONFIG_SCHED
@@ -46,6 +60,10 @@ void trace_info_set(trace_info_t *info, const char *file, int line, bool alloc)
 
 }
 
+/**
+ * @brief Destory information stored in a trace.
+ * @param info Trace info structure to invalidate.
+ */
 void trace_info_invalidate(trace_info_t *info)
 {
 #ifdef CONFIG_SCHED
@@ -60,4 +78,7 @@ void trace_info_invalidate(trace_info_t *info)
 	}
 
 	info->line = -1;
+	info->alloc = false;
 }
+
+/** @} */

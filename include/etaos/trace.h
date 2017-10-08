@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup trace
+ * @ {
+ */
+
 #ifndef __TRACE_H__
 #define __TRACE_H__
 
@@ -26,17 +31,34 @@
 struct thread;
 #endif
 
+/**
+ * @brief Call trace info structure.
+ */
 typedef struct trace_info {
-	const char *file;
-	int line;
+	const char *file; //!< Call origin file.
+	int line; //!< Origin line number.
 #ifdef CONFIG_SCHED
-	struct thread *owner;
+	struct thread *owner; //!< Owner thread.
 #endif
-	bool allocated;
+	bool allocated; //!< Indicates whether \p file is allocated or not.
 } trace_info_t;
 
+/**
+ * @brief Set trace info.
+ * @param nfo Trace info structure.
+ * @param fn File name.
+ * @param ln Line number.
+ * @param ma Boolean to indicate wheter or not the \p fn needs to be reallocated.
+ */
 #define __trace_set(nfo, fn, ln, ma) trace_info_set(nfo, fn, ln, ma)
+/**
+ * @brief Set trace info to the current file and line.
+ * @param nfo Trace info structure.
+ */
 #define trace_set(nfo) trace_info_set(nfo, __FILE__, __LINE__, true)
+/**
+ * @brief Reset a trace info structure.
+ */
 #define trace_unset(nfo) trace_info_invalidate(nfo)
 
 CDECL
@@ -45,3 +67,5 @@ extern void trace_info_invalidate(trace_info_t *info);
 CDECL_END
 
 #endif /* end of include guard: __TRACE_H__ */
+
+/** @} */
