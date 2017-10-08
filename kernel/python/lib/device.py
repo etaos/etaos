@@ -16,6 +16,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+## @addtogroup python-device
+# @{
+
+## @package Device
+#  @brief Provides PyMite's device module
+
 """__NATIVE__
 #include <etaos/stdio.h>
 #include <etaos/device.h>
@@ -26,27 +32,57 @@
 
 __name__ = "device"
 
+## Python device class
 class Device(object):
+        ## Create a new device object.
+        # @param name Device name.
         def __init__(self, name):
                 self.path = "/dev/%s" % name
 
+        ## Read a string of bytes from a device.
+        # @param num Number of bytes to read.
+        # @param addr Address to start reading at.
+        # @return Bytes read from \p this device in a string object.
         def read(self, num, addr = None):
                 return dev_read(self.path, num, addr)
 
+        ## Write a string to a device.
+        # @param data to write.
+        # @param addr Address to start writing at.
+        # @return An error code
         def write(self, data, addr = None):
                 return dev_write(self.path, data, len(data), addr)
 
+        # Write an array to a device.
+        # @param ary Array to write.
+        # @param flt Set \p flt to true to indicate that ary contains floats.
+        # @param addr Address to start writing at.
         def write_list(self, ary, flt = False, addr = None):
                 return dev_write_list(self.path, ary, len(ary), flt, addr)
 
+        # Read an array from a device.
+        # @param num Number of elements to read.
+        # @param flt Set \p flt to true to indicate that the read data are floats.
+        # @param addr Address to start reading from.
+        # @return The array list read from
         def read_list(self, num, flt = False, addr = None):
                 return dev_read_list(self.path, num, flt, addr)
 
+        ## Write a numeral character to a device.
+        # @param num Integer or float to write.
+        # @param addr Address to write to.
+        # @return An error code.
         def write_numeral(self, num, addr = None):
                 return dev_write_numeral(self.path, num, addr)
 
+        ## Read a numberal from a device.
+        # @param addr Address to read from.
+        # @param flt Set \p flt to true to read the input as a float.
+        # @return The numeral read from the device.
         def read_numeral(self, addr = None, flt = False):
                 return dev_read_numeral(self.path, flt, addr)
+
+## @}
 
 def dev_write_numeral(desc, num, addr):
         """__NATIVE__
