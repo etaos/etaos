@@ -100,3 +100,11 @@ void main(void)
  * thread.
  */
 
+/**
+ * @defgroup trace Call trace API
+ * @brief API to trace function calls.
+ *
+ * This API stores function call information in datastructure which can
+ * be printed during, for example, a kernel panic.
+ */
+
