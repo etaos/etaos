@@ -62,6 +62,9 @@
 #define TIMER5_OCB_VECTOR_NUM 48
 #define TIMER5_OCC_VECTOR_NUM 49
 
+#define USART1_RX_COMPLETE_VECTOR_NUM 36
+#define USART1_UDRE_VECTOR_NUM 37
+
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define EXT_IRQ1_VECTOR irq_vector(2)
 #define EXT_IRQ2_VECTOR irq_vector(3)
@@ -76,6 +79,8 @@
 #define USART_RX_STC_VECTOR irq_vector(25)
 #define ADC_COMPLETED_VECTOR irq_vector(29)
 #define TIMER2_OVERFLOW_VECTOR irq_vector(15)
+#define USART1_RX_COMPLETE_VECTOR irq_vector(36)
+#define USART1_UDRE_VECTOR irq_vector(37)
 
 #define TIMER1_CAPT_VECTOR irq_vector(16)
 #define TIMER1_OCA_VECTOR irq_vector(17)
@@ -129,6 +134,43 @@
 #define sei() __asm__ __volatile__("sei")
 
 #define SREG (*((volatile unsigned char*)0x5F))
+
+/* USART1 */
+#define UCSR1A  MEM_IO8(0xC8)
+#define RXC1    7
+#define TXC1    6
+#define UDRE1   5
+#define FE1     4
+#define DOR1    3
+#define UPE1    2
+#define U2X1    1
+#define MPCM1   0
+
+#define UCSR1B  MEM_IO8(0XC9)
+#define RXCIE1  7
+#define TXCIE1  6
+#define UDRIE1  5
+#define RXEN1   4
+#define TXEN1   3
+#define UCSZ12  2
+#define RXB81   1
+#define TXB81   0
+
+#define UCSR1C  MEM_IO8(0xCA)
+#define UMSEL11 7
+#define UMSEL10 6
+#define UPM11   5
+#define UPM10   4
+#define USBS1   3
+#define UCSZ11  2
+#define UCSZ10  1
+#define UCPOL1  0
+
+#define UBRR1   MEM_IO16(0xCC)
+
+#define UBRR1L  MEM_IO8(0xCC)
+#define UBRR1H  MEM_IO8(0xCD)
+#define UDR1    MEM_IO8(0XCE)
 
 #ifdef CONFIG_SIMUL_AVR
 
@@ -490,6 +532,7 @@
 #define GPIO_PINS 87
 
 /* USART defs */
+#define UBRR0 MEM_IO16(0xC4)
 #define UBRR0L MEM_IO8(0xC4)
 #define UBRR0H MEM_IO8(0xC5)
 #define UDR0 MEM_IO8(0xC6)

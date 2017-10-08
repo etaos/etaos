@@ -31,6 +31,8 @@ config HAVE_PWM3
 	bool
 config ARCH_PWM
 	bool
+config HAVE_USART1
+	bool
 
 config INIT_STACK_SIZE
 	int "Init stack size"
@@ -147,6 +149,7 @@ config ATMEGA1280
 	select HAVE_PWM1
 	select HAVE_PWM2
 	select HAVE_PWM3
+	select HAVE_USART1
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega1280
@@ -164,6 +167,7 @@ config ATMEGA2560
 	select HAVE_PWM1
 	select HAVE_PWM2
 	select HAVE_PWM3
+	select HAVE_USART1
 	select HARVARD
 	help
 	  Select if you are building for the Atmel ATmega328 or ATmega2560

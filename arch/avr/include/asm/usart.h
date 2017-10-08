@@ -24,60 +24,7 @@
 
 #include <asm/io.h>
 
-#ifndef BAUD
-#define BAUD 9600
-#endif
-
-	/* baud calculations */
-#undef USE_2X
-
-	/* Baud rate tolerance is 2 % unless previously defined */
-#ifndef BAUD_TOL
-#  define BAUD_TOL 2
-#endif
-
-#ifdef __ASSEMBLER__
-#define UBRR_VALUE (((F_CPU) + 8 * (BAUD)) / (16 * (BAUD)) -1)
-#else
-#define UBRR_VALUE (((F_CPU) + 8UL * (BAUD)) / (16UL * (BAUD)) -1UL)
-#endif
-
-#if 100 * (F_CPU) > \
-	(16 * ((UBRR_VALUE) + 1)) * (100 * (BAUD) + (BAUD) * (BAUD_TOL))
-#  define USE_2X 1
-#elif 100 * (F_CPU) < \
-	(16 * ((UBRR_VALUE) + 1)) * (100 * (BAUD) - (BAUD) * (BAUD_TOL))
-#  define USE_2X 1
-#else
-#  define USE_2X 0
-#endif
-
-#if USE_2X
-	/* U2X required, recalculate */
-#undef UBRR_VALUE
-
-#ifdef __ASSEMBLER__
-#define UBRR_VALUE (((F_CPU) + 4 * (BAUD)) / (8 * (BAUD)) -1)
-#else
-#define UBRR_VALUE (((F_CPU) + 4UL * (BAUD)) / (8UL * (BAUD)) -1UL)
-#endif
-
-#if 100 * (F_CPU) > \
-	(8 * ((UBRR_VALUE) + 1)) * (100 * (BAUD) + (BAUD) * (BAUD_TOL))
-#  warning "Baud rate achieved is higher than allowed"
-#endif
-
-#if 100 * (F_CPU) < \
-	(8 * ((UBRR_VALUE) + 1)) * (100 * (BAUD) - (BAUD) * (BAUD_TOL))
-#  warning "Baud rate achieved is lower than allowed"
-#endif
-
-#endif /* USE_U2X */
-
-#ifdef UBRR_VALUE
-#  define UBRR0L_VALUE (UBRR_VALUE & 0xff)
-#  define UBRR0H_VALUE (UBRR_VALUE >> 8)
-#endif
+#define BAUD CONFIG_USART_BAUD
 
 #define U2X0 1
 #define UCSZ00 1
@@ -98,4 +45,3 @@ extern void avr_setup_usart_streams(void);
 CDECL_END
 
 #endif /* __ATMEGA_USART_H */
-

@@ -1,0 +1,14 @@
+menuconfig FLASH
+	tristate "HARVARD flash"
+	help
+	  Say 'y' or 'm' here to build support for HARVARD flash
+	  drivers.
+
+if FLASH
+config ATMEGA_FLASH
+	tristate "ATmega flash"
+	depends on FLASH
+	help
+	  Say 'y' or 'm' here to build support for the HARVARD flash
+	  drivers.
+endif

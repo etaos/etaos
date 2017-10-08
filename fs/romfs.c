@@ -51,13 +51,21 @@ static int romfs_open(struct file *file)
 {
         char *buff;
         struct romfs *entry;
+        int fd;
 
         if(file->data)
                 return -EEXIST;
 
+        fd = open("/dev/flash", _FDEV_SETUP_READ);
+
+        if(fd < 0)
+                return -EBADF;
+
         entry = file->fs_data;
         buff = kzalloc(file->length);
-        memcpy_P(buff, entry->data, file->length);
+        lseek(filep(fd), (size_t)entry->data, SEEK_SET);
+        read(fd, buff, file->length);
+        close(fd);
 
         file->data = buff;
         atomic_inc(&file->uses);
@@ -182,4 +190,3 @@ static void __used romfs_rollout(void)
 module_init(romfs_rollout);
 
 /** @} */
-

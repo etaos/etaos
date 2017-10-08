@@ -8,3 +8,4 @@ obj-y += spi/
 obj-y += sram/
 obj-y += analog/
 obj-y += pwm/
+obj-y += flash/

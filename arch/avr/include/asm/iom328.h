@@ -237,6 +237,7 @@
 #define GPIO_PINS 24
 
 /* USART defs */
+#define UBRR0 MEM_IO16(0xC4)
 #define UBRR0L MEM_IO8(0xC4)
 #define UBRR0H MEM_IO8(0xC5)
 #define UDR0 MEM_IO8(0xC6)

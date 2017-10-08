@@ -14,6 +14,8 @@ source "drivers/analog/Kconfig"
 
 source "drivers/platform/Kconfig"
 
+source "drivers/flash/Kconfig"
+
 source "drivers/eeprom/Kconfig"
 
 source "drivers/sram/Kconfig"

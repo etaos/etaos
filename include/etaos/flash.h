@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - AVR USART support
- *  Copyright (C) 2016   Michel Megens <dev@bietje.net>
+ *  ETA/OS - FLASH header
+ *  Copyright (C) 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,32 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __FLASH_H__
+#define __FLASH_H__
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
-#include <etaos/irq.h>
+#include <etaos/device.h>
 
-#include <asm/io.h>
-#include <asm/irq.h>
+struct flash_chip {
+	struct device dev;
 
-SIGNAL(USART_RX_STC_VECTOR)
-{
-	struct irq_chip *chip = arch_get_irq_chip();
-	chip->chip_handle(USART_RX_STC_NUM);
-}
+	int (*read)(struct flash_chip *flash, size_t addr, void *buff, size_t length);
+	int  (*getc)(struct flash_chip *flash, size_t addr);
+};
 
-#ifdef USART1_UDRE_VECTOR
-SIGNAL(USART1_UDRE_VECTOR)
-{
-	struct irq_chip *chip = arch_get_irq_chip();
-	chip->chip_handle(USART1_UDRE_VECTOR_NUM);
+CDECL
+extern void flash_chip_init(struct flash_chip *flash);
+CDECL_END
 
-}
-#endif
-
-#ifdef USART1_RX_COMPLETE_VECTOR
-SIGNAL(USART1_RX_COMPLETE_VECTOR)
-{
-	struct irq_chip *chip = arch_get_irq_chip();
-	chip->chip_handle(USART1_RX_COMPLETE_VECTOR_NUM);
-}
-#endif
+#endif /* end of include guard: __FLASH_H__ */
