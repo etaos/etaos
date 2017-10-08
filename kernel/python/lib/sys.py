@@ -225,6 +225,117 @@ def run(f):
 	"""
 	pass
 
+## Return the number of bytes a given object takes in memory.
+# @param obj Object to get the size for.
+# @return Number of bytes \p obj takes up in memory.
+def sizeof(obj):
+    """__NATIVE__
+    pPmObj_t pobj;
+    pPmObj_t psize;
+    int32_t n;
+    PmReturn_t retval = PM_RET_OK;
+    int32_t static size[] = {
+        sizeof(PmObj_t), /* None type */
+        sizeof(PmInt_t),
+        sizeof(PmFloat_t),
+        sizeof(PmString_t),
+        sizeof(PmTuple_t),
+        sizeof(PmCo_t),
+        sizeof(PmFunc_t), /* Module Obj uses func struct */
+        sizeof(PmClass_t),
+        sizeof(PmFunc_t),
+        sizeof(PmClass_t), /* Class instance */
+        0, /* CIM */
+        0, /* NIM */
+        sizeof(PmCo_t), /* NOB */
+        sizeof(PmThread_t),
+        sizeof(PmClass_t), /* Exception instance */
+        sizeof(PmBoolean_t),
+        sizeof(PmCodeImgObj_t),
+        sizeof(PmList_t),
+        sizeof(PmDict_t),
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        sizeof(PmFrame_t),
+        sizeof(PmBlock_t),
+        sizeof(Segment_t),
+        sizeof(Seglist_t),
+        sizeof(PmSeqIter_t),
+        sizeof(PmNativeFrame_t),
+    };
+
+    /* If wrong number of args, raise TypeError */
+    if (NATIVE_GET_NUM_ARGS() != 1)
+    {
+        PM_RAISE(retval, PM_RET_EX_TYPE);
+        return retval;
+    }
+
+    pobj = NATIVE_GET_LOCAL(0);
+    if (OBJ_GET_TYPE(pobj) == OBJ_TYPE_INT)
+    {
+        n = ((pPmInt_t)pobj)->val;
+        if ((n >= 0) && (n < 32))
+        {
+            /* Return the size of the type represented by the integer */
+            retval = int_new(size[n], &psize);
+        }
+        else
+        {
+            /* Return the size of an integer object */
+            retval = int_new(OBJ_GET_SIZE(pobj), &psize);
+        }
+    }
+    else
+    {
+        /* Return the size of the given non-integer object */
+        retval = int_new(OBJ_GET_SIZE(pobj), &psize);
+    }
+
+    NATIVE_SET_TOS(psize);
+    return retval;
+    """
+    pass
+
+## Return the raw size of \p var.
+# @param var Object to get the raw size of.
+# @return The raw size of \p var.
+def raw_sizeof(var):
+        """__NATIVE__
+        PmReturn_t retval;
+        pPmObj_t obj, rv;
+        int size;
+
+        if(NATIVE_GET_NUM_ARGS() != 1) {
+                PM_RAISE(retval, PM_RET_EX_TYPE);
+                return retval;
+        }
+
+        obj = NATIVE_GET_LOCAL(0);
+        switch(OBJ_GET_TYPE(obj)) {
+        case OBJ_TYPE_INT:
+                size = sizeof(int32_t);
+                break;
+        case OBJ_TYPE_FLT:
+                size = sizeof(float);
+                break;
+        case OBJ_TYPE_BOOL:
+                size = sizeof(bool);
+                break;
+        default:
+                size = OBJ_GET_SIZE(obj);
+                break;
+        }
+
+        retval = int_new(size, &rv);
+        NATIVE_SET_TOS(rv);
+        return retval;
+        """
+        pass
 
 ## Returns the number of milliseconds since the PyMite VM was initialized
 # @return Number of milliseconds since VM initialization.

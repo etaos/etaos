@@ -188,4 +188,3 @@ static void __used eeprom_init(void)
 subsys_init(eeprom_init);
 
 /** @} */
-

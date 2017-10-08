@@ -58,4 +58,3 @@ int main(void)
 	printf(CALYPSO_EXIT);
 	return -EOK;
 }
-

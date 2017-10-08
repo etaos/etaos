@@ -29,6 +29,7 @@
 #include <etaos/irq.h>
 #include <etaos/thread.h>
 #include <etaos/spinlock.h>
+#include <etaos/trace.h>
 
 /**
  * @brief Recursive mutex data structure.
@@ -42,6 +43,9 @@ typedef struct mutex {
 #endif
 #ifdef CONFIG_SCHED
 	struct thread *owner; //!< Owner of the mutex.
+#endif
+#ifdef CONFIG_MUTEX_TRACE
+	trace_info_t trace;
 #endif
 } mutex_t;
 
@@ -73,8 +77,19 @@ CDECL
 
 extern int mutex_wait_tmo(mutex_t *mutex, unsigned int tmo);
 extern void mutex_wait(mutex_t *mutex);
+#ifdef CONFIG_MUTEX_TRACE
+
+extern void __mutex_lock(mutex_t *mutex, const char *file, int line);
+extern void __mutex_unlock(mutex_t *mutex, const char *file, int line);
+#define mutex_lock(_mtx_) __mutex_lock(_mtx_, __FILE__, __LINE__)
+#define mutex_unlock(_mtx_) __mutex_unlock(_mtx_, __FILE__, __LINE__)
+
+#else /* CONFIG_MUTEX_TRACE */
+
 extern void mutex_lock(mutex_t *mutex);
 extern void mutex_unlock(mutex_t *mutex);
+#endif
+
 extern void mutex_unlock_irq(mutex_t *mutex);
 
 /**
@@ -137,4 +152,3 @@ CDECL_END
 #endif
 
 /** @} */
-

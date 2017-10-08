@@ -35,6 +35,8 @@
 #include <asm/io.h>
 #include <asm/pwm.h>
 
+#include "eepromify.h"
+
 static struct ipm_queue ipm_q;
 static uint8_t ee_value = 0x0;
 
@@ -295,11 +297,27 @@ static void setup_pwm(void)
 	pwm_update_channel(pwm, 1, &state);
 }
 
+static time_t read_time_from_config(void)
+{
+	int fd;
+	time_t rv;
+
+	fd = open("/dev/atmega-eeprom", _FDEV_SETUP_RW);
+
+	if(fd < 0)
+		panic_P(PSTR("Couldn't open ATmega EEPROM!"));
+
+	lseek(filep(fd), (size_t)&timestamp, SEEK_SET);
+	read(fd, &rv, sizeof(time_t));
+	close(fd);
+
+	return rv;
+}
+
 int main(void)
 {
 	const char * ip_msg = "IPM message\n";
 	uint8_t readback = 0;
-	char buff[16];
 	time_t now;
 	float temperature;
 
@@ -319,9 +337,8 @@ int main(void)
 	python_init();
 	python_start("main");
 
-	read(to_fd(stdin), &buff[0], 10);
-	buff[10] = 0;
-	now = (time_t)atol(buff);
+	getc(stdin);
+	now = read_time_from_config();
 	stime(now);
 
 	pgpio_pin_request(10);

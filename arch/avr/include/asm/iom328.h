@@ -81,6 +81,21 @@
 #define cli() __asm__ __volatile__("cli")
 #define sei() __asm__ __volatile__("sei")
 
+#define EEPROM_SIZE 1024
+/* EEPROM REGISTERS */
+#define EECR MEM_IO8(0x3F)
+#define EERE  0
+#define EEPE  1
+#define EEMPE 2
+#define EERIE 3
+#define EEPM0 4
+#define EEPM1 5
+
+#define EEDR MEM_IO8(0x40)
+
+#define EEAR MEM_IO16(0x41)
+#define EEARH MEM_IO8(0x42)
+#define EEARL MEM_IO8(0x41)
 
 #define SREG (*((volatile unsigned char*)0x5F))
 

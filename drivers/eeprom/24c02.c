@@ -80,7 +80,7 @@ static int __ee_24c02_write(struct eeprom *ee, const void *_buff, size_t len)
 	if(left_over) {
 		buff[0] = ee->file->index + eeprom_index;
 		memcpy(&buff[1], _buff + (PAGE_SIZE*idx), left_over);
-		i2c_master_send(client, buff, left_over);
+		i2c_master_send(client, buff, left_over+1);
 	}
 	dev_sync_unlock(&client->dev);
 
@@ -114,7 +114,7 @@ static int __ee_24c02_read(struct eeprom *ee, void *_buff, size_t len)
 	dev_sync_lock(&client->dev, EE_SYNC);
 	rc = i2c_bus_xfer(client->bus, msgs, 2);
 	dev_sync_unlock(&client->dev);
-	
+
 	kfree(msgs);
 	return (rc == 2) ? -EOK : rc;
 }
@@ -201,4 +201,3 @@ void eeprom_init_24c02(void)
 device_init(eeprom_init_24c02);
 
 /** @} */
-

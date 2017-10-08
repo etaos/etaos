@@ -29,6 +29,13 @@ config CPP
 	  language. If you are unsure, say leave this option set
 	  to 'y'.
 
+config TRACE_INFO
+	bool "Call tracing"
+	depends on CRT
+	default n
+	help
+	  Say 'y' here to build support for function call tracing.
+
 source "kernel/python/Kconfig"
 
 source "kernel/irq/Kconfig"
@@ -39,9 +46,9 @@ source "kernel/sched/Kconfig"
 
 config SPINLOCK_DEBUG
 	depends on CRT
+	select TRACE_INFO
 	bool "Spinlock tracing"
 	help
 	  Say 'y' here to built support for spinlock tracing.
 
 endmenu
-

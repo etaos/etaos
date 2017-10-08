@@ -23,6 +23,10 @@
 #include <etaos/thread.h>
 #include <etaos/mem.h>
 
+bool post_early_init = false;
+bool post_dev_init   = false;
+bool post_init       = false;
+
 #ifdef weak_sym
 weak_sym void finalize_init(void)
 {
@@ -53,4 +57,3 @@ void main_thread_func(void *arg)
 	while(true);
 }
 #endif
-

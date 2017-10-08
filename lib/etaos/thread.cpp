@@ -46,9 +46,14 @@ static void stl_thread_start(void *arg)
  */
 Thread::Thread(const char *name, void *arg)
 {
+	thread_attr_t attrs;
+
+	attrs.prio = SCHED_DEFAULT_PRIO;
+	attrs.stack = NULL;
+	attrs.stack_size = 0;
 	this->arg = arg;
-	this->base = thread_alloc(name, stl_thread_start, this, NULL);
-	running = true;
+	this->base = thread_alloc(name, stl_thread_start, this, &attrs);
+	this->running = false;
 }
 
 /**
@@ -66,6 +71,7 @@ Thread::~Thread()
  */
 void Thread::start()
 {
+	this->running = true;
 	thread_start(this->base);
 }
 
@@ -95,4 +101,3 @@ void Thread::join()
 }
 
 /** @} */
-

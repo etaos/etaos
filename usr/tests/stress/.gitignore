@@ -1,2 +1,4 @@
 pyusrlib.c
 pyusrlib-img.c
+eepromify.c
+eepromify.h

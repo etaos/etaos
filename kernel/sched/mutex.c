@@ -29,6 +29,10 @@
 #include <etaos/mutex.h>
 #include <etaos/panic.h>
 
+#ifdef CONFIG_MUTEX_TRACE
+#include <etaos/trace.h>
+#endif
+
 #include <asm/pgm.h>
 
 /**
@@ -55,11 +59,18 @@ int mutex_wait_tmo(mutex_t *mutex, unsigned int tmo)
 /**
  * @brief Lock a mutex.
  * @param mutex Mutex to lock.
+ * @param file File from which the mutex is locked.
+ * @param line Line number within \p file.
  * @see mutex_unlock
  *
- * This function can be used recursively by the same thread without blocking.
+ * This function can be used recursively by the same thread without blocking. The
+ * \p file and \p line arguments are used for mutex tracing.
  */
+#ifdef CONFIG_MUTEX_TRACE
+void __mutex_lock(mutex_t *mutex, const char *file, int line)
+#else
 void mutex_lock(mutex_t *mutex)
+#endif
 {
 	struct thread *tp = current_thread();
 
@@ -69,6 +80,10 @@ void mutex_lock(mutex_t *mutex)
 			raw_event_wait(&mutex->qp, EVENT_WAIT_INFINITE);
 	}
 
+#ifdef CONFIG_MUTEX_TRACE
+	if(!mutex->count)
+		__trace_set(&mutex->trace, file, line, true);
+#endif
 	mutex->count++;
 	mutex->owner = tp;
 }
@@ -76,17 +91,39 @@ void mutex_lock(mutex_t *mutex)
 /**
  * @brief Unlock a mutex.
  * @param mutex Mutex to unlock.
+ * @param file File from which the unlock was called.
+ * @param line Line number within \p file.
  * @see mutex_lock
  * @see mutex_unlock_irq
+ *
+ * The \p file and \p line arguments are used for mutex tracing.
  */
+#ifdef CONFIG_MUTEX_TRACE
+void __mutex_unlock(mutex_t *mutex, const char *file, int line)
+#else
 void mutex_unlock(mutex_t *mutex)
+#endif
 {
 	struct thread *tp = current_thread();
+#ifdef CONFIG_MUTEX_TRACE
+	trace_info_t *trace = &mutex->trace;
+#endif
 
-	if(mutex->owner != tp)
-		return;
+	if(mutex->owner != tp) {
+#ifdef CONFIG_MUTEX_TRACE
+		panic("Faulty mutex unlock! From: {%s in %s:%i} By: {%s in %s:%i}",
+			trace->owner ? trace->owner->name : "null", trace->file,
+			trace->line, tp->name, file, line);
+#else
+		panic("Faulty mutex unlock!");
+#endif
+	}
 
-	if(--mutex->count == 0) {
+	mutex->count -= 1;
+	if(mutex->count == 0) {
+#ifdef CONFIG_MUTEX_TRACE
+		trace_unset(&mutex->trace);
+#endif
 		mutex->owner = NULL;
 		event_notify(&mutex->qp);
 	}

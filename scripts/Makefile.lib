@@ -27,7 +27,7 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
 # ---------------------------------------------------------------------------
 # o if we encounter foo/ in $(obj-y), replace it by foo/built-in.o
 #   and add the directory to the list of dirs to descend into: $(subdir-y)
-# o if we encounter foo/ in $(obj-m), remove it from $(obj-m) 
+# o if we encounter foo/ in $(obj-m), remove it from $(obj-m)
 #   and add the directory to the list of dirs to descend into: $(subdir-m)
 
 # Determine modorder.
@@ -45,6 +45,13 @@ obj-m		:= $(filter-out %/, $(obj-m))
 # PyMite stuff
 ifneq ($(pylib-y),)
 pylib-y := $(addprefix $(obj)/, $(pylib-y))
+endif
+
+ifneq ($(nvmem-y),)
+nvmem-y := $(addprefix $(obj)/, $(nvmem-y))
+eepromify-target := $(addprefix $(obj)/, eepromify.c)
+eepromify-output-target := $(addprefix $(obj)/, eepromify)
+eepromify-obj-target := $(obj)/eepromify.o
 endif
 
 ifneq ($(pyusrlib-y),)
@@ -68,12 +75,12 @@ endif
 
 subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
 
-# if $(foo-objs) exists, foo.o is a composite object 
+# if $(foo-objs) exists, foo.o is a composite object
 multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
 multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
 multi-used   := $(multi-used-y) $(multi-used-m)
 single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
-           
+
 # Build list of the parts of our composite objects, our composite
 # objects depend on those (obviously)
 multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
@@ -114,7 +121,7 @@ obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
 
 # These flags are needed for modversions and compiling, so we define them here
 # already
-# $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will 
+# $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will
 # end up in (or would, if it gets compiled in)
 # Note: It's possible that one object gets potentially linked into more
 #       than one module. In that case KBUILD_MODNAME will be set to foo_bar,
@@ -207,7 +214,7 @@ $(obj)/%:: $(src)/%_shipped
 
 # Commands useful for building a boot image
 # ===========================================================================
-# 
+#
 #	Use as following:
 #
 #	target: source(s) FORCE
@@ -221,7 +228,7 @@ $(obj)/%:: $(src)/%_shipped
 
 quiet_cmd_ld = LD      $@
 cmd_ld = $(LD) $(LDFLAGS) $(ldflags-y) $(LDFLAGS_$(@F)) \
-	       $(filter-out FORCE,$^) -o $@ 
+	       $(filter-out FORCE,$^) -o $@
 
 # Objcopy
 # ---------------------------------------------------------------------------
@@ -274,4 +281,3 @@ quiet_cmd_lzo = LZO    $@
 cmd_lzo = (cat $(filter-out FORCE,$^) | \
 	lzop -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
            (rm -f $@ ; false)
-

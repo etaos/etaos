@@ -15,6 +15,8 @@
 
 #define EEPROM_WRITE_ADDR 0x20
 
+extern int xdbg;
+
 int main(void)
 {
 	int fd;
@@ -29,7 +31,7 @@ int main(void)
 		file = filep(fd);
 		lseek(file, EEPROM_WRITE_ADDR, SEEK_SET);
 		putc(0xBA, file);
-		
+
 		/*
 		 * now get the byte back
 		 */
@@ -46,4 +48,3 @@ int main(void)
 	printf(CALYPSO_EXIT);
 	return 0;
 }
-

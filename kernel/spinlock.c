@@ -47,9 +47,8 @@ void spinlock_init(spinlock_t *lock)
 {
 	lock->lock = 0;
 #ifdef CONFIG_SPINLOCK_DEBUG
-	lock->owner = NULL;
-	lock->acquire_file = NULL;
-	lock->acquire_line = 0;
+	lock->trace.owner = NULL;
+	lock->trace.line = -1;
 #endif
 }
 
@@ -60,7 +59,6 @@ void spinlock_acquire(spinlock_t *lock)
 #endif
 {
 #ifdef CONFIG_SPINLOCK_DEBUG
-	bool notified = false;
 #ifdef CONFIG_SCHED
 	const char *msg = "Spinlock locked! Lock was previously acquired from: "
 		"%s:%i by %s\n";
@@ -74,19 +72,18 @@ void spinlock_acquire(spinlock_t *lock)
 	lock_ptr = &lock->lock;
 	while(lock_test_and_set(lock_ptr, 1)) {
 #ifdef CONFIG_SPINLOCK_DEBUG
-		if(!notified)
-			printf(msg, lock->acquire_file, lock->acquire_line,
-					lock->owner->name);
+#ifdef CONFIG_SCHED
+		printf(msg, lock->trace.file, lock->trace.line,
+			lock->trace.owner->name);
+#else
+		printf(msg, lock->trace.file, lock->trace.line);
+#endif
 #endif
 
 		while(lock_ptr[LOCK_IDX]);
 	}
 #ifdef CONFIG_SPINLOCK_DEBUG
-	lock->acquire_file = file;
-	lock->acquire_line = line;
-#ifdef CONFIG_SCHED
-	lock->owner = current_thread();
-#endif
+	__trace_set(&lock->trace, file, line, false);
 #endif /* CONFIG_SPINLOCK_DEBUG */
 }
 
@@ -103,13 +100,8 @@ void spinlock_release(spinlock_t *lock)
 	irq_save_and_disable(&flags);
 	barrier();
 #ifdef CONFIG_SPINLOCK_DEBUG
-	lock->acquire_file = NULL;
-	lock->acquire_line = 0;
-#ifdef CONFIG_SCHED
-	lock->owner = NULL;
-#endif
+	trace_unset(&lock->trace);
 #endif /* CONFIG_SPINLOCK_DEBUG */
 	lock_ptr[LOCK_IDX] = 0;
 	irq_restore(&flags);
 }
-

@@ -541,6 +541,12 @@ int rq_add_thread(struct rq *rq, struct thread *tp)
  * @param rq RQ to remove from.
  * @param tp Thread to remove.
  * @return An error code.
+ * @retval 1 if a reschedule is required (\p tp is the current thread).
+ * @retval 0 on success.
+ *
+ * No run queue locks will be acquired prior to attempting to remove
+ * \p tp from the run queue. There will be no forced reschedule after \p
+ * tp has been removed. If \p tp is the current thread \p 1 will be returned.
  */
 int raw_rq_remove_thread_noresched(struct rq *rq, struct thread *tp)
 {
@@ -733,6 +739,9 @@ static struct thread *sched_get_next_runnable(struct rq *rq)
 /**
  * @brief Destroy the kill queue.
  * @param rq Run queue containing the kill queue head.
+ *
+ * Destroy all threads on the kill queue. Memory objects they own will be
+ * returned to the heap.
  */
 static void rq_destroy_kill_q(struct rq *rq)
 {
@@ -822,7 +831,7 @@ static inline void dyn_prio_update(struct rq *rq)
  * @param new New thread to replace \p prev.
  * @see __schedule
  */
-static void __hot rq_switch_context(struct rq *rq, struct thread *prev,
+static void __sched__ rq_switch_context(struct rq *rq, struct thread *prev,
 				    struct thread *new)
 {
 	struct sched_class *class = rq->sched_class;
@@ -1047,6 +1056,55 @@ static inline void __schedule_prepare(struct rq *rq,
 }
 
 /**
+ * @brief Reschedule policy.
+ * @param cur Current thread.
+ * @param next Thread which is supposed to be running after \p cur.
+ * @return an integer indicating whether to reschedule or not.
+ * @retval 1 if __schedule should reschedule.
+ * @retval 0 if __schedule should not reschedule.
+ *
+ * When the next runnable thread is the idle thread and only
+ * \p PREEMPT_NEED_RESCHED_FLAG is set, the timeslice is reset and no
+ * reschedule operation occurs.
+ *
+ * This function returns according to the following logical expression:
+ *
+ * \f$ p \lor (v \land \neg q)\f$ and (`cur` \f$ \neq \f$ `next`)\n\n
+ * Where:
+ * * \f$p\f$ is the `PREEMPT_NEED_RESCHED_FLAG`
+ * * \f$v\f$ is the `THREAD_NEED_RESCHED_FLAG`
+ * * \f$q\f$ is the `THREAD_IDLE_FLAG` flag of the `next` thread
+ *
+ * When preemption is not enabled the value of \p THREAD_NEED_RESCHED_FLAG is
+ * returned.
+ */
+static int __sched__ reschedule_decide(struct thread *cur, struct thread *next)
+{
+#ifdef CONFIG_PREEMPT
+	int resched, preempt;
+
+	if(unlikely(cur == next)) {
+		clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
+		clear_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+		preempt_reset_slice(cur);
+		return false;
+	}
+
+	preempt = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
+	resched = test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
+
+	if(unlikely(thread_is_idle(next) && (preempt && !resched))) {
+		preempt_reset_slice(cur);
+		return false;
+	}
+
+	return preempt | resched;
+#else
+	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
+#endif
+}
+
+/**
  * @brief Mark a thread for termination.
  * @param tp Thread to be terminated.
  * @see sched_remote_kill_if thread_destroy
@@ -1123,53 +1181,6 @@ static void sched_remote_kill_if(struct rq *rq)
 #endif
 }
 
-/**
- * @brief Reschedule policy.
- * @param cur Current thread.
- * @param next Thread which is supposed to be running after \p cur.
- * @return an integer indicating whether to reschedule or not.
- * @retval 1 if __schedule should reschedule.
- * @retval 0 if __schedule should not reschedule.
- *
- * When the next runnable thread is the idle thread and only
- * \p PREEMPT_NEED_RESCHED_FLAG is set, the timeslice is reset and no
- * reschedule operation occurs.
- *
- * If the next thread is _not_ the idle thread, the return value \p rv
- * will be:\n\n
- *
- * \f$ f(rv) = y \lor (x \land \neg f(n))\f$\n\n
- * Where:
- * * \f$x\f$ is the `PREEMPT_NEED_RESCHED_FLAG`
- * * \f$y\f$ is the `THREAD_NEED_RESCHED_FLAG`
- * * \f$f(n)\f$ is the `THREAD_IDLE_FLAG` flag of the `next` thread
- *
- * When preemption is not enabled the value of \p THREAD_NEED_RESCHED_FLAG is
- * returned.
- */
-static int schedule_decide(struct thread *cur, struct thread *next)
-{
-#ifdef CONFIG_PREEMPT
-	int resched;
-
-	resched = test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
-	if(unlikely(resched)) {
-		clear_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
-	} else {
-		resched = test_and_clear_bit(PREEMPT_NEED_RESCHED_FLAG, &cur->flags);
-
-		if(unlikely(thread_is_idle(next) && resched)) {
-			resched = false;
-			preempt_reset_slice(cur);
-		}
-	}
-
-	return resched;
-#else
-	return test_and_clear_bit(THREAD_NEED_RESCHED_FLAG, &cur->flags);
-#endif
-}
-
 #ifdef CONFIG_PREEMPT
 /**
  * @brief Check if the algorithm wants to preempt the current thread.
@@ -1201,12 +1212,12 @@ static void preempt_check(struct rq *rq, struct thread *cur, struct thread *nxt)
  * 	   - timers;
  * 	   - threads which have used up their time slice;
  * 	   - the kill queue of the run queue;
- * @see __schedule_need_resched
+ * @see reschedule_decide
  * @return Boolean value indicating whether a reschedule occurred or not.
  *
  * struct rq::lock will be locked (and unlocked).
  */
-static bool __hot __schedule(int cpu)
+static bool __sched__ __schedule(int cpu)
 {
 	struct rq *rq;
 	struct thread *next,
@@ -1234,7 +1245,7 @@ static bool __hot __schedule(int cpu)
 	 * THREAD_NEED_RESCHED_FLAG and the PREEMPT_NEED_RESCHED_FLAG. Also,
 	 * if prev == next a reschedule is redundant.
 	 */
-	if(likely(schedule_decide(prev, next) && prev != next)) {
+	if(likely(reschedule_decide(prev, next))) {
 		__sched_set_current_thread(rq, next);
 		rq->switch_count++;
 		rescheduled = true;
@@ -1256,10 +1267,10 @@ static bool __hot __schedule(int cpu)
 
 /**
  * @brief Check if a reschedule is required.
- * @see schedule_decide
+ * @see reschedule_decide
  * @return true if a reschedule is required, false otherwise.
  *
- * For a more extensive check, use #schedule_decide.
+ * For a more extensive check, use #reschedule_decide.
  */
 static inline bool need_resched()
 {
@@ -1283,7 +1294,7 @@ static inline bool need_resched()
  * Run the scheduler to allow other threads to access the CPU. Most likely
  * you don't want to call this function directly.
  */
-void __hot schedule(void)
+void __sched__ schedule(void)
 {
 	int cpu;
 
@@ -1303,7 +1314,7 @@ void __hot schedule(void)
  * the interrupts are already disabled. The most notable use of this function
  * is the 'off IRQ return' preemption calls.
  */
-void __hot preempt_schedule_irq(void)
+void __sched__ preempt_schedule_irq(void)
 {
 	int cpu;
 
@@ -1326,7 +1337,7 @@ void __hot preempt_schedule_irq(void)
  * This function is the preemption entry point for in-application preemption
  * (such as preemption from preempt_enable).
  */
-void __hot preempt_schedule(void)
+void __sched__ preempt_schedule(void)
 {
 	/* we don't want to preempt the current process if either
 	 * a) the interrupts are disabled or

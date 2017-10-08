@@ -46,8 +46,8 @@
  * @param stack Pointer to the stack.
  * @param prio Priority of the thread.
  */
-static void raw_thread_init(struct thread *tp, const char *name, 
-		thread_handle_t handle, void *arg, size_t stack_size, 
+static void raw_thread_init(struct thread *tp, const char *name,
+		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack, unsigned char prio)
 {
 	memset(tp, 0, sizeof(*tp));
@@ -95,8 +95,8 @@ static void raw_thread_init(struct thread *tp, const char *name,
  * @param stack_size Idle thread stack size.
  * @param stack Idle thread stack pointer.
  */
-void sched_init_idle(struct thread *tp, const char *name, 
-		thread_handle_t handle, void *arg, size_t stack_size, 
+void sched_init_idle(struct thread *tp, const char *name,
+		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack)
 {
 	raw_thread_init(tp, name, handle, arg, stack_size, stack, 255);
@@ -191,9 +191,15 @@ struct thread *thread_alloc(const char *name, thread_handle_t handle,
 	unsigned char prio;
 	bool alloc;
 
-	prio = 0;
-	stack_size = 0;
-	stack = NULL;
+	if(attr) {
+		prio = attr->prio;
+		stack = attr->stack;
+		stack_size = attr->stack_size;
+	} else {
+		prio = 0;
+		stack_size = 0;
+		stack = NULL;
+	}
 	tp = kzalloc(sizeof(*tp));
 
 	if(!tp)
@@ -250,8 +256,8 @@ void thread_start(struct thread *tp)
  * @param prio Priority of the thread.
  * @return An error code.
  */
-int thread_initialise(struct thread *tp, const char *name, 
-		thread_handle_t handle, void *arg, size_t stack_size, 
+int thread_initialise(struct thread *tp, const char *name,
+		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack, unsigned char prio)
 {
 	struct rq *rq;
@@ -287,7 +293,7 @@ void kill(void)
 	raw_event_notify_broadcast(&tp->joinq);
 #endif
 	thread_add_to_kill_q(tp);
-	
+
 	if(class->kill)
 		class->kill(tp);
 

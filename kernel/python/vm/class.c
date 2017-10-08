@@ -241,6 +241,44 @@ PmReturn_t class_get_attrib(pPmObj_t obj, const char *name, pPmObj_t *r_obj)
 	return class_getAttr(obj, attrname, r_obj);
 }
 
+static PmReturn_t __class_set_attr(pPmObj_t obj, pPmObj_t attr, pPmObj_t val)
+{
+	pPmInstance_t iobj;
+	PmReturn_t retval;
+
+	if(OBJ_GET_TYPE(obj) != OBJ_TYPE_CLI) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	iobj = (pPmInstance_t)obj;
+	return dict_setItem((pPmObj_t)iobj->cli_attrs, attr, val);
+}
+
+PmReturn_t class_set_attr(pPmObj_t obj, pPmObj_t attr, pPmObj_t value)
+{
+	PmReturn_t retval;
+
+	if(OBJ_GET_TYPE(attr) != OBJ_TYPE_STR) {
+		PM_RAISE(retval, PM_RET_EX_TYPE);
+		return retval;
+	}
+
+	return __class_set_attr(obj, attr, value);
+}
+
+PmReturn_t class_set_attr_cstr(pPmObj_t obj, const char *c_attr, pPmObj_t value)
+{
+	pPmObj_t attr;
+	PmReturn_t retval;
+
+	retval = string_new(&c_attr, &attr);
+	if(retval != PM_RET_OK)
+		return retval;
+
+	return class_set_attr(obj, attr, value);
+}
+
 uint8_t				/* boolean */
 class_isSubclass(pPmObj_t ptest_class, pPmObj_t pbase_class)
 {

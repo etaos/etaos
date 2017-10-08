@@ -206,4 +206,3 @@ int dirent_free(struct dirent *dir)
 }
 
 /** @} */
-

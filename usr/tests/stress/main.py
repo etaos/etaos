@@ -19,14 +19,15 @@
 import sys, cpu, string, avr, math
 from lm35 import LM35
 from eeprom import EEPROM
-from sram import SRAM
 from time import Time
+from device import Device
+from sram import SRAM
 
 ee = EEPROM("24C02")
 ram = SRAM("23K256")
-sram_write_data = math.pi
 addr = 0x60
-num = 2
+data_ary = [155.0, 121.3, 3.1415, 12.2, 90.0, 8.91]
+ram_lst = [3.1415, 12.1, math.pi]
 
 def print_temperature(sensor):
 	tm = Time(True)
@@ -47,23 +48,26 @@ def print_temperature(sensor):
 
 def print_eeprom_and_sram():
 	while True:
-		sram_data = ram.read_float(addr)
-		ee_data = ee.read(addr, num)
+		sram_data = ram.read_list(len(ram_lst), True, addr)
+		ee_data = ee.read_list(len(data_ary), True, addr)
+
+		if len(ee_data) is 0:
+			continue
+
 		vlength = math.hypot(2.0, 2.0)
-		if sram_data is not None:
-			sram_data = math.sin(sram_data / 2.0)
+		if len(sram_data) is not 0:
+			sram_data = math.sin(sram_data[2] / 2.0)
 		else:
 			sram_data = 0.0
 
-		print "[python]:    EEPROM: %d and %d" % (ee_data[0], ee_data[1])
+		print "[python]:    EEPROM: %f and %f" % (ee_data[4], ee_data[5])
 		print "[python]:    SRAM: %f :: Length of (2, 2): %f" % (sram_data, vlength)
 		sys.wait(1000)
 
 def main():
 	lm = LM35(0)
-	data_ary = [155, 120, 10, 20, 52, 80]
-	ee.write(addr, data_ary, len(data_ary))
-	ram.write_float(addr, sram_write_data)
+	ee.write_list(data_ary, True, addr)
+	ram.write_list(ram_lst, True, addr)
 
 	# Setup the LED pin
 	avr.port_direction_or(avr.portb, 0x80)

@@ -26,16 +26,18 @@ module ETAOS
       hex = options[:hex]
       baud = options[:baud]
       conf = options[:config]
+      eeprom = options[:eeprom]
 
       avrdude_args = AVRDUDE_CMD
       avrdude_args += "-p #{mcu} -c #{prog} -b #{baud} -P #{port} -C #{conf} "
-      avrdude_args += "-U flash:w:#{hex}:i"
+      avrdude_args += "-U flash:w:#{hex}:i" unless eeprom
+      avrdude_args += "-U eeprom:w:#{hex}:i" if eeprom
 
       `#{avrdude_args}`
     end
 
     private
-    STTY_FIX_COMMAND = "stty 57600 raw ignbrk hup".freeze
+    STTY_FIX_COMMAND = "stty 115200 raw ignbrk hup".freeze
 
     def fix_tty(port)
       fix_cmd = "#{STTY_FIX_COMMAND} < #{port}"
@@ -54,6 +56,7 @@ def parse(args)
   options.port = nil
   options.baud = 115200
   options.config = "/etc/avrdude.conf"
+  options.eeprom = false
 
   parser = OptionParser.new do |p|
     p.banner = "Usage: avr_upload [options]"
@@ -62,6 +65,10 @@ def parse(args)
 
     p.on('-f', '--tty-fix', "Reset the TTY config before uploading") do
       options.tty_fix = true
+    end
+
+    p.on('-e', '--eeprom', "Write to the internal EEPROM") do
+      options.eeprom = true
     end
 
     p.on('-H [FILE]', '--hex [FILE]',
@@ -126,4 +133,3 @@ end
 
 options = parse ARGV
 ETAOS.upload options
-
