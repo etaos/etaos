@@ -26,6 +26,7 @@ libc-files-$(CONFIG_CRT) += opendir.o readdir.o readdir_r.o closedir.o
 libc-files-$(CONFIG_CRT) += fmode.o fopen.o fclose.o fread.o fwrite.o
 libc-files-$(CONFIG_CRT) += flush.o fflush.o ferror.o feof.o fileno.o
 libc-files-$(CONFIG_CRT) += putchar.o getchar.o
+libc-files-$(CONFIG_EXT_STRING) += strsplit.o
 
 libc-files-$(CONFIG_HARVARD) += printf_p.o vfprintf_p.o
 libc-files-$(CONFIG_HARVARD) += fprintf_P.o

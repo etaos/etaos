@@ -7,8 +7,8 @@ config CRT
 	  say 'y' here.
 
 config EXT_STRING
-	tristate "Extended string functions"
-	depends on m && CRT
+	bool "Extended string functions"
+	depends on CRT
 	default n
 	help
 	  Say 'y' here to build the extended string function library.
