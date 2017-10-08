@@ -78,7 +78,7 @@ void trace_info_invalidate(trace_info_t *info)
 	}
 
 	info->line = -1;
-	info->alloc = false;
+	info->allocated = false;
 }
 
 /** @} */
