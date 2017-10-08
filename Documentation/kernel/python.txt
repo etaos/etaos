@@ -50,17 +50,17 @@
  *
 @code{.py}
 read_example(eeprom, addr, num):
-	return eeprom.read(addr, num)
+	return eeprom.read(num, addr)
 
-example_write(eeprom, addr, ary):
-	eeprom.write(addr, ary, len(ary))
+example_write(eeprom, data, addr)
+	eeprom.write(data, addr)
 
 main():
 	ee = EEPROM("24C02")
-	write_example(ee, 0x40, [20, 0x10, 40, 100])
-	data = read_example(ee, 0x40, 4)
-	for x in data:
-		print x
+	tst = "Some test data"
+	write_example(ee, 0x40, tst)
+	data = read_example(ee, 0x40, len(tst))
+	print data
 @endcode
  */
 
