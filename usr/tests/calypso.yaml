@@ -123,6 +123,19 @@ unit-tests:
     libdir: usr/lib
     compare: expected_output.cyo
 
+  cxx-string-test:
+    autorun: true
+    hardware: ard-uno
+    mode: auto
+    name: "CXX string test"
+    path: usr/tests/cxx-string
+    execute: clean all hex upload
+    config: config-atmega328p.conf
+    port: /dev/ttyACM0
+    baud: 9600
+    libdir: usr/lib
+    compare: expected_output.cyo
+
   cxx-test:
     autorun: true
     hardware: ard-mega
