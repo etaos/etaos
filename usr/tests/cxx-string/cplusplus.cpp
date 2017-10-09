@@ -14,15 +14,14 @@
 
 int main(void)
 {
-	String s("String");
-	String s2("Hey");
+	String s("Test");
+	String s2("Test data 1");
 
-	s += " plus ";
-	s += (int)5;
-	s += " ";
-	s += 5.1234f;
+	s += " data ";
+	s += (int)1;
+
 	printf("Str: %s\n", s.c_str());
-	printf("Equal? %u\n", String("Hey") == s2);
+	printf("Equal? %u\n", s == s2);
 
 	printf(CALYPSO_EXIT);
 	return -EOK;
