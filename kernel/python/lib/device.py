@@ -260,6 +260,7 @@ def dev_write_list(desc, ary, length, flt, addr):
                 rv = device_write(fd, buf, length, NULL);
         }
 
+        kfree((void*)buf);
         int_new(rv, &retval);
         NATIVE_SET_TOS(retval);
         return PM_RET_OK;
