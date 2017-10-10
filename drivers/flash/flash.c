@@ -41,6 +41,11 @@ static inline struct flash_chip *file_to_flash(struct file *file)
 	return (struct flash_chip*)dev->dev_data;
 }
 
+/**
+ * @brief Open a flash device.
+ * @param flash File to open.
+ * @return Error code.
+ */
 static int flash_open(struct file *flash)
 {
 	struct device *dev;
@@ -51,6 +56,11 @@ static int flash_open(struct file *flash)
 	return -EOK;
 }
 
+/**
+ * @brief Close an open flash device.
+ * @param flash Flash device to close.
+ * @return Error code.
+ */
 static int flash_close(struct file *flash)
 {
 	struct device *dev;
@@ -61,6 +71,13 @@ static int flash_close(struct file *flash)
 	return -EOK;
 }
 
+/**
+ * @brief Read from a flash device.
+ * @param stream Flash device file.
+ * @param buff Buffer to read into.
+ * @param num Length of \p buff.
+ * @return Error code.
+ */
 static int flash_read(struct file *stream, void *buff, size_t num)
 {
 	struct flash_chip *flash;
@@ -78,6 +95,11 @@ static int flash_read(struct file *stream, void *buff, size_t num)
 	return rc;
 }
 
+/**
+ * @brief Read a single byte from a flash device.
+ * @param stream Flash device file.
+ * @return Byte read from \p stream or an error code.
+ */
 static int flash_getc(struct file *stream)
 {
 	struct flash_chip *flash;
