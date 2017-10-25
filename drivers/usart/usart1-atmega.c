@@ -31,13 +31,13 @@
 
 static mutex_t usart_mtx;
 
-static const uint8_t *usart_tx_buff;
-static size_t usart_tx_len;
-static size_t usart_tx_idx;
+static volatile const uint8_t *usart_tx_buff;
+static volatile size_t usart_tx_len;
+static volatile size_t usart_tx_idx;
 
-static uint8_t *usart_rx_buff;
-static size_t usart_rx_len;
-static size_t usart_rx_idx;
+static volatile uint8_t *usart_rx_buff;
+static volatile size_t usart_rx_len;
+static volatile size_t usart_rx_idx;
 
 static int atmega_usart_putc(struct usart *usart, int c)
 {
@@ -79,6 +79,7 @@ static int atmega_usart_read(struct usart *uart, void *rx, size_t rxlen)
 	return -EOK;
 }
 
+static volatile bool tx_done = true;
 static int atmega_usart_write(struct usart *uart, const void *tx,
 			size_t txlen)
 {
@@ -90,8 +91,12 @@ static int atmega_usart_write(struct usart *uart, const void *tx,
 	usart_tx_len = txlen;
 	usart_tx_idx = 0;
 	UCSR1B |= BIT(UDRIE1);
+	tx_done = false;
 	irq_exit_critical();
+
 	mutex_wait(&usart_mtx);
+	tx_done = true;
+	UCSR1B &= ~BIT(UDRIE1);
 
 	return -EOK;
 }
@@ -117,16 +122,20 @@ static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
 
 static irqreturn_t usart_udre_irq(struct irq_data *data, void *arg)
 {
-	if(!usart_tx_buff || !usart_tx_len || usart_tx_idx >= usart_tx_len)
+	if(!usart_tx_buff || !usart_tx_len) {
+		if(!tx_done)
+			mutex_unlock_from_irq(&usart_mtx);
+
 		return IRQ_HANDLED;
+	}
 
 	UDR1 = usart_tx_buff[usart_tx_idx];
 	usart_tx_idx++;
 
 	if(usart_tx_idx >= usart_tx_len) {
+		usart_tx_buff = NULL;
 		usart_tx_idx = 0;
 		mutex_unlock_from_irq(&usart_mtx);
-		UCSR1B &= ~BIT(UDRIE1);
 	}
 
 	return IRQ_HANDLED;
