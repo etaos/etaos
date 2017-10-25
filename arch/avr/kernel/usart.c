@@ -33,8 +33,9 @@ SIGNAL(USART_RX_STC_VECTOR)
 SIGNAL(USART1_UDRE_VECTOR)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
+	
 	chip->chip_handle(USART1_UDRE_VECTOR_NUM);
-
+	preempt_schedule_irq();
 }
 #endif
 
@@ -42,6 +43,8 @@ SIGNAL(USART1_UDRE_VECTOR)
 SIGNAL(USART1_RX_COMPLETE_VECTOR)
 {
 	struct irq_chip *chip = arch_get_irq_chip();
+
 	chip->chip_handle(USART1_RX_COMPLETE_VECTOR_NUM);
+	preempt_schedule_irq();
 }
 #endif
