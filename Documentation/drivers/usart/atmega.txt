@@ -16,3 +16,15 @@
  *   * Multi-processor Communication Mode
  *   * Double Speed Asynchronous Communication Mode
  */
+
+/**
+ * @defgroup usart1-atmega ATmega USART1
+ * @ingroup usart-core
+ * @brief ATmega USART1
+ *
+ * The ATmega USART1 is the device driver for the (optional) second USART
+ * device. The difference with the main driver, is that the USART1 driver
+ * runs fully on IRQs. This means, that it can archieve much higher
+ * baud rates.
+ */
+
