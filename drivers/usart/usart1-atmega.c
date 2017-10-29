@@ -78,9 +78,11 @@ static int atmega_usart_read(struct usart *uart, void *rx, size_t rxlen)
 	usart_rx_buff = rx;
 	usart_rx_len = rxlen;
 	usart_rx_idx = 0;
+	UCSR1B |= BIT(RXCIE1);
 	irq_exit_critical();
 
 	mutex_wait(&usart_mtx);
+	UCSR1B &= ~BIT(RXCIE1);
 	return -EOK;
 }
 
@@ -176,7 +178,7 @@ static __used void atmega_usart1_init(void)
 
 	UBRR1 = baud;
 	UCSR1C = BIT(UCSZ11) | BIT(UCSZ10);
-	UCSR1B = BIT(RXEN1) | BIT(TXEN1) | BIT(RXCIE1);
+	UCSR1B = BIT(RXEN1) | BIT(TXEN1);
 
 	mutex_init(&usart_mtx);
 
