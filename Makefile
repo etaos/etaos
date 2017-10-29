@@ -316,7 +316,7 @@ mrproper-extra += $(shell find -name "*.hex")
 mrproper-dirs      := $(addprefix _mrproper_,scripts)
 mrproper-rmdirs += include/config include/generated Documentation/html
 mrproper-files   := $(addprefix _mrproper_,.config)
-mrproper-rmfiles := .config .config.old $(mrproper-extra)
+mrproper-rmfiles := .config .config.old
 
 PHONY += $(mrproper-dirs) $(mrproper-rmfiles) mrproper
 
@@ -326,6 +326,7 @@ $(mrproper-dirs):
 
 $(mrproper-files):
 	$(call cmd,mrproper_files)
+	@rm -rf $(mrproper-extra)
 
 mrproper: clean $(mrproper-dirs) $(mrproper-files)
 
