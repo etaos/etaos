@@ -142,11 +142,11 @@ PmReturn_t string_newFromChar(uint8_t const c, pPmObj_t * r_pstring)
 }
 
 #ifdef HAVE_SLICE
-/* 
- * This function does not fill in the string contents 
+/*
+ * This function does not fill in the string contents
  * and should only be called by other string functions
  */
-static PmReturn_t string_newFromLength(uint16_t len, pPmObj_t * r_pstring)
+PmReturn_t string_newFromLength(uint16_t len, pPmObj_t * r_pstring)
 {
 	PmReturn_t retval;
 	pPmString_t pstr;

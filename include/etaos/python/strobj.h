@@ -148,6 +148,8 @@ PmReturn_t string_create(PmMemSpace_t memspace, uint8_t const **paddr,
  */
 PmReturn_t string_newFromChar(uint8_t const c, pPmObj_t * r_pstring);
 
+extern PmReturn_t string_newFromLength(uint16_t len, pPmObj_t * r_pstring);
+
 /**
  * Compares two String objects for equality.
  *
