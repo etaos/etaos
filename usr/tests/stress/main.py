@@ -23,6 +23,8 @@ from time import Time
 from device import Device
 from sram import SRAM
 
+__name__ = "__main__"
+
 ee = EEPROM("24C02")
 ram = SRAM("23K256")
 addr = 0x60

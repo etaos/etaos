@@ -163,7 +163,8 @@ static const char *const fnlookup[LEN_FNLOOKUP] __pgm = {
 	fnstr_12, fnstr_13, fnstr_14, fnstr_15,
 	fnstr_16, fnstr_17, fnstr_18, fnstr_19,
 	fnstr_20, fnstr_21, fnstr_22, fnstr_23,
-	fnstr_24, fnstr_25, fnstr_26
+	fnstr_24, fnstr_25, fnstr_26, fnstr_27,
+	fnstr_28,
 };
 
 /* This table should match src/vm/pm.h PmReturn_t */
@@ -265,7 +266,7 @@ void plat_reportError(PmReturn_t result)
 				  (char *)pframe->fo_func->f_co->co_filename,
 				  MAX(FN_MAX_LEN, EXN_MAX_LEN));
 		}
-		printf_P(PSTR("  File \"%s\", line %d, in %s\n"),
+		printf_P(PSTR("  File \"%s\", line %u, in %s\n"),
 			 ((pframe->fo_func->f_co->co_memspace == MEMSPACE_PROG)
 			  ? pstrbuf
 			  : (char *)pframe->fo_func->f_co->co_filename),
@@ -281,7 +282,7 @@ void plat_reportError(PmReturn_t result)
 			  EXN_MAX_LEN);
 		printf_P(PSTR("%s"), pstrbuf);
 	} else {
-		printf_P(PSTR("Error code 0x%02X"), result);
+		printf_P(PSTR("Error code 0x%X"), result);
 	}
 	printf_P(PSTR(" detected by "));
 
@@ -292,17 +293,17 @@ void plat_reportError(PmReturn_t result)
 			  FN_MAX_LEN);
 		printf_P(PSTR("%s:"), pstrbuf);
 	} else {
-		printf_P(PSTR("FileId 0x%02X line "), gVmGlobal.errFileId);
+		printf_P(PSTR("FileId 0x%X line "), gVmGlobal.errFileId);
 	}
-	printf_P(PSTR("%d\n"), gVmGlobal.errLineNum);
+	printf_P(PSTR("%u\n"), gVmGlobal.errLineNum);
 
 #else				/* HAVE_DEBUG_INFO */
 
 	/* Print error */
-	printf_P(PSTR("Error:     0x%02X\n"), result);
-	printf_P(PSTR("  Release: 0x%02X\n"), gVmGlobal.errVmRelease);
-	printf_P(PSTR("  FileId:  0x%02X\n"), gVmGlobal.errFileId);
-	printf_P(PSTR("  LineNum: %d\n"), gVmGlobal.errLineNum);
+	printf_P(PSTR("Error:     0x%X\n"), result);
+	printf_P(PSTR("  Release: 0x%X\n"), gVmGlobal.errVmRelease);
+	printf_P(PSTR("  FileId:  0x%X\n"), gVmGlobal.errFileId);
+	printf_P(PSTR("  LineNum: %u\n"), gVmGlobal.errLineNum);
 
 	/* Print traceback */
 	{

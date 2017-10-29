@@ -94,6 +94,7 @@ config HAVE_BYTEARRAY
 
 config HAVE_DEBUG_INFO
 	bool "Debug info"
+	depends on DEBUG
 	default y
 	help
 	  Say 'y' here to print debug information (stacktraces etc.)

@@ -17,6 +17,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define __FILE_ID__ 0xC
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/error.h>
