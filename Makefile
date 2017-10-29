@@ -308,10 +308,15 @@ quiet_cmd_mrproper_files = CLEAN   $(mrproper-rmfiles)
 quiet_cmd_mrproper_dirs = CLEAN   $(mrproper-rmdirs)
       cmd_mrproper_dirs = rm -rf $(mrproper-rmdirs)
 
+mrproper-extra := $(shell find -name "*.o")
+mrproper-extra += $(shell find -name "*.img")
+mrproper-extra += $(shell find -name "*.hex")
+
+
 mrproper-dirs      := $(addprefix _mrproper_,scripts)
 mrproper-rmdirs += include/config include/generated Documentation/html
 mrproper-files   := $(addprefix _mrproper_,.config)
-mrproper-rmfiles := .config .config.old
+mrproper-rmfiles := .config .config.old $(mrproper-extra)
 
 PHONY += $(mrproper-dirs) $(mrproper-rmfiles) mrproper
 
