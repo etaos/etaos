@@ -45,46 +45,82 @@ struct tm _tm;
  *
  * Thread safe version of gmtime.
  */
-int gmtime_r(const time_t *t, struct tm *tm_struct)
+int gmtime_r(const time_t * timer, struct tm* ptm)
 {
-	int tmp;
+	time_t ctimer = *timer;     /* var to calculate with */
+	bool isleapyear = false;
+	uint32_t tmptimer;
 	int *mdays;
-	bool isleap = false;
-	uint32_t tval;
 
-	if(!tm_struct)
+	if(!ptm)            /* check pointer */
 		return -EINVAL;
 
-	tmp = *t / _YEAR_SEC; /* years since 1970 */
-	tval = *t - (tmp * _YEAR_SEC); /* seconds within the current year */
+	/*
+	First calculate the number of four-year-interval, so calculation
+	of leap year will be simple. Btw, because 2000 IS a leap year and
+	2100 is out of range, this formula is so simple.
+	*/
+	tmptimer = (ctimer / _FOUR_YEAR_SEC);
+	ctimer -= (tmptimer * _FOUR_YEAR_SEC);
 
-	/* determine if we are in a leap year */
-	tmp += 1970;
-	if(((tmp % 4) == 0 && (tmp % 100) != 0) || (tmp % 400) == 0)
-		isleap = true;
+	/* Determine the correct year within the interval */
+	tmptimer = (tmptimer * 4) + 70;     /* 1970, 1974, 1978,... */
+	if (ctimer >= _YEAR_SEC) {
+		tmptimer++;             /* 1971, 1975, 1979,... */
+		ctimer -= _YEAR_SEC;
+		if (ctimer >= _YEAR_SEC) {
+			tmptimer++; /* 1972, 1976, 1980,... (all leap years!) */
+			ctimer -= _YEAR_SEC;
+			/* A leap year has 366 days, so compare t
+			 _YEAR_SEC + _DAY_SEC */
+			if (ctimer >= (_YEAR_SEC + _DAY_SEC)) {
+				tmptimer++; /* 1973, 1977, 1981,... */
+				ctimer -= (_YEAR_SEC + _DAY_SEC);
+			} else {
+				isleapyear = 1; /*If leap year, set the flag */
+			}
+		}
+	}
 
-	tmp -= 1900;
-	tm_struct->tm_year = tmp;
-	tm_struct->tm_yday = tval / _DAY_SEC;
+	/*
+	tmptimer now has the value for tm_year. ctimer now holds the
+	number of elapsed seconds since the beginning of that year.
+	*/
+	ptm->tm_year = tmptimer;
 
-	tval -= tm_struct->tm_yday * _DAY_SEC; /* Number of seconds left */
+	/*
+	Calculate days since January 1st and store it to tm_yday.
+	Leave ctimer with number of elapsed seconds in that day.
+	*/
+	ptm->tm_yday = (int) (ctimer / _DAY_SEC);
+	ctimer -= (ptm->tm_yday) * _DAY_SEC;
 
-	if(isleap)
+	/*
+	Determine months since January (Note, range is 0 - 11)
+	and day of month (range: 1 - 31)
+	*/
+	if (isleapyear)
 		mdays = _lpdays;
 	else
 		mdays = _days;
 
-	for(tmp = 1; mdays[tmp] < tm_struct->tm_yday; tmp++);
-	tm_struct->tm_mon = --tmp;
-	tm_struct->tm_mday = tm_struct->tm_yday - mdays[tmp];
-	tm_struct->tm_wday = ((int) (*t / _DAY_SEC) + _BASE_DOW) % 7;
-	tm_struct->tm_hour = (int) (tval / 3600);
-	tval -= (time_t) tm_struct->tm_hour * 3600;
 
-	tm_struct->tm_min = tval / 60;
-	tval -= tm_struct->tm_min * 60;
-	tm_struct->tm_sec = tval;
-	tm_struct->tm_isdst = false;
+	for (tmptimer = 1; mdays[tmptimer] < ptm->tm_yday; tmptimer++);
+
+	ptm->tm_mon = --tmptimer;
+
+	ptm->tm_mday = ptm->tm_yday - mdays[tmptimer];
+
+	/* Calculate day of week. Sunday is 0 */
+	ptm->tm_wday = ((*timer / _DAY_SEC) + _BASE_DOW) % 7;
+
+	/* Calculate the time of day from the remaining seconds */
+	ptm->tm_hour = (ctimer / 3600);
+	ctimer -= ptm->tm_hour * 3600L;
+
+	ptm->tm_min = ctimer / 60;
+	ptm->tm_sec = ctimer - (ptm->tm_min) * 60;
+	ptm->tm_isdst = false;
 
 	return 0;
 }
@@ -105,4 +141,3 @@ struct tm *gmtime(const time_t *t)
 }
 
 /** @} */
-
