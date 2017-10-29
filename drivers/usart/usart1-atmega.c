@@ -108,17 +108,16 @@ static int atmega_usart_write(struct usart *uart, const void *tx,
 
 static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
 {
-	if(!usart_rx_len || !usart_rx_buff || usart_rx_idx >= usart_rx_len)
+	if(unlikely(!usart_rx_len || !usart_rx_buff ||
+		!(usart_rx_idx < usart_rx_len)))
 		return IRQ_HANDLED;
 
-	if(usart_rx_idx < usart_rx_len) {
-		usart_rx_buff[usart_rx_idx] = UDR1;
-		usart_rx_idx++; /* AVRICC breaks if we don't do this
-				   seperately */
-	}
+	usart_rx_buff[usart_rx_idx] = UDR1;
+	usart_rx_idx++; /* AVRICC breaks if we don't do this seperately */
 
 	if(usart_rx_idx >= usart_rx_len) {
 		usart_rx_idx = 0;
+		usart_rx_buff = NULL;
 		mutex_unlock_from_irq(&usart_mtx);
 	}
 
@@ -127,7 +126,8 @@ static irqreturn_t usart_rx_irq(struct irq_data *data, void *arg)
 
 static irqreturn_t usart_udre_irq(struct irq_data *data, void *arg)
 {
-	if(!usart_tx_buff || !usart_tx_len) {
+	if(unlikely(!usart_tx_buff || !usart_tx_len ||
+		     !(usart_tx_idx < usart_tx_len))) {
 		if(!tx_done)
 			mutex_unlock_from_irq(&usart_mtx);
 
@@ -139,7 +139,7 @@ static irqreturn_t usart_udre_irq(struct irq_data *data, void *arg)
 
 	if(usart_tx_idx >= usart_tx_len) {
 		usart_tx_buff = NULL;
-		usart_tx_idx = 0;
+		usart_tx_len = 0;
 		mutex_unlock_from_irq(&usart_mtx);
 	}
 
