@@ -55,11 +55,12 @@ print math.atan2(1, 0)
 
 readback = ee.read_list(data_len, True, 0x10)
 
-print "EEPROM read:"
 print "SRAM read: %s" % ram.read_string(0x40, sram_len)
 
+print "EEPROM read:"
 print readback
 print "calypso_exit"
 
 while True:
 	pass
+
