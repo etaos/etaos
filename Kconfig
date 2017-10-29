@@ -10,6 +10,11 @@ config MODULES
 	help
 	  Enable the building of modules.
 
+config DEBUG
+	bool "ETA/OS debugging"
+	help
+	  Say 'y' here to enable compiler debugging flags.
+
 config CROSS_COMPILE
 	string "Cross compile prefix"
 	help
