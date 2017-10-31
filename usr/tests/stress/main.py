@@ -17,7 +17,7 @@
 #
 
 import sys, cpu, string, avr, math
-from lm35 import LM35
+from tmp36 import TMP36
 from eeprom import EEPROM
 from time import Time
 from device import Device
@@ -67,7 +67,7 @@ def print_eeprom_and_sram():
 		sys.wait(1000)
 
 def main():
-	lm = LM35(0)
+	lm = TMP36(0)
 	ee.write_list(data_ary, True, addr)
 	ram.write_list(ram_lst, True, addr)
 
