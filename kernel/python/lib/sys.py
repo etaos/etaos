@@ -399,8 +399,7 @@ def thread_yield():
 def wait(ms):
 	t = clock() + ms
 	while clock() < t:
-		gc()
-		thread_yield()
+                pass
 
 ## @}
 
