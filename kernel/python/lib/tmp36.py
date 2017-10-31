@@ -22,6 +22,8 @@
 ## @package LM36
 #  @brief Provides PyMite's LM36 sensor driver.
 
+import cpu
+
 __name__ = "tmp36"
 
 ## LM36 class.
