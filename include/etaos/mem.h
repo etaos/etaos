@@ -35,11 +35,7 @@
 
 #define MM_MAGIC_BYTE 0x99
 
-#ifdef CONFIG_PYTHON
-#define MM_ALIGNMENT 4
-#else
 #define MM_ALIGNMENT 1
-#endif
 
 /**
  * @brief Heap node structure
@@ -131,4 +127,3 @@ extern size_t mm_heap_available(void);
 CDECL_END
 
 #endif
-
