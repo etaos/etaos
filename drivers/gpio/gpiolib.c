@@ -66,7 +66,7 @@ int gpio_chip_init(struct gpio_chip *chip, uint16_t pins)
  * @param nr GPIO pin number.
  * @param flags GPIO pin flags.
  */
-void gpio_pin_init(struct gpio_chip *chip, 
+void gpio_pin_init(struct gpio_chip *chip,
 		struct gpio_pin *pin, uint16_t nr, unsigned long flags)
 {
 	if(!pin)
@@ -287,12 +287,7 @@ int raw_gpio_pin_write(struct gpio_pin *pin, int val)
  */
 int __raw_gpio_pin_write(struct gpio_pin *pin, int val)
 {
-	struct gpio_chip *chip = pin->chip;
-
-	if(test_bit(GPIO_IS_OUTPUT, &pin->flags))
-		return chip->set(chip, val, pin->nr);
-	else
-		return -EINVAL;
+	return pin->chip->set(pin->chip, val, pin->nr);
 }
 
 /**
@@ -382,4 +377,3 @@ static void __used gpiolib_init(void)
 subsys_init(gpiolib_init);
 
 /* @} */
-
