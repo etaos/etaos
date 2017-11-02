@@ -26,9 +26,9 @@
  * @brief Arch backend for micro second delays.
  * @param us Amount of micro seconds to delay.
  */
-extern void arch_delay_us(double us);
+extern void arch_delay_us(unsigned int us);
 #ifdef CONFIG_DELAY_US
-extern void delay_us(double us);
+#define delay_us(_us_) arch_delay_us(_us_)
 #endif
 #ifdef CONFIG_DELAY_MS
 extern void delay(unsigned int ms);

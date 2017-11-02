@@ -27,17 +27,6 @@
 #include <etaos/tick.h>
 #include <etaos/delay.h>
 
-#ifdef CONFIG_DELAY_US
-/**
- * @brief Delay for a certain amount of micro seconds.
- * @param us Amount of micro seconds to delay.
- */
-void delay_us(double us)
-{
-	arch_delay_us(us);
-}
-#endif
-
 #ifdef CONFIG_DELAY_MS
 /**
  * @brief Delay for a certain amount of miliseconds.
