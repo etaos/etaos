@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup bmp085
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/stdlib.h>
@@ -258,6 +263,10 @@ static inline struct bmp085 *to_bmp_chip(struct file *file)
 	return dev->dev_data;
 }
 
+/**
+ * @brief Open the BMP085 device file.
+ * @param file File to open.
+ */
 static int bmp_open(struct file *file)
 {
 	struct bmp085 *bmp;
@@ -277,6 +286,10 @@ static int bmp_open(struct file *file)
 	return rc;
 }
 
+/**
+ * @brief Close the BMP085 device file.
+ * @param file File to close.
+ */
 static int bmp_close(struct file *file)
 {
 	struct device *dev;
@@ -286,6 +299,14 @@ static int bmp_close(struct file *file)
 	return -EOK;
 }
 
+/**
+ * @brief Read from the BMP085 sensor.
+ * @param file Device file.
+ * @param buf Data buffer.
+ * @param len Length of \p buf.
+ * @note The length of buf must be `sizeof(int32_t)`.
+ * @return The number of bytes read or an error code.
+ */
 static int bmp_read(struct file *file, void *buf, size_t len)
 {
 	int32_t *_buf;
@@ -328,3 +349,5 @@ void bmp085_init(void)
 }
 
 device_init(bmp085_init);
+
+/** @} */
