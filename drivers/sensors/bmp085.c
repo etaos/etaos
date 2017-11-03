@@ -266,6 +266,7 @@ static inline struct bmp085 *to_bmp_chip(struct file *file)
 /**
  * @brief Open the BMP085 device file.
  * @param file File to open.
+ * @return Error code
  */
 static int bmp_open(struct file *file)
 {
@@ -289,6 +290,7 @@ static int bmp_open(struct file *file)
 /**
  * @brief Close the BMP085 device file.
  * @param file File to close.
+ * @return Error code
  */
 static int bmp_close(struct file *file)
 {

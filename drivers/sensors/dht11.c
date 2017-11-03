@@ -160,6 +160,7 @@ static bool raw_dht11_read(struct dht11 *dht)
 /**
  * @brief Open the DHT11 device file.
  * @param file File to open.
+ * @return Error code
  */
 static int dht_open(struct file *file)
 {
@@ -173,6 +174,7 @@ static int dht_open(struct file *file)
 /**
  * @brief Close the DHT11 device file.
  * @param file File to close.
+ * @return Error code
  */
 static int dht_close(struct file *file)
 {
@@ -224,7 +226,7 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
  * @brief Read from the DHT11 sensor.
  * @param file Device file.
  * @param buf Data buffer.
- * @param len Length of \p buf.
+ * @param length Length of \p buf.
  * @note The length of buf must be `sizeof(float)`.
  * @return The number of bytes read or an error code.
  */
