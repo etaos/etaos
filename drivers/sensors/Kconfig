@@ -1,0 +1,7 @@
+menu "Sensor drivers"
+config DHT11
+	tristate "DHT sensor"
+	depends on GPIO && DELAY_US
+	help
+	  Say 'y' or 'm' here to build support for the DHT temperature sensor.
+endmenu

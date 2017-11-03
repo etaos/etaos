@@ -9,3 +9,4 @@ obj-y += sram/
 obj-y += analog/
 obj-y += pwm/
 obj-y += flash/
+obj-y += sensors/
