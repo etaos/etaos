@@ -28,6 +28,7 @@
 #include <etaos/xorlist.h>
 #include <etaos/python.h>
 #include <etaos/pwm.h>
+#include <etaos/dht11.h>
 
 #include <etaos/sram/23k256.h>
 
@@ -65,6 +66,51 @@ extern int sram_stress_write(uint16_t addr, const void *buff, size_t len);
 static char *current_thread_name(void)
 {
 	return current_thread()->name;
+}
+
+static void dht_test(void)
+{
+	int fd;
+	float f;
+
+	fd = open("/dev/dht11", _FDEV_SETUP_RW);
+	if(fd < 0)
+		panic_P(PSTR("Couldn't open DHT device!\n"));
+
+	read(fd, &f, sizeof(f));
+	close(fd);
+
+	printf_P(PSTR("[2][%s]: Humidity: %f%%\n"), current_thread_name(), f);
+}
+
+static void bmp_test(void)
+{
+	int fd;
+	int32_t bmp;
+
+	fd = open("/dev/bmp085", _FDEV_SETUP_RW);
+	if(fd < 0)
+		panic_P(PSTR("Couldn't open BMP device!\n"));
+
+	read(fd, &bmp, sizeof(bmp));
+	close(fd);
+
+	printf_P(PSTR("[0][%s]:   Pressure: %liPa\n"), current_thread_name(), bmp);
+}
+
+static void dht_setup(void)
+{
+	int fd;
+	struct gpio_pin *pin;
+
+	pin = platform_pin_to_gpio(14);
+
+	fd = open("/dev/dht11", _FDEV_SETUP_RW);
+	if(fd < 0)
+		panic_P(PSTR("Couldn't open DHT device!\n"));
+
+	ioctl(filep(fd), DHT_SET_PIN, pin);
+	close(fd);
 }
 
 static irqreturn_t threaded_irq_handle(struct irq_data *data, void *arg)
@@ -130,6 +176,7 @@ THREAD(test_th_handle2, arg)
 		kfree(romdata);
 		now = time(NULL);
 		tm = localtime(&now);
+		dht_test();
 
 		printf_P(PSTR("[2][%s]: Date: %i-%i-%i, %i:%i\n"),
 				current_thread_name(),
@@ -323,6 +370,7 @@ int main(void)
 
 	printf_P(PSTR("Application started (m: %u)\n"), mm_heap_available());
 
+	dht_setup();
 	test_xorlist();
 	setup_pwm();
 	condition_init(&dbg_condi);
@@ -353,6 +401,7 @@ int main(void)
 		main_thr_data = 12.3456f;
 		condition_signal(&dbg_condi);
 		condition_unlock(&dbg_condi);
+		bmp_test();
 
 		ipm_post_msg(&ipm_q, ip_msg, strlen(ip_msg));
 

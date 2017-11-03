@@ -1,6 +1,6 @@
 /*
- *  ETA/OS - Delay header
- *  Copyright (C) 2014   Michel Megens
+ *  ETA/OS - DHT11 sensor driver
+ *  Copyright (C) 2017   Michel Megens <dev@bietje.net>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,22 +16,20 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file etaos/delay.h */
-
-#ifndef __DELAY_H__
-#define __DELAY_H__
+#ifndef __DHT_SENSOR_H__
+#define __DHT_SENSOR_H__
+/**
+ * @addtogroup dht11
+ * @{
+ */
 
 /**
- * @ingroup archAPI
- * @brief Arch backend for micro second delays.
- * @param us Amount of micro seconds to delay.
+ * @brief DHT11 `ioctl()` options.
  */
-extern void arch_delay_us(unsigned int us);
-#ifdef CONFIG_DELAY_US
-#define delay_us(_us_) arch_delay_us(_us_)
-#endif
-#ifdef CONFIG_DELAY_MS
-extern void delay(unsigned int ms);
-#endif
+typedef enum {
+	DHT_SET_PIN, //!< Set the DHT11 data pin.
+	DHT_RELEASE_PIN, //!< Release the DHT11 data pin.
+} dht11_ioctl_t;
 
+/** @} */
 #endif

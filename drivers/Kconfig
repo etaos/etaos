@@ -2,6 +2,8 @@ menu "Device drivers"
 
 source "drivers/core/Kconfig"
 
+source "drivers/sensors/Kconfig"
+
 source "drivers/usart/Kconfig"
 
 source "drivers/spi/Kconfig"

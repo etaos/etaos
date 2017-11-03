@@ -1,0 +1,13 @@
+menu "Sensor drivers"
+config DHT11
+	tristate "DHT sensor"
+	depends on GPIO && DELAY_US
+	help
+	  Say 'y' or 'm' here to build support for the DHT temperature sensor.
+
+config BMP085
+	tristate "BMP085 sensor"
+	depends on I2C
+	help
+	  Say 'y' or 'm' here to build support for the BMP085 barometric sensor.
+endmenu
