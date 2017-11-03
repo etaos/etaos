@@ -16,7 +16,7 @@
  */
 
 /**
- * @defgroup dht11 DHT11 humidity sensor driver.
+ * @defgroup dht11 DHT11
  * @ingroup sensors
  * @brief Device driver for the DHT11 humidity sensor.
  *

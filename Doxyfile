@@ -782,6 +782,7 @@ INPUT                  = . \
                          Documentation/drivers/gpio/gpio.txt \
                          Documentation/drivers/i2c/atmega.txt \
                          Documentation/drivers/i2c/i2c.txt \
+			 Documentation/drivers/sensors/sensors.txt \
                          Documentation/drivers/usart/atmega.txt \
                          Documentation/drivers/usart/usart.txt \
                          Documentation/drivers/pwm/pwm.txt \
