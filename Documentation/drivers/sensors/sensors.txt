@@ -7,6 +7,7 @@
 
 /**
  * @defgroup bmp085 BMP085
+ * @ingroup sensors
  * @brief BMP085 barometric sensor driver.
  *
  * The BMP085 sensor measures the air pressure in Pascals. The device driver
@@ -16,6 +17,7 @@
 
 /**
  * @defgroup dht11 DHT11 humidity sensor driver.
+ * @ingroup sensors
  * @brief Device driver for the DHT11 humidity sensor.
  *
  * The device driver is located in the device filesystem. Once the device file
