@@ -39,8 +39,8 @@ struct tm _tm;
 
 /**
  * @brief Convert a time value.
- * @param t Pointer to stored time.
- * @param tm_struct tm structure to store the converted time.
+ * @param timer Pointer to stored time.
+ * @param ptm tm structure to store the converted time.
  * @return If an error occured, nonzero will be returned.
  *
  * Thread safe version of gmtime.
