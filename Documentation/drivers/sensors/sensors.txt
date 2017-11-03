@@ -1,0 +1,27 @@
+/**
+ * @defgroup sensors Sensor drivers
+ * @brief Complex sensor device drivers
+ *
+ * This module contains the documentation for various complex sensor drivers.
+ */
+
+/**
+ * @defgroup bmp085 BMP085
+ * @ingroup sensors
+ * @brief BMP085 barometric sensor driver.
+ *
+ * The BMP085 sensor measures the air pressure in Pascals. The device driver
+ * works through the device file system. The device file for this driver
+ * is found in `/dev/bmp085`.
+ */
+
+/**
+ * @defgroup dht11 DHT11 humidity sensor driver.
+ * @ingroup sensors
+ * @brief Device driver for the DHT11 humidity sensor.
+ *
+ * The device driver is located in the device filesystem. Once the device file
+ * is opened, the driver needs to be setup using ioctl and the DHT11_SET_PIN
+ * register. This ioctl register takes a `struct gpio_pin*` as argument.
+ */
+
