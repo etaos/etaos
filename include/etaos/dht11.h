@@ -18,10 +18,18 @@
 
 #ifndef __DHT_SENSOR_H__
 #define __DHT_SENSOR_H__
+/**
+ * @addtogroup dht11
+ * @{
+ */
 
+/**
+ * @brief DHT11 `ioctl()` options.
+ */
 typedef enum {
-	DHT_SET_PIN,
-	DHT_RELEASE_PIN,
+	DHT_SET_PIN, //!< Set the DHT11 data pin.
+	DHT_RELEASE_PIN, //!< Release the DHT11 data pin.
 } dht11_ioctl_t;
 
+/** @} */
 #endif

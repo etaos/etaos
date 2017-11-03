@@ -16,6 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @addtogroup dht11
+ * @{
+ */
+
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/init.h>
@@ -152,6 +157,10 @@ static bool raw_dht11_read(struct dht11 *dht)
 	return parity == dht->data[4];
 }
 
+/**
+ * @brief Open the DHT11 device file.
+ * @param file File to open.
+ */
 static int dht_open(struct file *file)
 {
 	struct device *dev;
@@ -161,6 +170,10 @@ static int dht_open(struct file *file)
 	return -EOK;
 }
 
+/**
+ * @brief Close the DHT11 device file.
+ * @param file File to close.
+ */
 static int dht_close(struct file *file)
 {
 	struct device *dev;
@@ -170,6 +183,13 @@ static int dht_close(struct file *file)
 	return -EOK;
 }
 
+/**
+ * @brief Change DHT11 control options.
+ * @param file Device file.
+ * @param reg Control register.
+ * @param buf Argument to \p reg.
+ * @return An error code, -EOK on success.
+ */
 static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
 {
 	int rc = -EINVAL;
@@ -200,6 +220,14 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
 	return rc;
 }
 
+/**
+ * @brief Read from the DHT11 sensor.
+ * @param file Device file.
+ * @param buf Data buffer.
+ * @param len Length of \p buf.
+ * @note The length of buf must be `sizeof(float)`.
+ * @return The number of bytes read or an error code.
+ */
 static int dht_read(struct file *file, void *buf, size_t length)
 {
 	float f;
@@ -225,22 +253,6 @@ static struct dev_file_ops dht_ops = {
 
 static struct dht11 dhtchip;
 
-/*void dht_init(void)
-{
-	dhtchip.pin = platform_pin_to_gpio(14);
-	gpio_pin_request(dhtchip.pin);
-	gpio_direction_input(dhtchip.pin);
-	__raw_gpio_pin_write(dhtchip.pin, HIGH);
-}
-
-void dht_debug(void)
-{
-	bool result;
-
-	result = raw_dht11_read(&dhtchip);
-	printf("DHT result: %u and %u%%\n", result, dhtchip.data[0]);
-}*/
-
 static void __used dht_init(void)
 {
 	dhtchip.last_read = -1;
@@ -251,3 +263,5 @@ static void __used dht_init(void)
 }
 
 module_init(dht_init);
+
+/** @} */
