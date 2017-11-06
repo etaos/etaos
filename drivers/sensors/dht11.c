@@ -41,6 +41,7 @@ struct dht11 {
 	tick_t last_read;
 	unsigned long cycles;
 	uint8_t data[5];
+	bool read_temp;
 };
 
 #define LOW false
@@ -215,6 +216,15 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
 		rc = -EOK;
 		break;
 
+	case DHT_MEASURE_HUMIDITY:
+		dht->read_temp = false;
+		rc = -EOK;
+		break;
+
+	case DHT_MEASURE_TEMPERATURE:
+		dht->read_temp = true;
+		rc = -EOK;
+
 	default:
 		break;
 	}
@@ -241,7 +251,10 @@ static int dht_read(struct file *file, void *buf, size_t length)
 	if(!raw_dht11_read(chip))
 		return -EINVAL;
 
-	f = chip->data[0];
+	if(chip->read_temp)
+		f = chip->data[2];
+	else
+		f = chip->data[0];
 	*((float*)buf) = f;
 	return sizeof(f);
 }
@@ -258,6 +271,7 @@ static struct dht11 dhtchip;
 static void __used dht_init(void)
 {
 	dhtchip.last_read = -1;
+	dhtchip.read_temp = false;
 	dhtchip.cycles = dht_cycles_per_us(1000);
 	dhtchip.dev.name = "dht11";
 	device_initialize(&dhtchip.dev, &dht_ops);

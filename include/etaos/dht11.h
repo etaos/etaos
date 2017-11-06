@@ -29,6 +29,9 @@
 typedef enum {
 	DHT_SET_PIN, //!< Set the DHT11 data pin.
 	DHT_RELEASE_PIN, //!< Release the DHT11 data pin.
+
+	DHT_MEASURE_TEMPERATURE,
+	DHT_MEASURE_HUMIDITY,
 } dht11_ioctl_t;
 
 /** @} */
