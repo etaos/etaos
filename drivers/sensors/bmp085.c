@@ -33,6 +33,7 @@
 #include <etaos/device.h>
 #include <etaos/thread.h>
 #include <etaos/delay.h>
+#include <etaos/bmp085.h>
 
 #define BMP_ADDR 0xEE
 
@@ -46,6 +47,7 @@ struct bmp085 {
 	struct i2c_client *client;
 	bool needs_calibration;
 	uint8_t oversampling;
+	bool read_temp;
 
 	int16_t ac1, ac2, ac3;
 	uint16_t ac4, ac5, ac6;
@@ -224,6 +226,17 @@ static inline int32_t bmp_compute_b5(struct bmp085 *bmp, int32_t ut)
 	return x1 + x2;
 }
 
+static float bmp_calc_temperature(struct bmp085 *bmp)
+{
+	int32_t ut, b5;
+	float t;
+
+	ut = bmp_read_raw_temperature(bmp);
+	b5 = bmp_compute_b5(bmp, ut);
+	t = (b5 + 8) >> 4;
+	return t / 10.0f;
+}
+
 static int32_t bmp_calc_pressure(struct bmp085 * bmp)
 {
 	int32_t up, ut, b5, b6, x1, x2, x3, p, b3;
@@ -311,20 +324,51 @@ static int bmp_close(struct file *file)
  */
 static int bmp_read(struct file *file, void *buf, size_t len)
 {
-	int32_t *_buf;
+	int32_t *pbuf;
+	float *tbuf;
 	struct bmp085 *bmp;
 
-	if(len != sizeof(int32_t) || !buf)
+	if((len != sizeof(int32_t) || len != sizeof(float)) || !buf)
 		return -EINVAL;
 
 	bmp = to_bmp_chip(file);
-	_buf = buf;
-	*_buf = bmp_calc_pressure(bmp);
 
-	return (_buf != 0) ? len : -EINVAL;
+	if(bmp->read_temp) {
+		tbuf = buf;
+		*tbuf = bmp_calc_temperature(bmp);
+	} else {
+		pbuf = buf;
+		*pbuf = bmp_calc_pressure(bmp);
+	}
+
+	return len;
+}
+
+static int bmp_ioctl(struct file *file, unsigned long reg, void *buf)
+{
+	int rc = -EINVAL;
+	struct bmp085 *chip = to_bmp_chip(file);
+
+	switch(reg) {
+	case BMP_MEASURE_TEMPERATURE:
+		chip->read_temp = true;
+		rc = -EOK;
+		break;
+
+	case BMP_MEASURE_PRESSURE:
+		chip->read_temp = false;
+		rc = -EOK;
+		break;
+
+	default:
+		break;
+	}
+
+	return rc;
 }
 
 static struct dev_file_ops bmpfops = {
+	.ioctl = &bmp_ioctl,
 	.open = &bmp_open,
 	.close = &bmp_close,
 	.read = &bmp_read,
