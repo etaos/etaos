@@ -30,8 +30,8 @@ typedef enum {
 	DHT_SET_PIN, //!< Set the DHT11 data pin.
 	DHT_RELEASE_PIN, //!< Release the DHT11 data pin.
 
-	DHT_MEASURE_TEMPERATURE,
-	DHT_MEASURE_HUMIDITY,
+	DHT_MEASURE_TEMPERATURE, //!< Switch to the temperature sensor.
+	DHT_MEASURE_HUMIDITY, //!< Switch to the humidity sensor.
 } dht11_ioctl_t;
 
 /** @} */

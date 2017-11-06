@@ -28,8 +28,8 @@
  * @brief BMP085 `ioctl()` options.
  */
 typedef enum {
-	BMP_MEASURE_TEMPERATURE,
-	BMP_MEASURE_PRESSURE,
+	BMP_MEASURE_TEMPERATURE, //!< Switch to the temperature sensor.
+	BMP_MEASURE_PRESSURE, //!< Switch to the pressure sensor.
 } bmp085_ioctl_t;
 
 /** @} */
