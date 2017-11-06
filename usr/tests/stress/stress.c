@@ -22,7 +22,7 @@
 #include <etaos/vfs.h>
 #include <etaos/platform.h>
 #include <etaos/analog.h>
-#include <etaos/lm35.h>
+#include <etaos/tmp36.h>
 #include <etaos/ipm.h>
 #include <etaos/panic.h>
 #include <etaos/xorlist.h>
@@ -103,7 +103,7 @@ static void dht_setup(void)
 	int fd;
 	struct gpio_pin *pin;
 
-	pin = platform_pin_to_gpio(14);
+	pin = platform_pin_to_gpio(7);
 
 	fd = open("/dev/dht11", _FDEV_SETUP_RW);
 	if(fd < 0)
@@ -157,6 +157,7 @@ THREAD(test_th_handle2, arg)
 		printf_P(PSTR("[2][%s]: SRAM: %u :: RAND: %u\n"),
 				current_thread_name(), sram_readback, rand);
 
+		dht_test();
 		fd = open("/romfs/test.txt", O_RDONLY);
 		if(fd >= 0) {
 			file = filep(fd);
@@ -176,7 +177,6 @@ THREAD(test_th_handle2, arg)
 		kfree(romdata);
 		now = time(NULL);
 		tm = localtime(&now);
-		dht_test();
 
 		printf_P(PSTR("[2][%s]: Date: %i-%i-%i, %i:%i\n"),
 				current_thread_name(),
@@ -411,7 +411,7 @@ int main(void)
 		printf_P(PSTR("[%u][%s]:   ee-byte read: %u\n"), 0,
 				current_thread_name(), readback);
 
-		temperature = lm35_read(PIN_A0);
+		temperature = tmp36_read(PIN_A0);
 		printf_P(PSTR("[0][%s]:   Memory available: %u :: "
 					"Temperature: %f :: Preempt count: %lu\n"),
 				current_thread_name(),
