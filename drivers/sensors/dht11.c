@@ -39,6 +39,7 @@ struct dht11 {
 	struct device dev;
 	struct gpio_pin *pin;
 	tick_t last_read;
+	bool last_read_ok;
 	unsigned long cycles;
 	uint8_t data[5];
 	bool read_temp;
@@ -92,8 +93,8 @@ static bool raw_dht11_read(struct dht11 *dht)
 	uint8_t parity;
 	uint32_t lowc, highc;
 
-	if(!time_after(current, dht->last_read + 200))
-		return false;
+	if(!time_after(current, dht->last_read + 2000) && dht->last_read_ok)
+		return dht->last_read_ok;
 
 	cyclesdata = kzalloc(80 * sizeof(uint32_t));
 	preempt_disable();
@@ -118,6 +119,7 @@ static bool raw_dht11_read(struct dht11 *dht)
 		irq_restore(&flags);
 		preempt_enable();
 		kfree(cyclesdata);
+		dht->last_read_ok = false;
 		return false;
 	}
 
@@ -125,6 +127,7 @@ static bool raw_dht11_read(struct dht11 *dht)
 		irq_restore(&flags);
 		preempt_enable();
 		kfree(cyclesdata);
+		dht->last_read_ok = false;
 		return false;
 	}
 
@@ -142,6 +145,7 @@ static bool raw_dht11_read(struct dht11 *dht)
 		if(!lowc || !highc) {
 			preempt_enable();
 			kfree(cyclesdata);
+			dht->last_read_ok = false;
 			return false;
 		}
 
@@ -155,7 +159,13 @@ static bool raw_dht11_read(struct dht11 *dht)
 	parity = (dht->data[0] + dht->data[1] + dht->data[2] + dht->data[3]) & 0xFF;
 	preempt_enable();
 	kfree(cyclesdata);
-	return parity == dht->data[4];
+
+	if(parity == dht->data[4])
+		dht->last_read_ok = true;
+	else
+		dht->last_read_ok = false;
+
+	return dht->last_read_ok;
 }
 
 /**
@@ -271,6 +281,7 @@ static struct dht11 dhtchip;
 static void __used dht_init(void)
 {
 	dhtchip.last_read = -1;
+	dhtchip.last_read_ok = false;
 	dhtchip.read_temp = false;
 	dhtchip.cycles = dht_cycles_per_us(1000);
 	dhtchip.dev.name = "dht11";
