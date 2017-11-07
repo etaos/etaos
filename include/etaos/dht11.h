@@ -32,7 +32,15 @@ typedef enum {
 
 	DHT_MEASURE_TEMPERATURE, //!< Switch to the temperature sensor.
 	DHT_MEASURE_HUMIDITY, //!< Switch to the humidity sensor.
+
+	DHT_MODE_DHT11,
+	DHT_MODE_DHT22,
 } dht11_ioctl_t;
+
+typedef enum {
+	DHT11,
+	DHT22,
+} dht_mode_t;
 
 /** @} */
 #endif

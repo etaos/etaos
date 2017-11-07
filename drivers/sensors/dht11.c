@@ -43,6 +43,7 @@ struct dht11 {
 	unsigned long cycles;
 	uint8_t data[5];
 	bool read_temp;
+	dht_mode_t mode;
 };
 
 #define LOW false
@@ -59,15 +60,6 @@ static inline struct dht11 *to_dht_chip(struct file *file)
 static inline unsigned long dht_cycles_per_us(unsigned long us)
 {
 	return us * (CONFIG_FCPU / 1000000UL);
-}
-
-static inline void dht11_delay(int ms)
-{
-#ifdef CONFIG_SCHED
-	sleep(ms);
-#else
-	delay(ms);
-#endif
 }
 
 static uint32_t dht_expect(struct dht11 *dht, bool level)
@@ -89,23 +81,22 @@ static bool raw_dht11_read(struct dht11 *dht)
 	tick_t current = sys_tick;
 	uint32_t *cyclesdata;
 	unsigned long flags;
-	int i;
-	uint8_t parity;
 	uint32_t lowc, highc;
+	int i;
 
 	if(!time_after(current, dht->last_read + 2000) && dht->last_read_ok)
 		return dht->last_read_ok;
 
 	cyclesdata = kzalloc(80 * sizeof(uint32_t));
-	preempt_disable();
 	dht->last_read = current;
 	dht->data[0] = dht->data[1] = dht->data[2] = dht->data[3] = dht->data[4] = 0;
 
+	preempt_disable();
 	__raw_gpio_pin_write(dht->pin, HIGH);
-	dht11_delay(250);
+	delay(250);
 
 	gpio_direction_output(dht->pin, LOW);
-	dht11_delay(25);
+	delay(20);
 
 	irq_save_and_disable(&flags);
 	__raw_gpio_pin_write(dht->pin, HIGH);
@@ -156,14 +147,15 @@ static bool raw_dht11_read(struct dht11 *dht)
 	}
 
 	/* PARITY check */
-	parity = (dht->data[0] + dht->data[1] + dht->data[2] + dht->data[3]) & 0xFF;
 	preempt_enable();
 	kfree(cyclesdata);
 
-	if(parity == dht->data[4])
+	if (dht->data[4] == ((dht->data[0] + dht->data[1] +
+		dht->data[2] + dht->data[3]) & 0xFF)) {
 		dht->last_read_ok = true;
-	else
+	} else {
 		dht->last_read_ok = false;
+	}
 
 	return dht->last_read_ok;
 }
@@ -235,12 +227,24 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
 		dht->read_temp = true;
 		rc = -EOK;
 
+	case DHT_MODE_DHT11:
+		dht->mode = DHT11;
+		rc = -EOK;
+		break;
+
+	case DHT_MODE_DHT22:
+		dht->mode = DHT22;
+		rc = -EOK;
+		break;
+
 	default:
 		break;
 	}
 
 	return rc;
 }
+
+#define DHT22_NEG_BIT 7
 
 /**
  * @brief Read from the DHT11 sensor.
@@ -252,7 +256,7 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
  */
 static int dht_read(struct file *file, void *buf, size_t length)
 {
-	float f;
+	float f = 0.0f;
 	struct dht11 *chip = to_dht_chip(file);
 
 	if(length != sizeof(f) || !buf)
@@ -261,10 +265,32 @@ static int dht_read(struct file *file, void *buf, size_t length)
 	if(!raw_dht11_read(chip))
 		return -EINVAL;
 
-	if(chip->read_temp)
-		f = chip->data[2];
-	else
-		f = chip->data[0];
+	switch(chip->mode) {
+	case DHT11:
+		if(chip->read_temp)
+			f = chip->data[2];
+		else
+			f = chip->data[0];
+		break;
+
+	case DHT22:
+		if(chip->read_temp) {
+			f = (float)(chip->data[2] & 0x7F);
+			f *= 256.0;
+			f += chip->data[3];
+			f *= 0.1;
+			if(test_bit(DHT22_NEG_BIT, &chip->data[2]))
+				f *= -1.0;
+		} else {
+			/* read humidity */
+			f = chip->data[0];
+			f *= 256.0;
+			f += chip->data[1];
+			f *= 0.1;
+		}
+		break;
+	}
+
 	*((float*)buf) = f;
 	return sizeof(f);
 }
@@ -281,6 +307,7 @@ static struct dht11 dhtchip;
 static void __used dht_init(void)
 {
 	dhtchip.last_read = -1;
+	dhtchip.mode = DHT11;
 	dhtchip.last_read_ok = false;
 	dhtchip.read_temp = false;
 	dhtchip.cycles = dht_cycles_per_us(1000);
