@@ -109,6 +109,7 @@ static void dht_setup(void)
 	if(fd < 0)
 		panic_P(PSTR("Couldn't open DHT device!\n"));
 
+	ioctl(filep(fd), DHT_MODE_DHT22, NULL);
 	ioctl(filep(fd), DHT_SET_PIN, pin);
 	close(fd);
 }
