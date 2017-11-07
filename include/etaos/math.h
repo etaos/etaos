@@ -19,6 +19,8 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <etaos/compiler.h>
+
 /**
  * @addtogroup math
  * @{
@@ -142,6 +144,12 @@ extern double pow(double x, double y);
 #define to_ns(__s) (__s * 1E9) //!< Convert seconds to nanoseconds
 #define to_us(__s) (__s * 1E6) //!< Convert seconds to microseconds
 #define to_ms(__s) (__s * 1E3) //!< Convert seconds to miliseconds
+
+#ifdef compiler_NaN
+#define NAN compiler_NaN
+#else
+#warning "NAN could not be defined!"
+#endif
 
 /** @} */
 
