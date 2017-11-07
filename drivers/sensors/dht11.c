@@ -67,9 +67,8 @@ static uint32_t dht_expect(struct dht11 *dht, bool level)
 {
 	uint32_t count = 1;
 
-	while(!!raw_gpio_read_pin(dht->pin) == level) {
-		count ++;
-		if(count >= dht->cycles+1)
+	while(raw_gpio_read_pin(dht->pin) == level) {
+		if(count++ >= dht->cycles+1)
 			return 0;
 	}
 
@@ -93,9 +92,9 @@ static bool raw_dht11_read(struct dht11 *dht)
 	unsigned long flags;
 	uint32_t lowc, highc;
 	int i;
-	static uint8_t data[] = {0,0,0,0,0};
+	uint8_t data[5];
 
-	if(!time_after(current, dht->last_read + 2000) && dht->last_read_ok)
+	if(time_after(current, dht->last_read + 3000))
 		return dht->last_read_ok;
 
 	cyclesdata = kzalloc(80 * sizeof(uint32_t));
@@ -108,7 +107,7 @@ static bool raw_dht11_read(struct dht11 *dht)
 	dht_delay(250);
 
 	gpio_direction_output(dht->pin, LOW);
-	delay(20);
+	dht_delay(20);
 
 	irq_save_and_disable(&flags);
 	__raw_gpio_pin_write(dht->pin, HIGH);
@@ -146,12 +145,13 @@ static bool raw_dht11_read(struct dht11 *dht)
 		if(!lowc || !highc) {
 			preempt_enable();
 			kfree(cyclesdata);
+			dht->last_read_ok = false;
 			return dht->last_read_ok;
 		}
 
 		data[i/8] <<= 1;
 
-		if(highc > lowc)
+		if(highc >= lowc)
 			data[i/8] |= 1;
 	}
 
@@ -168,6 +168,8 @@ static bool raw_dht11_read(struct dht11 *dht)
 		dht->data[2] = data[2];
 		dht->data[3] = data[3];
 		dht->data[4] = data[4];
+	} else {
+		dht->last_read_ok = false;
 	}
 
 	return dht->last_read_ok;
