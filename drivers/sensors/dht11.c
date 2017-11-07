@@ -245,6 +245,7 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
 		rc = -EOK;
 		break;
 
+	case DHT_MODE_DHT21:
 	case DHT_MODE_DHT22:
 		dht->mode = DHT22;
 		rc = -EOK;
@@ -288,6 +289,7 @@ static int dht_read(struct file *file, void *buf, size_t length)
 			f = chip->data[0];
 		break;
 
+	case DHT21:
 	case DHT22:
 		if(chip->read_temp) {
 			f = (float)(chip->data[2] & 0x7F);

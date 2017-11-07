@@ -35,11 +35,13 @@ typedef enum {
 
 	DHT_MODE_DHT11,
 	DHT_MODE_DHT22,
+	DHT_MODE_DHT21,
 } dht11_ioctl_t;
 
 typedef enum {
 	DHT11,
 	DHT22,
+	DHT21,
 } dht_mode_t;
 
 /** @} */
