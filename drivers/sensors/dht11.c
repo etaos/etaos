@@ -24,6 +24,7 @@
 #include <etaos/kernel.h>
 #include <etaos/types.h>
 #include <etaos/init.h>
+#include <etaos/math.h>
 #include <etaos/error.h>
 #include <etaos/device.h>
 #include <etaos/gpio.h>
@@ -75,6 +76,15 @@ static uint32_t dht_expect(struct dht11 *dht, bool level)
 	return count;
 }
 
+static void dht_delay(int ms)
+{
+#ifdef CONFIG_SCHED
+	sleep(ms);
+#else
+	delay(ms);
+#endif
+}
+
 /* Implementation if DHT11 weirdo 1-wire protocol */
 static bool raw_dht11_read(struct dht11 *dht)
 {
@@ -83,17 +93,19 @@ static bool raw_dht11_read(struct dht11 *dht)
 	unsigned long flags;
 	uint32_t lowc, highc;
 	int i;
+	static uint8_t data[] = {0,0,0,0,0};
 
 	if(!time_after(current, dht->last_read + 2000) && dht->last_read_ok)
 		return dht->last_read_ok;
 
 	cyclesdata = kzalloc(80 * sizeof(uint32_t));
 	dht->last_read = current;
-	dht->data[0] = dht->data[1] = dht->data[2] = dht->data[3] = dht->data[4] = 0;
+
+	data[0] = data[1] = data[2] = data[3] = data[4] = 0;
 
 	preempt_disable();
 	__raw_gpio_pin_write(dht->pin, HIGH);
-	delay(250);
+	dht_delay(250);
 
 	gpio_direction_output(dht->pin, LOW);
 	delay(20);
@@ -110,16 +122,14 @@ static bool raw_dht11_read(struct dht11 *dht)
 		irq_restore(&flags);
 		preempt_enable();
 		kfree(cyclesdata);
-		dht->last_read_ok = false;
-		return false;
+		return dht->last_read_ok;
 	}
 
 	if(dht_expect(dht, HIGH) == 0) {
 		irq_restore(&flags);
 		preempt_enable();
 		kfree(cyclesdata);
-		dht->last_read_ok = false;
-		return false;
+		return dht->last_read_ok;
 	}
 
 	/* Read 40 bits of data sent by the sensor */
@@ -136,25 +146,28 @@ static bool raw_dht11_read(struct dht11 *dht)
 		if(!lowc || !highc) {
 			preempt_enable();
 			kfree(cyclesdata);
-			dht->last_read_ok = false;
-			return false;
+			return dht->last_read_ok;
 		}
 
-		dht->data[i/8] <<= 1;
+		data[i/8] <<= 1;
 
 		if(highc > lowc)
-			dht->data[i/8] |= 1;
+			data[i/8] |= 1;
 	}
 
 	/* PARITY check */
 	preempt_enable();
 	kfree(cyclesdata);
 
-	if (dht->data[4] == ((dht->data[0] + dht->data[1] +
-		dht->data[2] + dht->data[3]) & 0xFF)) {
+	if (data[4] == ((data[0] + data[1] +
+		data[2] + data[3]) & 0xFF)) {
 		dht->last_read_ok = true;
-	} else {
-		dht->last_read_ok = false;
+
+		dht->data[0] = data[0];
+		dht->data[1] = data[1];
+		dht->data[2] = data[2];
+		dht->data[3] = data[3];
+		dht->data[4] = data[4];
 	}
 
 	return dht->last_read_ok;
@@ -256,14 +269,16 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
  */
 static int dht_read(struct file *file, void *buf, size_t length)
 {
-	float f = 0.0f;
+	float f = NAN;
 	struct dht11 *chip = to_dht_chip(file);
 
 	if(length != sizeof(f) || !buf)
 		return -EINVAL;
 
-	if(!raw_dht11_read(chip))
+	if(!raw_dht11_read(chip)) {
+		*((float*)buf) = NAN;
 		return -EINVAL;
+	}
 
 	switch(chip->mode) {
 	case DHT11:
