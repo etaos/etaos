@@ -92,10 +92,7 @@ static bool raw_dht11_read(struct dht11 *dht)
 	unsigned long flags;
 	uint32_t lowc, highc;
 	int i;
-	uint8_t data[5];
-
-	if(time_after(current, dht->last_read + 3000))
-		return dht->last_read_ok;
+	static uint8_t data[5];
 
 	cyclesdata = kzalloc(80 * sizeof(uint32_t));
 	dht->last_read = current;
@@ -107,7 +104,7 @@ static bool raw_dht11_read(struct dht11 *dht)
 	dht_delay(250);
 
 	gpio_direction_output(dht->pin, LOW);
-	dht_delay(20);
+	delay(20);
 
 	irq_save_and_disable(&flags);
 	__raw_gpio_pin_write(dht->pin, HIGH);
@@ -137,6 +134,7 @@ static bool raw_dht11_read(struct dht11 *dht)
 		cyclesdata[i+1] = dht_expect(dht, HIGH);
 	}
 	irq_restore(&flags);
+	preempt_enable();
 
 	for(i = 0; i < 40; i++) {
 		lowc = cyclesdata[2*i];
@@ -156,7 +154,6 @@ static bool raw_dht11_read(struct dht11 *dht)
 	}
 
 	/* PARITY check */
-	preempt_enable();
 	kfree(cyclesdata);
 
 	if (data[4] == ((data[0] + data[1] +
@@ -261,6 +258,7 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
 }
 
 #define DHT22_NEG_BIT 7
+#define DHT_TIMEOUT_PERIOD 2000LL
 
 /**
  * @brief Read from the DHT11 sensor.
@@ -278,7 +276,14 @@ static int dht_read(struct file *file, void *buf, size_t length)
 	if(length != sizeof(f) || !buf)
 		return -EINVAL;
 
-	if(!raw_dht11_read(chip)) {
+	if(time_after(sys_tick, chip->last_read + DHT_TIMEOUT_PERIOD)) {
+		if(!raw_dht11_read(chip)) {
+			*((float*)buf) = NAN;
+			return -EINVAL;
+		}
+	}
+
+	if(!chip->last_read_ok) {
 		*((float*)buf) = NAN;
 		return -EINVAL;
 	}
@@ -325,7 +330,7 @@ static struct dht11 dhtchip;
 
 static void __used dht_init(void)
 {
-	dhtchip.last_read = -1;
+	dhtchip.last_read = 0LL;
 	dhtchip.mode = DHT11;
 	dhtchip.last_read_ok = false;
 	dhtchip.read_temp = false;
