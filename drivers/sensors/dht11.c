@@ -238,6 +238,7 @@ static int dht_ioctl(struct file *file, unsigned long reg, void *buf)
 	case DHT_MEASURE_TEMPERATURE:
 		dht->read_temp = true;
 		rc = -EOK;
+		break;
 
 	case DHT_MODE_DHT11:
 		dht->mode = DHT11;
