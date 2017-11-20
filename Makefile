@@ -53,14 +53,32 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
 	  else echo sh; fi ; fi)
 
+ifeq ($(OS),Windows_NT)
+WINDOWS_TOOL_PATH = $(srctree)/usr/toolchain/$(ARCH)/bin/
+PYTHON26_PATH = $(srctree)/usr/toolchain/Python26/python
+PYTHON27_PATH = $(srctree)/usr/toolchain/Python27/python
+else
+PYTHON26_PATH = python2.6
+PYTHON27_PATH = python2.7
+endif
+
+ifeq ($(OS),Windows_NT)
+FIND         = $(MSYS2_PATH)/usr/bin/find.exe
+PYTHON       = $(PYTHON27_PATH)
+PYTHON26     = $(PYTHON26_PATH)
+else
+FIND         = find
+PYTHON       = python
+PYTHON26     = python2.6
+endif
+
 HOSTCC       = gcc
 HOSTCXX      = g++
 CRUROM       = $(srctree)/scripts/crurom/crurom
 PYLIBCREATOR = $(srctree)/scripts/pm-img-creator.py
 PYLIBLIST    = $(srctree)/scripts/pylib-list.py
-EEPROMIFY    = $(PYTHON) $(srctree)/scripts/crurom/eepromify.py
+EEPROMIFY    = $(srctree)/scripts/crurom/eepromify.py
 CRUROMFLAGS  = -r
-PYTHON       = python
 HOSTCFLAGS   = -Wall -Wno-char-subscripts -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOSTCXXFLAGS = -O2
 DOXYGEN      = doxygen
@@ -122,6 +140,7 @@ export CRUROM CRUROMFLAGS
 export PYLIBCREATOR PYLIBLIST EEPROMIFY PYTHON
 export KBUILD_BUILTIN KBUILD_MODULES
 export KBUILD_CFLAGS KBUILD_CXXFLAGS KBUILD_AFLAGS
+export FIND PYTHON PYTHON26
 
 debug-flags-$(CONFIG_DEBUG) := -gstabs
 
@@ -161,6 +180,7 @@ endif
 export quiet Q KBUILD_VERBOSE
 
 export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(appdir))/).tmp_versions
+export HOST_INSTALL_PATH := $(srctree)/usr/bin
 
 # We need some generic definitions (do not try to remake the file).
 include $(srctree)/scripts/Kbuild.include
@@ -181,6 +201,17 @@ INSTALLKERNEL  := installkernel
 DEPMOD		= /sbin/depmod
 PERL		= perl
 CHECK		= sparse
+
+ifeq ($(OS),Windows_NT)
+AS := $(addprefix $(WINDOWS_TOOL_PATH),$(AS))
+LD := $(addprefix $(WINDOWS_TOOL_PATH),$(LD))
+CC := $(addprefix $(WINDOWS_TOOL_PATH),$(CC))
+CXX := $(addprefix $(WINDOWS_TOOL_PATH),$(CXX))
+AR := $(addprefix $(WINDOWS_TOOL_PATH),$(AR))
+NM := $(addprefix $(WINDOWS_TOOL_PATH),$(NM))
+OBJCOPY := $(addprefix $(WINDOWS_TOOL_PATH),$(OBJCOPY))
+OBJDUMP := $(addprefix $(WINDOWS_TOOL_PATH),$(OBJDUMP))
+endif
 
 KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
 export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
@@ -253,6 +284,7 @@ modules: prepare $(etaos-dirs)
 etaos: prepare $(etaos-img)
 app: $(etaos-target)
 prepare: cremodverdir
+	$(Q)mkdir -p $(HOST_INSTALL_PATH)
 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
 	$(Q)$(MAKE) $(build)=scripts
 
@@ -308,10 +340,11 @@ quiet_cmd_mrproper_files = CLEAN   $(mrproper-rmfiles)
 quiet_cmd_mrproper_dirs = CLEAN   $(mrproper-rmdirs)
       cmd_mrproper_dirs = rm -rf $(mrproper-rmdirs)
 
-mrproper-extra := $(shell find -name "*.o")
-mrproper-extra += $(shell find -name "*.img")
-mrproper-extra += $(shell find -name "*.hex")
-
+mrproper-extra := $(shell $(FIND) -name "*.o")
+mrproper-extra += $(shell $(FIND) -name "*.img")
+mrproper-extra += $(shell $(FIND) -name "*.hex")
+mrproper-extra += $(shell $(FIND) -name ".*.d")
+mrproper-extra += $(shell $(FIND) -name ".*.tmp")
 
 mrproper-dirs      := $(addprefix _mrproper_,scripts)
 mrproper-rmdirs += include/config include/generated Documentation/html
@@ -402,7 +435,7 @@ $(clean-dirs):
 clean: $(clean-dirs)
 	$(call cmd,rmdirs)
 	$(call cmd,rmfiles)
-	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(CLEAN_IGNORE) \
+	$(Q)$(FIND) $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(CLEAN_IGNORE) \
 		\( -name '*.[oas]' -o -name '*.a' -o -name '.*.cmd' \
 		-o -name '*.a.*' \
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
@@ -421,7 +454,7 @@ $(clean-dirs):
 
 clean: $(clean-dirs)
 	$(call cmd,rmdirs)
-	@find $(appdir) $(RCS_FIND_IGNORE) \
+	$(Q)$(FIND) $(appdir) $(RCS_FIND_IGNORE) \
 		\( -name '*.[oas]' -o -name '*.a' -o -name '.*.cmd' \
 		-o -name '*.a.*' \
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \

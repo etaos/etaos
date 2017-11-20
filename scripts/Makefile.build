@@ -13,7 +13,7 @@ __build:
 crurom-y :=
 crurom-obj :=
 pylib-y :=
-pythonlibs := $(shell $(PYLIBLIST) \
+pythonlibs := $(shell $(PYTHON) $(PYLIBLIST) \
 	arch/$(ARCH)/kernel/python/lib kernel/python/lib)
 pyusrlib-y :=
 nvmem-y :=
@@ -208,24 +208,36 @@ $(crurom-obj):
 	$(call cmd,gen_romfs)
 	$(call cmd,cc_crurom_o_c)
 
+ifeq ($(OS),Windows_NT)
+quiet_cmd_gen_pylib = GEN     $(obj)/pylib.c $(obj)/pylib-img.c
+else
 quiet_cmd_gen_pylib = GEN     $(obj)/pylib.c\n  GEN     $(obj)/pylib-img.c
-      cmd_gen_pylib = $(PYLIBCREATOR) -f kernel/python/lib/pmfeatures.py \
+endif
+      cmd_gen_pylib = $(PYTHON26) $(PYLIBCREATOR) -f kernel/python/lib/pmfeatures.py \
 		      -c -s --memspace=flash -o kernel/python/vm/pylib-img.c \
 		      --native-file=kernel/python/vm/pylib.c $(pythonlibs)
 
 kernel/python/vm/pylib.c kernel/python/vm/pylib-img.c: $(pythonlibs) $(PYLIBCREATOR)
 	$(call cmd,gen_pylib)
 
+ifeq ($(OS),Windows_NT)
+quiet_cmd_gen_pyusrlib = GEN     $(obj)/pyusrlib.c $(obj)/pyusrlib-img.c
+else
 quiet_cmd_gen_pyusrlib = GEN     $(obj)/pyusrlib.c\n  GEN     $(obj)/pyusrlib-img.c
-      cmd_gen_pyusrlib = $(PYLIBCREATOR) -f kernel/python/lib/pmfeatures.py \
+endif
+      cmd_gen_pyusrlib = $(PYTHON26) $(PYLIBCREATOR) -f kernel/python/lib/pmfeatures.py \
 		      -c -u --memspace=flash -o $(obj)/pyusrlib-img.c \
 		      --native-file=$(obj)/pyusrlib.c $(pyusrlib-y)
 
 $(pyusrlib-target):
 	$(call cmd,gen_pyusrlib)
 
+ifeq ($(OS),Windows_NT)
+quiet_cmd_gen_eepromify = GEN     $(obj)/eepromify.c $(obj)/eepromify.h
+else
 quiet_cmd_gen_eepromify = GEN     $(obj)/eepromify.c\n  GEN     $(obj)/eepromify.h
-      cmd_gen_eepromify = $(EEPROMIFY) -o $(eepromify-output-target) $(nvmem-y)
+endif
+      cmd_gen_eepromify = $(PYTHON) $(EEPROMIFY) -o $(eepromify-output-target) $(nvmem-y)
 
 $(eepromify-target):
 	$(call cmd,gen_eepromify)
@@ -262,7 +274,7 @@ quiet_cmd_cxx_o = CXX $(quiet_modtag) $@
 cmd_cxx_o       = $(CXX) $(cxx_flags)  -c -o $@ $<
 
 $(obj)/%.o: $(src)/%.cpp FORCE
-	$(call if_changed,cxx_o)
+	$(call if_changed_dep,cxx_o)
 
 # Compile assembler sources (.S)
 # ---------------------------------------------------------------------------
@@ -341,7 +353,7 @@ quiet_cmd_link_l_target = AR      $@
 cmd_link_l_target = rm -f $@; $(AR) rcs $@ $(lib-y)
 
 $(lib-target): $(lib-y) FORCE
-	$(call if_changed,link_l_target)
+	$(call if_changed_dep,link_l_target)
 
 targets += $(lib-target)
 endif
