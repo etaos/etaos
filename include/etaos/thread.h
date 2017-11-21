@@ -132,6 +132,9 @@ struct stack_info {
 	void *base; //!< Stack base pointer.
 	stack_t *sp; //!< Stack pointer.
 	size_t size; //!< Stack size.
+#ifdef CONFIG_STACK_TRACE_LENGTH
+	size_t max_length;
+#endif
 };
 
 struct rq;
@@ -233,6 +236,12 @@ extern void thread_start(struct thread *tp);
 extern void sched_init_idle(struct thread *tp, const char *name,
 		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack);
+
+static inline size_t thread_max_stack_length(struct thread *tp)
+{
+	return tp->stack.max_length;
+}
+
 extern struct thread *current_thread();
 
 extern int thread_destroy(struct thread *tp);

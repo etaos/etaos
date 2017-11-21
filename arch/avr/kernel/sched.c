@@ -146,11 +146,29 @@ void sched_free_stack_frame(struct thread *tp)
 	kfree(tp->stack.base);
 }
 
+#ifdef CONFIG_STACK_TRACE_LENGTH
+static void avr_stack_update(struct thread *tp)
+{
+	stack_t *top, *base;
+	size_t used;
+
+	base = tp->stack.base;
+	top = &base[tp->stack.size - 1];
+	used = (size_t)top - (size_t)tp->stack.sp;
+	if(unlikely(used > tp->stack.max_length))
+		tp->stack.max_length = used;
+}
+#else
+static inline void avr_stack_update(struct thread *tp)
+{}
+#endif
+
 void avr_save_stack(stack_t *sp, struct thread *current)
 {
 	if(current) {
 		sp += 2;
 		current->stack.sp = sp;
+		avr_stack_update(current);
 	}
 
 	return;
