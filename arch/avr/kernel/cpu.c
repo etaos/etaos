@@ -35,8 +35,6 @@ static struct irq_chip avr_irq_chip = {
 	.name = "avr_irq_chip",
 	.irqs = STATIC_INIT_LIST_HEAD(avr_irq_chip.irqs),
 	.chip_handle = &irq_handle,
-	.sleep = NULL,
-	.resume = NULL,
 };
 
 int cpu_get_id(void)
@@ -53,4 +51,3 @@ struct irq_chip *arch_get_irq_chip(void)
 	return &avr_irq_chip;
 }
 /* @} */
-

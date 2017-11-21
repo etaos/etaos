@@ -61,8 +61,6 @@ int irq_chip_init(struct irq_chip *chip, const char *name)
 		return -ENOTINITIALISED;
 
 	chip->name = name;
-	chip->sleep = NULL;
-	chip->resume = NULL;
 	chip->chip_handle = &irq_handle;
 	spinlock_init(&chip->lock);
 	return -EOK;

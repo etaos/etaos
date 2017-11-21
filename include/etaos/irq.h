@@ -229,8 +229,6 @@ struct irq_chip {
 	struct list_head irqs; //!< Assigned irqs.
 
 	void (*chip_handle)(int irq); //!< Chip handler.
-	void (*sleep)(struct irq_chip *chip); //!< Put the chip to sleep.
-	void (*resume)(struct irq_chip *chip); //!< Resume the chip.
 };
 
 CDECL
@@ -257,28 +255,6 @@ extern void irq_handle(int irq);
  * @ingroup archAPI
  */
 extern struct irq_chip *arch_get_irq_chip(void);
-
-/**
- * @brief Set the sleep function for an IRQ chip.
- * @param chip to set sleep for.
- * @param sleep Function sleep pointer.
- */
-static inline void irq_chip_set_sleep(struct irq_chip *chip,
-				      void (*sleep)(struct irq_chip *))
-{
-	chip->sleep = sleep;
-}
-
-/**
- * @brief Set the resume function for an IRQ chip.
- * @param chip to set resume for.
- * @param resume Function resume pointer.
- */
-static inline void irq_chip_set_resume(struct irq_chip *chip,
-				      void (*resume)(struct irq_chip *))
-{
-	chip->resume = resume;
-}
 
 /**
  * @brief Store the IRQ flags.
