@@ -62,8 +62,13 @@ PYTHON26_PATH = python2.6
 PYTHON27_PATH = python2.7
 endif
 
+# Try and find the right find tool
+FIND         = $(shell command -v find 2> /dev/null)
+
 ifeq ($(OS),Windows_NT)
+ifndef FIND
 FIND         = $(MSYS2_PATH)/usr/bin/find.exe
+endif
 PYTHON       = $(PYTHON27_PATH)
 PYTHON26     = $(PYTHON26_PATH)
 else
