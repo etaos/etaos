@@ -242,6 +242,16 @@ static inline size_t thread_max_stack_length(struct thread *tp)
 	return tp->stack.max_length;
 }
 
+static inline float thread_max_relative_stack_length(struct thread *tp)
+{
+	float m, s;
+
+	m = tp->stack.max_length;
+	s = tp->stack.size;
+
+	return m / s * 100.0f;
+}
+
 extern struct thread *current_thread();
 
 extern int thread_destroy(struct thread *tp);
