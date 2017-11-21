@@ -57,17 +57,6 @@ struct clocksource *avr_get_sys_clk(void)
 }
 
 /**
- * @brief Enable the AVR system clock.
- * @param cs Clocksource which has to be enabled.
- * @return An error code.
- * @note Dummy function, the AVR sysclk is enabled on initialise.
- */
-static int avr_sysclk_enable(struct clocksource *cs)
-{
-	return -EOK;
-}
-
-/**
  * @brief Start the AVR system clock.
  * @param irq IRQ vector number.
  * @param src Clocksource structure for the AVR sysclk.
@@ -93,8 +82,7 @@ static void avr_start_sysclk(int irq, struct clocksource *src)
  */
 static void __used avr_timer_init(void)
 {
-	clocksource_init(sysclk.name, &sysclk, AVR_SYSCLK_FRQ,
-					&avr_sysclk_enable, NULL);
+	clocksource_init(sysclk.name, &sysclk, AVR_SYSCLK_FRQ);
 	avr_start_sysclk(TIMER0_OVERFLOW_VECTOR_NUM, &sysclk);
 	sysctl(SYS_SET_SYSCLK, &sysclk);
 }

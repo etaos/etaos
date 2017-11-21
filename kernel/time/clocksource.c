@@ -41,9 +41,7 @@ static struct list_head sources = STATIC_INIT_LIST_HEAD(sources);
  * @param disable Function pointer to disable the source.
  * @return An error code.
  */
-int clocksource_init(const char *name, struct clocksource *cs,
-		unsigned long freq, int (*enable)(struct clocksource *cs),
-		void (*disable)(struct clocksource *cs))
+int clocksource_init(const char *name, struct clocksource *cs, unsigned long freq)
 {
 	if(!cs || !name)
 		return -EINVAL;
@@ -51,8 +49,6 @@ int clocksource_init(const char *name, struct clocksource *cs,
 	cs->thead = NULL;
 	cs->name = name;
 	cs->freq = freq;
-	cs->enable = enable;
-	cs->disable = disable;
 	cs->count = 0UL;
 	cs->tc_update = 0UL;
 	spinlock_init(&cs->lock);
@@ -163,4 +159,3 @@ int clocksource_remove_timer(struct clocksource *cs, struct list_head *lh)
 }
 
 /** @} */
-

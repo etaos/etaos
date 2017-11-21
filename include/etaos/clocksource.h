@@ -31,17 +31,6 @@ struct timer;
  */
 struct clocksource {
 	const char *name; //!< Timer name.
-
-	/**
-	 * @brief Enable the timer.
-	 * @param cs Clocksource to enable.
-	 */
-	int (*enable)(struct clocksource* cs);
-	/**
-	 * @brief disable the timer.
-	 * @param cs Clocksource to disable.
-	 */
-	void (*disable)(struct clocksource* cs);
 	unsigned long freq; //!< Frequency of the source (in Hz).
 
 	volatile tick_t count; //!< Tick counter.
@@ -87,9 +76,7 @@ static inline tick_t clocksource_get_diff(struct clocksource *cs)
 	return update;
 }
 
-extern int clocksource_init(const char *name, struct clocksource *cs,
-		unsigned long freq, int (*enable)(struct clocksource *cs),
-		void (*disable)(struct clocksource *cs));
+extern int clocksource_init(const char *name, struct clocksource *cs, unsigned long freq);
 extern void clocksource_add_timer(struct clocksource *cs, struct timer *t);
 extern void clocksource_delete_timer(struct clocksource *cs, struct timer *timer);
 extern tick_t clocksource_update(struct clocksource *cs);
@@ -107,4 +94,3 @@ extern int clocksource_remove_timer(struct clocksource *cs,
 CDECL_END
 
 #endif /* CLOCKSOURCE_H */
-

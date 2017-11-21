@@ -51,8 +51,7 @@ static void avr_start_hrclock(int irq, struct clocksource *src)
 
 static void __used avr_hrtimer_init(void)
 {
-	clocksource_init(avr_hrtimer_src.name, &avr_hrtimer_src,
-			AVR_HRTIMER_FREQ, NULL, NULL);
+	clocksource_init(avr_hrtimer_src.name, &avr_hrtimer_src, AVR_HRTIMER_FREQ);
 	sysctl(SYS_SET_HR_CLK, &avr_hrtimer_src);
 	avr_start_hrclock(TIMER2_OVERFLOW_VECTOR_NUM, &avr_hrtimer_src);
 }
@@ -64,4 +63,3 @@ SIGNAL(TIMER2_OVERFLOW_VECTOR)
 }
 
 subsys_init(avr_hrtimer_init);
-
