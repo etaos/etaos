@@ -128,6 +128,12 @@ struct thread_queue {
 
 #endif
 
+struct stack_info {
+	void *base; //!< Stack base pointer.
+	stack_t *sp; //!< Stack pointer.
+	size_t size; //!< Stack size.
+};
+
 struct rq;
 /**
  * @struct thread
@@ -156,9 +162,7 @@ struct thread {
 	time_t cputime; //!< Total CPU time.
 #endif
 
-	void    *stack; //!< Root stack pointer.
-	stack_t *sp; //!< Run time stack pointer.
-	size_t stack_size; //!< Size of the stack.
+	struct stack_info stack;
 	unsigned char prio; //!< Thread priority.
 #ifdef CONFIG_DYN_PRIO
 	unsigned char dprio; //!< Dynamic thread priority.
@@ -215,8 +219,8 @@ typedef struct thread_attr {
 /** @} */
 
 CDECL
-extern int thread_initialise(struct thread *tp, const char *name, 
-		thread_handle_t handle, void *arg, size_t stack_size, 
+extern int thread_initialise(struct thread *tp, const char *name,
+		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack, unsigned char prio);
 extern int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 		void *arg, thread_attr_t *attr);
@@ -226,8 +230,8 @@ extern struct thread *thread_alloc(const char *name, thread_handle_t handle,
 		void *arg, thread_attr_t *attr);
 extern void thread_start(struct thread *tp);
 
-extern void sched_init_idle(struct thread *tp, const char *name, 
-		thread_handle_t handle, void *arg, size_t stack_size, 
+extern void sched_init_idle(struct thread *tp, const char *name,
+		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack);
 extern struct thread *current_thread();
 
