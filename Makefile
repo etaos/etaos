@@ -123,10 +123,6 @@ export PYLIBCREATOR PYLIBLIST EEPROMIFY PYTHON
 export KBUILD_BUILTIN KBUILD_MODULES
 export KBUILD_CFLAGS KBUILD_CXXFLAGS KBUILD_AFLAGS
 
-debug-flags-$(CONFIG_DEBUG) := -gstabs
-
-KBUILD_CFLAGS += $(debug-flags-y)
-KBUILD_CXXFLAGS += $(debug-flags-y)
 
 # Beautify output
 # ---------------------------------------------------------------------------

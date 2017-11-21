@@ -9,10 +9,30 @@ DEFCONF-$(CONFIG_ATMEGA2560) += arch/avr/defconf/atmega2560.dc
 
 include $(DEFCONF-y)
 
-KBUILD_CFLAGS += -nostdlib -nostdinc -ffreestanding -Os
+KBUILD_CFLAGS += -nostdlib -nostdinc -ffreestanding
 KBUILD_CFLAGS += -Iarch/avr/include $(KBUILD_DBG)
 KBUILD_CFLAGS += -ffunction-sections -fdata-sections
 KBUILD_AFLAGS += -Iarch/avr/include
+
+# Optimisatio flags.
+debug-flags-$(CONFIG_DEBUG) := -gstabs
+ifeq ($(debug-flags-y),)
+optimise-size-flags-$(CONFIG_OPTIMIZE_SIZE) := -Os
+optimise-full-flags-$(CONFIG_OPTIMIZE_O3) := -O2 -fpredictive-commoning -fpeel-loops -funswitch-loops
+optimise-full-flags-$(CONFIG_OPTIMIZE_O3) += -fgcse-after-reload -ffast-math \
+                        -ftree-loop-distribute-patterns \
+                        -ftree-slp-vectorize -fvect-cost-model -ftree-partial-pre -fipa-cp-clone
+optimise-default-flags-$(CONFIG_OPTIMIZE_O2) := -O2
+optimise-fast-flags-$(CONFIG_OPTIMIZE_FAST) := $(optimise-full-flags-)
+endif
+
+KBUILD_CFLAGS += $(debug-flags-y)
+KBUILD_CFLAGS += $(optimise-default-flags-y) $(optimise-full-flags-y) $(optimise-size-flags-y)
+KBUILD_CFLAGS += $(optimise-fast-flags-y)
+
+KBUILD_CXXFLAGS += $(debug-flags-y)
+KBUILD_CXXFLAGS += $(optimise-default-flags-y) $(optimise-full-flags-y) $(optimise-size-flags-y)
+KBUILD_CXXFLAGS += $(optimise-fast-flags-y)
 
 ifneq ($(CONFIG_PICO_POWER),)
 	MCU=$(addsuffix p, $(mcu-y))
@@ -52,4 +72,3 @@ ldscripts-y += $(lscript-y)
 define archhelp
   @echo '*  etaos.elf       - ELF image using load address 0x0'
 endef
-

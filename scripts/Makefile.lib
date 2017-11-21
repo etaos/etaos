@@ -134,7 +134,7 @@ modname_flags  = $(if $(filter 1,$(words $(modname))),\
 #hash values
 debug_flags =
 
-orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -std=gnu89 \
+orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -std=gnu11 \
                       $(KBUILD_SUBDIR_CCFLAGS) \
                       $(ccflags-y) $(CFLAGS_$(basetarget).o)
 

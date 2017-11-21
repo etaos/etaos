@@ -15,6 +15,33 @@ config DEBUG
 	help
 	  Say 'y' here to enable compiler debugging flags.
 
+choice
+	prompt "Compiler optimisation"
+	default OPTIMIZE_SIZE
+	help
+	  Select the compiler optimisation level.
+
+config OPTIMIZE_O2
+	bool "Default"
+	help
+	  Use the default O2 optimisation.
+
+config OPTIMIZE_O3
+	bool "Full"
+	help
+	  Use the O3 optimisation to optimise for speed.
+
+config OPTIMIZE_FAST
+	bool "Fast"
+	help
+	  Use the Ofast optimisation to get all possible speed optimisations.
+
+config OPTIMIZE_SIZE
+	bool "Size"
+	help
+	  Use the 'Os' optimisation to optimise for size.
+endchoice
+
 config CROSS_COMPILE
 	string "Cross compile prefix"
 	help
