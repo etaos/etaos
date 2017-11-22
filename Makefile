@@ -349,7 +349,6 @@ quiet_cmd_mrproper_files = CLEAN   $(mrproper-rmfiles)
 quiet_cmd_mrproper_dirs = CLEAN   $(mrproper-rmdirs)
       cmd_mrproper_dirs = rm -rf $(mrproper-rmdirs)
 
-mrproper-extra := $(shell $(FIND) -name "*.o")
 mrproper-extra += $(shell $(FIND) -name "*.img")
 mrproper-extra += $(shell $(FIND) -name "*.hex")
 mrproper-extra += $(shell $(FIND) -name ".*.d")
