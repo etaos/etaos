@@ -133,7 +133,7 @@ struct stack_info {
 	stack_t *sp; //!< Stack pointer.
 	size_t size; //!< Stack size.
 #ifdef CONFIG_STACK_TRACE_LENGTH
-	size_t max_length;
+	size_t max_length; //!< Maximum stack usage.
 #endif
 };
 
@@ -238,11 +238,21 @@ extern void sched_init_idle(struct thread *tp, const char *name,
 		void *stack);
 
 #ifdef CONFIG_STACK_TRACE_LENGTH
+/**
+ * @brief Get the stack usage in bytes.
+ * @param tp Thread to get the maximum stack usage for.
+ * @return The highest amount of stack bytes used so far.
+ */
 static inline size_t thread_max_stack_length(struct thread *tp)
 {
 	return tp->stack.max_length;
 }
 
+/**
+ * @brief Get the stack usage relative to the allocated stack size.
+ * @param tp Thread to get the relative stack usage for.
+ * @return The relative stack usage of \p tp.
+ */
 static inline float thread_max_relative_stack_length(struct thread *tp)
 {
 	float m, s;
