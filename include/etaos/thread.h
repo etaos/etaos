@@ -237,6 +237,7 @@ extern void sched_init_idle(struct thread *tp, const char *name,
 		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack);
 
+#ifdef CONFIG_STACK_TRACE_LENGTH
 static inline size_t thread_max_stack_length(struct thread *tp)
 {
 	return tp->stack.max_length;
@@ -251,6 +252,17 @@ static inline float thread_max_relative_stack_length(struct thread *tp)
 
 	return m / s * 100.0f;
 }
+#else
+static inline size_t thread_max_stack_length(struct thread *tp)
+{
+	return 0UL;
+}
+
+static inline float thread_max_relative_stack_length(struct thread *tp)
+{
+	return -1.0f;
+}
+#endif
 
 extern struct thread *current_thread();
 
