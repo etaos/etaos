@@ -15,9 +15,13 @@ export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
 			  -name CVS -o -name .pc -o -name .hg -o -name .git \) \
 			  -prune -o
 
-export CLEAN_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
+export CLEAN_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name toolchain -o    \
 			  -name CVS -o -name .pc -o -name scripts -o -name .hg -o -name .git \) \
 			  -prune -o
+export MRPROPER_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name toolchain -o    \
+			  -name CVS -o -name .pc -o -name .hg -o -name .git \) \
+			  -prune -o
+
 _all: all
 
 # To put more focus on warnings, be less verbose as default
@@ -367,6 +371,14 @@ $(mrproper-files):
 	@rm -rf $(mrproper-extra)
 
 mrproper: clean $(mrproper-dirs) $(mrproper-files)
+	$(Q)$(FIND) $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(MRPROPER_IGNORE) \
+		\( -name '*.[oas]' -o -name '*.a' -o -name '.*.cmd' \
+		-o -name '*.a.*' \
+		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+		-o -name '*.symtypes' -o -name 'modules.order' \
+		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+		-o -name '*.img' -o -name '*.hex' -o -name '*.exe' \
+		-o -name '*.gcno' \) -type f -print | xargs rm -f
 
 quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
       cmd_rmdirs = rm -rf $(rm-dirs)
@@ -446,7 +458,7 @@ clean: $(clean-dirs)
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
 		-o -name '*.symtypes' -o -name 'modules.order' \
 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
-		-o -name '*.img' -o -name '*.hex' \
+		-o -name '*.img' -o -name '*.hex' -o -name '*.exe' \
 		-o -name '*.gcno' \) -type f -print | xargs rm -f
 else
 CLEAN_DIRS += $(MODVERDIR)
