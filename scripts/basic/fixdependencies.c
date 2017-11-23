@@ -102,10 +102,18 @@
  * through arch/um/include/uml-config.h; this fixdep "bug" makes sure that
  * those files will have correct dependencies.
  */
+ 
+//#if defined(__MINGW32__) || defined(__MINGW64__)
+#define __WINDOWS__ 1
+//#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef __WINDOWS__
 #include <sys/mman.h>
+#else
+#include "mman.h"
+#endif
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
@@ -113,18 +121,28 @@
 #include <stdio.h>
 #include <limits.h>
 #include <ctype.h>
+#ifndef __WINDOWS__
 #include <arpa/inet.h>
+#endif
+
+#ifdef __WINDOWS__
+/*
+ Fix Windows build horrors here by implementing a wrapper around sys/mman.h
+*/
+
+#endif
 
 #define INT_CONF ntohl(0x434f4e46)
 #define INT_ONFI ntohl(0x4f4e4649)
 #define INT_NFIG ntohl(0x4e464947)
 #define INT_FIG_ ntohl(0x4649475f)
 
-char *target;
-char *depfile;
-char *cmdline;
+static char *target;
+static char *depfile;
+static char *cmdline;
 
 static void usage(void)
+
 {
 	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
 	exit(1);
@@ -138,36 +156,38 @@ static void print_cmdline(void)
 	printf("cmd_%s := %s\n\n", target, cmdline);
 }
 
-struct item {
-	struct item	*next;
-	unsigned int	len;
-	unsigned int	hash;
-	char		name[0];
-};
+char * str_config  = NULL;
+int    size_config = 0;
+int    len_config  = 0;
 
-#define HASHSZ 256
-static struct item *hashtab[HASHSZ];
-
-static unsigned int strhash(const char *str, unsigned int sz)
+/*
+ * Grow the configuration string to a desired length.
+ * Usually the first growth is plenty.
+ */
+static void grow_config(int len)
 {
-	/* fnv32 hash */
-	unsigned int i, hash = 2166136261U;
-
-	for (i = 0; i < sz; i++)
-		hash = (hash ^ str[i]) * 0x01000193;
-	return hash;
+	while (len_config + len > size_config) {
+		if (size_config == 0)
+			size_config = 2048;
+		str_config = realloc(str_config, size_config *= 2);
+		if (str_config == NULL)
+			{ perror("fixdep:malloc"); exit(1); }
+	}
 }
+
+
 
 /*
  * Lookup a value in the configuration string.
  */
-static int is_defined_config(const char *name, int len, unsigned int hash)
+static int is_defined_config(const char * name, int len)
 {
-	struct item *aux;
-
-	for (aux = hashtab[hash % HASHSZ]; aux; aux = aux->next) {
-		if (aux->hash == hash && aux->len == len &&
-		    memcmp(aux->name, name, len) == 0)
+	const char * pconfig;
+	const char * plast = str_config + len_config - len;
+	for ( pconfig = str_config + 1; pconfig < plast; pconfig++ ) {
+		if (pconfig[ -1] == '\n'
+		&&  pconfig[len] == '\n'
+		&&  !memcmp(pconfig, name, len))
 			return 1;
 	}
 	return 0;
@@ -176,19 +196,13 @@ static int is_defined_config(const char *name, int len, unsigned int hash)
 /*
  * Add a new value to the configuration string.
  */
-static void define_config(const char *name, int len, unsigned int hash)
+static void define_config(const char * name, int len)
 {
-	struct item *aux = malloc(sizeof(*aux) + len);
+	grow_config(len + 1);
 
-	if (!aux) {
-		perror("fixdep:malloc");
-		exit(1);
-	}
-	memcpy(aux->name, name, len);
-	aux->len = len;
-	aux->hash = hash;
-	aux->next = hashtab[hash % HASHSZ];
-	hashtab[hash % HASHSZ] = aux;
+	memcpy(str_config+len_config, name, len);
+	len_config += len;
+	str_config[len_config++] = '\n';
 }
 
 /*
@@ -196,73 +210,76 @@ static void define_config(const char *name, int len, unsigned int hash)
  */
 static void clear_config(void)
 {
-	struct item *aux, *next;
-	unsigned int i;
-
-	for (i = 0; i < HASHSZ; i++) {
-		for (aux = hashtab[i]; aux; aux = next) {
-			next = aux->next;
-			free(aux);
-		}
-		hashtab[i] = NULL;
-	}
+	len_config = 0;
+	define_config("", 0);
 }
 
 /*
  * Record the use of a CONFIG_* word.
  */
-static void use_config(const char *m, int slen)
+static void use_config(char *m, int slen)
 {
-	unsigned int hash = strhash(m, slen);
-	int c, i;
+	char *s = alloca(slen+1);
+	char *p;
 
-	if (is_defined_config(m, slen, hash))
+	if (is_defined_config(m, slen))
 	    return;
 
-	define_config(m, slen, hash);
+	define_config(m, slen);
 
-	printf("    $(wildcard include/config/");
-	for (i = 0; i < slen; i++) {
-		c = m[i];
-		if (c == '_')
-			c = '/';
+	memcpy(s, m, slen); s[slen] = 0;
+
+	for (p = s; p < s + slen; p++) {
+		if (*p == '_')
+			*p = '/';
 		else
-			c = tolower(c);
-		putchar(c);
+			*p = tolower((int)*p);
 	}
-	printf(".h) \\\n");
+	printf("    $(wildcard include/config/%s.h) \\\n", s);
 }
 
-static void parse_config_file(const char *map, size_t len)
+static void parse_config_file(char *map, size_t len)
 {
-	const int *end = (const int *) (map + len);
-	/* start at +1, so that p can never be < map */
-	const int *m   = (const int *) map + 1;
-	const char *p, *q;
+	/* modified for bbox */
+	char *end_3 = map + len - 3; /* 3 == length of "IF_" */
+	char *end_7 = map + len - 7;
+	char *p = map;
+	char *q;
+	int off;
 
-	for (; m < end; m++) {
-		if (*m == INT_CONF) { p = (char *) m  ; goto conf; }
-		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
-		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
-		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
-		continue;
-	conf:
-		if (p > map + len - 7)
+	for (; p <= end_3; p++) {
+		/* Find next identifier's beginning */
+		if (!(isalnum(*p) || *p == '_'))
 			continue;
-		if (memcmp(p, "CONFIG_", 7))
-			continue;
-		for (q = p + 7; q < map + len; q++) {
-			if (!(isalnum(*q) || *q == '_'))
-				goto found;
+
+		/* Check it */
+		if (p < end_7 && p[6] == '_') {
+			if (!memcmp(p, "CONFIG", 6)) goto conf7;
+			if (!memcmp(p, "ENABLE", 6)) goto conf7;
+			if (!memcmp(p, "IF_NOT", 6)) goto conf7;
 		}
+		/* we have at least 3 chars because of p <= end_3 */
+		/*if (!memcmp(p, "IF_", 3)) ...*/
+		if (p[0] == 'I' && p[1] == 'F' && p[2] == '_') {
+			off = 3;
+			goto conf;
+		}
+
+		/* This identifier is not interesting, skip it */
+		while (p <= end_3 && (isalnum(*p) || *p == '_'))
+			p++;
 		continue;
 
-	found:
-		if (!memcmp(q - 7, "_MODULE", 7))
-			q -= 7;
-		if( (q-p-7) < 0 )
-			continue;
-		use_config(p+7, q-p-7);
+	conf7:	off = 7;
+	conf:
+		p += off;
+		for (q = p; q < end_3+3; q++) {
+			if (!(isalnum(*q) || *q == '_'))
+				break;
+		}
+		if (q != p) {
+			use_config(p, q-p);
+		}
 	}
 }
 
@@ -278,7 +295,7 @@ static int strrcmp(char *s, char *sub)
 	return memcmp(s + slen - sublen, sub, sublen);
 }
 
-static void do_config_file(const char *filename)
+static void do_config_file(char *filename)
 {
 	struct stat st;
 	int fd;
@@ -286,7 +303,7 @@ static void do_config_file(const char *filename)
 
 	fd = open(filename, O_RDONLY);
 	if (fd < 0) {
-		fprintf(stderr, "fixdep: error opening config file: ");
+		fprintf(stderr, "fixdep: ");
 		perror(filename);
 		exit(2);
 	}
@@ -309,89 +326,42 @@ static void do_config_file(const char *filename)
 	close(fd);
 }
 
-/*
- * Important: The below generated source_foo.o and deps_foo.o variable
- * assignments are parsed not only by make, but also by the rather simple
- * parser in scripts/mod/sumversion.c.
- */
 static void parse_dep_file(void *map, size_t len)
 {
 	char *m = map;
 	char *end = m + len;
 	char *p;
-	char s[PATH_MAX];
-	int is_target;
-	int saw_any_target = 0;
-	int is_first_dep = 0;
+	char *s = alloca(len);
+
+	p = memchr(m, ':', len);
+	if (!p) {
+		fprintf(stderr, "fixdep: parse error\n");
+		exit(1);
+	}
+	memcpy(s, m, p-m); s[p-m] = 0;
+	printf("deps_%s := \\\n", target);
+	m = p+1;
 
 	clear_config();
 
 	while (m < end) {
-		/* Skip any "white space" */
-		while (m < end && (*m == ' ' || *m == '\\' || *m == '\n'))
+		while (m < end && (*m == ' ' || *m == '\\' || *m == '\n' || *m == '\r'))
 			m++;
-		/* Find next "white space" */
 		p = m;
-		while (p < end && *p != ' ' && *p != '\\' && *p != '\n')
+		while (p < end && *p != ' ') p++;
+		if (p == end) {
+			do p--; while (!isalnum(*p));
 			p++;
-		/* Is the token we found a target name? */
-		is_target = (*(p-1) == ':');
-		/* Don't write any target names into the dependency file */
-		if (is_target) {
-			/* The /next/ file is the first dependency */
-			is_first_dep = 1;
-		} else {
-			/* Save this token/filename */
-			memcpy(s, m, p-m);
-			s[p - m] = 0;
-
-			/* Ignore certain dependencies */
-			if (strrcmp(s, "include/generated/autoconf.h") &&
-			    strrcmp(s, "arch/um/include/uml-config.h") &&
-			    strrcmp(s, "include/linux/kconfig.h") &&
-			    strrcmp(s, ".ver")) {
-				/*
-				 * Do not list the source file as dependency,
-				 * so that kbuild is not confused if a .c file
-				 * is rewritten into .S or vice versa. Storing
-				 * it in source_* is needed for modpost to
-				 * compute srcversions.
-				 */
-				if (is_first_dep) {
-					/*
-					 * If processing the concatenation of
-					 * multiple dependency files, only
-					 * process the first target name, which
-					 * will be the original source name,
-					 * and ignore any other target names,
-					 * which will be intermediate temporary
-					 * files.
-					 */
-					if (!saw_any_target) {
-						saw_any_target = 1;
-						printf("source_%s := %s\n\n",
-							target, s);
-						printf("deps_%s := \\\n",
-							target);
-					}
-					is_first_dep = 0;
-				} else
-					printf("  %s \\\n", s);
-				do_config_file(s);
-			}
 		}
-		/*
-		 * Start searching for next token immediately after the first
-		 * "whitespace" character that follows this token.
-		 */
+		memcpy(s, m, p-m); s[p-m] = 0;
+		if (strrcmp(s, "include/autoconf.h") &&
+		    strrcmp(s, "arch/um/include/uml-config.h") &&
+		    strrcmp(s, ".ver")) {
+			printf("  %s \\\n", s);
+			do_config_file(s);
+		}
 		m = p + 1;
 	}
-
-	if (!saw_any_target) {
-		fprintf(stderr, "fixdep: parse error; no targets found\n");
-		exit(1);
-	}
-
 	printf("\n%s: $(deps_%s)\n\n", target, target);
 	printf("$(deps_%s):\n", target);
 }
@@ -404,15 +374,11 @@ static void print_deps(void)
 
 	fd = open(depfile, O_RDONLY);
 	if (fd < 0) {
-		fprintf(stderr, "fixdep: error opening depfile: ");
+		fprintf(stderr, "fixdep: ");
 		perror(depfile);
 		exit(2);
 	}
-	if (fstat(fd, &st) < 0) {
-		fprintf(stderr, "fixdep: error fstat'ing depfile: ");
-		perror(depfile);
-		exit(2);
-	}
+	fstat(fd, &st);
 	if (st.st_size == 0) {
 		fprintf(stderr,"fixdep: %s is empty\n",depfile);
 		close(fd);
@@ -434,17 +400,17 @@ static void print_deps(void)
 
 static void traps(void)
 {
+#ifndef __WINDOWS__
 	static char test[] __attribute__((aligned(sizeof(int)))) = "CONF";
-	int *p = (int *)test;
 
-	if (*p != INT_CONF) {
-		fprintf(stderr, "fixdep: sizeof(int) != 4 or wrong endianness? %#x\n",
-			*p);
+	if (test[0] != INT_CONF) {
+		fprintf(stderr, "fixdep: sizeof(int) != 4 or wrong endianess? %#x\n",test[0]);
 		exit(2);
 	}
+#endif
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
 	traps();
 

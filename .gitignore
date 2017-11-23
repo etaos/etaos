@@ -21,3 +21,6 @@ Documentation/doxygen_sqlite3.db
 .vimproject
 .vimws/*
 .vimws/
+
+usr/toolchain
+*.exe
