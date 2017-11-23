@@ -227,13 +227,15 @@ THREAD(test_th_handle, arg)
 			condition_wait(&dbg_condi);
 
 		local = main_thr_data;
+		main_thr_data = 0.0f;
 		condition_unlock(&dbg_condi);
+
+		printf_P(PSTR("[1][%s]: main-data: %f - "),
+				current_thread_name(), local);
 
 		ipm_get_msg(&ipm_q, &msg);
 		ipm_reset_queue(&ipm_q);
 
-		printf_P(PSTR("[1][%s]: main-data: %f - "),
-				current_thread_name(), local);
 		write(to_fd(stdout), msg.data, msg.len);
 
 		sram_stress_read(SRAM_STRING_ADDR, &sram_data,
