@@ -801,6 +801,7 @@ INPUT                  = . \
                          Documentation/generic/codestyle.txt \
                          Documentation/generic/contributing.txt \
                          Documentation/generic/coc.txt \
+                         Documentation/generic/setup.txt \
                          Documentation/kernel/hrtimer.txt \
                          Documentation/kernel/stl.txt \
                          Documentation/generic/driver.md \

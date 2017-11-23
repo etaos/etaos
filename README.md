@@ -13,7 +13,7 @@ portable embedded applications. Some of its features:
   * Interrupt management
   * Timer management
   * Driver core
-  * Bunch of basic drivers (USART etc..)
+  * Several device and sensor drivers
 
 License
 -------
@@ -41,42 +41,11 @@ if it's not included, look at http://www.gnu.org/licences/.
 Compiling ETA/OS
 ----------------
 
-To retrieve and build ETA/OS the following tools are required:
-
-Retreiving:
-  * Git
-or
-  * a tarball download
-
-Build tools (for the host and target system):
-  * GCC tool chain (binutils and gcc)
-    - gcc
-    - ld
-    - as
-    - objcopy
-  * A working Linux distribution (windows isn't supported (yet))
-
-To test:
-  * simulavr
-or
-  * embedded hardware (arduino's etc..)
-
-Before you can build ETA/OS you have to configure it. Run
-
-    make menuconfig ARCH=archname
-
-to start the configuration process.
-
-When you are finished configuring the project run the following make commands
-to fully build ETA/OS:
-
-    make prepare ARCH=archname
-    make all ARCH=archname
-    make modules_install ARCH=archname INSTALL_MOD_PATH=path
-
-After that, you are ready to compile an application. To compile an application
-you need application sources and Kbuild file in a sepperate directory (anywhere).
-See the usr/tests/ directory for some examples.
+In order to build ETA/OS you need a working cross compile toolchain and a
+host toolchain to build the DevOps applications. The entire setup process
+is described [here](http://etaos.bietje.net/docs/env-setup.html). The
+build scripts has a builtin help function. Run `make help ARCH=<arch>` to
+see all available targets.
 
 Testing
 -------

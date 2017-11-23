@@ -1,0 +1,115 @@
+/**
+@page env-setup Environment setup
+@tableofcontents
+
+@section linux Linux
+Linux is the native build environment for ETA/OS and you'll have full access to all
+features, including automated unit tests and hex file uploading. This section is
+also relevant if you are using the WSL under Windows 10.
+
+@subsection linux-tc Toolchain
+Start by opening up a terminal window and install the following packages:
+
+>  $ sudo apt-get update
+
+>  $ sudo apt-get install gcc g++ binutils make git-all
+
+>  $ sudo apt-get install libncurses5-dev ruby python2.7 python-yaml
+
+>  $ sudo apt-get install avr-libc gcc-avr binutils-avr
+
+@subsection linux-py26 Pyton 2.6.9
+Now download the Python2.6 source code from the Python Foundation and build and install Python2.6:
+
+>  $ wget https://www.python.org/ftp/python/2.6.9/Python-2.6.9.tgz
+
+>  $ tar -xzvf Python-2.6.9.tgz
+
+>  $ cd Python-2.6.9
+
+>  $ ./configure --prefix=/usr
+
+>  $ make -sj4
+
+>  $ make install -sj2
+
+>  $ ln -fs /usr/bin/python /usr/bin/python2.7
+
+And that is it. You can download the ruby gems `calypso` and `zeno` to automate unit tests and setup
+ETA/OS applications quickly.
+
+Follow this guide to test if you have a correct build environment.
+
+@section windows Windows
+ETA/OS is compiled under Windows using the same build system: Kbuild. Kbuild however, expects a
+*NIX environment, which is something Windows doesn't natively have. To solve this issue, msys2 needs
+to be installed. Msys2 can be downloaded from [here](http://www.msys2.org). Msys2 is a unix emulator
+for Windows, with a package manager included. For those of us that know Arch Linux, things should start
+to get familiar fairly soon. For this guide we'll asume that you have downloaded ETA/OS to `C:\etaos`.
+
+@subsection msys Msys2 setup
+After downloading and installing `msys2`, run the msys terminal and run the following commands:
+
+>  $ pacman -Syu
+
+Force close Msys2 and open up a new terminal window and continue the update process:
+
+>  $ pacman -Su
+
+Msys2 is now fully up to date. All that is left is setting up an environment variable and installing
+the host compilers.
+
+Add a environment variable `MSYS_PATH` with the full path to the msys2 installation path. Make sure you
+escape all backslashes:
+![alt text][envvar]
+
+After adding the environment variable, go back to the terminal and install the following software
+packages:
+
+>  $ pacman -S git make gcc binutils
+
+>  $ pacman -S ncurses ncurses-devel
+
+@subsection win-tc Windows toolchain
+While it is running download the AVR toolchain (includes
+Python 2.6 and Python 2.7) from [here](http://files.berlin1.de.bietje.net/etaos-avr-toolchain.zip). Extract
+toolchain into the `usr` folder ETA/OS. So if you downloaded ETA/OS to `C:\etaos`, extract it to `C:\etaos\usr`.
+You should now have a folder called _toolchain_ in the _usr_ directory.
+
+Your system is now ready to build ETA/OS applications. To test your configuration, you can follow this guide.
+
+[envvar]: https://i.imgur.com/QXTdnFy.png "Adding an environment variable"
+
+@section test Environment test
+
+Testing the ETA/OS build environment is fairly simple: just build the stress test. This unit test
+uses almost every feature that ETA/OS has to offer and therefore its safe to assume you have
+a correct setup if it compiles without error.
+
+Start by opening up a terminal / msys2 window and changing the active directory to the ETA/OS base
+path:
+
+>  $ cd \<path to eta/os\>
+
+Copy the stress test configuration and run menuconfig to see if menuconfig works correctly. If menuconfig
+works correctly exit it by using the arrow keys.
+
+>  $ cp usr/tests/stress/config-atmega2560.conf .config
+
+>  $ make menuconfig ARCH=avr
+
+>  (Exit menuconfig)
+
+>  $ make prepare ARCH=avr
+
+>  $ make
+
+>  $ make modules_install INSTALL_MOD_PATH=usr/lib ARCH=avr
+
+>  $ cd usr/tests/stress
+
+>  $ make all hex
+
+If the process above does not throw up any compilation / linking errors, your ETA/OS build environment
+is setup correctly.
+*/
