@@ -118,15 +118,18 @@ void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 				size_t stack_size, thread_handle_t handle)
 {
 	struct avr_stack_frame *frame;
+	struct stack_info *info;
 
 	if(!stack || !stack_size)
 		return;
 
-	tp->stack = stack;
-	tp->stack_size = stack_size;
-	tp->sp = &stack[stack_size-1];
-	tp->sp -= sizeof(*frame);
-	frame = (struct avr_stack_frame *) tp->sp;
+	info = &tp->stack;
+
+	info->base = stack;
+	info->size = stack_size;
+	info->sp = &stack[stack_size - 1];
+	info->sp -= sizeof(*frame);
+	frame = (struct avr_stack_frame*)info->sp;
 	memset(frame, 0, sizeof(*frame));
 
 	frame->handle_lo = (unsigned short)handle & 0xff;
@@ -135,19 +138,37 @@ void sched_create_stack_frame(struct thread *tp, stack_t *stack,
 	frame->status = SREG;
 	frame->r24 = ((unsigned short)tp->param) & 0xFF; /* r24 */
 	frame->r25 = (((unsigned short)tp->param) >> 8) & 0xFF; /* r25 */
-	tp->sp--;
+	info->sp--;
 }
 
 void sched_free_stack_frame(struct thread *tp)
 {
-	kfree(tp->stack);
+	kfree(tp->stack.base);
 }
+
+#ifdef CONFIG_STACK_TRACE_LENGTH
+static void avr_stack_update(struct thread *tp)
+{
+	stack_t *top, *base;
+	size_t used;
+
+	base = tp->stack.base;
+	top = &base[tp->stack.size - 1];
+	used = (size_t)top - (size_t)tp->stack.sp;
+	if(unlikely(used > tp->stack.max_length))
+		tp->stack.max_length = used;
+}
+#else
+static inline void avr_stack_update(struct thread *tp)
+{}
+#endif
 
 void avr_save_stack(stack_t *sp, struct thread *current)
 {
 	if(current) {
 		sp += 2;
-		current->sp = sp;
+		current->stack.sp = sp;
+		avr_stack_update(current);
 	}
 
 	return;
@@ -155,6 +176,5 @@ void avr_save_stack(stack_t *sp, struct thread *current)
 
 void cpu_switch_context(struct rq *rq, struct thread *prev, struct thread *next)
 {
-	avr_switch_context(next->sp, prev);
+	avr_switch_context(next->stack.sp, prev);
 }
-

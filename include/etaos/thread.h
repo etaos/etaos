@@ -128,6 +128,15 @@ struct thread_queue {
 
 #endif
 
+struct stack_info {
+	void *base; //!< Stack base pointer.
+	stack_t *sp; //!< Stack pointer.
+	size_t size; //!< Stack size.
+#ifdef CONFIG_STACK_TRACE_LENGTH
+	size_t max_length; //!< Maximum stack usage.
+#endif
+};
+
 struct rq;
 /**
  * @struct thread
@@ -156,9 +165,7 @@ struct thread {
 	time_t cputime; //!< Total CPU time.
 #endif
 
-	void    *stack; //!< Root stack pointer.
-	stack_t *sp; //!< Run time stack pointer.
-	size_t stack_size; //!< Size of the stack.
+	struct stack_info stack;
 	unsigned char prio; //!< Thread priority.
 #ifdef CONFIG_DYN_PRIO
 	unsigned char dprio; //!< Dynamic thread priority.
@@ -215,8 +222,8 @@ typedef struct thread_attr {
 /** @} */
 
 CDECL
-extern int thread_initialise(struct thread *tp, const char *name, 
-		thread_handle_t handle, void *arg, size_t stack_size, 
+extern int thread_initialise(struct thread *tp, const char *name,
+		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack, unsigned char prio);
 extern int thread_init(struct thread *tp, const char *name, thread_handle_t handle,
 		void *arg, thread_attr_t *attr);
@@ -226,9 +233,47 @@ extern struct thread *thread_alloc(const char *name, thread_handle_t handle,
 		void *arg, thread_attr_t *attr);
 extern void thread_start(struct thread *tp);
 
-extern void sched_init_idle(struct thread *tp, const char *name, 
-		thread_handle_t handle, void *arg, size_t stack_size, 
+extern void sched_init_idle(struct thread *tp, const char *name,
+		thread_handle_t handle, void *arg, size_t stack_size,
 		void *stack);
+
+#ifdef CONFIG_STACK_TRACE_LENGTH
+/**
+ * @brief Get the stack usage in bytes.
+ * @param tp Thread to get the maximum stack usage for.
+ * @return The highest amount of stack bytes used so far.
+ */
+static inline size_t thread_max_stack_length(struct thread *tp)
+{
+	return tp->stack.max_length;
+}
+
+/**
+ * @brief Get the stack usage relative to the allocated stack size.
+ * @param tp Thread to get the relative stack usage for.
+ * @return The relative stack usage of \p tp.
+ */
+static inline float thread_max_relative_stack_length(struct thread *tp)
+{
+	float m, s;
+
+	m = tp->stack.max_length;
+	s = tp->stack.size;
+
+	return m / s * 100.0f;
+}
+#else
+static inline size_t thread_max_stack_length(struct thread *tp)
+{
+	return 0UL;
+}
+
+static inline float thread_max_relative_stack_length(struct thread *tp)
+{
+	return -1.0f;
+}
+#endif
+
 extern struct thread *current_thread();
 
 extern int thread_destroy(struct thread *tp);

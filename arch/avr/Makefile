@@ -19,11 +19,10 @@ debug-flags-$(CONFIG_DEBUG) := -gstabs
 ifeq ($(debug-flags-y),)
 optimise-size-flags-$(CONFIG_OPTIMIZE_SIZE) := -Os
 optimise-full-flags-$(CONFIG_OPTIMIZE_O3) := -O2 -fpredictive-commoning -fpeel-loops -funswitch-loops
-optimise-full-flags-$(CONFIG_OPTIMIZE_O3) += -fgcse-after-reload -ffast-math \
-                        -ftree-loop-distribute-patterns \
+optimise-full-flags-$(CONFIG_OPTIMIZE_O3) += -fgcse-after-reload -ftree-loop-distribute-patterns \
                         -ftree-slp-vectorize -fvect-cost-model -ftree-partial-pre -fipa-cp-clone
 optimise-default-flags-$(CONFIG_OPTIMIZE_O2) := -O2
-optimise-fast-flags-$(CONFIG_OPTIMIZE_FAST) := $(optimise-full-flags-)
+optimise-fast-flags-$(CONFIG_OPTIMIZE_FAST) := $(optimise-full-flags-) -ffast-math
 endif
 
 KBUILD_CFLAGS += $(debug-flags-y)

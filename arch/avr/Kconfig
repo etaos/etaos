@@ -71,6 +71,15 @@ config IRQ_STACK_SIZE
 	  note that the stacks of threaded IRQ's are generally
 	  a tad bigger than normal threads.
 
+config STACK_TRACE_LENGTH
+	bool "Stack length tracing"
+	default n
+	depends on SCHED
+	help
+	  Say 'y' here to enable stack length tracing. This tracer
+	  measures the maximum number of bytes that a stack uses at
+	  any given time.
+
 config FCPU
 	int "CPU frequency"
 	default 8000000
