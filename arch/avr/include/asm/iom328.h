@@ -36,6 +36,7 @@
 #define USART_RX_STC_NUM	   18
 #define ADC_COMPLETED_NUM	   21
 #define TIMER2_OVERFLOW_VECTOR_NUM  9
+#define WDT_TMO_VECTOR_NUM          6
 #define TIMER1_CAPT_VECTOR_NUM  10
 #define TIMER1_OCA_VECTOR_NUM 11
 #define TIMER1_OCB_VECTOR_NUM 12
@@ -44,6 +45,7 @@
 #define TIMER1_OCB_VECTOR irq_vector(12)
 #define EXT_IRQ0_VECTOR irq_vector(1)
 #define EXT_IRQ1_VECTOR irq_vector(2)
+#define WDT_TMO_VECTOR irq_vector(6)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(16)
 #define USART_RX_STC_VECTOR irq_vector(18)
 #define SPI_STC_VECTOR irq_vector(17)

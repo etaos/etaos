@@ -20,7 +20,9 @@
 #include <etaos/types.h>
 #include <etaos/irq.h>
 #include <etaos/stdlib.h>
+#include <etaos/stdio.h>
 
+#include <asm/pgm.h>
 #include <asm/io.h>
 #include <asm/watchdog.h>
 
@@ -50,7 +52,8 @@ void watchdog_enable(const uint8_t value)
 	:
 	: "M" (WDTCSR_ADDR),
 	  "r" ((uint8_t) (BIT(WDCE) | BIT(WDE))),
-	  "r" ((uint8_t) ((value & 0x8 ? WDP3 : 0x0) | BIT(WDE) | (value & 0x7)))
+	  "r" ((uint8_t) ((value & 0x8 ? WDP3 : 0x0) | BIT(WDE) |
+	       BIT(WDIE) | (value & 0x7)))
 	: "r0"
 	);
 
@@ -78,4 +81,9 @@ void watchdog_disable(void)
 	);
 
 	wdt.enabled = false;
+}
+
+SIGNAL(WDT_TMO_VECTOR)
+{
+	fprintf_P(stderr, PSTR("[WDT]: Watchdog timeout triggered!\n"));
 }

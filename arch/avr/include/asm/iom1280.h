@@ -41,6 +41,7 @@
 #define EXT_IRQ5_VECTOR_NUM			 6
 #define EXT_IRQ6_VECTOR_NUM			 7
 #define EXT_IRQ7_VECTOR_NUM			 8
+#define WDT_TMO_VECTOR_NUM                      12
 #define TIMER0_OVERFLOW_VECTOR_NUM	23
 #define SPI_STC_VECTOR_NUM		24
 #define TWI_STC_VECTOR_NUM		39
@@ -73,6 +74,7 @@
 #define EXT_IRQ5_VECTOR irq_vector(6)
 #define EXT_IRQ6_VECTOR irq_vector(7)
 #define EXT_IRQ7_VECTOR irq_vector(8)
+#define WDT_TMO_VECTOR  irq_vector(12)
 #define TIMER0_OVERFLOW_VECTOR irq_vector(23)
 #define SPI_STC_VECTOR irq_vector(24)
 #define TWI_STC_VECTOR irq_vector(39)
