@@ -50,8 +50,8 @@ static inline struct watchdog *watchdog_get_info(void)
 extern void watchdog_enable(const uint8_t value);
 extern void watchdog_disable(void);
 #else
-#define watchdog_get_info()
-#define watchdog_enable()
+#define watchdog_get_info() NULL
+#define watchdog_enable(wdtvar)
 #define watchdog_disable()
 #endif
 CDECL_END

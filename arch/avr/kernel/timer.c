@@ -230,7 +230,7 @@ SIGNAL(TIMER0_OVERFLOW_VECTOR)
 	struct irq_chip *chip = arch_get_irq_chip();
 
 	wdog = watchdog_get_info();
-	if(wdog->enabled)
+	if(wdog && wdog->enabled)
 		watchdog_reset();
 
 #ifdef CONFIG_IRQ_DEBUG
