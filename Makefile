@@ -138,6 +138,9 @@ config: scripts_basic FORCE
 %config: scripts_basic FORCE
 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
 
+smon: scripts_basic FORCE
+	$(Q)$(MAKE) $(build)=scripts/basic smon
+
 -include include/config/auto.conf
 ifneq ($(CONFIG_CROSS_COMPILE),)
   CROSS_COMPILE=$(CONFIG_CROSS_COMPILE)

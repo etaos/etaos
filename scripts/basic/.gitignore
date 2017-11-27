@@ -1,1 +1,3 @@
 fixdep
+.*.d
+scat

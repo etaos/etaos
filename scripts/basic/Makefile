@@ -9,9 +9,19 @@
 # fixdep: 	 Used to generate dependency information during build process
 
 hostprogs-y	:= fixdep
-always		:= $(hostprogs-y)
 
 fixdep-objs += fixdependencies.o mmap.o
 
 # fixdep is needed to compile other host programs
 $(addprefix $(obj)/,$(filter-out fixdep,$(always))): $(obj)/fixdep
+
+smon: $(obj)/scat
+	$< -B $(BAUD) $(TTYFILE)
+
+ifeq ($(MAKECMDGOALS),smon)
+HOSTCFLAGS += -lpthread
+hostprogs-y += scat
+endif
+
+clean-files += scat
+always		:= $(hostprogs-y)
