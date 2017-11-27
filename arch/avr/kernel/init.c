@@ -35,6 +35,7 @@
 #include <asm/simulavr.h>
 #include <asm/usart.h>
 #include <asm/init.h>
+#include <asm/watchdog.h>
 
 extern void avr_init(void);
 extern void avr_install_irqs(void);
@@ -78,6 +79,7 @@ void avr_init(void)
 void finalize_init(void)
 {
 	post_init = true;
+	watchdog_enable(WDT_250MS);
 }
 
 /* @} */

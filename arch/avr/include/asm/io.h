@@ -25,6 +25,10 @@
 #include <asm/init.h>
 #endif
 
+#define __noinit __attribute__ ((section (".noinit")))
+#define __init3  __attribute__ ((section (".init3")))
+#define __naked  __attribute__ ((naked))
+
 #define CPU_CORE_NUM 1
 
 /**

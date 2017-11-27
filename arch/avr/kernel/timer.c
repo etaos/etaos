@@ -35,6 +35,7 @@
 #include <asm/timer.h>
 #include <asm/irq.h>
 #include <asm/io.h>
+#include <asm/watchdog.h>
 
 /**
  * @def AVR_SYSCLK_FRQ
@@ -225,7 +226,12 @@ unsigned short test_sys_tick = 0;
 
 SIGNAL(TIMER0_OVERFLOW_VECTOR)
 {
+	struct watchdog *wdog;
 	struct irq_chip *chip = arch_get_irq_chip();
+
+	wdog = watchdog_get_info();
+	if(wdog->enabled)
+		watchdog_reset();
 
 #ifdef CONFIG_IRQ_DEBUG
 	test_sys_tick++;

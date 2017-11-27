@@ -15,7 +15,7 @@ KBUILD_CFLAGS += -ffunction-sections -fdata-sections
 KBUILD_AFLAGS += -Iarch/avr/include
 
 # Optimisatio flags.
-debug-flags-$(CONFIG_DEBUG) := -gstabs
+debug-flags-$(CONFIG_DEBUG) := -gstabs -Og
 ifeq ($(debug-flags-y),)
 optimise-size-flags-$(CONFIG_OPTIMIZE_SIZE) := -Os
 optimise-full-flags-$(CONFIG_OPTIMIZE_O3) := -O2 -fpredictive-commoning -fpeel-loops -funswitch-loops

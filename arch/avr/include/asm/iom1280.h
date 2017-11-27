@@ -119,6 +119,18 @@
 #define AVR_IRQ_FLAG 7
 #define AVR_IRQ_BITS (1 << AVR_IRQ_FLAG)
 
+#define MCUSR MEM_IO8(0x54)
+#define WDTCSR_ADDR 0x60
+#define WDTCSR MEM_IO8(0x60)
+#define WDIF    7
+#define WDIE    6
+#define WDP3    5
+#define WDCE    4
+#define WDE     3
+#define WDP2    2
+#define WDP1    1
+#define WDP0    0
+
 /* stack defs */
 #define AVR_STACK_LOW_ADDR 0x3D
 #define AVR_STACK_HI_ADDR 0x3E

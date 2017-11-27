@@ -112,6 +112,18 @@
 #define EXT_IRQ0_PIN 18
 #define EXT_IRQ1_PIN 19
 
+#define MCUSR MEM_IO8(0x55)
+#define WDTCSR_ADDR 0x60
+#define WDTCSR MEM_IO8(0x60)
+#define WDIF    7
+#define WDIE    6
+#define WDP3    5
+#define WDCE    4
+#define WDE     3
+#define WDP2    2
+#define WDP1    1
+#define WDP0    0
+
 /* External interrupts */
 #define EIMSK MEM_IO8(0x3D)
 #define INT0 0

@@ -13,5 +13,6 @@ obj-$(CONFIG_ARCH_POWER_SAVE) += power.o
 obj-$(CONFIG_HRTIMER) += hrtimer.o
 obj-$(CONFIG_PYTHON) += python/
 obj-$(CONFIG_ATMEGA_EE:m=y) += eeprom.o
+obj-$(CONFIG_WATCHDOG) += watchdog.o
 obj-y += cpu.o
 extra-y += start.o devinit.o init.o

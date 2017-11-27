@@ -202,7 +202,15 @@ config ARCH_POWER_SAVE
 	help
 	  Selecting this options enables the use of the power saving
 	  module for AVR MCU's. If you are unsure, say 'y' here.
+
+config WATCHDOG
+	bool "Watchdog timer"
+	depends on SYS_TICK
+	default y
+	help
+	  Say 'y' here to enable the watchdog timer.
 endmenu
+
 
 source "kernel/Kconfig"
 source "drivers/Kconfig"
