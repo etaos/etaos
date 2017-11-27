@@ -127,7 +127,7 @@ ifeq ($(MAKECMDGOALS),)
 endif
 
 # Basic helpers built in scripts/
-PHONY += scripts_basic
+PHONY += scripts_basic smon
 scripts_basic:
 	$(Q)$(MAKE) $(build)=scripts/basic
 	$(Q)rm -f .tmp_quiet_recordmcount

@@ -30,3 +30,6 @@ upload:
 upload_eeprom:
 	@$(AVRUPLOAD) -feH eeprom.hex -m $(MCU) -p $(PROGRAMMER) -P $(PORT) \
 		-b $(BAUD) -c /etc/avrdude.conf
+
+monitor:
+	@$(MAKE) -C $(ETAOS) smon BAUD=$(BR) TTYFILE=$(PORT)
