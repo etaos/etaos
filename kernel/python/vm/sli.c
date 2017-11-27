@@ -254,7 +254,7 @@ sli_ptoa16(intptr_t value, uint8_t * buf, uint8_t buflen, uint8_t upperCase)
 	int j;
 
 	C_ASSERT(buflen >= 2 * sizeof(intptr_t) + 1);
-
+	retval = PM_RET_OK;
 	/* Print the hex value, most significant byte first */
 	for (j = 0, i = 8 * sizeof(intptr_t) - 8; i >= 0; i -= 8, j += 2) {
 		retval =
