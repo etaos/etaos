@@ -96,12 +96,17 @@ int ipm_get_msg(struct ipm_queue *iq, struct ipm *msg)
 {
 	unsigned long flags;
 
-	raw_event_wait(&iq->qp, EVM_WAIT_INFINITE);
-
+	/* check if there are messages available */
 	spin_lock_irqsave(&iq->lock, flags);
-	if(iq->wr_idx == iq->rd_idx) {
+	if(iq->rd_idx >= iq->wr_idx) {
 		spin_unlock_irqrestore(&iq->lock, flags);
-		return -EINVAL;
+		raw_event_wait(&iq->qp, EVM_WAIT_INFINITE);
+
+		spin_lock_irqsave(&iq->lock, flags);
+		if(iq->wr_idx == iq->rd_idx) {
+			spin_unlock_irqrestore(&iq->lock, flags);
+			return -EINVAL;
+		}
 	}
 
 	*msg = iq->msgs[iq->rd_idx];
