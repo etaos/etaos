@@ -102,10 +102,6 @@
  * through arch/um/include/uml-config.h; this fixdep "bug" makes sure that
  * those files will have correct dependencies.
  */
- 
-//#if defined(__MINGW32__) || defined(__MINGW64__)
-#define __WINDOWS__ 1
-//#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -123,13 +119,6 @@
 #include <ctype.h>
 #ifndef __WINDOWS__
 #include <arpa/inet.h>
-#endif
-
-#ifdef __WINDOWS__
-/*
- Fix Windows build horrors here by implementing a wrapper around sys/mman.h
-*/
-
 #endif
 
 #define INT_CONF ntohl(0x434f4e46)
@@ -398,22 +387,8 @@ static void print_deps(void)
 	close(fd);
 }
 
-static void traps(void)
-{
-#ifndef __WINDOWS__
-	static char test[] __attribute__((aligned(sizeof(int)))) = "CONF";
-
-	if (test[0] != INT_CONF) {
-		fprintf(stderr, "fixdep: sizeof(int) != 4 or wrong endianess? %#x\n",test[0]);
-		exit(2);
-	}
-#endif
-}
-
 int main(int argc, char **argv)
 {
-	traps();
-
 	if (argc != 4)
 		usage();
 

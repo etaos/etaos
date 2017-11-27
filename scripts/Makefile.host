@@ -90,6 +90,11 @@ obj-dirs += $(host-objdirs)
 #####
 # Handle options to gcc. Support building with separate output directory
 
+ifeq ($(OS),Windows_NT)
+HOSTCFLAGS += -D__WINDOWS__
+HOSTCXXFLAGS += -D__WINDOWS__
+endif
+
 _hostc_flags   = $(HOSTCFLAGS)   $(HOST_EXTRACFLAGS)   \
                  $(HOSTCFLAGS_$(basetarget).o)
 _hostcxx_flags = $(HOSTCXXFLAGS) $(HOST_EXTRACXXFLAGS) \

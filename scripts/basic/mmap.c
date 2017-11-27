@@ -2,10 +2,6 @@
  * Fixdep mmap wrapper for windows.
  */
 
-//#if defined(__MINGW32__) || defined(__MINGW64__)
-#define __WINDOWS__
-//#endif
- 
 #ifdef __WINDOWS__
 #include <stdlib.h>
 #include <stdio.h>
